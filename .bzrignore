@@ -1,6 +1,17 @@
 .deps
 Makefile
 Makefile.in
+./aclocal.m4
+./config.log
+./config.status
+./omf.make
+./xmldocs.make
+./autom4te.cache
+./configure
+./missing
+./install-sh
+./compile
+./depcomp
 src/*.c
 src/*_vala.stamp
 src/easy-build
