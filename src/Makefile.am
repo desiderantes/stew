@@ -1,6 +1,7 @@
 bin_PROGRAMS = easy-build
 
 easy_build_SOURCES = \
+	config.vapi \
 	easy-build.vala
 
 easy_build_VALAFLAGS = \

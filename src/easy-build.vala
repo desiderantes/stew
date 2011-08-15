@@ -17,7 +17,7 @@ public class EasyBuild
     {
         var c = new OptionContext (/* Arguments and description for --help text */
                                    _("- Build system"));
-        c.add_main_entries (options, null);//Config.GETTEXT_PACKAGE);
+        c.add_main_entries (options, Config.GETTEXT_PACKAGE);
         try
         {
             c.parse (ref args);
@@ -33,7 +33,7 @@ public class EasyBuild
         if (show_version)
         {
             /* Note, not translated so can be easily parsed */
-            stderr.printf ("easy-build %s\n", "0.0.0");//Config.VERSION);
+            stderr.printf ("easy-build %s\n", Config.VERSION);
             return Posix.EXIT_SUCCESS;
         }
 
