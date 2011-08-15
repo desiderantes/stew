@@ -9,6 +9,9 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES(yes)])
 
 GNOME_COMPILE_WARNINGS(maximum)
 
+IT_PROG_INTLTOOL([0.35.0])
+AC_SUBST(GETTEXT_PACKAGE, easy-build)
+
 PKG_CHECK_MODULES(EASY_BUILD, [
     gobject-2.0
     glib-2.0
@@ -17,5 +20,6 @@ PKG_CHECK_MODULES(EASY_BUILD, [
 AC_CONFIG_FILES([
 Makefile
 src/Makefile
+po/Makefile.in
 ])
 AC_OUTPUT
