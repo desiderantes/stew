@@ -72,7 +72,18 @@ public class Rule
            try
            {
                Shell.parse_argv (c, out argv);
-               Process.spawn_sync (null, argv, null, SpawnFlags.SEARCH_PATH, null);
+               int exit_status;
+               Process.spawn_sync (null, argv, null, SpawnFlags.SEARCH_PATH, null, null, null, out exit_status);
+               if (Process.if_signaled (exit_status))
+               {
+                   printerr ("Build stopped with signal %d\n", Process.term_sig (exit_status));
+                   return false;
+               }
+               if (Process.if_exited (exit_status) && Process.exit_status (exit_status) != 0)
+               {
+                   printerr ("Build stopped with return value %d\n", Process.exit_status (exit_status));               
+                   return false;
+               }
            }
            catch (Error e)
            {
@@ -286,10 +297,7 @@ public class EasyBuild
             foreach (var target in targets.split (" "))
             {
                 if (!f.build (target))
-                {
-                    printerr ("Error building\n");
-                    return Posix.EXIT_SUCCESS;
-                }
+                    return Posix.EXIT_FAILURE;
             }
             break;
 
