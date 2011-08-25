@@ -62,7 +62,7 @@ public class Rule
 
        return do_build;
     }
-    
+
     public bool build ()
     {
        foreach (var c in commands)
@@ -87,11 +87,27 @@ public class Rule
 
 public class BuildFile
 {
+    public string dirname;
+    public List<BuildFile> children;
     public HashTable<string, string> variables;
     public List<Rule> rules;
-    
+
     public BuildFile (string filename) throws FileError
     {
+        dirname = Path.get_dirname (filename);
+
+        var dir = Dir.open (dirname);
+        while (true)
+        {
+            var child_dir = dir.read_name ();
+            if (child_dir == null)
+                 break;
+
+            var child_filename = Path.build_filename (dirname, child_dir, "Buildfile");
+            if (FileUtils.test (child_filename, FileTest.EXISTS))
+                children.append (new BuildFile (child_filename));
+        }
+
         variables = new HashTable<string, string> (str_hash, str_equal);
         string contents;
         FileUtils.get_contents (filename, out contents);
@@ -163,7 +179,7 @@ public class BuildFile
         return null;
     }
 
-    public bool build (string output)
+    private bool build_file (string output)
     {
         //GLib.print ("Building %s\n", output);
 
@@ -172,7 +188,7 @@ public class BuildFile
         {
             foreach (var input in rule.inputs)
             {
-                if (!build (input))
+                if (!build_file (input))
                     return false;
             }
 
@@ -192,9 +208,34 @@ public class BuildFile
 
         return true;
     }
+    
+    public bool build ()
+    {
+        Environment.set_current_dir (dirname);
+
+        foreach (var child in children)
+        {
+            if (!child.build ())
+                return false;
+        }
+
+        var targets = variables.lookup ("targets");
+        if (targets == null)
+            return true;
+
+        foreach (var target in targets.split (" "))
+        {
+            if (!build_file (target))
+                return false;
+        }
+
+        return true;
+    }
 
     public void clean ()
     {
+        Environment.set_current_dir (dirname);
+
         foreach (var r in rules)
         {
             foreach (var o in r.outputs)
@@ -276,18 +317,8 @@ public class EasyBuild
         switch (command)
         {
         case "build":
-            var targets = f.variables.lookup ("targets");
-            if (targets == null)
-            {
-                printerr ("No targets defined\n");
+            if (!f.build ())
                 return Posix.EXIT_FAILURE;
-            }
-
-            foreach (var target in targets.split (" "))
-            {
-                if (!f.build (target))
-                    return Posix.EXIT_FAILURE;
-            }
             break;
 
         case "clean":
