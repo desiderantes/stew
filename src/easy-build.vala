@@ -68,26 +68,15 @@ public class Rule
        foreach (var c in commands)
        {
            print ("    %s\n", c);
-           string[] argv;
-           try
+           var exit_status = Posix.system (c);
+           if (Process.if_signaled (exit_status))
            {
-               Shell.parse_argv (c, out argv);
-               int exit_status;
-               Process.spawn_sync (null, argv, null, SpawnFlags.SEARCH_PATH, null, null, null, out exit_status);
-               if (Process.if_signaled (exit_status))
-               {
-                   printerr ("Build stopped with signal %d\n", Process.term_sig (exit_status));
-                   return false;
-               }
-               if (Process.if_exited (exit_status) && Process.exit_status (exit_status) != 0)
-               {
-                   printerr ("Build stopped with return value %d\n", Process.exit_status (exit_status));               
-                   return false;
-               }
+               printerr ("Build stopped with signal %d\n", Process.term_sig (exit_status));
+               return false;
            }
-           catch (Error e)
+           if (Process.if_exited (exit_status) && Process.exit_status (exit_status) != 0)
            {
-               warning ("Error building: %s", e.message);
+               printerr ("Build stopped with return value %d\n", Process.exit_status (exit_status));               
                return false;
            }
        }
