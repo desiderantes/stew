@@ -6,6 +6,7 @@ easy_build_SOURCES = \
 
 easy_build_VALAFLAGS = \
 	--pkg=glib-2.0 \
+	--pkg=gio-2.0 \
 	--pkg=posix
 
 easy_build_CFLAGS = \

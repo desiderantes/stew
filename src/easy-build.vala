@@ -3,12 +3,71 @@ public class Rule
     public string[] inputs;
     public string[] outputs;
     public List<string> commands;
+    
+    private TimeVal? get_modification_time (string filename) throws Error
+    {
+        var f = File.new_for_path (filename);
+        var info = f.query_info (FILE_ATTRIBUTE_TIME_MODIFIED, FileQueryInfoFlags.NONE);
 
+        GLib.TimeVal modification_time;
+        info.get_modification_time (out modification_time);
+
+        return modification_time;
+    }
+    
+    private static int timeval_cmp (TimeVal a, TimeVal b)
+    {
+        if (a.tv_sec == b.tv_sec)
+            return (int) (a.tv_usec - b.tv_usec);
+        else
+            return (int) (a.tv_sec - b.tv_sec);
+    }
+    
+    public bool needs_build ()
+    {
+       TimeVal max_input_time = { 0, 0 };
+       foreach (var filename in inputs)
+       {
+           TimeVal modification_time;
+           try
+           {
+               modification_time = get_modification_time (filename);
+           }
+           catch (Error e)
+           {
+               warning ("Unable to access input file %s: %s", filename, e.message);
+               return false;
+           }
+           if (timeval_cmp (modification_time, max_input_time) > 0)
+               max_input_time = modification_time;
+       }
+
+       var do_build = false;
+       foreach (var filename in outputs)
+       {
+           TimeVal modification_time;
+           try
+           {
+               modification_time = get_modification_time (filename);
+           }
+           catch (Error e)
+           {
+               // FIXME: Only if opened
+               do_build = true;
+               continue;
+           }
+           if (timeval_cmp (modification_time, max_input_time) < 0)
+              do_build = true;
+       }
+
+       return do_build;
+    }
+    
     public bool build ()
     {
        foreach (var c in commands)
        {
-           print ("%s\n", c);
+           print ("    %s\n", c);
            string[] argv;
            try
            {
@@ -106,7 +165,7 @@ public class BuildFile
 
     public bool build (string output)
     {
-        GLib.print ("Building %s\n", output);
+        //GLib.print ("Building %s\n", output);
 
         var rule = find_rule (output);
         if (rule != null)
@@ -117,8 +176,12 @@ public class BuildFile
                     return false;
             }
 
-            if (!rule.build ())
-                return false;
+            if (rule.needs_build ())
+            {
+                GLib.print ("Building %s\n", output);
+                if (!rule.build ())
+                    return false;
+            }
         }
 
         if (!FileUtils.test (output, FileTest.EXISTS))
@@ -128,6 +191,18 @@ public class BuildFile
         }
 
         return true;
+    }
+
+    public void clean ()
+    {
+        foreach (var r in rules)
+        {
+            foreach (var o in r.outputs)
+            {
+                GLib.print ("RM %s\n", o);
+                FileUtils.unlink (o);
+            }
+        }
     }
 
     public void print ()
@@ -161,7 +236,7 @@ public class EasyBuild
     public static int main (string[] args)
     {
         var c = new OptionContext (/* Arguments and description for --help text */
-                                   _("- Build system"));
+                                   _("[COMMAND] - Build system"));
         c.add_main_entries (options, Config.GETTEXT_PACKAGE);
         try
         {
@@ -194,20 +269,37 @@ public class EasyBuild
         }
         //f.print ();
 
-        var targets = f.variables.lookup ("targets");
-        if (targets == null)
-        {
-            printerr ("No targets defined\n");
-            return Posix.EXIT_FAILURE;
-        }
+        string command = "build";
+        if (args.length >= 2)
+            command = args[1];
 
-        foreach (var target in targets.split (" "))
+        switch (command)
         {
-            if (!f.build (target))
+        case "build":
+            var targets = f.variables.lookup ("targets");
+            if (targets == null)
             {
-                printerr ("Error building\n");
-                return Posix.EXIT_SUCCESS;
+                printerr ("No targets defined\n");
+                return Posix.EXIT_FAILURE;
             }
+
+            foreach (var target in targets.split (" "))
+            {
+                if (!f.build (target))
+                {
+                    printerr ("Error building\n");
+                    return Posix.EXIT_SUCCESS;
+                }
+            }
+            break;
+
+        case "clean":
+            f.clean ();
+            break;
+
+        default:
+            printerr ("Unknown command %s\n", command);
+            break;
         }
 
         return Posix.EXIT_SUCCESS;
