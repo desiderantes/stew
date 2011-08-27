@@ -90,6 +90,7 @@ public class BuildFile
     public string dirname;
     public List<BuildFile> children;
     public HashTable<string, string> variables;
+    public List<string> programs;
     public List<Rule> rules;
 
     public BuildFile (string filename) throws FileError
@@ -148,6 +149,24 @@ public class BuildFile
             {
                 var name = statement.substring (0, index).chomp ();
                 variables.insert (name, statement.substring (index + 1).strip ());
+
+                var tokens = name.split (".");
+                if (tokens.length > 1 && tokens[0] == "programs")
+                {
+                    var program_name = tokens[1];
+                    var has_name = false;
+                    foreach (var p in programs)
+                    {
+                        if (p == program_name)
+                        {
+                            has_name = true;
+                            break;
+                        }
+                    }
+                    if (!has_name)
+                        programs.append (program_name);
+                }
+
                 continue;
             }
 
@@ -166,7 +185,7 @@ public class BuildFile
             //return Posix.EXIT_FAILURE;
         }   
     }
-    
+
     public Rule? find_rule (string output)
     {
         foreach (var r in rules)
@@ -219,13 +238,9 @@ public class BuildFile
                 return false;
         }
 
-        var targets = variables.lookup ("targets");
-        if (targets == null)
-            return true;
-
-        foreach (var target in targets.split (" "))
+        foreach (var program in programs)
         {
-            if (!build_file (target))
+            if (!build_file (program))
                 return false;
         }
 
