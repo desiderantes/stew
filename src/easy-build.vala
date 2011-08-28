@@ -310,11 +310,11 @@ public class BuildFile
 
     public Rule? find_rule (string output)
     {
-        foreach (var r in rules)
+        foreach (var rule in rules)
         {
-            foreach (var o in r.outputs)
+            foreach (var o in rule.outputs)
                 if (o == output)
-                    return r;
+                    return rule;
         }
 
         return null;
@@ -376,9 +376,9 @@ public class BuildFile
         Environment.set_current_dir (dirname);
         if (debug_enabled)
             debug ("Entering directory %s", dirname);
-        foreach (var r in rules)
+        foreach (var rule in rules)
         {
-            foreach (var output in r.outputs)
+            foreach (var output in rule.outputs)
             {
                 var result = FileUtils.unlink (output);
                 if (result >= 0) // FIXME: Report errors
@@ -387,19 +387,34 @@ public class BuildFile
         }
     }
 
+    public void install ()
+    {
+        if (!build ())
+            return;
+
+        foreach (var child in children)
+            child.install ();
+
+        foreach (var program in programs)
+        {
+            var install_path = Path.build_filename ("/usr/local/bin", program);
+            GLib.print ("\x1B[1m[Install %s to %s]\x1B[21m\n".printf (program, install_path));
+        }
+    }
+
     public void print ()
     {
         foreach (var name in variables.get_keys ())
             GLib.print ("%s=%s\n", name, variables.lookup (name));
-        foreach (var r in rules)
+        foreach (var rule in rules)
         {
-            foreach (var output in r.outputs)
+            foreach (var output in rule.outputs)
                 GLib.print ("%s ", output);
             GLib.print (":");
-            foreach (var input in r.inputs)
+            foreach (var input in rule.inputs)
                 GLib.print (" %s", input);
             GLib.print ("\n");
-            foreach (var c in r.commands)
+            foreach (var c in rule.commands)
                 GLib.print ("    %s\n", c);
         }
     }
@@ -476,6 +491,10 @@ public class EasyBuild
 
         case "clean":
             f.clean ();
+            break;
+            
+        case "install":
+            f.install ();
             break;
 
         default:
