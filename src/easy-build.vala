@@ -378,10 +378,11 @@ public class BuildFile
             debug ("Entering directory %s", dirname);
         foreach (var r in rules)
         {
-            foreach (var o in r.outputs)
+            foreach (var output in r.outputs)
             {
-                GLib.print ("RM %s\n", o);
-                FileUtils.unlink (o);
+                var result = FileUtils.unlink (output);
+                if (result >= 0) // FIXME: Report errors
+                    GLib.print ("\x1B[1m[Removed %s]\x1B[21m\n".printf (output));
             }
         }
     }
