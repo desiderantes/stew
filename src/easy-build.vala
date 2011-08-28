@@ -1,7 +1,16 @@
+private string replace_extension (string filename, string extension)
+{
+    var i = filename.last_index_of_char ('.');
+    if (i < 0)
+        return "%s.%s".printf (filename, extension);
+
+    return "%.*s.%s".printf (i, filename, extension);
+}
+
 public class Rule
 {
-    public string[] inputs;
-    public string[] outputs;
+    public List<string> inputs;
+    public List<string> outputs;
     public List<string> commands;
     
     private TimeVal? get_modification_time (string filename) throws Error
@@ -174,8 +183,10 @@ public class BuildFile
             if (index > 0)
             {
                 var rule = new Rule ();
-                rule.outputs = statement.substring (0, index).chomp ().split (" ");
-                rule.inputs = statement.substring (index + 1).strip ().split (" ");
+                foreach (var output in statement.substring (0, index).chomp ().split (" "))
+                    rule.outputs.append (output);
+                foreach (var input in statement.substring (index + 1).strip ().split (" "))
+                    rule.inputs.append (input);
                 rules.append (rule);
                 in_rule = true;
                 continue;
@@ -183,7 +194,112 @@ public class BuildFile
 
             debug ("Unknown statement '%s'", statement);
             //return Posix.EXIT_FAILURE;
-        }   
+        }
+
+        /* Make rules */
+        foreach (var program in programs)
+        {
+            var source_list = variables.lookup ("programs.%s.sources".printf (program));
+            if (source_list == null)
+                continue;
+
+            var sources = source_list.split (" ");
+
+            var package_list = variables.lookup ("programs.%s.packages".printf (program));
+            var cflags = variables.lookup ("programs.%s.cflags".printf (program));
+            var ldflags = variables.lookup ("programs.%s.ldflags".printf (program));
+
+            string? package_cflags = null;
+            string? package_ldflags = null;
+            if (package_list != null)
+            {
+                int exit_status;
+                try
+                {
+                    Process.spawn_command_line_sync ("pkg-config --cflags %s".printf (package_list), out package_cflags, null, out exit_status);
+                    package_cflags = package_cflags.strip ();
+                }
+                catch (SpawnError e)
+                {
+                }
+                try
+                {
+                    Process.spawn_command_line_sync ("pkg-config --libs %s".printf (package_list), out package_ldflags, null, out exit_status);
+                    package_ldflags = package_ldflags.strip ();
+                }
+                catch (SpawnError e)
+                {
+                }
+            }
+
+            /* Vala compile */
+            var rule = new Rule ();
+            var command = "valac -C";
+            if (package_list != null)
+            {
+                foreach (var package in package_list.split (" "))
+                    command += " --pkg %s".printf (package);
+            }
+            foreach (var source in sources)
+            {
+                if (!source.has_suffix (".vala") && !source.has_suffix (".vapi"))
+                    continue;
+
+                rule.inputs.append (source);
+                if (source.has_suffix (".vala"))
+                    rule.outputs.append (replace_extension (source, "c"));
+                command += " %s".printf (source);
+            }
+            if (rule.outputs != null)
+            {
+                rule.commands.append (command);
+                rules.append (rule);
+            }
+
+            /* C compile */
+            foreach (var source in sources)
+            {
+                if (!source.has_suffix (".vala") && !source.has_suffix (".c"))
+                    continue;
+
+                var input = replace_extension (source, "c");
+                var output = replace_extension (source, "o");
+
+                rule = new Rule ();
+                rule.inputs.append (input);
+                rule.outputs.append (output);
+                command = "gcc -g -Wall";
+                if (cflags != null)
+                    command += " %s".printf (cflags);
+                if (package_cflags != null)
+                    command += " %s".printf (package_cflags);
+                command += " -c %s -o %s".printf (input, output);
+                rule.commands.append (command);
+                rules.append (rule);
+            }
+
+            /* Link */
+            rule = new Rule ();
+            foreach (var source in sources)
+            {
+                if (source.has_suffix (".vala") || source.has_suffix (".c"))
+                    rule.inputs.append (replace_extension (source, "o"));
+            }
+            rule.outputs.append (program);
+            command = "gcc -g -Wall";
+            foreach (var source in sources)
+            {
+                if (source.has_suffix (".vala") || source.has_suffix (".c"))
+                    command += " %s".printf (replace_extension (source, "o"));
+            }
+            if (ldflags != null)
+                command += " %s".printf (ldflags);
+            if (package_ldflags != null)
+                command += " %s".printf (package_ldflags);
+            command += " -o %s".printf (program);
+            rule.commands.append (command);
+            rules.append (rule);
+        }
     }
 
     public Rule? find_rule (string output)
@@ -267,7 +383,12 @@ public class BuildFile
             GLib.print ("%s=%s\n", name, variables.lookup (name));
         foreach (var r in rules)
         {
-            GLib.print ("%s: %s\n", string.joinv (" ", r.outputs), string.joinv (" ", r.inputs));
+            foreach (var output in r.outputs)
+                GLib.print ("%s ", output);
+            GLib.print (":");
+            foreach (var input in r.inputs)
+                GLib.print (" %s", input);
+            GLib.print ("\n");
             foreach (var c in r.commands)
                 GLib.print ("    %s\n", c);
         }
@@ -332,6 +453,8 @@ public class EasyBuild
         switch (command)
         {
         case "build":
+            //f.print ();
+            GLib.print ("\n\n");
             if (!f.build ())
                 return Posix.EXIT_FAILURE;
             break;
