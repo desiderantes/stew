@@ -316,8 +316,6 @@ public class BuildFile
 
     private bool build_file (string output)
     {
-        //GLib.print ("Building %s\n", output);
-
         var rule = find_rule (output);
         if (rule != null)
         {
@@ -329,7 +327,7 @@ public class BuildFile
 
             if (rule.needs_build ())
             {
-                GLib.print ("Building %s\n", output);
+                GLib.print ("\x1B[1m[Building %s]\x1B[21m\n", output);
                 if (!rule.build ())
                     return false;
             }
@@ -454,7 +452,7 @@ public class EasyBuild
         {
         case "build":
             //f.print ();
-            GLib.print ("\n\n");
+            //GLib.print ("\n\n");
             if (!f.build ())
                 return Posix.EXIT_FAILURE;
             break;
