@@ -102,6 +102,7 @@ public class BuildFile
     public List<BuildFile> children;
     public HashTable<string, string> variables;
     public List<string> programs;
+    public List<string> files;
     public List<Rule> rules;
 
     public BuildFile (string filename) throws FileError
@@ -180,6 +181,21 @@ public class BuildFile
                     }
                     if (!has_name)
                         programs.append (program_name);
+                }
+                else if (tokens.length > 1 && tokens[0] == "files")
+                {
+                    var files_type = tokens[1];
+                    var has_name = false;
+                    foreach (var p in files)
+                    {
+                        if (p == files_type)
+                        {
+                            has_name = true;
+                            break;
+                        }
+                    }
+                    if (!has_name)
+                        files.append (files_type);
                 }
 
                 continue;
@@ -398,7 +414,24 @@ public class BuildFile
         foreach (var program in programs)
         {
             var install_path = Path.build_filename ("/usr/local/bin", program);
-            GLib.print ("\x1B[1m[Install %s to %s]\x1B[21m\n".printf (program, install_path));
+            GLib.print ("\x1B[1m[Install %s from %s]\x1B[21m\n".printf (install_path, program));
+        }
+        foreach (var file_class in files)
+        {
+            var file_list = variables.lookup ("files.%s.files".printf (file_class));
+            var directory = variables.lookup ("files.%s.directory".printf (file_class));
+
+            if (directory == null)
+            {
+                warning ("Unable to install %s, no files.%s.directory defined", file_list, file_class);
+                continue;
+            }
+
+            foreach (var file in file_list.split (" "))
+            {
+                var install_path = Path.build_filename (directory, file);
+                GLib.print ("\x1B[1m[Install %s from %s]\x1B[21m\n".printf (install_path, file));
+            }
         }
     }
 
