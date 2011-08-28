@@ -1,3 +1,5 @@
+private bool debug_enabled = false;
+
 private string replace_extension (string filename, string extension)
 {
     var i = filename.last_index_of_char ('.');
@@ -115,7 +117,11 @@ public class BuildFile
 
             var child_filename = Path.build_filename (dirname, child_dir, "Buildfile");
             if (FileUtils.test (child_filename, FileTest.EXISTS))
+            {
+                if (debug_enabled)
+                    debug ("Loading %s", child_filename);
                 children.append (new BuildFile (child_filename));
+            }
         }
 
         variables = new HashTable<string, string> (str_hash, str_equal);
@@ -344,14 +350,15 @@ public class BuildFile
     
     public bool build ()
     {
-        Environment.set_current_dir (dirname);
-
         foreach (var child in children)
         {
             if (!child.build ())
                 return false;
         }
 
+        Environment.set_current_dir (dirname);
+        if (debug_enabled)
+            debug ("Entering directory %s", dirname);
         foreach (var program in programs)
         {
             if (!build_file (program))
@@ -363,8 +370,12 @@ public class BuildFile
 
     public void clean ()
     {
-        Environment.set_current_dir (dirname);
+        foreach (var child in children)
+            child.clean ();
 
+        Environment.set_current_dir (dirname);
+        if (debug_enabled)
+            debug ("Entering directory %s", dirname);
         foreach (var r in rules)
         {
             foreach (var o in r.outputs)
@@ -396,7 +407,6 @@ public class BuildFile
 public class EasyBuild
 {
     private static bool show_version = false;
-    private static bool debug_enabled = false;
     public static const OptionEntry[] options =
     {
         { "version", 'v', 0, OptionArg.NONE, ref show_version,
@@ -433,9 +443,12 @@ public class EasyBuild
         }
 
         BuildFile f;
+        var filename = Path.build_filename (Environment.get_current_dir (), "Buildfile");
+        if (debug_enabled)
+            debug ("Loading %s", filename);
         try
         {
-            f = new BuildFile ("Buildfile");
+            f = new BuildFile (filename);
         }
         catch (FileError e)
         {
@@ -451,8 +464,11 @@ public class EasyBuild
         switch (command)
         {
         case "build":
-            //f.print ();
-            //GLib.print ("\n\n");
+            /*if (debug_enabled)
+            {
+               f.print ();
+               GLib.print ("\n\n");
+            }*/
             if (!f.build ())
                 return Posix.EXIT_FAILURE;
             break;
