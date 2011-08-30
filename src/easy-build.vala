@@ -534,24 +534,50 @@ public class EasyBuild
     {
         var input_filename = Path.build_filename (directory, filename);
         var output_filename = Path.build_filename (temp_dir, directory, filename);
+        if (directory == ".")
+        {
+            input_filename = filename;
+            output_filename = Path.build_filename (temp_dir, filename);
+        }
+
+        var has_dir = false;
+        foreach (var input in release_rule.inputs)
+        {
+            /* Ignore if already being copied */
+            if (input == input_filename)
+                return;
+
+            if (!has_dir && Path.get_dirname (input) == Path.get_dirname (input_filename))
+                has_dir = true;
+        }
+
+        /* Generate directory if a new one */
+        if (!has_dir)
+            release_rule.commands.append ("mkdir -p %s".printf (Path.get_dirname (output_filename)));
+
         release_rule.inputs.append (input_filename);
         release_rule.commands.append ("cp %s %s".printf (input_filename, output_filename));
     }
     
     public static void generate_release_rule (Rule release_rule, string temp_dir, BuildFile buildfile)
     {
-        release_rule.commands.append ("mkdir -p %s".printf (Path.build_filename (temp_dir, buildfile.get_relative_dirname ())));
+        var relative_dirname = buildfile.get_relative_dirname ();
 
-        add_release_file (release_rule, temp_dir, buildfile.get_relative_dirname (), "Buildfile");
-        
-        /* Add files that are installed */
-        // FIXME: This picks up other release rules
+        var dirname = Path.build_filename (temp_dir, relative_dirname);
+        if (relative_dirname == ".")
+            dirname = temp_dir;
+
+        /* Add files that are used */
+        add_release_file (release_rule, temp_dir, relative_dirname, "Buildfile");
         foreach (var rule in buildfile.rules)
         {
             foreach (var input in rule.inputs)
             {
-                if (buildfile.find_rule (input) == null)
-                    add_release_file (release_rule, temp_dir, buildfile.get_relative_dirname (), input);
+                /* Ignore generated files */
+                if (buildfile.find_rule (input) != null)
+                    return;
+
+                add_release_file (release_rule, temp_dir, relative_dirname, input);
             }
         }
 
@@ -610,12 +636,12 @@ public class EasyBuild
         rule.commands.append ("rm -r %s". printf (temp_dir));
         toplevel.rules.append (rule);
 
-        /*rule = new Rule ();
+        rule = new Rule ();
         rule.outputs.append ("%s.tar.bz2".printf (release_name));
         generate_release_rule (rule, temp_dir, toplevel);
         rule.commands.append ("tar cfj %s.tar.bz2 %s".printf (release_name, release_name));
         rule.commands.append ("rm -r %s". printf (temp_dir));
-        toplevel.rules.append (rule);*/
+        toplevel.rules.append (rule);
 
         string command = "build";
         if (args.length >= 2)
@@ -650,10 +676,10 @@ public class EasyBuild
             toplevel.build_file (tarball_name);
             break;
 
-        /*case "release-bzip":
+        case "release-bzip":
             var tarball_name = "%s-%s.tar.bz2".printf (toplevel.variables.lookup ("package.name"), toplevel.variables.lookup ("package.version"));
             toplevel.build_file (tarball_name);
-            break;*/
+            break;
 
         default:
             f.build_file (command);
