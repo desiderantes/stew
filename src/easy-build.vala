@@ -33,33 +33,36 @@ public class Rule
         else
             return (int) (a.tv_sec - b.tv_sec);
     }
-    
+
     public bool needs_build ()
     {
        TimeVal max_input_time = { 0, 0 };
-       foreach (var filename in inputs)
+       foreach (var input in inputs)
        {
            TimeVal modification_time;
            try
            {
-               modification_time = get_modification_time (filename);
+               modification_time = get_modification_time (input);
            }
            catch (Error e)
            {
-               warning ("Unable to access input file %s: %s", filename, e.message);
-               return false;
+               warning ("Unable to access input file %s: %s", input, e.message);
+               return true;
            }
            if (timeval_cmp (modification_time, max_input_time) > 0)
                max_input_time = modification_time;
        }
 
        var do_build = false;
-       foreach (var filename in outputs)
+       foreach (var output in outputs)
        {
+           if (output.has_prefix ("%"))
+               return true;
+
            TimeVal modification_time;
            try
            {
-               modification_time = get_modification_time (filename);
+               modification_time = get_modification_time (output);
            }
            catch (Error e)
            {
@@ -76,21 +79,30 @@ public class Rule
 
     public bool build ()
     {
-       foreach (var c in commands)
-       {
-           print ("    %s\n", c);
-           var exit_status = Posix.system (c);
-           if (Process.if_signaled (exit_status))
-           {
-               printerr ("Build stopped with signal %d\n", Process.term_sig (exit_status));
-               return false;
-           }
-           if (Process.if_exited (exit_status) && Process.exit_status (exit_status) != 0)
-           {
-               printerr ("Build stopped with return value %d\n", Process.exit_status (exit_status));               
-               return false;
-           }
-       }
+        foreach (var c in commands)
+        {
+            print ("    %s\n", c);
+            var exit_status = Posix.system (c);
+            if (Process.if_signaled (exit_status))
+            {
+                printerr ("Build stopped with signal %d\n", Process.term_sig (exit_status));
+                return false;
+            }
+            if (Process.if_exited (exit_status) && Process.exit_status (exit_status) != 0)
+            {
+                printerr ("Build stopped with return value %d\n", Process.exit_status (exit_status));               
+                return false;
+            }
+        }
+
+        foreach (var output in outputs)
+        {
+            if (!output.has_prefix ("%") && !FileUtils.test (output, FileTest.EXISTS))
+            {
+                GLib.printerr ("Failed to build file %s", output);
+                return false;
+            }
+        }
 
        return true;
     }
@@ -192,10 +204,15 @@ public class BuildFile
             if (index > 0)
             {
                 var rule = new Rule ();
-                foreach (var output in statement.substring (0, index).chomp ().split (" "))
+
+                var input_list = statement.substring (0, index).chomp ();
+                foreach (var output in input_list.split (" "))
                     rule.outputs.append (output);
-                foreach (var input in statement.substring (index + 1).strip ().split (" "))
+
+                var output_list = statement.substring (index + 1).strip ();
+                foreach (var input in output_list.split (" "))
                     rule.inputs.append (input);
+
                 rules.append (rule);
                 in_rule = true;
                 continue;
@@ -208,8 +225,13 @@ public class BuildFile
 
     public void generate_rules ()
     {
+        var build_rule = new Rule ();
+        build_rule.outputs.append ("%build");
+
         foreach (var program in programs)
         {
+            build_rule.inputs.append (program);
+
             var source_list = variables.lookup ("programs.%s.sources".printf (program));
             if (source_list == null)
                 continue;
@@ -312,6 +334,48 @@ public class BuildFile
             rules.append (rule);
         }
 
+        var clean_rule = new Rule ();
+        clean_rule.outputs.append ("%clean");
+        foreach (var rule in rules)
+        {
+            foreach (var output in rule.outputs)
+                clean_rule.commands.append ("rm -f %s".printf (output));
+        }
+
+        var install_rule = new Rule ();
+        install_rule.outputs.append ("%install");
+        foreach (var program in programs)
+        {
+            var source = program;
+            var target = Path.build_filename ("/usr/local/bin", program);
+            install_rule.inputs.append (source);
+            install_rule.commands.append ("install %s %s".printf (source, target));
+        }
+        foreach (var file_class in files)
+        {
+            var file_list = variables.lookup ("files.%s.files".printf (file_class));
+
+            /* Only install files that are requested to */
+            var install_dir = variables.lookup ("files.%s.install-dir".printf (file_class));
+            if (install_dir == null)
+                continue;
+
+            if (file_list != null)
+            {
+                foreach (var file in file_list.split (" "))
+                {
+                    var source = file;
+                    var target = Path.build_filename (install_dir, file);
+                    install_rule.inputs.append (source);
+                    install_rule.commands.append ("install %s %s".printf (source, target));
+                }
+            }
+        }
+
+        rules.append (build_rule);
+        rules.append (clean_rule);
+        rules.append (install_rule);
+
         foreach (var child in children)
             child.generate_rules ();
     }
@@ -345,46 +409,67 @@ public class BuildFile
 
         return null;
     }
+    
+    private void change_directory (string dirname)
+    {
+        if (Environment.get_current_dir () == dirname)
+            return;
+
+        GLib.print ("[Entering directory %s]\n", dirname);
+        Environment.set_current_dir (dirname);
+    }
+
+    public bool run_recursive (string command)
+    {
+        if (!build_file (command))
+            return false;
+
+        foreach (var child in children)
+        {
+            change_directory (child.dirname);
+            if (!child.run_recursive (command))
+                return false;
+        }
+
+        change_directory (dirname);
+
+        return true;
+    }
 
     public bool build_file (string output)
     {
         var rule = find_rule (output);
-        if (rule != null)
+        if (rule == null)
         {
-            foreach (var input in rule.inputs)
+            if (FileUtils.test (output, FileTest.EXISTS))
+                return true;
+            else
             {
-                if (!build_file (input))
-                    return false;
-            }
-
-            if (rule.needs_build ())
-            {
-                GLib.print ("\x1B[1m[Building %s]\x1B[21m\n", output);
-                if (!rule.build ())
-                    return false;
+                GLib.printerr ("No rule to build %s\n", output);
+                return false;
             }
         }
 
-        if (!FileUtils.test (output, FileTest.EXISTS))
+        if (!rule.needs_build ())
+            return true;
+
+        GLib.print ("\x1B[1m[Building %s]\x1B[21m\n", output);
+
+        /* Build all the inputs */
+        foreach (var input in rule.inputs)
         {
-            GLib.print ("File %s does not exist\n", output);
-            return false;
+            if (!build_file (input))
+                return false;
         }
+
+        /* Run the commands */
+        rule.build ();
 
         return true;
     }
     
     public bool build ()
     {
-        foreach (var child in children)
-        {
-            if (!child.build ())
-                return false;
-        }
-
-        Environment.set_current_dir (dirname);
-        if (debug_enabled)
-            debug ("Entering directory %s", dirname);
         foreach (var program in programs)
         {
             if (!build_file (program))
@@ -394,60 +479,6 @@ public class BuildFile
         return true;
     }
 
-    public void clean ()
-    {
-        foreach (var child in children)
-            child.clean ();
-
-        Environment.set_current_dir (dirname);
-        if (debug_enabled)
-            debug ("Entering directory %s", dirname);
-        foreach (var rule in rules)
-        {
-            foreach (var output in rule.outputs)
-            {
-                var result = FileUtils.unlink (output);
-                if (result >= 0) // FIXME: Report errors
-                    GLib.print ("\x1B[1m[Removed %s]\x1B[21m\n".printf (output));
-            }
-        }
-    }
-
-    public void install ()
-    {
-        if (!build ())
-            return;
-
-        foreach (var child in children)
-            child.install ();
-
-        Environment.set_current_dir (dirname);
-        if (debug_enabled)
-            debug ("Entering directory %s", dirname);
-        foreach (var program in programs)
-        {
-            var install_path = Path.build_filename ("/usr/local/bin", program);
-            GLib.print ("\x1B[1m[Install %s from %s]\x1B[21m\n".printf (install_path, program));
-        }
-        foreach (var file_class in files)
-        {
-            var file_list = variables.lookup ("files.%s.files".printf (file_class));
-            var directory = variables.lookup ("files.%s.directory".printf (file_class));
-
-            if (directory == null)
-            {
-                warning ("Unable to install %s, no files.%s.directory defined", file_list, file_class);
-                continue;
-            }
-
-            foreach (var file in file_list.split (" "))
-            {
-                var install_path = Path.build_filename (directory, file);
-                GLib.print ("\x1B[1m[Install %s from %s]\x1B[21m\n".printf (install_path, file));
-            }
-        }
-    }
-    
     public void print ()
     {
         foreach (var name in variables.get_keys ())
@@ -635,12 +666,20 @@ public class EasyBuild
         rule.commands.append ("tar cfz %s.tar.gz %s".printf (release_name, release_name));
         rule.commands.append ("rm -r %s". printf (temp_dir));
         toplevel.rules.append (rule);
+        rule = new Rule ();
+        rule.outputs.append ("release-gzip");
+        rule.inputs.append ("%s.tar.gz".printf (release_name));
+        toplevel.rules.append (rule);
 
         rule = new Rule ();
         rule.outputs.append ("%s.tar.bz2".printf (release_name));
         generate_release_rule (rule, temp_dir, toplevel);
         rule.commands.append ("tar cfj %s.tar.bz2 %s".printf (release_name, release_name));
         rule.commands.append ("rm -r %s". printf (temp_dir));
+        toplevel.rules.append (rule);
+        rule = new Rule ();
+        rule.outputs.append ("release-bzip");
+        rule.inputs.append ("%s.tar.bz2".printf (release_name));
         toplevel.rules.append (rule);
 
         string command = "build";
@@ -650,35 +689,22 @@ public class EasyBuild
         switch (command)
         {
         case "build":
-            /*if (debug_enabled)
-            {
-               f.print ();
-               GLib.print ("\n\n");
-            }*/
-            if (!f.build ())
+            if (!f.run_recursive ("%build"))
                 return Posix.EXIT_FAILURE;
             break;
 
         case "clean":
-            f.clean ();
+            if (!f.run_recursive ("%clean"))
+                return Posix.EXIT_FAILURE;
             break;
 
         case "install":
-            f.install ();
+            if (!f.run_recursive ("%install"))
+                return Posix.EXIT_FAILURE;
             break;
-            
+
         case "expand":
             f.print ();
-            break;
-
-        case "release-gzip":
-            var tarball_name = "%s-%s.tar.gz".printf (toplevel.variables.lookup ("package.name"), toplevel.variables.lookup ("package.version"));
-            toplevel.build_file (tarball_name);
-            break;
-
-        case "release-bzip":
-            var tarball_name = "%s-%s.tar.bz2".printf (toplevel.variables.lookup ("package.name"), toplevel.variables.lookup ("package.version"));
-            toplevel.build_file (tarball_name);
             break;
 
         default:
