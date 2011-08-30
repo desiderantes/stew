@@ -105,7 +105,7 @@ public class BuildFile
     public List<string> programs;
     public List<string> files;
     public List<Rule> rules;
-
+    
     public BuildFile (string filename) throws FileError
     {
         dirname = Path.get_dirname (filename);
@@ -145,6 +145,7 @@ public class BuildFile
             if (statement.has_prefix ("#"))
                 continue;
 
+            /* Load variables */
             var index = statement.index_of ("=");
             if (index > 0)
             {
@@ -186,6 +187,7 @@ public class BuildFile
                 continue;
             }
 
+            /* Load explicit rules */
             index = statement.index_of (":");
             if (index > 0)
             {
@@ -309,11 +311,27 @@ public class BuildFile
             rule.commands.append (command);
             rules.append (rule);
         }
+
+        foreach (var child in children)
+            child.generate_rules ();
     }
     
     public bool is_toplevel
     {
-        get { return variables.lookup ("package.version") != null; }
+        get { return variables.lookup ("package.name") != null && variables.lookup ("package.version") != null; }
+    }
+
+    public BuildFile toplevel
+    {
+        get { if (is_toplevel) return this; else return parent.toplevel; }
+    }
+
+    public string get_relative_dirname ()
+    {
+        if (is_toplevel)
+            return ".";
+        else
+            return dirname.substring (toplevel.dirname.length + 1);
     }
 
     public Rule? find_rule (string output)
@@ -328,7 +346,7 @@ public class BuildFile
         return null;
     }
 
-    private bool build_file (string output)
+    public bool build_file (string output)
     {
         var rule = find_rule (output);
         if (rule != null)
@@ -429,13 +447,14 @@ public class BuildFile
             }
         }
     }
-
+    
     public void print ()
     {
         foreach (var name in variables.get_keys ())
             GLib.print ("%s=%s\n", name, variables.lookup (name));
         foreach (var rule in rules)
         {
+            GLib.print ("\n");
             foreach (var output in rule.outputs)
                 GLib.print ("%s ", output);
             GLib.print (":");
@@ -492,6 +511,7 @@ public class EasyBuild
             /* Already loaded */
             if (child != null && Path.build_filename (f.dirname, child_dir) == child.dirname)
             {
+                child.parent = f;
                 f.children.append (child);
                 continue;
             }
@@ -501,11 +521,42 @@ public class EasyBuild
             {
                 if (debug_enabled)
                     debug ("Loading %s", child_filename);
-                f.children.append (new BuildFile (child_filename));
+                var c = new BuildFile (child_filename);
+                c.parent = f;
+                f.children.append (c);
             }
         }
 
         return f;
+    }
+
+    private static void add_release_file (Rule release_rule, string temp_dir, string directory, string filename)
+    {
+        var input_filename = Path.build_filename (directory, filename);
+        var output_filename = Path.build_filename (temp_dir, directory, filename);
+        release_rule.inputs.append (input_filename);
+        release_rule.commands.append ("cp %s %s".printf (input_filename, output_filename));
+    }
+    
+    public static void generate_release_rule (Rule release_rule, string temp_dir, BuildFile buildfile)
+    {
+        release_rule.commands.append ("mkdir -p %s".printf (Path.build_filename (temp_dir, buildfile.get_relative_dirname ())));
+
+        add_release_file (release_rule, temp_dir, buildfile.get_relative_dirname (), "Buildfile");
+        
+        /* Add files that are installed */
+        // FIXME: This picks up other release rules
+        foreach (var rule in buildfile.rules)
+        {
+            foreach (var input in rule.inputs)
+            {
+                if (buildfile.find_rule (input) == null)
+                    add_release_file (release_rule, temp_dir, buildfile.get_relative_dirname (), input);
+            }
+        }
+
+        foreach (var child in buildfile.children)
+            generate_release_rule (release_rule, temp_dir, child);
     }
 
     public static int main (string[] args)
@@ -543,6 +594,28 @@ public class EasyBuild
             printerr ("Failed to load Buildfile: %s\n", e.message);
             return Posix.EXIT_FAILURE;
         }
+        var toplevel = f.toplevel;
+
+        /* Generate implicit rules */
+        toplevel.generate_rules ();
+
+        /* Generate release rules */
+        var release_name = "%s-%s".printf (toplevel.variables.lookup ("package.name"), toplevel.variables.lookup ("package.version"));
+        var temp_dir = Path.build_filename (toplevel.dirname, release_name);
+
+        var rule = new Rule ();
+        rule.outputs.append ("%s.tar.gz".printf (release_name));
+        generate_release_rule (rule, temp_dir, toplevel);
+        rule.commands.append ("tar cfz %s.tar.gz %s".printf (release_name, release_name));
+        rule.commands.append ("rm -r %s". printf (temp_dir));
+        toplevel.rules.append (rule);
+
+        /*rule = new Rule ();
+        rule.outputs.append ("%s.tar.bz2".printf (release_name));
+        generate_release_rule (rule, temp_dir, toplevel);
+        rule.commands.append ("tar cfj %s.tar.bz2 %s".printf (release_name, release_name));
+        rule.commands.append ("rm -r %s". printf (temp_dir));
+        toplevel.rules.append (rule);*/
 
         string command = "build";
         if (args.length >= 2)
@@ -567,9 +640,23 @@ public class EasyBuild
         case "install":
             f.install ();
             break;
+            
+        case "expand":
+            f.print ();
+            break;
+
+        case "release-gzip":
+            var tarball_name = "%s-%s.tar.gz".printf (toplevel.variables.lookup ("package.name"), toplevel.variables.lookup ("package.version"));
+            toplevel.build_file (tarball_name);
+            break;
+
+        /*case "release-bzip":
+            var tarball_name = "%s-%s.tar.bz2".printf (toplevel.variables.lookup ("package.name"), toplevel.variables.lookup ("package.version"));
+            toplevel.build_file (tarball_name);
+            break;*/
 
         default:
-            printerr ("Unknown command %s\n", command);
+            f.build_file (command);
             break;
         }
 
