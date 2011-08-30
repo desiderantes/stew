@@ -99,6 +99,7 @@ public class Rule
 public class BuildFile
 {
     public string dirname;
+    public BuildFile? parent;
     public List<BuildFile> children;
     public HashTable<string, string> variables;
     public List<string> programs;
@@ -108,22 +109,6 @@ public class BuildFile
     public BuildFile (string filename) throws FileError
     {
         dirname = Path.get_dirname (filename);
-
-        var dir = Dir.open (dirname);
-        while (true)
-        {
-            var child_dir = dir.read_name ();
-            if (child_dir == null)
-                 break;
-
-            var child_filename = Path.build_filename (dirname, child_dir, "Buildfile");
-            if (FileUtils.test (child_filename, FileTest.EXISTS))
-            {
-                if (debug_enabled)
-                    debug ("Loading %s", child_filename);
-                children.append (new BuildFile (child_filename));
-            }
-        }
 
         variables = new HashTable<string, string> (str_hash, str_equal);
         string contents;
@@ -217,8 +202,10 @@ public class BuildFile
             debug ("Unknown statement '%s'", statement);
             //return Posix.EXIT_FAILURE;
         }
+    }
 
-        /* Make rules */
+    public void generate_rules ()
+    {
         foreach (var program in programs)
         {
             var source_list = variables.lookup ("programs.%s.sources".printf (program));
@@ -323,6 +310,11 @@ public class BuildFile
             rules.append (rule);
         }
     }
+    
+    public bool is_toplevel
+    {
+        get { return variables.lookup ("package.version") != null; }
+    }
 
     public Rule? find_rule (string output)
     {
@@ -411,6 +403,9 @@ public class BuildFile
         foreach (var child in children)
             child.install ();
 
+        Environment.set_current_dir (dirname);
+        if (debug_enabled)
+            debug ("Entering directory %s", dirname);
         foreach (var program in programs)
         {
             var install_path = Path.build_filename ("/usr/local/bin", program);
@@ -466,6 +461,52 @@ public class EasyBuild
           N_("Print debugging messages"), null},
         { null }
     };
+    
+    public static BuildFile? load_buildfiles (string filename, BuildFile? child = null) throws Error
+    {    
+        if (debug_enabled)
+            debug ("Loading %s", filename);
+
+        var f = new BuildFile (filename);
+
+        /* Find the toplevel buildfile */
+        if (!f.is_toplevel)
+        {
+            var parent_dir = Path.get_dirname (f.dirname);
+            f.parent = load_buildfiles (Path.build_filename (parent_dir, "Buildfile"), f);
+            if (f.parent == null)
+            {
+                printerr ("Unable to find toplevel Buildfile");
+                return null;
+            }
+        }
+
+        /* Load children */
+        var dir = Dir.open (f.dirname);
+        while (true)
+        {
+            var child_dir = dir.read_name ();
+            if (child_dir == null)
+                 break;
+
+            /* Already loaded */
+            if (child != null && Path.build_filename (f.dirname, child_dir) == child.dirname)
+            {
+                f.children.append (child);
+                continue;
+            }
+
+            var child_filename = Path.build_filename (f.dirname, child_dir, "Buildfile");
+            if (FileUtils.test (child_filename, FileTest.EXISTS))
+            {
+                if (debug_enabled)
+                    debug ("Loading %s", child_filename);
+                f.children.append (new BuildFile (child_filename));
+            }
+        }
+
+        return f;
+    }
 
     public static int main (string[] args)
     {
@@ -491,20 +532,17 @@ public class EasyBuild
             return Posix.EXIT_SUCCESS;
         }
 
-        BuildFile f;
         var filename = Path.build_filename (Environment.get_current_dir (), "Buildfile");
-        if (debug_enabled)
-            debug ("Loading %s", filename);
+        BuildFile f;
         try
         {
-            f = new BuildFile (filename);
+            f = load_buildfiles (filename);
         }
-        catch (FileError e)
+        catch (Error e)
         {
             printerr ("Failed to load Buildfile: %s\n", e.message);
             return Posix.EXIT_FAILURE;
         }
-        //f.print ();
 
         string command = "build";
         if (args.length >= 2)
@@ -525,7 +563,7 @@ public class EasyBuild
         case "clean":
             f.clean ();
             break;
-            
+
         case "install":
             f.install ();
             break;
