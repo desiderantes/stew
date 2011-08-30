@@ -14,7 +14,7 @@ Makefile.in
 ./depcomp
 src/*.c
 src/*_vala.stamp
-src/easy-build
+src/eb
 po/POTFILES
 po/Makefile.in.in
 po/stamp-it
