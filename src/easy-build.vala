@@ -457,13 +457,21 @@ public class BuildFile
         if (!rule.needs_build ())
             return true;
 
-        GLib.print ("\x1B[1m[Building %s]\x1B[21m\n", output);
-
         /* Build all the inputs */
         foreach (var input in rule.inputs)
         {
             if (!build_file (input))
                 return false;
+        }
+
+        /* Log if actually produces output */
+        foreach (var o in rule.outputs)
+        {
+            if (o == output)
+            {
+                GLib.print ("\x1B[1m[%s]\x1B[21m\n", output);
+                break;
+            }
         }
 
         /* Run the commands */
