@@ -711,6 +711,13 @@ public class EasyBuild
         rule.inputs.append ("%s.tar.bz2".printf (release_name));
         toplevel.rules.append (rule);
 
+        rule = new Rule ();
+        rule.outputs.append ("%release-gnome");
+        rule.inputs.append ("%s.tar.gz".printf (release_name));
+        rule.commands.append ("scp %s.tar.gz master.gnome.org:". printf (release_name));
+        rule.commands.append ("ssh master.gnome.org install-module %s.tar.gz". printf (release_name));
+        toplevel.rules.append (rule);
+
         string command = "build";
         if (args.length >= 2)
             command = args[1];
