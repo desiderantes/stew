@@ -700,17 +700,9 @@ public class EasyBuild
         switch (command)
         {
         case "build":
-            if (!f.run_recursive ("build"))
-                return Posix.EXIT_FAILURE;
-            break;
-
         case "clean":
-            if (!f.run_recursive ("clean"))
-                return Posix.EXIT_FAILURE;
-            break;
-
         case "install":
-            if (!f.run_recursive ("install"))
+            if (!f.run_recursive (command))
                 return Posix.EXIT_FAILURE;
             break;
 
