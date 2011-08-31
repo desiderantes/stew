@@ -312,7 +312,7 @@ public class BuildFile
                 if (package_cflags != null)
                     command += " %s".printf (package_cflags);
                 command += " -c %s -o %s".printf (input, output);
-                rule.commands.append ("@echo '    CC   %s'".printf (input));
+                rule.commands.append ("@echo '    CC %s'".printf (input));
                 rule.commands.append (command);
                 rules.append (rule);
             }
@@ -331,7 +331,7 @@ public class BuildFile
                 if (source.has_suffix (".vala") || source.has_suffix (".c"))
                     command += " %s".printf (replace_extension (source, "o"));
             }
-            rule.commands.append ("@echo '    LINK %s'".printf (program));
+            rule.commands.append ("@echo '    LD %s'".printf (program));
             if (ldflags != null)
                 command += " %s".printf (ldflags);
             if (package_ldflags != null)
@@ -346,7 +346,10 @@ public class BuildFile
         foreach (var rule in rules)
         {
             foreach (var output in rule.outputs)
-                clean_rule.commands.append ("rm -f %s".printf (output));
+            {
+                clean_rule.commands.append ("@echo '    RM %s'".printf (output));
+                clean_rule.commands.append ("@rm -f %s".printf (output));
+            }
         }
 
         var install_rule = new Rule ();
