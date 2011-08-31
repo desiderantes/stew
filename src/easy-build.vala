@@ -122,12 +122,13 @@ public class BuildFile
     public List<string> programs;
     public List<string> files;
     public List<Rule> rules;
-    
+
     public BuildFile (string filename) throws FileError
     {
         dirname = Path.get_dirname (filename);
 
         variables = new HashTable<string, string> (str_hash, str_equal);
+
         string contents;
         FileUtils.get_contents (filename, out contents);
         var lines = contents.split ("\n");
@@ -227,9 +228,14 @@ public class BuildFile
             //return Posix.EXIT_FAILURE;
         }
     }
-
+    
     public void generate_rules ()
     {
+        /* Add predefined variables */
+        variables.insert ("files.project.install-dir", "/usr/local/share/%s".printf (toplevel.variables.lookup ("package.name")));
+        variables.insert ("files.application.install-dir", "/usr/local/share/applications");
+        variables.insert ("files.gsettings-schemas.install-dir", "/usr/local/share/glib-2.0/schemas");
+
         var build_rule = new Rule ();
         build_rule.outputs.append ("%build");
 
@@ -242,7 +248,7 @@ public class BuildFile
                 continue;
 
             var sources = source_list.split (" ");
-
+            
             var package_list = variables.lookup ("programs.%s.packages".printf (program));
             var cflags = variables.lookup ("programs.%s.cflags".printf (program));
             var ldflags = variables.lookup ("programs.%s.ldflags".printf (program));
@@ -341,17 +347,6 @@ public class BuildFile
             rules.append (rule);
         }
 
-        var clean_rule = new Rule ();
-        clean_rule.outputs.append ("%clean");
-        foreach (var rule in rules)
-        {
-            foreach (var output in rule.outputs)
-            {
-                clean_rule.commands.append ("@echo '    RM %s'".printf (output));
-                clean_rule.commands.append ("@rm -f %s".printf (output));
-            }
-        }
-
         var install_rule = new Rule ();
         install_rule.outputs.append ("%install");
         foreach (var program in programs)
@@ -363,7 +358,7 @@ public class BuildFile
         }
         foreach (var file_class in files)
         {
-            var file_list = variables.lookup ("files.%s.files".printf (file_class));
+            var file_list = variables.lookup ("files.%s".printf (file_class));
 
             /* Only install files that are requested to */
             var install_dir = variables.lookup ("files.%s.install-dir".printf (file_class));
@@ -383,8 +378,42 @@ public class BuildFile
         }
 
         rules.append (build_rule);
-        rules.append (clean_rule);
         rules.append (install_rule);
+
+        /* M4 rules */
+        foreach (var rule in rules)
+        {
+            foreach (var output in rule.inputs)
+            {
+                var input = "%s.in".printf (output);
+                if (!FileUtils.test (input, FileTest.EXISTS))
+                    continue;
+
+                if (find_rule (output) != null)
+                    continue;
+
+                rule = new Rule ();
+                rule.outputs.append (output);
+                rule.inputs.append (input);
+                rule.commands.append ("@echo '    M4 %s'".printf (input));
+                rule.commands.append ("@m4 %s > %s".printf (input, output));
+                rules.append (rule);
+            }
+        }
+
+        var clean_rule = new Rule ();
+        clean_rule.outputs.append ("%clean");
+        foreach (var rule in rules)
+        {
+            foreach (var output in rule.outputs)
+            {
+                if (output.has_prefix ("%"))
+                    continue;
+                clean_rule.commands.append ("@echo '    RM %s'".printf (output));
+                clean_rule.commands.append ("@rm -f %s".printf (output));
+            }
+        }
+        rules.append (clean_rule);
 
         foreach (var child in children)
             child.generate_rules ();
