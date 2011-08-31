@@ -99,7 +99,7 @@ public class Rule
         {
             if (!output.has_prefix ("%") && !FileUtils.test (output, FileTest.EXISTS))
             {
-                GLib.printerr ("Failed to build file %s", output);
+                GLib.printerr ("Failed to build file %s\n", output);
                 return false;
             }
         }
@@ -403,8 +403,12 @@ public class BuildFile
         foreach (var rule in rules)
         {
             foreach (var o in rule.outputs)
+            {
+                if (o.has_prefix ("%"))
+                    o = o.substring (1);
                 if (o == output)
                     return rule;
+            }
         }
 
         return null;
@@ -445,7 +449,7 @@ public class BuildFile
                 return true;
             else
             {
-                GLib.printerr ("No rule to build %s\n", output);
+                GLib.printerr ("No rule to build '%s'\n", output);
                 return false;
             }
         }
@@ -667,7 +671,7 @@ public class EasyBuild
         rule.commands.append ("rm -r %s". printf (temp_dir));
         toplevel.rules.append (rule);
         rule = new Rule ();
-        rule.outputs.append ("release-gzip");
+        rule.outputs.append ("%release-gzip");
         rule.inputs.append ("%s.tar.gz".printf (release_name));
         toplevel.rules.append (rule);
 
@@ -678,7 +682,7 @@ public class EasyBuild
         rule.commands.append ("rm -r %s". printf (temp_dir));
         toplevel.rules.append (rule);
         rule = new Rule ();
-        rule.outputs.append ("release-bzip");
+        rule.outputs.append ("%release-bzip");
         rule.inputs.append ("%s.tar.bz2".printf (release_name));
         toplevel.rules.append (rule);
 
@@ -689,17 +693,17 @@ public class EasyBuild
         switch (command)
         {
         case "build":
-            if (!f.run_recursive ("%build"))
+            if (!f.run_recursive ("build"))
                 return Posix.EXIT_FAILURE;
             break;
 
         case "clean":
-            if (!f.run_recursive ("%clean"))
+            if (!f.run_recursive ("clean"))
                 return Posix.EXIT_FAILURE;
             break;
 
         case "install":
-            if (!f.run_recursive ("%install"))
+            if (!f.run_recursive ("install"))
                 return Posix.EXIT_FAILURE;
             break;
 
