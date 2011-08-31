@@ -46,7 +46,8 @@ public class Rule
            }
            catch (Error e)
            {
-               warning ("Unable to access input file %s: %s", input, e.message);
+               if (!(e is IOError.NOT_FOUND))
+                   warning ("Unable to access input file %s: %s", input, e.message);
                return true;
            }
            if (timeval_cmp (modification_time, max_input_time) > 0)
@@ -81,7 +82,11 @@ public class Rule
     {
         foreach (var c in commands)
         {
-            print ("    %s\n", c);
+            if (c.has_prefix ("@"))
+                c = c.substring (1);
+            else
+                print ("    %s\n", c);
+
             var exit_status = Posix.system (c);
             if (Process.if_signaled (exit_status))
             {
@@ -301,12 +306,13 @@ public class BuildFile
                 rule = new Rule ();
                 rule.inputs.append (input);
                 rule.outputs.append (output);
-                command = "gcc -g -Wall";
+                command = "@gcc -g -Wall";
                 if (cflags != null)
                     command += " %s".printf (cflags);
                 if (package_cflags != null)
                     command += " %s".printf (package_cflags);
                 command += " -c %s -o %s".printf (input, output);
+                rule.commands.append ("@echo '    CC   %s'".printf (input));
                 rule.commands.append (command);
                 rules.append (rule);
             }
@@ -319,12 +325,13 @@ public class BuildFile
                     rule.inputs.append (replace_extension (source, "o"));
             }
             rule.outputs.append (program);
-            command = "gcc -g -Wall";
+            command = "@gcc -g -Wall";
             foreach (var source in sources)
             {
                 if (source.has_suffix (".vala") || source.has_suffix (".c"))
                     command += " %s".printf (replace_extension (source, "o"));
             }
+            rule.commands.append ("@echo '    LINK %s'".printf (program));
             if (ldflags != null)
                 command += " %s".printf (ldflags);
             if (package_ldflags != null)
