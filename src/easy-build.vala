@@ -719,7 +719,7 @@ public class EasyBuild
         rule = new Rule ();
         rule.inputs.append (release_name);
         rule.outputs.append ("%s.tar.gz".printf (release_name));
-        rule.commands.append ("tar cfz %s.tar.gz %s".printf (release_name, release_name));
+        rule.commands.append ("tar --create --gzip --file %s.tar.gz %s".printf (release_name, release_name));
         rule.commands.append ("rm -r %s". printf (temp_dir));
         toplevel.rules.append (rule);
 
@@ -731,7 +731,7 @@ public class EasyBuild
         rule = new Rule ();
         rule.inputs.append (release_name);
         rule.outputs.append ("%s.tar.bz2".printf (release_name));
-        rule.commands.append ("tar cfj %s.tar.bz2 %s".printf (release_name, release_name));
+        rule.commands.append ("tar --create --bzip2 --file %s.tar.bz2 %s".printf (release_name, release_name));
         rule.commands.append ("rm -r %s". printf (temp_dir));
         toplevel.rules.append (rule);
 
@@ -741,10 +741,22 @@ public class EasyBuild
         toplevel.rules.append (rule);
 
         rule = new Rule ();
+        rule.inputs.append (release_name);
+        rule.outputs.append ("%s.tar.xz".printf (release_name));
+        rule.commands.append ("tar --create --xz --file %s.tar.xz %s".printf (release_name, release_name));
+        rule.commands.append ("rm -r %s". printf (temp_dir));
+        toplevel.rules.append (rule);
+
+        rule = new Rule ();
+        rule.outputs.append ("%release-xzip");
+        rule.inputs.append ("%s.tar.xz".printf (release_name));
+        toplevel.rules.append (rule);
+
+        rule = new Rule ();
         rule.outputs.append ("%release-gnome");
-        rule.inputs.append ("%s.tar.gz".printf (release_name));
-        rule.commands.append ("scp %s.tar.gz master.gnome.org:". printf (release_name));
-        rule.commands.append ("ssh master.gnome.org install-module %s.tar.gz". printf (release_name));
+        rule.inputs.append ("%s.tar.xz".printf (release_name));
+        rule.commands.append ("scp %s.tar.xz master.gnome.org:". printf (release_name));
+        rule.commands.append ("ssh master.gnome.org install-module %s.tar.xz". printf (release_name));
         toplevel.rules.append (rule);
 
         string command = "build";
