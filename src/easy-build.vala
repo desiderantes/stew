@@ -556,7 +556,7 @@ public class BuildFile
 
     public bool run_recursive (string command)
     {
-        if (!build_file (command))
+        if (!build_target (command))
             return false;
 
         foreach (var child in children)
@@ -571,7 +571,7 @@ public class BuildFile
         return true;
     }
 
-    public bool build_file (string output)
+    public bool build_target (string output)
     {
         var rule = find_rule (output);
         if (rule == null)
@@ -591,7 +591,7 @@ public class BuildFile
         /* Build all the inputs */
         foreach (var input in rule.inputs)
         {
-            if (!build_file (input))
+            if (!build_target (input))
                 return false;
         }
 
@@ -613,7 +613,7 @@ public class BuildFile
     {
         foreach (var program in programs)
         {
-            if (!build_file (program))
+            if (!build_target (program))
                 return false;
         }
 
@@ -881,7 +881,7 @@ public class EasyBuild
         if (target == "build" || target == "clean" || target == "install")
             result = f.run_recursive (target);
         else
-            result = f.build_file (target);
+            result = f.build_target (target);
 
         return result ? Posix.EXIT_SUCCESS : Posix.EXIT_FAILURE;
     }
