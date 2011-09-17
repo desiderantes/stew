@@ -346,23 +346,23 @@ public class BuildFile
         }
 
         /* Man rules */
-        var man_source_list = variables.lookup ("man.sources");
-        if (man_source_list != null)
+        var man_page_list = variables.lookup ("man.pages");
+        if (man_page_list != null)
         {
-            var sources = man_source_list.split (" ");
-            foreach (var source in sources)
+            var pages = man_page_list.split (" ");
+            foreach (var page in pages)
             {
-                var i = source.last_index_of_char ('.');
+                var i = page.last_index_of_char ('.');
                 var number = 0;
                 if (i > 0)
-                    number = int.parse (source.substring (i + 1));
+                    number = int.parse (page.substring (i + 1));
                 if (number == 0)
                 {
-                    warning ("Not a valid man page name '%s'", source);
+                    warning ("Not a valid man page name '%s'", page);
                     continue;
                 }
-                install_rule.inputs.append (source);
-                install_rule.commands.append ("install %s /usr/share/man/man%d/%s".printf (source, number, source));
+                install_rule.inputs.append (page);
+                install_rule.commands.append ("install %s /usr/share/man/man%d/%s".printf (page, number, page));
             }
         }
 
