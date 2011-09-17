@@ -3,6 +3,37 @@ private bool debug_enabled = false;
 
 private string original_dir;
 
+private void change_directory (string dirname)
+{
+    if (Environment.get_current_dir () == dirname)
+        return;
+
+    GLib.print ("\x1B[1m[Entering directory %s]\x1B[21m\n", get_relative_path (dirname));
+    Environment.set_current_dir (dirname);
+}
+
+public string get_relative_path (string path)
+{
+    var current_dir = original_dir;
+    
+    if (path == current_dir)
+        return ".";
+
+    var dir = current_dir + "/";
+    if (path.has_prefix (dir))
+        return path.substring (dir.length);
+
+    var relative_path = Path.get_basename (path);
+    while (true)
+    {
+        current_dir = Path.get_dirname (current_dir);
+        relative_path = "../" + relative_path;
+
+        if (path.has_prefix (current_dir + "/"))
+            return relative_path;
+    }
+}
+
 private string remove_extension (string filename)
 {
     var i = filename.last_index_of_char ('.');
@@ -25,7 +56,12 @@ public class Rule
     public List<string> inputs;
     public List<string> outputs;
     public List<string> commands;
-    
+
+    public bool has_output
+    {
+        get { return outputs.length () > 0 && !outputs.nth_data (0).has_prefix ("%"); }
+    }
+
     private TimeVal? get_modification_time (string filename) throws Error
     {
         var f = File.new_for_path (filename);
@@ -129,28 +165,6 @@ public errordomain BuildError
     NO_BUILDFILE,
     NO_TOPLEVEL,
     INVALID
-}
-
-public string get_relative_path (string path)
-{
-    var current_dir = original_dir;
-    
-    if (path == current_dir)
-        return ".";
-
-    var dir = current_dir + "/";
-    if (path.has_prefix (dir))
-        return path.substring (dir.length);
-
-    var relative_path = Path.get_basename (path);
-    while (true)
-    {
-        current_dir = Path.get_dirname (current_dir);
-        relative_path = "../" + relative_path;
-
-        if (path.has_prefix (current_dir + "/"))
-            return relative_path;
-    }
 }
 
 public class BuildFile
@@ -572,15 +586,6 @@ public class BuildFile
         return null;
     }
     
-    private void change_directory (string dirname)
-    {
-        if (Environment.get_current_dir () == dirname)
-            return;
-
-        GLib.print ("\x1B[1m[Entering directory %s]\x1B[21m\n", get_relative_path (dirname));
-        Environment.set_current_dir (dirname);
-    }
-
     public bool build_target (string target)
     {
         /* Build in the directory that contains this */
@@ -598,19 +603,19 @@ public class BuildFile
         var rule = find_rule (target);
         if (rule == null)
         {
-            if (FileUtils.test (target, FileTest.EXISTS))
+            var path = Path.build_filename (dirname, target);
+
+            if (FileUtils.test (path, FileTest.EXISTS))
                 return true;
             else
             {
-                GLib.printerr ("No rule to build '%s'\n", target);
+                GLib.printerr ("No rule to build '%s'\n", get_relative_path (target));
                 return false;
             }
         }
 
         if (!rule.needs_build ())
             return true;
-
-        change_directory (dirname);
 
         /* Build all the inputs */
         foreach (var input in rule.inputs)
@@ -619,17 +624,10 @@ public class BuildFile
                 return false;
         }
 
-        /* Log if actually produces output */
-        foreach (var o in rule.outputs)
-        {
-            if (o == target)
-            {
-                GLib.print ("\x1B[1m[Building %s]\x1B[21m\n", target);
-                break;
-            }
-        }
-
         /* Run the commands */
+        change_directory (dirname);
+        if (rule.has_output)
+            GLib.print ("\x1B[1m[Building %s]\x1B[21m\n", target);
         return rule.build ();
     }
     
@@ -782,6 +780,10 @@ public class EasyBuild
         add_release_file (release_rule, temp_dir, relative_dirname, "Buildfile");
         foreach (var rule in buildfile.rules)
         {
+            /* Ignore non-output rules */
+            if (!rule.has_output)
+                continue;
+
             foreach (var input in rule.inputs)
             {
                 /* Ignore generated files */
