@@ -5,6 +5,7 @@ Overview of changes in lightdm 0.0.2
     * Allow unversioned packages
     * Add intltool rules
     * Add man rules
+    * Add gsettings rules
 
 Overview of changes in lightdm 0.0.1
 

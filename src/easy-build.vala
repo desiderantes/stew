@@ -366,6 +366,18 @@ public class BuildFile
             }
         }
 
+        /* GSettings rules */
+        var gsettings_schema_list = variables.lookup ("gsettings.schemas");
+        if (gsettings_schema_list != null)
+        {
+            var schemas = gsettings_schema_list.split (" ");
+            foreach (var schema in schemas)
+            {
+                install_rule.inputs.append (schema);
+                install_rule.commands.append ("install %s /usr/share/glib-2.0/schemas/%s".printf (schema, schema));
+            }
+        }
+
         foreach (var program in programs)
         {
             var source_list = variables.lookup ("programs.%s.sources".printf (program));
