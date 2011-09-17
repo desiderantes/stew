@@ -606,6 +606,12 @@ public class BuildFile
     }
 }
 
+public errordomain BuildError 
+{
+    NO_BUILDFILE,
+    NO_TOPLEVEL
+}
+
 public class EasyBuild
 {
     private static bool show_version = false;
@@ -619,24 +625,35 @@ public class EasyBuild
           N_("Print debugging messages"), null},
         { null }
     };
-    
+
     public static BuildFile? load_buildfiles (string filename, BuildFile? child = null) throws Error
     {    
         if (debug_enabled)
             debug ("Loading %s", filename);
 
-        var f = new BuildFile (filename);
+        BuildFile f;
+        try
+        {
+            f = new BuildFile (filename);
+        }
+        catch (FileError e)
+        {
+            if (e is FileError.NOENT)
+            {
+                if (child == null)
+                    throw new BuildError.NO_BUILDFILE ("No Buildfile in current directory");
+                else
+                    throw new BuildError.NO_TOPLEVEL ("%s/Buildfile is missing package.name and package.version variables", child.dirname);
+            }
+	    else
+                throw e;
+        }
 
         /* Find the toplevel buildfile */
         if (!f.is_toplevel)
         {
             var parent_dir = Path.get_dirname (f.dirname);
             f.parent = load_buildfiles (Path.build_filename (parent_dir, "Buildfile"), f);
-            if (f.parent == null)
-            {
-                printerr ("Unable to find toplevel Buildfile");
-                return null;
-            }
         }
 
         /* Load children */
@@ -756,7 +773,7 @@ public class EasyBuild
         }
         catch (Error e)
         {
-            printerr ("Failed to load Buildfile: %s\n", e.message);
+            printerr ("Unable to build: %s\n", e.message);
             return Posix.EXIT_FAILURE;
         }
         var toplevel = f.toplevel;
