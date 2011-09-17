@@ -2,3 +2,4 @@ package.name = example
 package.version = 1.0.0
 
 programs.example.sources = example.vala
+programs.example.packages = gobject-2.0 glib-2.0
