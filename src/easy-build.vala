@@ -877,6 +877,7 @@ public class EasyBuild
             target = args[1];
 
         bool result;
+        // FIXME: Replace with %build: src/build data/build rules
         if (target == "build" || target == "clean" || target == "install")
             result = f.run_recursive (target);
         else
