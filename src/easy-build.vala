@@ -513,7 +513,7 @@ public class BuildFile
     
     public bool is_toplevel
     {
-        get { return variables.lookup ("package.name") != null && variables.lookup ("package.version") != null; }
+        get { return variables.lookup ("package.name") != null; }
     }
 
     public BuildFile toplevel
@@ -673,7 +673,7 @@ public class EasyBuild
                 if (child == null)
                     throw new BuildError.NO_BUILDFILE ("No Buildfile in current directory");
                 else
-                    throw new BuildError.NO_TOPLEVEL ("%s is missing package.name and package.version variables",
+                    throw new BuildError.NO_TOPLEVEL ("%s is missing package.name variable",
                                                       get_relative_path (child.dirname + "/Buildfile"));
             }
             else
@@ -815,7 +815,10 @@ public class EasyBuild
         toplevel.generate_rules ();
 
         /* Generate release rules */
-        var release_name = "%s-%s".printf (toplevel.variables.lookup ("package.name"), toplevel.variables.lookup ("package.version"));
+        var release_name = toplevel.variables.lookup ("package.name");
+        var version = toplevel.variables.lookup ("package.version");
+        if (version != null)
+            release_name += version;
         var temp_dir = Path.build_filename (toplevel.dirname, release_name);
 
         var rule = new Rule ();
