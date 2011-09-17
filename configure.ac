@@ -20,7 +20,8 @@ PKG_CHECK_MODULES(EASY_BUILD, [
 
 AC_CONFIG_FILES([
 Makefile
-src/Makefile
 po/Makefile.in
+src/Makefile
+tests/Makefile
 ])
 AC_OUTPUT
