@@ -14,6 +14,7 @@ Makefile.in
 ./depcomp
 examples/c/example
 examples/cpp/example
+examples/java/Example.class
 examples/vala/example
 examples/vala/example.c
 src/*.c

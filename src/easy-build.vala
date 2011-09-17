@@ -241,8 +241,6 @@ public class BuildFile
 
         foreach (var program in programs)
         {
-            build_rule.inputs.append (program);
-
             var source_list = variables.lookup ("programs.%s.sources".printf (program));
             if (source_list == null)
                 continue;
@@ -275,6 +273,8 @@ public class BuildFile
                 {
                 }
             }
+	    
+	    List<string> objects = null;
 
             /* Vala compile */
             var rule = new Rule ();
@@ -300,6 +300,27 @@ public class BuildFile
                 rules.append (rule);
             }
 
+            /* Java compile */
+            rule = new Rule ();
+            command = "javac";
+            foreach (var source in sources)
+            {
+                if (!source.has_suffix (".java"))
+                    continue;
+
+		var class_file = replace_extension (source, "class");
+
+                rule.inputs.append (source);
+                rule.outputs.append (class_file);
+                build_rule.inputs.append (class_file);
+                command += " %s".printf (source);
+            }
+            if (rule.outputs != null)
+            {
+                rule.commands.append (command);
+                rules.append (rule);
+            }
+
             /* C compile */
             foreach (var source in sources)
             {
@@ -308,6 +329,8 @@ public class BuildFile
 
                 var input = replace_extension (source, "c");
                 var output = replace_extension (source, "o");
+
+		objects.append (output);
 
                 rule = new Rule ();
                 rule.inputs.append (input);
@@ -324,27 +347,29 @@ public class BuildFile
             }
 
             /* Link */
-            rule = new Rule ();
-            foreach (var source in sources)
-            {
-                if (source.has_suffix (".vala") || source.has_suffix (".c"))
-                    rule.inputs.append (replace_extension (source, "o"));
+	    if (objects.length () > 0)
+	    {
+                build_rule.inputs.append (program);
+
+		rule = new Rule ();
+	        foreach (var o in objects)
+                    rule.inputs.append (o);
+                rule.outputs.append (program);
+                command = "@gcc -g -Wall";
+                foreach (var source in sources)
+                {
+                    if (source.has_suffix (".vala") || source.has_suffix (".c"))
+                        command += " %s".printf (replace_extension (source, "o"));
+                }
+                rule.commands.append ("@echo '    LD %s'".printf (program));
+                if (ldflags != null)
+                    command += " %s".printf (ldflags);
+                if (package_ldflags != null)
+                    command += " %s".printf (package_ldflags);
+                command += " -o %s".printf (program);
+                rule.commands.append (command);
+                rules.append (rule);
             }
-            rule.outputs.append (program);
-            command = "@gcc -g -Wall";
-            foreach (var source in sources)
-            {
-                if (source.has_suffix (".vala") || source.has_suffix (".c"))
-                    command += " %s".printf (replace_extension (source, "o"));
-            }
-            rule.commands.append ("@echo '    LD %s'".printf (program));
-            if (ldflags != null)
-                command += " %s".printf (ldflags);
-            if (package_ldflags != null)
-                command += " %s".printf (package_ldflags);
-            command += " -o %s".printf (program);
-            rule.commands.append (command);
-            rules.append (rule);
         }
 
         var install_rule = new Rule ();
