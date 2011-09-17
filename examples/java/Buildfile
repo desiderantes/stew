@@ -1,4 +1,4 @@
 package.name = example
 package.version = 1.0.0
 
-programs.example.sources = Example.java
+programs.Example.sources = Example.java

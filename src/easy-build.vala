@@ -303,6 +303,10 @@ public class BuildFile
 
             /* Java compile */
             rule = new Rule ();
+            var jar_rule = new Rule ();
+            var jar_file = "%s.jar".printf (program);
+            jar_rule.outputs.append (jar_file);
+            var jar_command = "jar cf %s".printf (jar_file);
             command = "javac";
             foreach (var source in sources)
             {
@@ -311,15 +315,20 @@ public class BuildFile
 
                 var class_file = replace_extension (source, "class");
 
+                jar_rule.inputs.append (class_file);
+                jar_command += " %s".printf (class_file);
+
                 rule.inputs.append (source);
                 rule.outputs.append (class_file);
-                build_rule.inputs.append (class_file);
                 command += " %s".printf (source);
             }
             if (rule.outputs != null)
             {
                 rule.commands.append (command);
                 rules.append (rule);
+                build_rule.inputs.append (jar_file);
+                jar_rule.commands.append (jar_command);
+                rules.append (jar_rule);
             }
 
             /* C++ compile */
