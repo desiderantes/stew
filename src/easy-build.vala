@@ -3,6 +3,14 @@ private bool debug_enabled = false;
 
 private string original_dir;
 
+private string remove_extension (string filename)
+{
+    var i = filename.last_index_of_char ('.');
+    if (i < 0)
+        return filename;
+    return filename.substring (0, i);
+}
+
 private string replace_extension (string filename, string extension)
 {
     var i = filename.last_index_of_char ('.');
@@ -276,6 +284,40 @@ public class BuildFile
         foreach (var child in children)
             build_rule.inputs.append ("%s/build".printf (Path.get_basename (child.dirname)));
 
+        /* Intltool rules */
+        var intltool_source_list = variables.lookup ("intltool.xml-sources");
+        if (intltool_source_list != null)
+        {
+            var sources = intltool_source_list.split (" ");
+            foreach (var source in sources)
+            {
+                var rule = new Rule ();
+                rule.inputs.append (source);
+                var output = remove_extension (source);
+                rule.outputs.append (output);
+                rule.commands.append ("LC_ALL=C intltool-merge --xml-style /dev/null %s %s".printf (source, output));
+                rules.append (rule);
+
+                build_rule.inputs.append (output);
+            }
+        }
+        intltool_source_list = variables.lookup ("intltool.desktop-sources");
+        if (intltool_source_list != null)
+        {
+            var sources = intltool_source_list.split (" ");
+            foreach (var source in sources)
+            {
+                var rule = new Rule ();
+                rule.inputs.append (source);
+                var output = remove_extension (source);
+                rule.outputs.append (output);
+                rule.commands.append ("LC_ALL=C intltool-merge --desktop-style -u /dev/null %s %s".printf (source, output));
+                rules.append (rule);
+
+                build_rule.inputs.append (output);
+            }
+        }
+
         foreach (var program in programs)
         {
             var source_list = variables.lookup ("programs.%s.sources".printf (program));
@@ -475,27 +517,6 @@ public class BuildFile
 
         rules.append (build_rule);
         rules.append (install_rule);
-
-        /* M4 rules */
-        foreach (var rule in rules)
-        {
-            foreach (var output in rule.inputs)
-            {
-                var input = "%s.in".printf (output);
-                if (!FileUtils.test (input, FileTest.EXISTS))
-                    continue;
-
-                if (find_rule (output) != null)
-                    continue;
-
-                rule = new Rule ();
-                rule.outputs.append (output);
-                rule.inputs.append (input);
-                rule.commands.append ("@echo '    M4 %s'".printf (input));
-                rule.commands.append ("@m4 %s > %s".printf (input, output));
-                rules.append (rule);
-            }
-        }
 
         var clean_rule = new Rule ();
         clean_rule.outputs.append ("%clean");
