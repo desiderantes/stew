@@ -1,4 +1,2 @@
 package.name = example
-package.version = 1.0.0
-
 programs.example.sources = example.cpp
