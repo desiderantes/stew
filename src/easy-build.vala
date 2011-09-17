@@ -273,8 +273,9 @@ public class BuildFile
                 {
                 }
             }
-	    
-	    List<string> objects = null;
+
+            var linker = "gcc";
+            List<string> objects = null;
 
             /* Vala compile */
             var rule = new Rule ();
@@ -308,7 +309,7 @@ public class BuildFile
                 if (!source.has_suffix (".java"))
                     continue;
 
-		var class_file = replace_extension (source, "class");
+                var class_file = replace_extension (source, "class");
 
                 rule.inputs.append (source);
                 rule.outputs.append (class_file);
@@ -317,6 +318,31 @@ public class BuildFile
             }
             if (rule.outputs != null)
             {
+                rule.commands.append (command);
+                rules.append (rule);
+            }
+
+            /* C++ compile */
+            foreach (var source in sources)
+            {
+                if (!source.has_suffix (".cpp") && !source.has_suffix (".C"))
+                    continue;
+
+                var output = replace_extension (source, "o");
+
+                linker = "g++";
+                objects.append (output);
+
+                rule = new Rule ();
+                rule.inputs.append (source);
+                rule.outputs.append (output);
+                command = "@g++ -g -Wall";
+                if (cflags != null)
+                    command += " %s".printf (cflags);
+                if (package_cflags != null)
+                    command += " %s".printf (package_cflags);
+                command += " -c %s -o %s".printf (source, output);
+                rule.commands.append ("@echo '    CC %s'".printf (source));
                 rule.commands.append (command);
                 rules.append (rule);
             }
@@ -330,7 +356,7 @@ public class BuildFile
                 var input = replace_extension (source, "c");
                 var output = replace_extension (source, "o");
 
-		objects.append (output);
+                objects.append (output);
 
                 rule = new Rule ();
                 rule.inputs.append (input);
@@ -347,20 +373,17 @@ public class BuildFile
             }
 
             /* Link */
-	    if (objects.length () > 0)
-	    {
+            if (objects.length () > 0)
+            {
                 build_rule.inputs.append (program);
 
-		rule = new Rule ();
-	        foreach (var o in objects)
+                rule = new Rule ();
+                foreach (var o in objects)
                     rule.inputs.append (o);
                 rule.outputs.append (program);
-                command = "@gcc -g -Wall";
-                foreach (var source in sources)
-                {
-                    if (source.has_suffix (".vala") || source.has_suffix (".c"))
-                        command += " %s".printf (replace_extension (source, "o"));
-                }
+                command = "@%s -g -Wall".printf (linker);
+                foreach (var o in objects)
+                    command += " %s".printf (o);
                 rule.commands.append ("@echo '    LD %s'".printf (program));
                 if (ldflags != null)
                     command += " %s".printf (ldflags);
