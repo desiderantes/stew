@@ -822,18 +822,17 @@ public class EasyBuild
         var version = toplevel.variables.lookup ("package.version");
         if (version != null)
             release_name += "-" + version;
-        var temp_dir = Path.build_filename (toplevel.dirname, release_name);
 
         var rule = new Rule ();
         rule.outputs.append (release_name);
-        generate_release_rule (rule, temp_dir, toplevel);
+        generate_release_rule (rule, release_name, toplevel);
         toplevel.rules.append (rule);
 
         rule = new Rule ();
         rule.inputs.append (release_name);
         rule.outputs.append ("%s.tar.gz".printf (release_name));
         rule.commands.append ("tar --create --gzip --file %s.tar.gz %s".printf (release_name, release_name));
-        rule.commands.append ("rm -r %s". printf (temp_dir));
+        rule.commands.append ("rm -r %s". printf (release_name));
         toplevel.rules.append (rule);
 
         rule = new Rule ();
@@ -845,7 +844,7 @@ public class EasyBuild
         rule.inputs.append (release_name);
         rule.outputs.append ("%s.tar.bz2".printf (release_name));
         rule.commands.append ("tar --create --bzip2 --file %s.tar.bz2 %s".printf (release_name, release_name));
-        rule.commands.append ("rm -r %s". printf (temp_dir));
+        rule.commands.append ("rm -r %s". printf (release_name));
         toplevel.rules.append (rule);
 
         rule = new Rule ();
@@ -857,7 +856,7 @@ public class EasyBuild
         rule.inputs.append (release_name);
         rule.outputs.append ("%s.tar.xz".printf (release_name));
         rule.commands.append ("tar --create --xz --file %s.tar.xz %s".printf (release_name, release_name));
-        rule.commands.append ("rm -r %s". printf (temp_dir));
+        rule.commands.append ("rm -r %s". printf (release_name));
         toplevel.rules.append (rule);
 
         rule = new Rule ();
