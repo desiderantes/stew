@@ -120,6 +120,25 @@ public errordomain BuildError
     INVALID
 }
 
+public string get_relative_path (string path)
+{
+    var current_dir = Environment.get_current_dir ();
+
+    var dir = current_dir + "/";
+    if (path.has_prefix (dir))
+        return path.substring (dir.length);
+
+    var relative_path = Path.get_basename (path);
+    while (true)
+    {
+        current_dir = Path.get_dirname (current_dir);
+        relative_path = "../" + relative_path;
+
+        if (path.has_prefix (current_dir + "/"))
+            return relative_path;
+    }
+}
+
 public class BuildFile
 {
     public string dirname;
@@ -139,12 +158,12 @@ public class BuildFile
         string contents;
         FileUtils.get_contents (filename, out contents);
         var lines = contents.split ("\n");
-	var line_number = 0;
+        var line_number = 0;
         var in_rule = false;
         string? rule_indent = null;
         foreach (var line in lines)
         {
-	    line_number++;
+            line_number++;
 
             var i = 0;
             while (line[i].isspace ())
@@ -234,7 +253,8 @@ public class BuildFile
                 continue;
             }
 
-            throw new BuildError.INVALID ("Invalid statement in %s line %d:\n%s", filename, line_number, statement);
+            throw new BuildError.INVALID ("Invalid statement in %s line %d:\n%s",
+                                          get_relative_path (filename), line_number, statement);
         }
     }
     
@@ -646,9 +666,10 @@ public class EasyBuild
                 if (child == null)
                     throw new BuildError.NO_BUILDFILE ("No Buildfile in current directory");
                 else
-                    throw new BuildError.NO_TOPLEVEL ("%s/Buildfile is missing package.name and package.version variables", child.dirname);
+                    throw new BuildError.NO_TOPLEVEL ("%s is missing package.name and package.version variables",
+                                                      get_relative_path (child.dirname + "/Buildfile"));
             }
-	    else
+            else
                 throw e;
         }
 
