@@ -632,7 +632,7 @@ public class BuildFile
         return null;
     }
     
-    public bool build_target (string target)
+    public BuildFile get_buildfile_with_target (string target)
     {
         /* Build in the directory that contains this */
         var dir = Path.get_dirname (target);
@@ -642,9 +642,18 @@ public class BuildFile
             foreach (var child in children)
             {
                 if (child.dirname == child_dir)
-                    return child.build_target (Path.get_basename (target));
+                    return child;
             }
         }
+
+        return this;
+    }
+    
+    public bool build_target (string target)
+    {
+        var buildfile = get_buildfile_with_target (target);
+        if (buildfile != this)
+            return buildfile.build_target (Path.get_basename (target));
 
         var rule = find_rule (target);
         if (rule == null)
@@ -814,7 +823,7 @@ public class EasyBuild
         release_rule.commands.append ("cp %s %s".printf (input_filename, output_filename));
     }
     
-    public static void generate_release_rule (Rule release_rule, string temp_dir, BuildFile buildfile)
+    public static void generate_release_rule (BuildFile buildfile, Rule release_rule, string temp_dir)
     {
         var relative_dirname = buildfile.get_relative_dirname ();
 
@@ -826,22 +835,22 @@ public class EasyBuild
         add_release_file (release_rule, temp_dir, relative_dirname, "Buildfile");
         foreach (var rule in buildfile.rules)
         {
-            /* Ignore non-output rules */
-            if (!rule.has_output)
-                continue;
-
             foreach (var input in rule.inputs)
             {
                 /* Ignore generated files */
                 if (buildfile.find_rule (input) != null)
-                    return;
+                    continue;
+
+                /* Ignore files built in other buildfiles */
+                if (buildfile.get_buildfile_with_target (input) != buildfile)
+                    continue;
 
                 add_release_file (release_rule, temp_dir, relative_dirname, input);
             }
         }
 
         foreach (var child in buildfile.children)
-            generate_release_rule (release_rule, temp_dir, child);
+            generate_release_rule (child, release_rule, temp_dir);
     }
 
     public static int main (string[] args)
@@ -894,7 +903,7 @@ public class EasyBuild
 
         var rule = new Rule ();
         rule.outputs.append (release_name);
-        generate_release_rule (rule, release_name, toplevel);
+        generate_release_rule (toplevel, rule, release_name);
         toplevel.rules.append (rule);
 
         rule = new Rule ();
