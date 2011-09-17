@@ -818,7 +818,7 @@ public class EasyBuild
         var release_name = toplevel.variables.lookup ("package.name");
         var version = toplevel.variables.lookup ("package.version");
         if (version != null)
-            release_name += version;
+            release_name += "-" + version;
         var temp_dir = Path.build_filename (toplevel.dirname, release_name);
 
         var rule = new Rule ();
