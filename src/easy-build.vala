@@ -125,6 +125,9 @@ public errordomain BuildError
 public string get_relative_path (string path)
 {
     var current_dir = original_dir;
+    
+    if (path == current_dir)
+        return ".";
 
     var dir = current_dir + "/";
     if (path.has_prefix (dir))
