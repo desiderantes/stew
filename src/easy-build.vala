@@ -113,6 +113,13 @@ public class Rule
     }
 }
 
+public errordomain BuildError 
+{
+    NO_BUILDFILE,
+    NO_TOPLEVEL,
+    INVALID
+}
+
 public class BuildFile
 {
     public string dirname;
@@ -123,7 +130,7 @@ public class BuildFile
     public List<string> files;
     public List<Rule> rules;
 
-    public BuildFile (string filename) throws FileError
+    public BuildFile (string filename) throws FileError, BuildError
     {
         dirname = Path.get_dirname (filename);
 
@@ -132,10 +139,13 @@ public class BuildFile
         string contents;
         FileUtils.get_contents (filename, out contents);
         var lines = contents.split ("\n");
+	var line_number = 0;
         var in_rule = false;
         string? rule_indent = null;
         foreach (var line in lines)
         {
+	    line_number++;
+
             var i = 0;
             while (line[i].isspace ())
                 i++;
@@ -224,8 +234,7 @@ public class BuildFile
                 continue;
             }
 
-            debug ("Unknown statement '%s'", statement);
-            //return Posix.EXIT_FAILURE;
+            throw new BuildError.INVALID ("Invalid statement in %s line %d:\n%s", filename, line_number, statement);
         }
     }
     
@@ -604,12 +613,6 @@ public class BuildFile
                 GLib.print ("    %s\n", c);
         }
     }
-}
-
-public errordomain BuildError 
-{
-    NO_BUILDFILE,
-    NO_TOPLEVEL
 }
 
 public class EasyBuild
