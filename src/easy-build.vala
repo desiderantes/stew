@@ -600,9 +600,7 @@ public class BuildFile
         }
 
         /* Run the commands */
-        rule.build ();
-
-        return true;
+        return rule.build ();
     }
     
     public bool build ()
