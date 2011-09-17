@@ -560,23 +560,6 @@ public class BuildFile
         Environment.set_current_dir (dirname);
     }
 
-    public bool run_recursive (string command)
-    {
-        if (!build_target (command))
-            return false;
-
-        foreach (var child in children)
-        {
-            change_directory (child.dirname);
-            if (!child.run_recursive (command))
-                return false;
-        }
-
-        change_directory (dirname);
-
-        return true;
-    }
-
     public bool build_target (string target)
     {
         /* Build in the directory that contains this */
