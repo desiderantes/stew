@@ -6,6 +6,7 @@ Overview of changes in lightdm 0.0.2
     * Add intltool rules
     * Add man rules
     * Add gsettings rules
+    * Add desktop rules
 
 Overview of changes in lightdm 0.0.1
 

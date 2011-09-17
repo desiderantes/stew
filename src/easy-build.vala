@@ -378,6 +378,18 @@ public class BuildFile
             }
         }
 
+        /* Desktop rules */
+        var desktop_entry_list = variables.lookup ("desktop.entries");
+        if (desktop_entry_list != null)
+        {
+            var entries = desktop_entry_list.split (" ");
+            foreach (var entry in entries)
+            {
+                install_rule.inputs.append (entry);
+                install_rule.commands.append ("install %s /usr/share/applications/%s".printf (entry, entry));
+            }
+        }
+
         foreach (var program in programs)
         {
             var source_list = variables.lookup ("programs.%s.sources".printf (program));
