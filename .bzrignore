@@ -12,6 +12,10 @@ Makefile.in
 ./install-sh
 ./compile
 ./depcomp
+examples/c/example
+examples/cpp/example
+examples/vala/example
+examples/vala/example.c
 src/*.c
 src/*_vala.stamp
 src/eb
