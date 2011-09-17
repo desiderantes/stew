@@ -273,6 +273,8 @@ public class BuildFile
 
         var build_rule = new Rule ();
         build_rule.outputs.append ("%build");
+        foreach (var child in children)
+            build_rule.inputs.append ("%s/build".printf (Path.get_basename (child.dirname)));
 
         foreach (var program in programs)
         {
@@ -441,6 +443,8 @@ public class BuildFile
 
         var install_rule = new Rule ();
         install_rule.outputs.append ("%install");
+        foreach (var child in children)
+            install_rule.inputs.append ("%s/install".printf (Path.get_basename (child.dirname)));
         foreach (var program in programs)
         {
             var source = program;
@@ -495,6 +499,8 @@ public class BuildFile
 
         var clean_rule = new Rule ();
         clean_rule.outputs.append ("%clean");
+        foreach (var child in children)
+            clean_rule.inputs.append ("%s/clean".printf (Path.get_basename (child.dirname)));
         foreach (var rule in rules)
         {
             foreach (var output in rule.outputs)
@@ -571,22 +577,36 @@ public class BuildFile
         return true;
     }
 
-    public bool build_target (string output)
+    public bool build_target (string target)
     {
-        var rule = find_rule (output);
+        /* Build in the directory that contains this */
+        var dir = Path.get_dirname (target);
+        if (dir != ".")
+        {
+            var child_dir = Path.build_filename (dirname, dir);
+            foreach (var child in children)
+            {
+                if (child.dirname == child_dir)
+                    return child.build_target (Path.get_basename (target));
+            }
+        }
+
+        var rule = find_rule (target);
         if (rule == null)
         {
-            if (FileUtils.test (output, FileTest.EXISTS))
+            if (FileUtils.test (target, FileTest.EXISTS))
                 return true;
             else
             {
-                GLib.printerr ("No rule to build '%s'\n", output);
+                GLib.printerr ("No rule to build '%s'\n", target);
                 return false;
             }
         }
 
         if (!rule.needs_build ())
             return true;
+
+        change_directory (dirname);
 
         /* Build all the inputs */
         foreach (var input in rule.inputs)
@@ -598,9 +618,9 @@ public class BuildFile
         /* Log if actually produces output */
         foreach (var o in rule.outputs)
         {
-            if (o == output)
+            if (o == target)
             {
-                GLib.print ("\x1B[1m[Building %s]\x1B[21m\n", output);
+                GLib.print ("\x1B[1m[Building %s]\x1B[21m\n", target);
                 break;
             }
         }
@@ -879,13 +899,9 @@ public class EasyBuild
         if (args.length >= 2)
             target = args[1];
 
-        bool result;
-        // FIXME: Replace with %build: src/build data/build rules
-        if (target == "build" || target == "clean" || target == "install")
-            result = f.run_recursive (target);
+        if (f.build_target (target))
+            return Posix.EXIT_SUCCESS;
         else
-            result = f.build_target (target);
-
-        return result ? Posix.EXIT_SUCCESS : Posix.EXIT_FAILURE;
+            return Posix.EXIT_FAILURE;
     }
 }
