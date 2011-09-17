@@ -297,6 +297,19 @@ public class BuildFile
         build_rule.outputs.append ("%build");
         foreach (var child in children)
             build_rule.inputs.append ("%s/build".printf (Path.get_basename (child.dirname)));
+        rules.append (build_rule);
+
+        var install_rule = new Rule ();
+        install_rule.outputs.append ("%install");
+        foreach (var child in children)
+            install_rule.inputs.append ("%s/install".printf (Path.get_basename (child.dirname)));
+        rules.append (install_rule);
+
+        var clean_rule = new Rule ();
+        clean_rule.outputs.append ("%clean");
+        foreach (var child in children)
+            clean_rule.inputs.append ("%s/clean".printf (Path.get_basename (child.dirname)));
+        rules.append (clean_rule);
 
         /* Intltool rules */
         var intltool_source_list = variables.lookup ("intltool.xml-sources");
@@ -329,6 +342,27 @@ public class BuildFile
                 rules.append (rule);
 
                 build_rule.inputs.append (output);
+            }
+        }
+
+        /* Man rules */
+        var man_source_list = variables.lookup ("man.sources");
+        if (man_source_list != null)
+        {
+            var sources = man_source_list.split (" ");
+            foreach (var source in sources)
+            {
+                var i = source.last_index_of_char ('.');
+                var number = 0;
+                if (i > 0)
+                    number = int.parse (source.substring (i + 1));
+                if (number == 0)
+                {
+                    warning ("Not a valid man page name '%s'", source);
+                    continue;
+                }
+                install_rule.inputs.append (source);
+                install_rule.commands.append ("install %s /usr/share/man/man%d/%s".printf (source, number, source));
             }
         }
 
@@ -497,10 +531,6 @@ public class BuildFile
             }
         }
 
-        var install_rule = new Rule ();
-        install_rule.outputs.append ("%install");
-        foreach (var child in children)
-            install_rule.inputs.append ("%s/install".printf (Path.get_basename (child.dirname)));
         foreach (var program in programs)
         {
             var source = program;
@@ -529,13 +559,6 @@ public class BuildFile
             }
         }
 
-        rules.append (build_rule);
-        rules.append (install_rule);
-
-        var clean_rule = new Rule ();
-        clean_rule.outputs.append ("%clean");
-        foreach (var child in children)
-            clean_rule.inputs.append ("%s/clean".printf (Path.get_basename (child.dirname)));
         foreach (var rule in rules)
         {
             foreach (var output in rule.outputs)
@@ -546,7 +569,6 @@ public class BuildFile
                 clean_rule.commands.append ("@rm -f %s".printf (output));
             }
         }
-        rules.append (clean_rule);
 
         foreach (var child in children)
             child.generate_rules ();
