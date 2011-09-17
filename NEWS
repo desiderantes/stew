@@ -1,6 +1,7 @@
 Overview of changes in lightdm 0.0.2
 
     * Improve build messages
+    * Replace "eb expand" with "eb --expand"
 
 Overview of changes in lightdm 0.0.1
 

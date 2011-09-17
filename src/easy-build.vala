@@ -1,3 +1,4 @@
+private bool do_expand = false;
 private bool debug_enabled = false;
 
 private string original_dir;
@@ -643,6 +644,9 @@ public class EasyBuild
     private static bool show_version = false;
     public static const OptionEntry[] options =
     {
+        { "expand", 0, 0, OptionArg.NONE, ref do_expand,
+          /* Help string for command line --expand flag */
+          N_("Expand current Buildfile and print to stdout"), null},
         { "version", 'v', 0, OptionArg.NONE, ref show_version,
           /* Help string for command line --version flag */
           N_("Show release version"), null},
@@ -773,7 +777,7 @@ public class EasyBuild
         original_dir = Environment.get_current_dir ();
 
         var c = new OptionContext (/* Arguments and description for --help text */
-                                   _("[COMMAND] - Build system"));
+                                   _("[TARGET] - Build system"));
         c.add_main_entries (options, Config.GETTEXT_PACKAGE);
         try
         {
@@ -813,7 +817,7 @@ public class EasyBuild
         /* Generate release rules */
         var release_name = "%s-%s".printf (toplevel.variables.lookup ("package.name"), toplevel.variables.lookup ("package.version"));
         var temp_dir = Path.build_filename (toplevel.dirname, release_name);
-        
+
         var rule = new Rule ();
         rule.outputs.append (release_name);
         generate_release_rule (rule, temp_dir, toplevel);
@@ -862,28 +866,22 @@ public class EasyBuild
         rule.commands.append ("ssh master.gnome.org install-module %s.tar.xz". printf (release_name));
         toplevel.rules.append (rule);
 
-        string command = "build";
-        if (args.length >= 2)
-            command = args[1];
-
-        switch (command)
+        if (do_expand)
         {
-        case "build":
-        case "clean":
-        case "install":
-            if (!f.run_recursive (command))
-                return Posix.EXIT_FAILURE;
-            break;
-
-        case "expand":
             f.print ();
-            break;
-
-        default:
-            f.build_file (command);
-            break;
+            return Posix.EXIT_SUCCESS;
         }
 
-        return Posix.EXIT_SUCCESS;
+        string target = "build";
+        if (args.length >= 2)
+            target = args[1];
+
+        bool result;
+        if (target == "build" || target == "clean" || target == "install")
+            result = f.run_recursive (target);
+        else
+            result = f.build_file (target);
+
+        return result ? Posix.EXIT_SUCCESS : Posix.EXIT_FAILURE;
     }
 }
