@@ -1,5 +1,7 @@
 private bool debug_enabled = false;
 
+private string original_dir;
+
 private string replace_extension (string filename, string extension)
 {
     var i = filename.last_index_of_char ('.');
@@ -122,7 +124,7 @@ public errordomain BuildError
 
 public string get_relative_path (string path)
 {
-    var current_dir = Environment.get_current_dir ();
+    var current_dir = original_dir;
 
     var dir = current_dir + "/";
     if (path.has_prefix (dir))
@@ -544,7 +546,7 @@ public class BuildFile
         if (Environment.get_current_dir () == dirname)
             return;
 
-        GLib.print ("[Entering directory %s]\n", dirname);
+        GLib.print ("\x1B[1m[Entering directory %s]\x1B[21m\n", get_relative_path (dirname));
         Environment.set_current_dir (dirname);
     }
 
@@ -594,7 +596,7 @@ public class BuildFile
         {
             if (o == output)
             {
-                GLib.print ("\x1B[1m[%s]\x1B[21m\n", output);
+                GLib.print ("\x1B[1m[Building %s]\x1B[21m\n", output);
                 break;
             }
         }
@@ -765,6 +767,8 @@ public class EasyBuild
 
     public static int main (string[] args)
     {
+        original_dir = Environment.get_current_dir ();
+
         var c = new OptionContext (/* Arguments and description for --help text */
                                    _("[COMMAND] - Build system"));
         c.add_main_entries (options, Config.GETTEXT_PACKAGE);
