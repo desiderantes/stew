@@ -305,12 +305,6 @@ public class BuildFile
             install_rule.inputs.append ("%s/install".printf (Path.get_basename (child.dirname)));
         rules.append (install_rule);
 
-        var clean_rule = new Rule ();
-        clean_rule.outputs.append ("%clean");
-        foreach (var child in children)
-            clean_rule.inputs.append ("%s/clean".printf (Path.get_basename (child.dirname)));
-        rules.append (clean_rule);
-
         /* Intltool rules */
         var intltool_source_list = variables.lookup ("intltool.xml-sources");
         if (intltool_source_list != null)
@@ -583,6 +577,17 @@ public class BuildFile
             }
         }
 
+        foreach (var child in children)
+            child.generate_rules ();
+    }
+
+    public void generate_clean_rule ()
+    {
+        var clean_rule = new Rule ();
+        clean_rule.outputs.append ("%clean");
+        foreach (var child in children)
+            clean_rule.inputs.append ("%s/clean".printf (Path.get_basename (child.dirname)));
+        rules.append (clean_rule);
         foreach (var rule in rules)
         {
             foreach (var output in rule.outputs)
@@ -590,12 +595,21 @@ public class BuildFile
                 if (output.has_prefix ("%"))
                     continue;
                 clean_rule.commands.append ("@echo '    RM %s'".printf (output));
-                clean_rule.commands.append ("@rm -f %s".printf (output));
+                if (output.has_suffix ("/"))
+                {
+                    /* Don't accidentally delete someone's entire hard-disk */
+                    if (output.has_prefix ("/"))
+                        warning ("Not making clean rule for absolute directory %s", output);
+                    else
+                        clean_rule.commands.append ("@rm -rf %s".printf (output));
+                }
+                else
+                    clean_rule.commands.append ("@rm -f %s".printf (output));
             }
         }
 
         foreach (var child in children)
-            child.generate_rules ();
+            child.generate_clean_rule ();
     }
     
     public bool is_toplevel
@@ -901,17 +915,17 @@ public class EasyBuild
         var version = toplevel.variables.lookup ("package.version");
         if (version != null)
             release_name += "-" + version;
+        var release_dir = "%s/".printf (release_name);
 
         var rule = new Rule ();
-        rule.outputs.append (release_name);
+        rule.outputs.append (release_dir);
         generate_release_rule (toplevel, rule, release_name);
         toplevel.rules.append (rule);
 
         rule = new Rule ();
-        rule.inputs.append (release_name);
+        rule.inputs.append (release_dir);
         rule.outputs.append ("%s.tar.gz".printf (release_name));
         rule.commands.append ("tar --create --gzip --file %s.tar.gz %s".printf (release_name, release_name));
-        rule.commands.append ("rm -r %s". printf (release_name));
         toplevel.rules.append (rule);
 
         rule = new Rule ();
@@ -920,10 +934,9 @@ public class EasyBuild
         toplevel.rules.append (rule);
 
         rule = new Rule ();
-        rule.inputs.append (release_name);
+        rule.inputs.append (release_dir);
         rule.outputs.append ("%s.tar.bz2".printf (release_name));
         rule.commands.append ("tar --create --bzip2 --file %s.tar.bz2 %s".printf (release_name, release_name));
-        rule.commands.append ("rm -r %s". printf (release_name));
         toplevel.rules.append (rule);
 
         rule = new Rule ();
@@ -932,10 +945,9 @@ public class EasyBuild
         toplevel.rules.append (rule);
 
         rule = new Rule ();
-        rule.inputs.append (release_name);
+        rule.inputs.append (release_dir);
         rule.outputs.append ("%s.tar.xz".printf (release_name));
         rule.commands.append ("tar --create --xz --file %s.tar.xz %s".printf (release_name, release_name));
-        rule.commands.append ("rm -r %s". printf (release_name));
         toplevel.rules.append (rule);
 
         rule = new Rule ();
@@ -946,28 +958,31 @@ public class EasyBuild
         rule = new Rule ();
         rule.outputs.append ("%release-gnome");
         rule.inputs.append ("%s.tar.xz".printf (release_name));
-        rule.commands.append ("scp %s.tar.xz master.gnome.org:". printf (release_name));
+        rule.commands.append ("scp %s.tar.xz master.gnome.org:".printf (release_name));
         rule.commands.append ("ssh master.gnome.org install-module %s.tar.xz". printf (release_name));
         toplevel.rules.append (rule);
 
         if (version != null)
         {
+            var package_version = "0";
+
             var orig_file = "%s_%s.orig.tar.gz".printf (package_name, version);
-            var changes_file = "%s_%s-0_source.changes".printf (package_name, version);
-            var dsc_file = "%s_%s-0.dsc".printf (package_name, version);
+            var debian_file = "%s_%s-%s.debian.tar.gz".printf (package_name, version, package_version);
+            var changes_file = "%s_%s-%s_source.changes".printf (package_name, version, package_version);
+            var dsc_file = "%s_%s-%s.dsc".printf (package_name, version, package_version);
 
             rule = new Rule ();
             rule.outputs.append (orig_file);
+            rule.outputs.append (debian_file);
             rule.outputs.append (dsc_file);
             rule.outputs.append (changes_file);
-            rule.inputs.append (release_name);
+            rule.inputs.append (release_dir);
             rule.commands.append ("@tar --create --gzip --file %s %s".printf (orig_file, release_name));
             rule.commands.append ("@mkdir -p %s/debian".printf (release_name));
 
             /* Generate debian/changelog */
             var changelog_file = "%s/debian/changelog".printf (release_name);
             var distribution = "oneiric";
-            var package_version = "0";
             var name = Environment.get_real_name ();
             var email = Environment.get_variable ("DEBEMAIL");
             if (email == null)
@@ -1038,6 +1053,9 @@ public class EasyBuild
                 toplevel.rules.append (rule);
             }
         }
+
+        /* Generate clean rule */
+        toplevel.generate_clean_rule ();
 
         if (do_expand)
         {
