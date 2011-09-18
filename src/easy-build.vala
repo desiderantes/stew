@@ -648,6 +648,10 @@ public class BuildFile
     
     public BuildFile get_buildfile_with_target (string target)
     {
+        // FIXME: Directories are broken
+        if (target.has_suffix ("/"))
+            return this;
+
         /* Build in the directory that contains this */
         var dir = Path.get_dirname (target);
         if (dir != ".")
@@ -962,6 +966,7 @@ public class EasyBuild
         rule.commands.append ("ssh master.gnome.org install-module %s.tar.xz". printf (release_name));
         toplevel.rules.append (rule);
 
+        /* Dpkg rules */
         if (version != null)
         {
             var package_version = "0";
@@ -1036,6 +1041,7 @@ public class EasyBuild
             rule.commands.append ("@echo \"3.0 (quilt)\" > %s/debian/source/format".printf (release_name));
 
             rule.commands.append ("cd %s && dpkg-buildpackage -S".printf (release_name));
+            rule.commands.append ("@rm -rf %s".printf (release_name));
             toplevel.rules.append (rule);
 
             var ppa_name = toplevel.variables.lookup ("package.ppa");
@@ -1047,6 +1053,45 @@ public class EasyBuild
                 rule.commands.append ("dput ppa:%s %s".printf (ppa_name, changes_file));
                 toplevel.rules.append (rule);
             }
+        }
+
+        /* RPM rules */
+        if (version != null)
+        {
+            var release = "1";
+            var summary = "Summary of %s".printf (package_name);
+            var description = "Description of %s".printf (package_name);
+            var license = "unknown";
+
+            var source_file = "%s.rpm.tar.gz".printf (package_name);
+            var spec_file = "%s/%s.spec".printf (release_name, package_name);
+
+            rule = new Rule ();
+            rule.inputs.append (release_dir);
+            rule.outputs.append ("%X");
+            rule.commands.append ("@echo \"Summary: %s\" > %s".printf (summary, spec_file));
+            rule.commands.append ("@echo \"Name: %s\" >> %s".printf (package_name, spec_file));
+            rule.commands.append ("@echo \"Version: %s\" >> %s".printf (version, spec_file));
+            rule.commands.append ("@echo \"Release: %s\" >> %s".printf (release, spec_file));
+            rule.commands.append ("@echo \"License: %s\" >> %s".printf (license, spec_file));
+            rule.commands.append ("@echo \"Source: %s\" >> %s".printf (source_file, spec_file));
+            rule.commands.append ("@echo >> %s".printf (spec_file));
+            rule.commands.append ("@echo \"%%description\" >> %s".printf (spec_file));
+            foreach (var line in description.split ("\n"))
+                rule.commands.append ("@echo \"%s\" >> %s".printf (line, spec_file));
+            rule.commands.append ("@echo >> %s".printf (spec_file));
+            rule.commands.append ("@echo \"%%prep\" >> %s".printf (spec_file));
+            rule.commands.append ("@echo \"%%setup -q\" >> %s".printf (spec_file));
+            rule.commands.append ("@echo >> %s".printf (spec_file));
+            rule.commands.append ("@echo \"%%build\" >> %s".printf (spec_file));
+            rule.commands.append ("@echo \"eb\" >> %s".printf (spec_file));
+            rule.commands.append ("@echo >> %s".printf (spec_file));
+            rule.commands.append ("@echo \"%%install\" >> %s".printf (spec_file));
+            rule.commands.append ("@echo \"eb install\" >> %s".printf (spec_file));
+            rule.commands.append ("tar --create --gzip --file %s %s".printf (source_file, release_name));
+            rule.commands.append ("@rm -rf %s".printf (release_name));
+            rule.commands.append ("rpmbuild -tb %s".printf (source_file));
+            toplevel.rules.append (rule);
         }
 
         /* Generate clean rule */
