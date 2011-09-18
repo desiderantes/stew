@@ -896,7 +896,8 @@ public class EasyBuild
         toplevel.generate_rules ();
 
         /* Generate release rules */
-        var release_name = toplevel.variables.lookup ("package.name");
+        var package_name = toplevel.variables.lookup ("package.name");
+        var release_name = package_name;
         var version = toplevel.variables.lookup ("package.version");
         if (version != null)
             release_name += "-" + version;
@@ -948,6 +949,95 @@ public class EasyBuild
         rule.commands.append ("scp %s.tar.xz master.gnome.org:". printf (release_name));
         rule.commands.append ("ssh master.gnome.org install-module %s.tar.xz". printf (release_name));
         toplevel.rules.append (rule);
+
+        if (version != null)
+        {
+            var orig_file = "%s_%s.orig.tar.gz".printf (package_name, version);
+            var changes_file = "%s_%s-0_source.changes".printf (package_name, version);
+            var dsc_file = "%s_%s-0.dsc".printf (package_name, version);
+
+            rule = new Rule ();
+            rule.outputs.append (orig_file);
+            rule.outputs.append (dsc_file);
+            rule.outputs.append (changes_file);
+            rule.inputs.append (release_name);
+            rule.commands.append ("@tar --create --gzip --file %s %s".printf (orig_file, release_name));
+            rule.commands.append ("@mkdir -p %s/debian".printf (release_name));
+
+            /* Generate debian/changelog */
+            var changelog_file = "%s/debian/changelog".printf (release_name);
+            var distribution = "oneiric";
+            var package_version = "0";
+            var name = Environment.get_real_name ();
+            var email = Environment.get_variable ("DEBEMAIL");
+            if (email == null)
+                email = Environment.get_variable ("EMAIL");
+            if (email == null)
+                email = "%s@%s".printf (Environment.get_user_name (), Environment.get_host_name ());
+            var now = Time.local (time_t ());
+            var release_date = now.format ("%a, %d %b %Y %H:%M:%S %z");
+            rule.commands.append ("@echo \"%s (%s-%s) %s; urgency=low\" > %s".printf (package_name, version, package_version, distribution, changelog_file));
+            rule.commands.append ("@echo >> %s".printf (changelog_file));
+            rule.commands.append ("@echo \"  * Initial release.\" >> %s".printf (changelog_file));
+            rule.commands.append ("@echo >> %s".printf (changelog_file));
+            rule.commands.append ("@echo \" -- %s <%s>  %s\" >> %s".printf (name, email, release_date, changelog_file));
+
+            /* Generate debian/rules */
+            var rules_file = "%s/debian/rules".printf (release_name);
+            rule.commands.append ("@echo \"#!/usr/bin/make -f\" > %s".printf (rules_file));
+            rule.commands.append ("@echo >> %s".printf (rules_file));
+            rule.commands.append ("@echo \"build:\" >> %s".printf (rules_file));
+            rule.commands.append ("@echo \"\teb\" >> %s".printf (rules_file));
+            rule.commands.append ("@echo >> %s".printf (rules_file));
+            rule.commands.append ("@echo \"binary: binary-arch binary-indep\" >> %s".printf (rules_file));
+            rule.commands.append ("@echo >> %s".printf (rules_file));
+            rule.commands.append ("@echo \"binary-arch: build\" >> %s".printf (rules_file));
+            rule.commands.append ("@echo \"\teb install\" >> %s".printf (rules_file));
+            rule.commands.append ("@echo >> %s".printf (rules_file));
+            rule.commands.append ("@echo \"binary-indep: build\" >> %s".printf (rules_file));
+            rule.commands.append ("@echo >> %s".printf (rules_file));
+            rule.commands.append ("@echo \"clean:\" >> %s".printf (rules_file));
+            rule.commands.append ("@echo \"\teb clean\" >> %s".printf (rules_file));
+            rule.commands.append ("@echo chmod +x %s".printf (rules_file));
+
+            /* Generate debian/control */
+            var control_file = "%s/debian/control".printf (release_name);
+            var build_depends = "easy-build";
+            var short_description = "Short description of %s".printf (package_name);
+            var long_description = "Long description of %s".printf (package_name);
+            rule.commands.append ("@echo \"Source: %s\" > %s".printf (package_name, control_file));
+            rule.commands.append ("@echo \"Maintainer: %s <%s>\" >> %s".printf (name, email, control_file));
+            rule.commands.append ("@echo \"Build-Depends: %s\" >> %s".printf (build_depends, control_file));
+            rule.commands.append ("@echo \"Standards-Version: 3.9.2\" >> %s".printf (control_file));
+            rule.commands.append ("@echo >> %s".printf (control_file));
+            rule.commands.append ("@echo \"Package: %s\" >> %s".printf (package_name, control_file));
+            rule.commands.append ("@echo \"Architecture: any\" >> %s".printf (control_file));
+            rule.commands.append ("@echo \"Description: %s\" >> %s".printf (short_description, control_file));
+            foreach (var line in long_description.split ("\n"))
+                rule.commands.append ("@echo \" %s\" >> %s".printf (line, control_file));
+
+            /* Generate debian/source/format */
+            rule.commands.append ("@mkdir -p %s/debian/source".printf (release_name));
+            rule.commands.append ("@echo \"3.0 (quilt)\" > %s/debian/source/format".printf (release_name));
+
+            rule.commands.append ("cd %s && dpkg-buildpackage -S".printf (release_name));
+            toplevel.rules.append (rule);
+
+            rule = new Rule ();
+            rule.outputs.append ("%release-dpkg");
+            rule.inputs.append (changes_file);
+            toplevel.rules.append (rule);
+
+            var ppa_name = toplevel.variables.lookup ("package.ppa");
+            if (ppa_name != null)
+            {
+                rule = new Rule ();
+                rule.outputs.append ("%release-ppa");
+                rule.inputs.append (changes_file);
+                rule.commands.append ("dput ppa:%s %s".printf (ppa_name, changes_file));
+                toplevel.rules.append (rule);
+            }
+        }
 
         if (do_expand)
         {
