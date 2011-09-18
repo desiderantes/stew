@@ -1038,11 +1038,6 @@ public class EasyBuild
             rule.commands.append ("cd %s && dpkg-buildpackage -S".printf (release_name));
             toplevel.rules.append (rule);
 
-            rule = new Rule ();
-            rule.outputs.append ("%release-dpkg");
-            rule.inputs.append (changes_file);
-            toplevel.rules.append (rule);
-
             var ppa_name = toplevel.variables.lookup ("package.ppa");
             if (ppa_name != null)
             {
