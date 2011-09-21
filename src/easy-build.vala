@@ -1,5 +1,11 @@
 private bool do_expand = false;
 private bool debug_enabled = false;
+private string resource_directory;
+private string bin_directory;
+private string data_directory;
+private string package_data_directory;
+private string sysconf_directory;
+private string? target_directory = null;
 
 private string original_dir;
 
@@ -49,6 +55,14 @@ private string replace_extension (string filename, string extension)
         return "%s.%s".printf (filename, extension);
 
     return "%.*s.%s".printf (i, filename, extension);
+}
+
+private string get_install_directory (string dir)
+{
+    if (target_directory == null)
+        return dir;
+
+    return "%s%s".printf (target_directory, dir);
 }
 
 public class Rule
@@ -285,13 +299,13 @@ public class BuildFile
                                           get_relative_path (filename), line_number, statement);
         }
     }
-    
+
     public void generate_rules ()
     {
         /* Add predefined variables */
-        variables.insert ("files.project.install-dir", "/usr/local/share/%s".printf (toplevel.variables.lookup ("package.name")));
-        variables.insert ("files.application.install-dir", "/usr/local/share/applications");
-        variables.insert ("files.gsettings-schemas.install-dir", "/usr/local/share/glib-2.0/schemas");
+        variables.insert ("files.project.install-directory", "%s".printf (get_install_directory (package_data_directory)));
+        variables.insert ("files.application.install-directory", "%s/applications".printf (get_install_directory (data_directory)));
+        variables.insert ("files.gsettings-schemas.install-directory", "%s/glib-2.0/schemas".printf (get_install_directory (sysconf_directory)));
 
         var build_rule = new Rule ();
         build_rule.outputs.append ("%build");
@@ -356,7 +370,9 @@ public class BuildFile
                     continue;
                 }
                 install_rule.inputs.append (page);
-                install_rule.commands.append ("install %s /usr/share/man/man%d/%s".printf (page, number, page));
+                var dir = "%s/man/man%d".printf  (data_directory, number);
+                install_rule.commands.append ("mkdir -p %s".printf (get_install_directory (dir)));
+                install_rule.commands.append ("install %s %s/%s".printf (page, get_install_directory (dir), page));
             }
         }
 
@@ -368,7 +384,9 @@ public class BuildFile
             foreach (var schema in schemas)
             {
                 install_rule.inputs.append (schema);
-                install_rule.commands.append ("install %s /usr/share/glib-2.0/schemas/%s".printf (schema, schema));
+                var dir = "%s/glib-2.0/schemas".printf (data_directory);
+                install_rule.commands.append ("mkdir -p %s".printf (get_install_directory (dir)));
+                install_rule.commands.append ("install %s %s/%s".printf (schema, get_install_directory (dir), schema));
             }
         }
 
@@ -380,7 +398,9 @@ public class BuildFile
             foreach (var entry in entries)
             {
                 install_rule.inputs.append (entry);
-                install_rule.commands.append ("install %s /usr/share/applications/%s".printf (entry, entry));
+                var dir = "%s/applications".printf (data_directory);
+                install_rule.commands.append ("mkdir -p %s".printf (get_install_directory (dir)));
+                install_rule.commands.append ("install %s %s/applications/%s".printf (entry, get_install_directory (dir), entry));
             }
         }
 
@@ -474,6 +494,9 @@ public class BuildFile
                 build_rule.inputs.append (jar_file);
                 jar_rule.commands.append (jar_command);
                 rules.append (jar_rule);
+                install_rule.inputs.append (jar_file);
+                install_rule.commands.append ("mkdir -p %s".printf (get_install_directory (package_data_directory)));
+                install_rule.commands.append ("install %s %s/%s".printf (jar_file, get_install_directory (package_data_directory), jar_file));
             }
 
             /* C++ compile */
@@ -546,33 +569,29 @@ public class BuildFile
                 command += " -o %s".printf (program);
                 rule.commands.append (command);
                 rules.append (rule);
+
+                install_rule.inputs.append (program);
+                install_rule.commands.append ("mkdir -p %s".printf (get_install_directory (bin_directory)));
+                install_rule.commands.append ("install %s %s/%s".printf (program, get_install_directory (bin_directory), program));
             }
         }
 
-        foreach (var program in programs)
-        {
-            var source = program;
-            var target = Path.build_filename ("/usr/local/bin", program);
-            install_rule.inputs.append (source);
-            install_rule.commands.append ("install %s %s".printf (source, target));
-        }
         foreach (var file_class in files)
         {
             var file_list = variables.lookup ("files.%s".printf (file_class));
 
             /* Only install files that are requested to */
-            var install_dir = variables.lookup ("files.%s.install-dir".printf (file_class));
-            if (install_dir == null)
+            var install_directory = variables.lookup ("files.%s.install-directory".printf (file_class));
+            if (install_directory == null)
                 continue;
 
             if (file_list != null)
             {
                 foreach (var file in file_list.split (" "))
                 {
-                    var source = file;
-                    var target = Path.build_filename (install_dir, file);
-                    install_rule.inputs.append (source);
-                    install_rule.commands.append ("install %s %s".printf (source, target));
+                    install_rule.inputs.append (file);
+                    install_rule.commands.append ("mkdir -p %s".printf (get_install_directory (install_directory)));
+                    install_rule.commands.append ("install %s %s/%s".printf (file, get_install_directory (install_directory), file));
                 }
             }
         }
@@ -745,6 +764,15 @@ public class EasyBuild
         { "version", 'v', 0, OptionArg.NONE, ref show_version,
           /* Help string for command line --version flag */
           N_("Show release version"), null},
+        { "resource-directory", 0, 0, OptionArg.STRING, ref resource_directory,
+          /* Help string for command line --resource-directory flag */
+          N_("Directory to install resources to"), "DIRECTORY" },
+        { "system-config-directory", 0, 0, OptionArg.STRING, ref sysconf_directory,
+          /* Help string for command line --system-config-directory flag */
+          N_("Directory containing system configuration"), "DIRECTORY" },
+        { "target-directory", 0, 0, OptionArg.STRING, ref target_directory,
+          /* Help string for command line --target_directory flag */
+          N_("Directory to copy installed files to"), "DIRECTORY" },
         { "debug", 'd', 0, OptionArg.NONE, ref debug_enabled,
           /* Help string for command line --debug flag */
           N_("Print debugging messages"), null},
@@ -875,6 +903,8 @@ public class EasyBuild
     {
         original_dir = Environment.get_current_dir ();
 
+        resource_directory = "/usr/local";
+        sysconf_directory = "/etc";
         var c = new OptionContext (/* Arguments and description for --help text */
                                    _("[TARGET] - Build system"));
         c.add_main_entries (options, Config.GETTEXT_PACKAGE);
@@ -910,13 +940,18 @@ public class EasyBuild
         }
         var toplevel = f.toplevel;
 
+        var package_name = toplevel.variables.lookup ("package.name");
+        var version = toplevel.variables.lookup ("package.version");
+
+        bin_directory = "%s/bin".printf (resource_directory);
+        data_directory = "%s/share".printf (resource_directory);
+        package_data_directory = "%s/%s".printf (data_directory, package_name);
+
         /* Generate implicit rules */
         toplevel.generate_rules ();
 
         /* Generate release rules */
-        var package_name = toplevel.variables.lookup ("package.name");
         var release_name = package_name;
-        var version = toplevel.variables.lookup ("package.version");
         if (version != null)
             release_name += "-" + version;
         var release_dir = "%s/".printf (release_name);
@@ -996,6 +1031,7 @@ public class EasyBuild
                 email = "%s@%s".printf (Environment.get_user_name (), Environment.get_host_name ());
             var now = Time.local (time_t ());
             var release_date = now.format ("%a, %d %b %Y %H:%M:%S %z");
+            rule.commands.append ("echo Writing debian/changelog");
             rule.commands.append ("@echo \"%s (%s-%s) %s; urgency=low\" > %s".printf (package_name, version, package_version, distribution, changelog_file));
             rule.commands.append ("@echo >> %s".printf (changelog_file));
             rule.commands.append ("@echo \"  * Initial release.\" >> %s".printf (changelog_file));
@@ -1004,15 +1040,16 @@ public class EasyBuild
 
             /* Generate debian/rules */
             var rules_file = "%s/debian/rules".printf (release_name);
+            rule.commands.append ("echo Writing debian/rules");
             rule.commands.append ("@echo \"#!/usr/bin/make -f\" > %s".printf (rules_file));
             rule.commands.append ("@echo >> %s".printf (rules_file));
             rule.commands.append ("@echo \"build:\" >> %s".printf (rules_file));
-            rule.commands.append ("@echo \"\teb\" >> %s".printf (rules_file));
+            rule.commands.append ("@echo \"\teb --resource-directory=/usr\" >> %s".printf (rules_file));
             rule.commands.append ("@echo >> %s".printf (rules_file));
             rule.commands.append ("@echo \"binary: binary-arch binary-indep\" >> %s".printf (rules_file));
             rule.commands.append ("@echo >> %s".printf (rules_file));
             rule.commands.append ("@echo \"binary-arch: build\" >> %s".printf (rules_file));
-            rule.commands.append ("@echo \"\teb install\" >> %s".printf (rules_file));
+            rule.commands.append ("@echo \"\teb install --resource-directory=/usr\" >> %s".printf (rules_file));
             rule.commands.append ("@echo >> %s".printf (rules_file));
             rule.commands.append ("@echo \"binary-indep: build\" >> %s".printf (rules_file));
             rule.commands.append ("@echo >> %s".printf (rules_file));
@@ -1025,6 +1062,7 @@ public class EasyBuild
             var build_depends = "easy-build";
             var short_description = "Short description of %s".printf (package_name);
             var long_description = "Long description of %s".printf (package_name);
+            rule.commands.append ("echo Writing debian/control");
             rule.commands.append ("@echo \"Source: %s\" > %s".printf (package_name, control_file));
             rule.commands.append ("@echo \"Maintainer: %s <%s>\" >> %s".printf (name, email, control_file));
             rule.commands.append ("@echo \"Build-Depends: %s\" >> %s".printf (build_depends, control_file));
@@ -1037,6 +1075,7 @@ public class EasyBuild
                 rule.commands.append ("@echo \" %s\" >> %s".printf (line, control_file));
 
             /* Generate debian/source/format */
+            rule.commands.append ("echo Writing debian/source/format");
             rule.commands.append ("@mkdir -p %s/debian/source".printf (release_name));
             rule.commands.append ("@echo \"3.0 (quilt)\" > %s/debian/source/format".printf (release_name));
 
@@ -1063,12 +1102,39 @@ public class EasyBuild
             var description = "Description of %s".printf (package_name);
             var license = "unknown";
 
+            string rpmbuild_rc = "";
+            int exit_status;
+            try
+            {
+                Process.spawn_command_line_sync ("rpmbuild --showrc", out rpmbuild_rc, null, out exit_status);
+            }
+            catch (SpawnError e)
+            {
+                // FIXME
+                warning ("Failed to get rpmbuild configuration");
+            }
+
+            var build_arch = "";
+            try
+            {
+                var build_arch_regex = new Regex ("build arch\\s+:(.*)");
+                MatchInfo info;
+                if (build_arch_regex.match (rpmbuild_rc, 0, out info))
+                    build_arch = info.fetch (1).strip ();
+            }
+            catch (RegexError e)
+            {
+                warning ("Failed to make rpmbuild regex");
+            }
+
             var source_file = "%s.rpm.tar.gz".printf (package_name);
             var spec_file = "%s/%s.spec".printf (release_name, package_name);
+            var rpm_file = "%s-%s-%s.%s.rpm".printf (package_name, version, release, build_arch);
 
             rule = new Rule ();
             rule.inputs.append (release_dir);
-            rule.outputs.append ("%X");
+            rule.outputs.append (source_file);
+            rule.commands.append ("echo Writing %s.spec".printf (package_name));
             rule.commands.append ("@echo \"Summary: %s\" > %s".printf (summary, spec_file));
             rule.commands.append ("@echo \"Name: %s\" >> %s".printf (package_name, spec_file));
             rule.commands.append ("@echo \"Version: %s\" >> %s".printf (version, spec_file));
@@ -1084,13 +1150,26 @@ public class EasyBuild
             rule.commands.append ("@echo \"%%setup -q\" >> %s".printf (spec_file));
             rule.commands.append ("@echo >> %s".printf (spec_file));
             rule.commands.append ("@echo \"%%build\" >> %s".printf (spec_file));
-            rule.commands.append ("@echo \"eb\" >> %s".printf (spec_file));
+            rule.commands.append ("@echo \"eb --resource-directory=/usr\" >> %s".printf (spec_file));
             rule.commands.append ("@echo >> %s".printf (spec_file));
             rule.commands.append ("@echo \"%%install\" >> %s".printf (spec_file));
-            rule.commands.append ("@echo \"eb install\" >> %s".printf (spec_file));
+            rule.commands.append ("@echo \"eb install --target-directory=\\$RPM_BUILD_ROOT --resource-directory=/usr\" >> %s".printf (spec_file));
+            rule.commands.append ("@echo \"find \\$RPM_BUILD_ROOT -type f -print | sed \\\"s#^\\$RPM_BUILD_ROOT/*#/#\\\" > FILE-LIST\" >> %s".printf (spec_file));
+            rule.commands.append ("@echo \"%%files -f FILE-LIST\" >> %s".printf (spec_file));
             rule.commands.append ("tar --create --gzip --file %s %s".printf (source_file, release_name));
             rule.commands.append ("@rm -rf %s".printf (release_name));
+            toplevel.rules.append (rule);
+
+            rule = new Rule ();
+            rule.inputs.append (source_file);
+            rule.outputs.append (rpm_file);
             rule.commands.append ("rpmbuild -tb %s".printf (source_file));
+            rule.commands.append ("cp %s/rpmbuild/RPMS/%s/%s .".printf (Environment.get_home_dir (), build_arch, rpm_file));
+            toplevel.rules.append (rule);
+
+            rule = new Rule ();
+            rule.inputs.append (rpm_file);
+            rule.outputs.append ("%release-rpm");
             toplevel.rules.append (rule);
         }
 
