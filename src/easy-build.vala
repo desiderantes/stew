@@ -1031,7 +1031,7 @@ public class EasyBuild
                 email = "%s@%s".printf (Environment.get_user_name (), Environment.get_host_name ());
             var now = Time.local (time_t ());
             var release_date = now.format ("%a, %d %b %Y %H:%M:%S %z");
-            rule.commands.append ("echo Writing debian/changelog");
+            rule.commands.append ("@echo '    Writing debian/changelog'");
             rule.commands.append ("@echo \"%s (%s-%s) %s; urgency=low\" > %s".printf (package_name, version, package_version, distribution, changelog_file));
             rule.commands.append ("@echo >> %s".printf (changelog_file));
             rule.commands.append ("@echo \"  * Initial release.\" >> %s".printf (changelog_file));
@@ -1040,7 +1040,7 @@ public class EasyBuild
 
             /* Generate debian/rules */
             var rules_file = "%s/debian/rules".printf (release_name);
-            rule.commands.append ("echo Writing debian/rules");
+            rule.commands.append ("@echo '    Writing debian/rules'");
             rule.commands.append ("@echo \"#!/usr/bin/make -f\" > %s".printf (rules_file));
             rule.commands.append ("@echo >> %s".printf (rules_file));
             rule.commands.append ("@echo \"build:\" >> %s".printf (rules_file));
@@ -1062,7 +1062,7 @@ public class EasyBuild
             var build_depends = "easy-build";
             var short_description = "Short description of %s".printf (package_name);
             var long_description = "Long description of %s".printf (package_name);
-            rule.commands.append ("echo Writing debian/control");
+            rule.commands.append ("@echo '    Writing debian/control'");
             rule.commands.append ("@echo \"Source: %s\" > %s".printf (package_name, control_file));
             rule.commands.append ("@echo \"Maintainer: %s <%s>\" >> %s".printf (name, email, control_file));
             rule.commands.append ("@echo \"Build-Depends: %s\" >> %s".printf (build_depends, control_file));
@@ -1075,7 +1075,7 @@ public class EasyBuild
                 rule.commands.append ("@echo \" %s\" >> %s".printf (line, control_file));
 
             /* Generate debian/source/format */
-            rule.commands.append ("echo Writing debian/source/format");
+            rule.commands.append ("@echo '    Writing debian/source/format'");
             rule.commands.append ("@mkdir -p %s/debian/source".printf (release_name));
             rule.commands.append ("@echo \"3.0 (quilt)\" > %s/debian/source/format".printf (release_name));
 
@@ -1134,7 +1134,7 @@ public class EasyBuild
             rule = new Rule ();
             rule.inputs.append (release_dir);
             rule.outputs.append (source_file);
-            rule.commands.append ("echo Writing %s.spec".printf (package_name));
+            rule.commands.append ("@echo '    Writing %s.spec'".printf (package_name));
             rule.commands.append ("@echo \"Summary: %s\" > %s".printf (summary, spec_file));
             rule.commands.append ("@echo \"Name: %s\" >> %s".printf (package_name, spec_file));
             rule.commands.append ("@echo \"Version: %s\" >> %s".printf (version, spec_file));
