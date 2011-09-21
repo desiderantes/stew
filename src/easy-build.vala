@@ -1164,6 +1164,7 @@ public class EasyBuild
             rule.inputs.append (source_file);
             rule.outputs.append (rpm_file);
             rule.commands.append ("rpmbuild -tb %s".printf (source_file));
+            rule.commands.append ("rm %s".printf (source_file));
             rule.commands.append ("cp %s/rpmbuild/RPMS/%s/%s .".printf (Environment.get_home_dir (), build_arch, rpm_file));
             toplevel.rules.append (rule);
 
