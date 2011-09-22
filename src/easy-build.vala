@@ -1040,6 +1040,8 @@ public class EasyBuild
                 warning ("Failed to get dpkg build arch");
             }
 
+            var build_dir = ".eb-dpkg-builddir";
+            var gzip_file = "%s.tar.gz".printf (release_name);
             var orig_file = "%s_%s.orig.tar.gz".printf (package_name, version);
             var debian_file = "%s_%s-%s.debian.tar.gz".printf (package_name, version, package_version);
             var changes_file = "%s_%s-%s_source.changes".printf (package_name, version, package_version);
@@ -1048,15 +1050,18 @@ public class EasyBuild
 
             rule = new Rule ();
             rule.outputs.append (orig_file);
+            rule.inputs.append (gzip_file);
+            rule.commands.append ("@cp %s %s".printf (gzip_file, orig_file));
+            toplevel.rules.append (rule);
+
+            rule = new Rule ();
             rule.outputs.append (debian_file);
-            rule.outputs.append (dsc_file);
-            rule.outputs.append (changes_file);
-            rule.inputs.append (release_dir);
-            rule.commands.append ("@tar --create --gzip --file %s %s".printf (orig_file, release_name));
-            rule.commands.append ("@mkdir -p %s/debian".printf (release_name));
+            rule.commands.append ("@rm -rf %s".printf (build_dir));
+            rule.commands.append ("@mkdir -p %s/debian".printf (build_dir));
+            toplevel.rules.append (rule);
 
             /* Generate debian/changelog */
-            var changelog_file = "%s/debian/changelog".printf (release_name);
+            var changelog_file = "%s/debian/changelog".printf (build_dir);
             var distribution = "oneiric";
             var name = Environment.get_real_name ();
             var email = Environment.get_variable ("DEBEMAIL");
@@ -1075,7 +1080,7 @@ public class EasyBuild
             rule.commands.append ("@echo \" -- %s <%s>  %s\" >> %s".printf (name, email, release_date, changelog_file));
 
             /* Generate debian/rules */
-            var rules_file = "%s/debian/rules".printf (release_name);
+            var rules_file = "%s/debian/rules".printf (build_dir);
             if (pretty_print)
                 rule.commands.append ("@echo '    Writing debian/rules'");
             rule.commands.append ("@echo \"#!/usr/bin/make -f\" > %s".printf (rules_file));
@@ -1095,7 +1100,7 @@ public class EasyBuild
             rule.commands.append ("@echo chmod +x %s".printf (rules_file));
 
             /* Generate debian/control */
-            var control_file = "%s/debian/control".printf (release_name);
+            var control_file = "%s/debian/control".printf (build_dir);
             var build_depends = "easy-build";
             var short_description = "Short description of %s".printf (package_name);
             var long_description = "Long description of %s".printf (package_name);
@@ -1115,13 +1120,45 @@ public class EasyBuild
             /* Generate debian/source/format */
             if (pretty_print)
                 rule.commands.append ("@echo '    Writing debian/source/format'");
-            rule.commands.append ("@mkdir -p %s/debian/source".printf (release_name));
-            rule.commands.append ("@echo \"3.0 (quilt)\" > %s/debian/source/format".printf (release_name));
+            rule.commands.append ("@mkdir -p %s/debian/source".printf (build_dir));
+            rule.commands.append ("@echo \"3.0 (quilt)\" > %s/debian/source/format".printf (build_dir));
 
+            rule.commands.append ("@cd %s && tar --create --gzip --file ../%s debian".printf (build_dir, debian_file));
+            rule.commands.append ("@rm -rf %s".printf (build_dir));
+
+            /* Source build */
+            rule = new Rule ();
+            rule.outputs.append (dsc_file);
+            rule.outputs.append (changes_file);
+            rule.inputs.append (orig_file);
+            rule.inputs.append (debian_file);
             if (pretty_print)
                 rule.commands.append ("@echo '    DPKG'");
-            rule.commands.append ("@cd %s && dpkg-buildpackage -S".printf (release_name));
-            rule.commands.append ("@rm -rf %s".printf (release_name));
+            rule.commands.append ("@rm -rf %s".printf (build_dir));
+            rule.commands.append ("@mkdir -p %s".printf (build_dir));
+            rule.commands.append ("@cp %s %s %s".printf (orig_file, debian_file, build_dir));
+            rule.commands.append ("@cd %s && tar --extract --gzip --file ../%s".printf (build_dir, orig_file));
+            rule.commands.append ("@cd %s/%s && tar --extract --gzip --file ../../%s".printf (build_dir, release_name, debian_file));
+            rule.commands.append ("@cd %s/%s && dpkg-buildpackage -S".printf (build_dir, release_name));
+            rule.commands.append ("@mv %s/%s %s/%s .".printf (build_dir, dsc_file, build_dir, changes_file));
+            rule.commands.append ("@rm -rf %s".printf (build_dir));
+            toplevel.rules.append (rule);
+
+            /* Binary build */
+            rule = new Rule ();
+            rule.outputs.append (deb_file);
+            rule.inputs.append (orig_file);
+            rule.inputs.append (debian_file);
+            if (pretty_print)
+                rule.commands.append ("@echo '    DPKG'");
+            rule.commands.append ("@rm -rf %s".printf (build_dir));
+            rule.commands.append ("@mkdir -p %s".printf (build_dir));
+            rule.commands.append ("@cp %s %s %s".printf (orig_file, debian_file, build_dir));
+            rule.commands.append ("@cd %s && tar --extract --gzip --file ../%s".printf (build_dir, orig_file));
+            rule.commands.append ("@cd %s/%s && tar --extract --gzip --file ../../%s".printf (build_dir, release_name, debian_file));
+            rule.commands.append ("@cd %s/%s && dpkg-buildpackage".printf (build_dir, release_name));
+            rule.commands.append ("@mv %s/%s .".printf (build_dir, deb_file));
+            rule.commands.append ("@rm -rf %s".printf (build_dir));
             toplevel.rules.append (rule);
 
             rule = new Rule ();
