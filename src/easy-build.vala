@@ -781,8 +781,8 @@ public class EasyBuild
         { "system-config-directory", 0, 0, OptionArg.STRING, ref sysconf_directory,
           /* Help string for command line --system-config-directory flag */
           N_("Directory containing system configuration"), "DIRECTORY" },
-        { "target-directory", 0, 0, OptionArg.STRING, ref target_directory,
-          /* Help string for command line --target_directory flag */
+        { "destination-directory", 0, 0, OptionArg.STRING, ref target_directory,
+          /* Help string for command line --destination-directory flag */
           N_("Directory to copy installed files to"), "DIRECTORY" },
         { "verbose", 0, 0, OptionArg.NONE, ref show_verbose,
           /* Help string for command line --verbose flag */
@@ -1237,7 +1237,7 @@ public class EasyBuild
             rule.commands.append ("@echo \"eb --resource-directory=/usr\" >> %s".printf (spec_file));
             rule.commands.append ("@echo >> %s".printf (spec_file));
             rule.commands.append ("@echo \"%%install\" >> %s".printf (spec_file));
-            rule.commands.append ("@echo \"eb install --target-directory=\\$RPM_BUILD_ROOT --resource-directory=/usr\" >> %s".printf (spec_file));
+            rule.commands.append ("@echo \"eb install --destination-directory=\\$RPM_BUILD_ROOT --resource-directory=/usr\" >> %s".printf (spec_file));
             rule.commands.append ("@echo \"find \\$RPM_BUILD_ROOT -type f -print | sed \\\"s#^\\$RPM_BUILD_ROOT/*#/#\\\" > FILE-LIST\" >> %s".printf (spec_file));
             rule.commands.append ("@echo \"%%files -f FILE-LIST\" >> %s".printf (spec_file));
             rule.commands.append ("@tar --create --gzip --file %s %s".printf (source_file, release_name));
