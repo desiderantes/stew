@@ -377,8 +377,8 @@ public class BuildFile
                 }
                 install_rule.inputs.append (page);
                 var dir = "%s/man/man%d".printf  (data_directory, number);
-                install_rule.commands.append ("mkdir -p %s".printf (get_install_directory (dir)));
-                install_rule.commands.append ("install %s %s/%s".printf (page, get_install_directory (dir), page));
+                install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (dir)));
+                install_rule.commands.append ("@install %s %s/%s".printf (page, get_install_directory (dir), page));
             }
         }
 
@@ -391,8 +391,8 @@ public class BuildFile
             {
                 install_rule.inputs.append (schema);
                 var dir = "%s/glib-2.0/schemas".printf (data_directory);
-                install_rule.commands.append ("mkdir -p %s".printf (get_install_directory (dir)));
-                install_rule.commands.append ("install %s %s/%s".printf (schema, get_install_directory (dir), schema));
+                install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (dir)));
+                install_rule.commands.append ("@install %s %s/%s".printf (schema, get_install_directory (dir), schema));
             }
         }
 
@@ -405,8 +405,8 @@ public class BuildFile
             {
                 install_rule.inputs.append (entry);
                 var dir = "%s/applications".printf (data_directory);
-                install_rule.commands.append ("mkdir -p %s".printf (get_install_directory (dir)));
-                install_rule.commands.append ("install %s %s/applications/%s".printf (entry, get_install_directory (dir), entry));
+                install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (dir)));
+                install_rule.commands.append ("@install %s %s/applications/%s".printf (entry, get_install_directory (dir), entry));
             }
         }
 
@@ -501,8 +501,8 @@ public class BuildFile
                 jar_rule.commands.append (jar_command);
                 rules.append (jar_rule);
                 install_rule.inputs.append (jar_file);
-                install_rule.commands.append ("mkdir -p %s".printf (get_install_directory (package_data_directory)));
-                install_rule.commands.append ("install %s %s/%s".printf (jar_file, get_install_directory (package_data_directory), jar_file));
+                install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (package_data_directory)));
+                install_rule.commands.append ("@install %s %s/%s".printf (jar_file, get_install_directory (package_data_directory), jar_file));
             }
 
             /* C++ compile */
@@ -580,8 +580,8 @@ public class BuildFile
                 rules.append (rule);
 
                 install_rule.inputs.append (program);
-                install_rule.commands.append ("mkdir -p %s".printf (get_install_directory (bin_directory)));
-                install_rule.commands.append ("install %s %s/%s".printf (program, get_install_directory (bin_directory), program));
+                install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (bin_directory)));
+                install_rule.commands.append ("@install %s %s/%s".printf (program, get_install_directory (bin_directory), program));
             }
         }
 
@@ -599,8 +599,8 @@ public class BuildFile
                 foreach (var file in file_list.split (" "))
                 {
                     install_rule.inputs.append (file);
-                    install_rule.commands.append ("mkdir -p %s".printf (get_install_directory (install_directory)));
-                    install_rule.commands.append ("install %s %s/%s".printf (file, get_install_directory (install_directory), file));
+                    install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (install_directory)));
+                    install_rule.commands.append ("@install %s %s/%s".printf (file, get_install_directory (install_directory), file));
                 }
             }
         }
@@ -877,10 +877,10 @@ public class EasyBuild
 
         /* Generate directory if a new one */
         if (!has_dir)
-            release_rule.commands.append ("mkdir -p %s".printf (Path.get_dirname (output_filename)));
+            release_rule.commands.append ("@mkdir -p %s".printf (Path.get_dirname (output_filename)));
 
         release_rule.inputs.append (input_filename);
-        release_rule.commands.append ("cp %s %s".printf (input_filename, output_filename));
+        release_rule.commands.append ("@cp %s %s".printf (input_filename, output_filename));
     }
     
     public static void generate_release_rule (BuildFile buildfile, Rule release_rule, string temp_dir)
@@ -980,7 +980,9 @@ public class EasyBuild
         rule = new Rule ();
         rule.inputs.append (release_dir);
         rule.outputs.append ("%s.tar.gz".printf (release_name));
-        rule.commands.append ("tar --create --gzip --file %s.tar.gz %s".printf (release_name, release_name));
+        if (pretty_print)
+            rule.commands.append ("@echo '    COMPRESS %s.tar.gz'".printf (release_name));
+        rule.commands.append ("@tar --create --gzip --file %s.tar.gz %s".printf (release_name, release_name));
         toplevel.rules.append (rule);
 
         rule = new Rule ();
@@ -991,7 +993,9 @@ public class EasyBuild
         rule = new Rule ();
         rule.inputs.append (release_dir);
         rule.outputs.append ("%s.tar.bz2".printf (release_name));
-        rule.commands.append ("tar --create --bzip2 --file %s.tar.bz2 %s".printf (release_name, release_name));
+        if (pretty_print)
+            rule.commands.append ("@echo '    COMPRESS %s.tar.bz2'".printf (release_name));
+        rule.commands.append ("@tar --create --bzip2 --file %s.tar.bz2 %s".printf (release_name, release_name));
         toplevel.rules.append (rule);
 
         rule = new Rule ();
@@ -1002,7 +1006,9 @@ public class EasyBuild
         rule = new Rule ();
         rule.inputs.append (release_dir);
         rule.outputs.append ("%s.tar.xz".printf (release_name));
-        rule.commands.append ("tar --create --xz --file %s.tar.xz %s".printf (release_name, release_name));
+        if (pretty_print)
+            rule.commands.append ("@echo '    COMPRESS %s.tar.xz'".printf (release_name));
+        rule.commands.append ("@tar --create --xz --file %s.tar.xz %s".printf (release_name, release_name));
         toplevel.rules.append (rule);
 
         rule = new Rule ();
@@ -1112,7 +1118,9 @@ public class EasyBuild
             rule.commands.append ("@mkdir -p %s/debian/source".printf (release_name));
             rule.commands.append ("@echo \"3.0 (quilt)\" > %s/debian/source/format".printf (release_name));
 
-            rule.commands.append ("cd %s && dpkg-buildpackage -S".printf (release_name));
+            if (pretty_print)
+                rule.commands.append ("@echo '    DPKG'");
+            rule.commands.append ("@cd %s && dpkg-buildpackage -S".printf (release_name));
             rule.commands.append ("@rm -rf %s".printf (release_name));
             toplevel.rules.append (rule);
 
@@ -1195,16 +1203,18 @@ public class EasyBuild
             rule.commands.append ("@echo \"eb install --target-directory=\\$RPM_BUILD_ROOT --resource-directory=/usr\" >> %s".printf (spec_file));
             rule.commands.append ("@echo \"find \\$RPM_BUILD_ROOT -type f -print | sed \\\"s#^\\$RPM_BUILD_ROOT/*#/#\\\" > FILE-LIST\" >> %s".printf (spec_file));
             rule.commands.append ("@echo \"%%files -f FILE-LIST\" >> %s".printf (spec_file));
-            rule.commands.append ("tar --create --gzip --file %s %s".printf (source_file, release_name));
+            rule.commands.append ("@tar --create --gzip --file %s %s".printf (source_file, release_name));
             rule.commands.append ("@rm -rf %s".printf (release_name));
             toplevel.rules.append (rule);
 
             rule = new Rule ();
             rule.inputs.append (source_file);
             rule.outputs.append (rpm_file);
-            rule.commands.append ("rpmbuild -tb %s".printf (source_file));
-            rule.commands.append ("rm %s".printf (source_file));
-            rule.commands.append ("cp %s/rpmbuild/RPMS/%s/%s .".printf (Environment.get_home_dir (), build_arch, rpm_file));
+            if (pretty_print)
+                rule.commands.append ("@echo '    RPM %s'".printf (rpm_file));
+            rule.commands.append ("@rpmbuild -tb %s".printf (source_file));
+            rule.commands.append ("@rm %s".printf (source_file));
+            rule.commands.append ("@cp %s/rpmbuild/RPMS/%s/%s .".printf (Environment.get_home_dir (), build_arch, rpm_file));
             toplevel.rules.append (rule);
 
             rule = new Rule ();
