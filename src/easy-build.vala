@@ -1216,13 +1216,18 @@ public class EasyBuild
                 warning ("Failed to make rpmbuild regex");
             }
 
+            var build_dir = ".eb-rpm-builddir";
+            var gzip_file = "%s.tar.gz".printf (release_name);
             var source_file = "%s.rpm.tar.gz".printf (package_name);
-            var spec_file = "%s/%s.spec".printf (release_name, package_name);
+            var spec_file = "%s/%s/%s.spec".printf (build_dir, release_name, package_name);
             var rpm_file = "%s-%s-%s.%s.rpm".printf (package_name, version, release, build_arch);
 
             rule = new Rule ();
-            rule.inputs.append (release_dir);
-            rule.outputs.append (source_file);
+            rule.inputs.append (gzip_file);
+            rule.outputs.append (rpm_file);
+            rule.commands.append ("@rm -rf %s".printf (build_dir));
+            rule.commands.append ("@mkdir %s".printf (build_dir));
+            rule.commands.append ("@cd %s && tar --extract --gzip --file ../%s".printf (build_dir, gzip_file));
             if (pretty_print)
                 rule.commands.append ("@echo '    Writing %s.spec'".printf (package_name));
             rule.commands.append ("@echo \"Summary: %s\" > %s".printf (summary, spec_file));
@@ -1246,18 +1251,13 @@ public class EasyBuild
             rule.commands.append ("@echo \"eb install --destination-directory=\\$RPM_BUILD_ROOT --resource-directory=/usr\" >> %s".printf (spec_file));
             rule.commands.append ("@echo \"find \\$RPM_BUILD_ROOT -type f -print | sed \\\"s#^\\$RPM_BUILD_ROOT/*#/#\\\" > FILE-LIST\" >> %s".printf (spec_file));
             rule.commands.append ("@echo \"%%files -f FILE-LIST\" >> %s".printf (spec_file));
-            rule.commands.append ("@tar --create --gzip --file %s %s".printf (source_file, release_name));
-            rule.commands.append ("@rm -rf %s".printf (release_name));
-            toplevel.rules.append (rule);
-
-            rule = new Rule ();
-            rule.inputs.append (source_file);
-            rule.outputs.append (rpm_file);
+            rule.commands.append ("@cd %s && tar --create --gzip --file ../%s %s".printf (build_dir, source_file, release_name));
             if (pretty_print)
                 rule.commands.append ("@echo '    RPM %s'".printf (rpm_file));
             rule.commands.append ("@rpmbuild -tb %s".printf (source_file));
-            rule.commands.append ("@rm %s".printf (source_file));
             rule.commands.append ("@cp %s/rpmbuild/RPMS/%s/%s .".printf (Environment.get_home_dir (), build_arch, rpm_file));
+            rule.commands.append ("@rm -f %s".printf (source_file));
+            rule.commands.append ("@rm -rf %s".printf (build_dir));
             toplevel.rules.append (rule);
 
             rule = new Rule ();
