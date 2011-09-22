@@ -940,7 +940,7 @@ public class EasyBuild
             stderr.printf ("easy-build %s\n", Config.VERSION);
             return Posix.EXIT_SUCCESS;
         }
-        
+
         pretty_print = !show_verbose;
 
         var filename = Path.build_filename (Environment.get_current_dir (), "Buildfile");
@@ -1018,14 +1018,27 @@ public class EasyBuild
         toplevel.rules.append (rule);
 
         /* Dpkg rules */
-        if (version != null)
+        if (version != null && Environment.find_program_in_path ("dpkg-buildpackage") != null)
         {
             var package_version = "0";
+
+            string build_arch = "";
+            int exit_status;
+            try
+            {
+                Process.spawn_command_line_sync ("dpkg-architecture -qDEB_BUILD_ARCH", out build_arch, null, out exit_status);
+                build_arch = build_arch.strip ();
+            }
+            catch (SpawnError e)
+            {
+                warning ("Failed to get dpkg build arch");
+            }
 
             var orig_file = "%s_%s.orig.tar.gz".printf (package_name, version);
             var debian_file = "%s_%s-%s.debian.tar.gz".printf (package_name, version, package_version);
             var changes_file = "%s_%s-%s_source.changes".printf (package_name, version, package_version);
             var dsc_file = "%s_%s-%s.dsc".printf (package_name, version, package_version);
+            var deb_file = "%s_%s-%s_%s.deb".printf (package_name, version, package_version, build_arch);
 
             rule = new Rule ();
             rule.outputs.append (orig_file);
@@ -1103,6 +1116,11 @@ public class EasyBuild
             rule.commands.append ("@rm -rf %s".printf (release_name));
             toplevel.rules.append (rule);
 
+            rule = new Rule ();
+            rule.inputs.append (deb_file);
+            rule.outputs.append ("%release-deb");
+            toplevel.rules.append (rule);
+
             var ppa_name = toplevel.variables.lookup ("package.ppa");
             if (ppa_name != null)
             {
@@ -1115,7 +1133,7 @@ public class EasyBuild
         }
 
         /* RPM rules */
-        if (version != null)
+        if (version != null && Environment.find_program_in_path ("rpmbuild") != null)
         {
             var release = "1";
             var summary = "Summary of %s".printf (package_name);
