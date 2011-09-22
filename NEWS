@@ -9,6 +9,8 @@ Overview of changes in lightdm 0.0.2
     * Add desktop rules
     * Add dpkg rules
     * Add PPA rules
+    * Add RPM rules
+    * Add --verbose option
 
 Overview of changes in lightdm 0.0.1
 
