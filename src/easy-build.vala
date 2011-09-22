@@ -1085,24 +1085,24 @@ public class EasyBuild
                 rule.commands.append ("@echo '    Writing debian/rules'");
             rule.commands.append ("@echo \"#!/usr/bin/make -f\" > %s".printf (rules_file));
             rule.commands.append ("@echo >> %s".printf (rules_file));
-            rule.commands.append ("@echo \"build:\" >> %s".printf (rules_file));
+            rule.commands.append ("@echo \"%%:\" >> %s".printf (rules_file));
+            rule.commands.append ("@echo '\tdh $@' >> %s".printf (rules_file));
+            rule.commands.append ("@echo >> %s".printf (rules_file));
+            rule.commands.append ("@echo \"override_dh_auto_configure:\" >> %s".printf (rules_file));
+            rule.commands.append ("@echo >> %s".printf (rules_file));
+            rule.commands.append ("@echo \"override_dh_auto_build:\" >> %s".printf (rules_file));
             rule.commands.append ("@echo \"\teb --resource-directory=/usr\" >> %s".printf (rules_file));
             rule.commands.append ("@echo >> %s".printf (rules_file));
-            rule.commands.append ("@echo \"binary: binary-arch binary-indep\" >> %s".printf (rules_file));
+            rule.commands.append ("@echo \"override_dh_auto_install:\" >> %s".printf (rules_file));
+            rule.commands.append ("@echo '\teb install --destination-directory=$(CURDIR)/debian/tmp --resource-directory=/usr' >> %s".printf (rules_file));
             rule.commands.append ("@echo >> %s".printf (rules_file));
-            rule.commands.append ("@echo \"binary-arch: build\" >> %s".printf (rules_file));
-            var dest_dir = "%s/%s/%s/debian/tmp".printf (Environment.get_current_dir (), build_dir, release_name);
-            rule.commands.append ("@echo \"\teb install --destination-directory=%s --resource-directory=/usr\" >> %s".printf (dest_dir, rules_file));
-            rule.commands.append ("@echo >> %s".printf (rules_file));
-            rule.commands.append ("@echo \"binary-indep: build\" >> %s".printf (rules_file));
-            rule.commands.append ("@echo >> %s".printf (rules_file));
-            rule.commands.append ("@echo \"clean:\" >> %s".printf (rules_file));
+            rule.commands.append ("@echo \"override_dh_auto_clean:\" >> %s".printf (rules_file));
             rule.commands.append ("@echo \"\teb clean\" >> %s".printf (rules_file));
             rule.commands.append ("@echo chmod +x %s".printf (rules_file));
 
             /* Generate debian/control */
             var control_file = "%s/debian/control".printf (build_dir);
-            var build_depends = "easy-build";
+            var build_depends = "debhelper easy-build";
             var short_description = "Short description of %s".printf (package_name);
             var long_description = "Long description of %s".printf (package_name);
             if (pretty_print)
@@ -1117,6 +1117,11 @@ public class EasyBuild
             rule.commands.append ("@echo \"Description: %s\" >> %s".printf (short_description, control_file));
             foreach (var line in long_description.split ("\n"))
                 rule.commands.append ("@echo \" %s\" >> %s".printf (line, control_file));
+
+            /* Generate debian/source/format */
+            if (pretty_print)
+                rule.commands.append ("@echo '    Writing debian/compat'");
+            rule.commands.append ("@echo \"7\" > %s/debian/compat".printf (build_dir));
 
             /* Generate debian/source/format */
             if (pretty_print)
