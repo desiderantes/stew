@@ -1162,7 +1162,7 @@ public class EasyBuild
             rule.commands.append ("@cp %s %s %s".printf (orig_file, debian_file, build_dir));
             rule.commands.append ("@cd %s && tar --extract --gzip --file ../%s".printf (build_dir, orig_file));
             rule.commands.append ("@cd %s/%s && tar --extract --gzip --file ../../%s".printf (build_dir, release_name, debian_file));
-            rule.commands.append ("@cd %s/%s && dpkg-buildpackage".printf (build_dir, release_name));
+            rule.commands.append ("@cd %s/%s && dpkg-buildpackage -b".printf (build_dir, release_name));
             rule.commands.append ("@mv %s/%s .".printf (build_dir, deb_file));
             rule.commands.append ("@rm -rf %s".printf (build_dir));
             toplevel.rules.append (rule);
