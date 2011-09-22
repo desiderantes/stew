@@ -1091,7 +1091,8 @@ public class EasyBuild
             rule.commands.append ("@echo \"binary: binary-arch binary-indep\" >> %s".printf (rules_file));
             rule.commands.append ("@echo >> %s".printf (rules_file));
             rule.commands.append ("@echo \"binary-arch: build\" >> %s".printf (rules_file));
-            rule.commands.append ("@echo \"\teb install --resource-directory=/usr\" >> %s".printf (rules_file));
+            var dest_dir = "%s/%s/%s/debian/tmp".printf (Environment.get_current_dir (), build_dir, release_name);
+            rule.commands.append ("@echo \"\teb install --destination-directory=%s --resource-directory=/usr\" >> %s".printf (dest_dir, rules_file));
             rule.commands.append ("@echo >> %s".printf (rules_file));
             rule.commands.append ("@echo \"binary-indep: build\" >> %s".printf (rules_file));
             rule.commands.append ("@echo >> %s".printf (rules_file));
