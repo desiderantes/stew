@@ -1,5 +1,6 @@
 private bool do_expand = false;
 private bool debug_enabled = false;
+private bool pretty_print = true;
 private string resource_directory;
 private string bin_directory;
 private string data_directory;
@@ -143,9 +144,14 @@ public class Rule
     {
         foreach (var c in commands)
         {
+            var show_output = true;
             if (c.has_prefix ("@"))
+            {
                 c = c.substring (1);
-            else
+                show_output = !pretty_print;
+            }
+
+            if (show_output)
                 print ("    %s\n", c);
 
             var exit_status = Posix.system (c);
@@ -519,7 +525,8 @@ public class BuildFile
                 if (package_cflags != null)
                     command += " %s".printf (package_cflags);
                 command += " -c %s -o %s".printf (source, output);
-                rule.commands.append ("@echo '    CC %s'".printf (source));
+                if (pretty_print)
+                    rule.commands.append ("@echo '    CC %s'".printf (source));
                 rule.commands.append (command);
                 rules.append (rule);
             }
@@ -544,7 +551,8 @@ public class BuildFile
                 if (package_cflags != null)
                     command += " %s".printf (package_cflags);
                 command += " -c %s -o %s".printf (input, output);
-                rule.commands.append ("@echo '    CC %s'".printf (input));
+                if (pretty_print)
+                    rule.commands.append ("@echo '    CC %s'".printf (input));
                 rule.commands.append (command);
                 rules.append (rule);
             }
@@ -561,7 +569,8 @@ public class BuildFile
                 command = "@%s -g -Wall".printf (linker);
                 foreach (var o in objects)
                     command += " %s".printf (o);
-                rule.commands.append ("@echo '    LD %s'".printf (program));
+                if (pretty_print)
+                    rule.commands.append ("@echo '    LD %s'".printf (program));
                 if (ldflags != null)
                     command += " %s".printf (ldflags);
                 if (package_ldflags != null)
@@ -613,7 +622,8 @@ public class BuildFile
             {
                 if (output.has_prefix ("%"))
                     continue;
-                clean_rule.commands.append ("@echo '    RM %s'".printf (output));
+                if (pretty_print)                    
+                    clean_rule.commands.append ("@echo '    RM %s'".printf (output));
                 if (output.has_suffix ("/"))
                 {
                     /* Don't accidentally delete someone's entire hard-disk */
@@ -756,6 +766,7 @@ public class BuildFile
 public class EasyBuild
 {
     private static bool show_version = false;
+    private static bool show_verbose = false;
     public static const OptionEntry[] options =
     {
         { "expand", 0, 0, OptionArg.NONE, ref do_expand,
@@ -773,6 +784,9 @@ public class EasyBuild
         { "target-directory", 0, 0, OptionArg.STRING, ref target_directory,
           /* Help string for command line --target_directory flag */
           N_("Directory to copy installed files to"), "DIRECTORY" },
+        { "verbose", 0, 0, OptionArg.NONE, ref show_verbose,
+          /* Help string for command line --verbose flag */
+          N_("Show verbose output"), null},
         { "debug", 'd', 0, OptionArg.NONE, ref debug_enabled,
           /* Help string for command line --debug flag */
           N_("Print debugging messages"), null},
@@ -926,6 +940,8 @@ public class EasyBuild
             stderr.printf ("easy-build %s\n", Config.VERSION);
             return Posix.EXIT_SUCCESS;
         }
+        
+        pretty_print = !show_verbose;
 
         var filename = Path.build_filename (Environment.get_current_dir (), "Buildfile");
         BuildFile f;
@@ -1031,7 +1047,8 @@ public class EasyBuild
                 email = "%s@%s".printf (Environment.get_user_name (), Environment.get_host_name ());
             var now = Time.local (time_t ());
             var release_date = now.format ("%a, %d %b %Y %H:%M:%S %z");
-            rule.commands.append ("@echo '    Writing debian/changelog'");
+            if (pretty_print)
+                rule.commands.append ("@echo '    Writing debian/changelog'");
             rule.commands.append ("@echo \"%s (%s-%s) %s; urgency=low\" > %s".printf (package_name, version, package_version, distribution, changelog_file));
             rule.commands.append ("@echo >> %s".printf (changelog_file));
             rule.commands.append ("@echo \"  * Initial release.\" >> %s".printf (changelog_file));
@@ -1040,7 +1057,8 @@ public class EasyBuild
 
             /* Generate debian/rules */
             var rules_file = "%s/debian/rules".printf (release_name);
-            rule.commands.append ("@echo '    Writing debian/rules'");
+            if (pretty_print)
+                rule.commands.append ("@echo '    Writing debian/rules'");
             rule.commands.append ("@echo \"#!/usr/bin/make -f\" > %s".printf (rules_file));
             rule.commands.append ("@echo >> %s".printf (rules_file));
             rule.commands.append ("@echo \"build:\" >> %s".printf (rules_file));
@@ -1062,7 +1080,8 @@ public class EasyBuild
             var build_depends = "easy-build";
             var short_description = "Short description of %s".printf (package_name);
             var long_description = "Long description of %s".printf (package_name);
-            rule.commands.append ("@echo '    Writing debian/control'");
+            if (pretty_print)
+                rule.commands.append ("@echo '    Writing debian/control'");
             rule.commands.append ("@echo \"Source: %s\" > %s".printf (package_name, control_file));
             rule.commands.append ("@echo \"Maintainer: %s <%s>\" >> %s".printf (name, email, control_file));
             rule.commands.append ("@echo \"Build-Depends: %s\" >> %s".printf (build_depends, control_file));
@@ -1075,7 +1094,8 @@ public class EasyBuild
                 rule.commands.append ("@echo \" %s\" >> %s".printf (line, control_file));
 
             /* Generate debian/source/format */
-            rule.commands.append ("@echo '    Writing debian/source/format'");
+            if (pretty_print)
+                rule.commands.append ("@echo '    Writing debian/source/format'");
             rule.commands.append ("@mkdir -p %s/debian/source".printf (release_name));
             rule.commands.append ("@echo \"3.0 (quilt)\" > %s/debian/source/format".printf (release_name));
 
@@ -1134,7 +1154,8 @@ public class EasyBuild
             rule = new Rule ();
             rule.inputs.append (release_dir);
             rule.outputs.append (source_file);
-            rule.commands.append ("@echo '    Writing %s.spec'".printf (package_name));
+            if (pretty_print)
+                rule.commands.append ("@echo '    Writing %s.spec'".printf (package_name));
             rule.commands.append ("@echo \"Summary: %s\" > %s".printf (summary, spec_file));
             rule.commands.append ("@echo \"Name: %s\" >> %s".printf (package_name, spec_file));
             rule.commands.append ("@echo \"Version: %s\" >> %s".printf (version, spec_file));
