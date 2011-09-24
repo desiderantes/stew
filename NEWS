@@ -11,6 +11,7 @@ Overview of changes in lightdm 0.0.2
     * Add PPA rules
     * Add RPM rules
     * Add --verbose option
+    * Split into modules
 
 Overview of changes in lightdm 0.0.1
 
