@@ -1,4 +1,8 @@
-Overview of changes in lightdm 0.0.2
+Overview of changes in easy-build 0.0.3
+
+    * ...
+
+Overview of changes in easy-build 0.0.2
 
     * Improve build messages
     * Replace "eb expand" with "eb --expand"
@@ -13,6 +17,6 @@ Overview of changes in lightdm 0.0.2
     * Add --verbose option
     * Split into modules
 
-Overview of changes in lightdm 0.0.1
+Overview of changes in easy-build 0.0.1
 
     * Initial release
