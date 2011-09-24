@@ -31,7 +31,12 @@ private void change_directory (string dirname)
 public string get_relative_path (string path)
 {
     var current_dir = original_dir;
+
+    /* Already relative */
+    if (!path.has_prefix ("/"))
+        return path;
     
+    /* It is the current directory */
     if (path == current_dir)
         return ".";
 
