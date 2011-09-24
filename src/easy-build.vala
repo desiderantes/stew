@@ -7,8 +7,17 @@ private string data_directory;
 private string package_data_directory;
 private string sysconf_directory;
 private string? target_directory = null;
+private string package_version;
+private string package_name;
+private string release_name;
+private string release_dir;
 
 private string original_dir;
+
+public abstract class BuildModule
+{
+    public abstract void generate_rules (BuildFile build_file);
+}
 
 private void change_directory (string dirname)
 {
@@ -194,8 +203,9 @@ public class BuildFile
     public List<BuildFile> children;
     public HashTable<string, string> variables;
     public List<string> programs;
-    public List<string> files;
     public List<Rule> rules;
+    public Rule build_rule;
+    public Rule install_rule;
 
     public BuildFile (string filename) throws FileError, BuildError
     {
@@ -263,21 +273,6 @@ public class BuildFile
                     if (!has_name)
                         programs.append (program_name);
                 }
-                else if (tokens.length > 1 && tokens[0] == "files")
-                {
-                    var files_type = tokens[1];
-                    var has_name = false;
-                    foreach (var p in files)
-                    {
-                        if (p == files_type)
-                        {
-                            has_name = true;
-                            break;
-                        }
-                    }
-                    if (!has_name)
-                        files.append (files_type);
-                }
 
                 continue;
             }
@@ -304,309 +299,18 @@ public class BuildFile
             throw new BuildError.INVALID ("Invalid statement in %s line %d:\n%s",
                                           get_relative_path (filename), line_number, statement);
         }
-    }
 
-    public void generate_rules ()
-    {
-        /* Add predefined variables */
-        variables.insert ("files.project.install-directory", "%s".printf (get_install_directory (package_data_directory)));
-        variables.insert ("files.application.install-directory", "%s/applications".printf (get_install_directory (data_directory)));
-        variables.insert ("files.gsettings-schemas.install-directory", "%s/glib-2.0/schemas".printf (get_install_directory (sysconf_directory)));
-
-        var build_rule = new Rule ();
-        build_rule.outputs.append ("%build");
+        build_rule = new Rule ();
         foreach (var child in children)
             build_rule.inputs.append ("%s/build".printf (Path.get_basename (child.dirname)));
+        build_rule.outputs.append ("%build");
         rules.append (build_rule);
 
-        var install_rule = new Rule ();
+        install_rule = new Rule ();
         install_rule.outputs.append ("%install");
         foreach (var child in children)
             install_rule.inputs.append ("%s/install".printf (Path.get_basename (child.dirname)));
         rules.append (install_rule);
-
-        /* Intltool rules */
-        var intltool_source_list = variables.lookup ("intltool.xml-sources");
-        if (intltool_source_list != null)
-        {
-            var sources = intltool_source_list.split (" ");
-            foreach (var source in sources)
-            {
-                var rule = new Rule ();
-                rule.inputs.append (source);
-                var output = remove_extension (source);
-                rule.outputs.append (output);
-                rule.commands.append ("LC_ALL=C intltool-merge --xml-style /dev/null %s %s".printf (source, output));
-                rules.append (rule);
-
-                build_rule.inputs.append (output);
-            }
-        }
-        intltool_source_list = variables.lookup ("intltool.desktop-sources");
-        if (intltool_source_list != null)
-        {
-            var sources = intltool_source_list.split (" ");
-            foreach (var source in sources)
-            {
-                var rule = new Rule ();
-                rule.inputs.append (source);
-                var output = remove_extension (source);
-                rule.outputs.append (output);
-                rule.commands.append ("LC_ALL=C intltool-merge --desktop-style -u /dev/null %s %s".printf (source, output));
-                rules.append (rule);
-
-                build_rule.inputs.append (output);
-            }
-        }
-
-        /* Man rules */
-        var man_page_list = variables.lookup ("man.pages");
-        if (man_page_list != null)
-        {
-            var pages = man_page_list.split (" ");
-            foreach (var page in pages)
-            {
-                var i = page.last_index_of_char ('.');
-                var number = 0;
-                if (i > 0)
-                    number = int.parse (page.substring (i + 1));
-                if (number == 0)
-                {
-                    warning ("Not a valid man page name '%s'", page);
-                    continue;
-                }
-                install_rule.inputs.append (page);
-                var dir = "%s/man/man%d".printf  (data_directory, number);
-                install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (dir)));
-                install_rule.commands.append ("@install %s %s/%s".printf (page, get_install_directory (dir), page));
-            }
-        }
-
-        /* GSettings rules */
-        var gsettings_schema_list = variables.lookup ("gsettings.schemas");
-        if (gsettings_schema_list != null)
-        {
-            var schemas = gsettings_schema_list.split (" ");
-            foreach (var schema in schemas)
-            {
-                install_rule.inputs.append (schema);
-                var dir = "%s/glib-2.0/schemas".printf (data_directory);
-                install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (dir)));
-                install_rule.commands.append ("@install %s %s/%s".printf (schema, get_install_directory (dir), schema));
-            }
-        }
-
-        /* Desktop rules */
-        var desktop_entry_list = variables.lookup ("desktop.entries");
-        if (desktop_entry_list != null)
-        {
-            var entries = desktop_entry_list.split (" ");
-            foreach (var entry in entries)
-            {
-                install_rule.inputs.append (entry);
-                var dir = "%s/applications".printf (data_directory);
-                install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (dir)));
-                install_rule.commands.append ("@install %s %s/applications/%s".printf (entry, get_install_directory (dir), entry));
-            }
-        }
-
-        foreach (var program in programs)
-        {
-            var source_list = variables.lookup ("programs.%s.sources".printf (program));
-            if (source_list == null)
-                continue;
-
-            var sources = source_list.split (" ");
-            
-            var package_list = variables.lookup ("programs.%s.packages".printf (program));
-            var cflags = variables.lookup ("programs.%s.cflags".printf (program));
-            var ldflags = variables.lookup ("programs.%s.ldflags".printf (program));
-
-            string? package_cflags = null;
-            string? package_ldflags = null;
-            if (package_list != null)
-            {
-                int exit_status;
-                try
-                {
-                    Process.spawn_command_line_sync ("pkg-config --cflags %s".printf (package_list), out package_cflags, null, out exit_status);
-                    package_cflags = package_cflags.strip ();
-                }
-                catch (SpawnError e)
-                {
-                }
-                try
-                {
-                    Process.spawn_command_line_sync ("pkg-config --libs %s".printf (package_list), out package_ldflags, null, out exit_status);
-                    package_ldflags = package_ldflags.strip ();
-                }
-                catch (SpawnError e)
-                {
-                }
-            }
-
-            var linker = "gcc";
-            List<string> objects = null;
-
-            /* Vala compile */
-            var rule = new Rule ();
-            var command = "valac -C";
-            if (package_list != null)
-            {
-                foreach (var package in package_list.split (" "))
-                    command += " --pkg %s".printf (package);
-            }
-            foreach (var source in sources)
-            {
-                if (!source.has_suffix (".vala") && !source.has_suffix (".vapi"))
-                    continue;
-
-                rule.inputs.append (source);
-                if (source.has_suffix (".vala"))
-                    rule.outputs.append (replace_extension (source, "c"));
-                command += " %s".printf (source);
-            }
-            if (rule.outputs != null)
-            {
-                rule.commands.append (command);
-                rules.append (rule);
-            }
-
-            /* Java compile */
-            rule = new Rule ();
-            var jar_rule = new Rule ();
-            var jar_file = "%s.jar".printf (program);
-            jar_rule.outputs.append (jar_file);
-            var jar_command = "jar cf %s".printf (jar_file);
-            command = "javac";
-            foreach (var source in sources)
-            {
-                if (!source.has_suffix (".java"))
-                    continue;
-
-                var class_file = replace_extension (source, "class");
-
-                jar_rule.inputs.append (class_file);
-                jar_command += " %s".printf (class_file);
-
-                rule.inputs.append (source);
-                rule.outputs.append (class_file);
-                command += " %s".printf (source);
-            }
-            if (rule.outputs != null)
-            {
-                rule.commands.append (command);
-                rules.append (rule);
-                build_rule.inputs.append (jar_file);
-                jar_rule.commands.append (jar_command);
-                rules.append (jar_rule);
-                install_rule.inputs.append (jar_file);
-                install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (package_data_directory)));
-                install_rule.commands.append ("@install %s %s/%s".printf (jar_file, get_install_directory (package_data_directory), jar_file));
-            }
-
-            /* C++ compile */
-            foreach (var source in sources)
-            {
-                if (!source.has_suffix (".cpp") && !source.has_suffix (".C"))
-                    continue;
-
-                var output = replace_extension (source, "o");
-
-                linker = "g++";
-                objects.append (output);
-
-                rule = new Rule ();
-                rule.inputs.append (source);
-                rule.outputs.append (output);
-                command = "@g++ -g -Wall";
-                if (cflags != null)
-                    command += " %s".printf (cflags);
-                if (package_cflags != null)
-                    command += " %s".printf (package_cflags);
-                command += " -c %s -o %s".printf (source, output);
-                if (pretty_print)
-                    rule.commands.append ("@echo '    CC %s'".printf (source));
-                rule.commands.append (command);
-                rules.append (rule);
-            }
-
-            /* C compile */
-            foreach (var source in sources)
-            {
-                if (!source.has_suffix (".vala") && !source.has_suffix (".c"))
-                    continue;
-
-                var input = replace_extension (source, "c");
-                var output = replace_extension (source, "o");
-
-                objects.append (output);
-
-                rule = new Rule ();
-                rule.inputs.append (input);
-                rule.outputs.append (output);
-                command = "@gcc -g -Wall";
-                if (cflags != null)
-                    command += " %s".printf (cflags);
-                if (package_cflags != null)
-                    command += " %s".printf (package_cflags);
-                command += " -c %s -o %s".printf (input, output);
-                if (pretty_print)
-                    rule.commands.append ("@echo '    CC %s'".printf (input));
-                rule.commands.append (command);
-                rules.append (rule);
-            }
-
-            /* Link */
-            if (objects.length () > 0)
-            {
-                build_rule.inputs.append (program);
-
-                rule = new Rule ();
-                foreach (var o in objects)
-                    rule.inputs.append (o);
-                rule.outputs.append (program);
-                command = "@%s -g -Wall".printf (linker);
-                foreach (var o in objects)
-                    command += " %s".printf (o);
-                if (pretty_print)
-                    rule.commands.append ("@echo '    LD %s'".printf (program));
-                if (ldflags != null)
-                    command += " %s".printf (ldflags);
-                if (package_ldflags != null)
-                    command += " %s".printf (package_ldflags);
-                command += " -o %s".printf (program);
-                rule.commands.append (command);
-                rules.append (rule);
-
-                install_rule.inputs.append (program);
-                install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (bin_directory)));
-                install_rule.commands.append ("@install %s %s/%s".printf (program, get_install_directory (bin_directory), program));
-            }
-        }
-
-        foreach (var file_class in files)
-        {
-            var file_list = variables.lookup ("files.%s".printf (file_class));
-
-            /* Only install files that are requested to */
-            var install_directory = variables.lookup ("files.%s.install-directory".printf (file_class));
-            if (install_directory == null)
-                continue;
-
-            if (file_list != null)
-            {
-                foreach (var file in file_list.split (" "))
-                {
-                    install_rule.inputs.append (file);
-                    install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (install_directory)));
-                    install_rule.commands.append ("@install %s %s/%s".printf (file, get_install_directory (install_directory), file));
-                }
-            }
-        }
-
-        foreach (var child in children)
-            child.generate_rules ();
     }
 
     public void generate_clean_rule ()
@@ -636,9 +340,6 @@ public class BuildFile
                     clean_rule.commands.append ("@rm -f %s".printf (output));
             }
         }
-
-        foreach (var child in children)
-            child.generate_clean_rule ();
     }
     
     public bool is_toplevel
@@ -732,17 +433,6 @@ public class BuildFile
             GLib.print ("\x1B[1m[Building %s]\x1B[21m\n", target);
         return rule.build ();
     }
-    
-    public bool build ()
-    {
-        foreach (var program in programs)
-        {
-            if (!build_target (program))
-                return false;
-        }
-
-        return true;
-    }
 
     public void print ()
     {
@@ -792,6 +482,8 @@ public class EasyBuild
           N_("Print debugging messages"), null},
         { null }
     };
+
+    public static List<BuildModule> modules;
 
     public static BuildFile? load_buildfiles (string filename, BuildFile? child = null) throws Error
     {    
@@ -882,7 +574,8 @@ public class EasyBuild
         release_rule.inputs.append (input_filename);
         release_rule.commands.append ("@cp %s %s".printf (input_filename, output_filename));
     }
-    
+
+    // FIXME: Move this into a module (but it needs to be run last or watch for rule changes)
     public static void generate_release_rule (BuildFile buildfile, Rule release_rule, string temp_dir)
     {
         var relative_dirname = buildfile.get_relative_dirname ();
@@ -897,6 +590,10 @@ public class EasyBuild
         {
             foreach (var input in rule.inputs)
             {
+                /* Can't depend on ourselves */
+                if (input == release_dir)
+                    continue;
+
                 /* Ignore generated files */
                 if (buildfile.find_rule (input) != null)
                     continue;
@@ -911,6 +608,21 @@ public class EasyBuild
 
         foreach (var child in buildfile.children)
             generate_release_rule (child, release_rule, temp_dir);
+    }
+    
+    private static void generate_rules (BuildFile build_file)
+    {
+        foreach (var module in modules)
+            module.generate_rules (build_file);
+        foreach (var child in build_file.children)
+            generate_rules (child);
+    }
+
+    private static void generate_clean_rules (BuildFile build_file)
+    {
+        build_file.generate_clean_rule ();
+        foreach (var child in build_file.children)
+            generate_clean_rules (child);
     }
 
     public static int main (string[] args)
@@ -943,6 +655,21 @@ public class EasyBuild
 
         pretty_print = !show_verbose;
 
+        modules.append (new BZIPModule ());
+        modules.append (new DesktopModule ());
+        modules.append (new DpkgModule ());
+        modules.append (new GCCModule ());
+        modules.append (new GNOMEModule ());
+        modules.append (new GSettingsModule ());
+        modules.append (new GZIPModule ());
+        modules.append (new IntltoolModule ());
+        modules.append (new JavaModule ());
+        modules.append (new ManModule ());
+        modules.append (new PackageModule ());
+        modules.append (new RPMModule ());
+        modules.append (new ValaModule ());
+        modules.append (new XZIPModule ());
+
         var filename = Path.build_filename (Environment.get_current_dir (), "Buildfile");
         BuildFile f;
         try
@@ -956,318 +683,29 @@ public class EasyBuild
         }
         var toplevel = f.toplevel;
 
-        var package_name = toplevel.variables.lookup ("package.name");
-        var version = toplevel.variables.lookup ("package.version");
+        package_name = toplevel.variables.lookup ("package.name");
+        package_version = toplevel.variables.lookup ("package.version");
 
         bin_directory = "%s/bin".printf (resource_directory);
         data_directory = "%s/share".printf (resource_directory);
         package_data_directory = "%s/%s".printf (data_directory, package_name);
 
+        release_name = package_name;
+        if (package_version != null)
+            release_name += "-" + package_version;
+        release_dir = "%s/".printf (release_name);
+
         /* Generate implicit rules */
-        toplevel.generate_rules ();
+        generate_rules (toplevel);
 
         /* Generate release rules */
-        var release_name = package_name;
-        if (version != null)
-            release_name += "-" + version;
-        var release_dir = "%s/".printf (release_name);
-
         var rule = new Rule ();
         rule.outputs.append (release_dir);
         generate_release_rule (toplevel, rule, release_name);
         toplevel.rules.append (rule);
 
-        rule = new Rule ();
-        rule.inputs.append (release_dir);
-        rule.outputs.append ("%s.tar.gz".printf (release_name));
-        if (pretty_print)
-            rule.commands.append ("@echo '    COMPRESS %s.tar.gz'".printf (release_name));
-        rule.commands.append ("@tar --create --gzip --file %s.tar.gz %s".printf (release_name, release_name));
-        toplevel.rules.append (rule);
-
-        rule = new Rule ();
-        rule.outputs.append ("%release-gzip");
-        rule.inputs.append ("%s.tar.gz".printf (release_name));
-        toplevel.rules.append (rule);
-
-        rule = new Rule ();
-        rule.inputs.append (release_dir);
-        rule.outputs.append ("%s.tar.bz2".printf (release_name));
-        if (pretty_print)
-            rule.commands.append ("@echo '    COMPRESS %s.tar.bz2'".printf (release_name));
-        rule.commands.append ("@tar --create --bzip2 --file %s.tar.bz2 %s".printf (release_name, release_name));
-        toplevel.rules.append (rule);
-
-        rule = new Rule ();
-        rule.outputs.append ("%release-bzip");
-        rule.inputs.append ("%s.tar.bz2".printf (release_name));
-        toplevel.rules.append (rule);
-
-        rule = new Rule ();
-        rule.inputs.append (release_dir);
-        rule.outputs.append ("%s.tar.xz".printf (release_name));
-        if (pretty_print)
-            rule.commands.append ("@echo '    COMPRESS %s.tar.xz'".printf (release_name));
-        rule.commands.append ("@tar --create --xz --file %s.tar.xz %s".printf (release_name, release_name));
-        toplevel.rules.append (rule);
-
-        rule = new Rule ();
-        rule.outputs.append ("%release-xzip");
-        rule.inputs.append ("%s.tar.xz".printf (release_name));
-        toplevel.rules.append (rule);
-
-        rule = new Rule ();
-        rule.outputs.append ("%release-gnome");
-        rule.inputs.append ("%s.tar.xz".printf (release_name));
-        rule.commands.append ("scp %s.tar.xz master.gnome.org:".printf (release_name));
-        rule.commands.append ("ssh master.gnome.org install-module %s.tar.xz". printf (release_name));
-        toplevel.rules.append (rule);
-
-        /* Dpkg rules */
-        if (version != null && Environment.find_program_in_path ("dpkg-buildpackage") != null)
-        {
-            var package_version = "0";
-
-            string build_arch = "";
-            int exit_status;
-            try
-            {
-                Process.spawn_command_line_sync ("dpkg-architecture -qDEB_BUILD_ARCH", out build_arch, null, out exit_status);
-                build_arch = build_arch.strip ();
-            }
-            catch (SpawnError e)
-            {
-                warning ("Failed to get dpkg build arch");
-            }
-
-            var build_dir = ".eb-dpkg-builddir";
-            var gzip_file = "%s.tar.gz".printf (release_name);
-            var orig_file = "%s_%s.orig.tar.gz".printf (package_name, version);
-            var debian_file = "%s_%s-%s.debian.tar.gz".printf (package_name, version, package_version);
-            var changes_file = "%s_%s-%s_source.changes".printf (package_name, version, package_version);
-            var dsc_file = "%s_%s-%s.dsc".printf (package_name, version, package_version);
-            var deb_file = "%s_%s-%s_%s.deb".printf (package_name, version, package_version, build_arch);
-
-            rule = new Rule ();
-            rule.outputs.append (orig_file);
-            rule.inputs.append (gzip_file);
-            rule.commands.append ("@cp %s %s".printf (gzip_file, orig_file));
-            toplevel.rules.append (rule);
-
-            rule = new Rule ();
-            rule.outputs.append (debian_file);
-            rule.commands.append ("@rm -rf %s".printf (build_dir));
-            rule.commands.append ("@mkdir -p %s/debian".printf (build_dir));
-            toplevel.rules.append (rule);
-
-            /* Generate debian/changelog */
-            var changelog_file = "%s/debian/changelog".printf (build_dir);
-            var distribution = "oneiric";
-            var name = Environment.get_real_name ();
-            var email = Environment.get_variable ("DEBEMAIL");
-            if (email == null)
-                email = Environment.get_variable ("EMAIL");
-            if (email == null)
-                email = "%s@%s".printf (Environment.get_user_name (), Environment.get_host_name ());
-            var now = Time.local (time_t ());
-            var release_date = now.format ("%a, %d %b %Y %H:%M:%S %z");
-            if (pretty_print)
-                rule.commands.append ("@echo '    Writing debian/changelog'");
-            rule.commands.append ("@echo \"%s (%s-%s) %s; urgency=low\" > %s".printf (package_name, version, package_version, distribution, changelog_file));
-            rule.commands.append ("@echo >> %s".printf (changelog_file));
-            rule.commands.append ("@echo \"  * Initial release.\" >> %s".printf (changelog_file));
-            rule.commands.append ("@echo >> %s".printf (changelog_file));
-            rule.commands.append ("@echo \" -- %s <%s>  %s\" >> %s".printf (name, email, release_date, changelog_file));
-
-            /* Generate debian/rules */
-            var rules_file = "%s/debian/rules".printf (build_dir);
-            if (pretty_print)
-                rule.commands.append ("@echo '    Writing debian/rules'");
-            rule.commands.append ("@echo \"#!/usr/bin/make -f\" > %s".printf (rules_file));
-            rule.commands.append ("@echo >> %s".printf (rules_file));
-            rule.commands.append ("@echo \"%%:\" >> %s".printf (rules_file));
-            rule.commands.append ("@echo '\tdh $@' >> %s".printf (rules_file));
-            rule.commands.append ("@echo >> %s".printf (rules_file));
-            rule.commands.append ("@echo \"override_dh_auto_configure:\" >> %s".printf (rules_file));
-            rule.commands.append ("@echo >> %s".printf (rules_file));
-            rule.commands.append ("@echo \"override_dh_auto_build:\" >> %s".printf (rules_file));
-            rule.commands.append ("@echo \"\teb --resource-directory=/usr\" >> %s".printf (rules_file));
-            rule.commands.append ("@echo >> %s".printf (rules_file));
-            rule.commands.append ("@echo \"override_dh_auto_install:\" >> %s".printf (rules_file));
-            rule.commands.append ("@echo '\teb install --destination-directory=$(CURDIR)/debian/tmp --resource-directory=/usr' >> %s".printf (rules_file));
-            rule.commands.append ("@echo >> %s".printf (rules_file));
-            rule.commands.append ("@echo \"override_dh_auto_clean:\" >> %s".printf (rules_file));
-            rule.commands.append ("@echo \"\teb clean\" >> %s".printf (rules_file));
-            rule.commands.append ("@echo chmod +x %s".printf (rules_file));
-
-            /* Generate debian/control */
-            var control_file = "%s/debian/control".printf (build_dir);
-            var build_depends = "debhelper easy-build";
-            var short_description = "Short description of %s".printf (package_name);
-            var long_description = "Long description of %s".printf (package_name);
-            if (pretty_print)
-                rule.commands.append ("@echo '    Writing debian/control'");
-            rule.commands.append ("@echo \"Source: %s\" > %s".printf (package_name, control_file));
-            rule.commands.append ("@echo \"Maintainer: %s <%s>\" >> %s".printf (name, email, control_file));
-            rule.commands.append ("@echo \"Build-Depends: %s\" >> %s".printf (build_depends, control_file));
-            rule.commands.append ("@echo \"Standards-Version: 3.9.2\" >> %s".printf (control_file));
-            rule.commands.append ("@echo >> %s".printf (control_file));
-            rule.commands.append ("@echo \"Package: %s\" >> %s".printf (package_name, control_file));
-            rule.commands.append ("@echo \"Architecture: any\" >> %s".printf (control_file));
-            rule.commands.append ("@echo \"Description: %s\" >> %s".printf (short_description, control_file));
-            foreach (var line in long_description.split ("\n"))
-                rule.commands.append ("@echo \" %s\" >> %s".printf (line, control_file));
-
-            /* Generate debian/source/format */
-            if (pretty_print)
-                rule.commands.append ("@echo '    Writing debian/compat'");
-            rule.commands.append ("@echo \"7\" > %s/debian/compat".printf (build_dir));
-
-            /* Generate debian/source/format */
-            if (pretty_print)
-                rule.commands.append ("@echo '    Writing debian/source/format'");
-            rule.commands.append ("@mkdir -p %s/debian/source".printf (build_dir));
-            rule.commands.append ("@echo \"3.0 (quilt)\" > %s/debian/source/format".printf (build_dir));
-
-            rule.commands.append ("@cd %s && tar --create --gzip --file ../%s debian".printf (build_dir, debian_file));
-            rule.commands.append ("@rm -rf %s".printf (build_dir));
-
-            /* Source build */
-            rule = new Rule ();
-            rule.outputs.append (dsc_file);
-            rule.outputs.append (changes_file);
-            rule.inputs.append (orig_file);
-            rule.inputs.append (debian_file);
-            if (pretty_print)
-                rule.commands.append ("@echo '    DPKG'");
-            rule.commands.append ("@rm -rf %s".printf (build_dir));
-            rule.commands.append ("@mkdir -p %s".printf (build_dir));
-            rule.commands.append ("@cp %s %s %s".printf (orig_file, debian_file, build_dir));
-            rule.commands.append ("@cd %s && tar --extract --gzip --file ../%s".printf (build_dir, orig_file));
-            rule.commands.append ("@cd %s/%s && tar --extract --gzip --file ../../%s".printf (build_dir, release_name, debian_file));
-            rule.commands.append ("@cd %s/%s && dpkg-buildpackage -S".printf (build_dir, release_name));
-            rule.commands.append ("@mv %s/%s %s/%s .".printf (build_dir, dsc_file, build_dir, changes_file));
-            rule.commands.append ("@rm -rf %s".printf (build_dir));
-            toplevel.rules.append (rule);
-
-            /* Binary build */
-            rule = new Rule ();
-            rule.outputs.append (deb_file);
-            rule.inputs.append (orig_file);
-            rule.inputs.append (debian_file);
-            if (pretty_print)
-                rule.commands.append ("@echo '    DPKG'");
-            rule.commands.append ("@rm -rf %s".printf (build_dir));
-            rule.commands.append ("@mkdir -p %s".printf (build_dir));
-            rule.commands.append ("@cp %s %s %s".printf (orig_file, debian_file, build_dir));
-            rule.commands.append ("@cd %s && tar --extract --gzip --file ../%s".printf (build_dir, orig_file));
-            rule.commands.append ("@cd %s/%s && tar --extract --gzip --file ../../%s".printf (build_dir, release_name, debian_file));
-            rule.commands.append ("@cd %s/%s && dpkg-buildpackage -b".printf (build_dir, release_name));
-            rule.commands.append ("@mv %s/%s .".printf (build_dir, deb_file));
-            rule.commands.append ("@rm -rf %s".printf (build_dir));
-            toplevel.rules.append (rule);
-
-            rule = new Rule ();
-            rule.inputs.append (deb_file);
-            rule.outputs.append ("%release-deb");
-            toplevel.rules.append (rule);
-
-            var ppa_name = toplevel.variables.lookup ("package.ppa");
-            if (ppa_name != null)
-            {
-                rule = new Rule ();
-                rule.outputs.append ("%release-ppa");
-                rule.inputs.append (changes_file);
-                rule.commands.append ("dput ppa:%s %s".printf (ppa_name, changes_file));
-                toplevel.rules.append (rule);
-            }
-        }
-
-        /* RPM rules */
-        if (version != null && Environment.find_program_in_path ("rpmbuild") != null)
-        {
-            var release = "1";
-            var summary = "Summary of %s".printf (package_name);
-            var description = "Description of %s".printf (package_name);
-            var license = "unknown";
-
-            string rpmbuild_rc = "";
-            int exit_status;
-            try
-            {
-                Process.spawn_command_line_sync ("rpmbuild --showrc", out rpmbuild_rc, null, out exit_status);
-            }
-            catch (SpawnError e)
-            {
-                // FIXME
-                warning ("Failed to get rpmbuild configuration");
-            }
-
-            var build_arch = "";
-            try
-            {
-                var build_arch_regex = new Regex ("build arch\\s+:(.*)");
-                MatchInfo info;
-                if (build_arch_regex.match (rpmbuild_rc, 0, out info))
-                    build_arch = info.fetch (1).strip ();
-            }
-            catch (RegexError e)
-            {
-                warning ("Failed to make rpmbuild regex");
-            }
-
-            var build_dir = ".eb-rpm-builddir";
-            var gzip_file = "%s.tar.gz".printf (release_name);
-            var source_file = "%s.rpm.tar.gz".printf (package_name);
-            var spec_file = "%s/%s/%s.spec".printf (build_dir, release_name, package_name);
-            var rpm_file = "%s-%s-%s.%s.rpm".printf (package_name, version, release, build_arch);
-
-            rule = new Rule ();
-            rule.inputs.append (gzip_file);
-            rule.outputs.append (rpm_file);
-            rule.commands.append ("@rm -rf %s".printf (build_dir));
-            rule.commands.append ("@mkdir %s".printf (build_dir));
-            rule.commands.append ("@cd %s && tar --extract --gzip --file ../%s".printf (build_dir, gzip_file));
-            if (pretty_print)
-                rule.commands.append ("@echo '    Writing %s.spec'".printf (package_name));
-            rule.commands.append ("@echo \"Summary: %s\" > %s".printf (summary, spec_file));
-            rule.commands.append ("@echo \"Name: %s\" >> %s".printf (package_name, spec_file));
-            rule.commands.append ("@echo \"Version: %s\" >> %s".printf (version, spec_file));
-            rule.commands.append ("@echo \"Release: %s\" >> %s".printf (release, spec_file));
-            rule.commands.append ("@echo \"License: %s\" >> %s".printf (license, spec_file));
-            rule.commands.append ("@echo \"Source: %s\" >> %s".printf (source_file, spec_file));
-            rule.commands.append ("@echo >> %s".printf (spec_file));
-            rule.commands.append ("@echo \"%%description\" >> %s".printf (spec_file));
-            foreach (var line in description.split ("\n"))
-                rule.commands.append ("@echo \"%s\" >> %s".printf (line, spec_file));
-            rule.commands.append ("@echo >> %s".printf (spec_file));
-            rule.commands.append ("@echo \"%%prep\" >> %s".printf (spec_file));
-            rule.commands.append ("@echo \"%%setup -q\" >> %s".printf (spec_file));
-            rule.commands.append ("@echo >> %s".printf (spec_file));
-            rule.commands.append ("@echo \"%%build\" >> %s".printf (spec_file));
-            rule.commands.append ("@echo \"eb --resource-directory=/usr\" >> %s".printf (spec_file));
-            rule.commands.append ("@echo >> %s".printf (spec_file));
-            rule.commands.append ("@echo \"%%install\" >> %s".printf (spec_file));
-            rule.commands.append ("@echo \"eb install --destination-directory=\\$RPM_BUILD_ROOT --resource-directory=/usr\" >> %s".printf (spec_file));
-            rule.commands.append ("@echo \"find \\$RPM_BUILD_ROOT -type f -print | sed \\\"s#^\\$RPM_BUILD_ROOT/*#/#\\\" > FILE-LIST\" >> %s".printf (spec_file));
-            rule.commands.append ("@echo \"%%files -f FILE-LIST\" >> %s".printf (spec_file));
-            rule.commands.append ("@cd %s && tar --create --gzip --file ../%s %s".printf (build_dir, source_file, release_name));
-            if (pretty_print)
-                rule.commands.append ("@echo '    RPM %s'".printf (rpm_file));
-            rule.commands.append ("@rpmbuild -tb %s".printf (source_file));
-            rule.commands.append ("@cp %s/rpmbuild/RPMS/%s/%s .".printf (Environment.get_home_dir (), build_arch, rpm_file));
-            rule.commands.append ("@rm -f %s".printf (source_file));
-            rule.commands.append ("@rm -rf %s".printf (build_dir));
-            toplevel.rules.append (rule);
-
-            rule = new Rule ();
-            rule.inputs.append (rpm_file);
-            rule.outputs.append ("%release-rpm");
-            toplevel.rules.append (rule);
-        }
-
         /* Generate clean rule */
-        toplevel.generate_clean_rule ();
+        generate_clean_rules (toplevel);
 
         if (do_expand)
         {

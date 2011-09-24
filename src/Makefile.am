@@ -2,7 +2,21 @@ bin_PROGRAMS = eb
 
 eb_SOURCES = \
 	config.vapi \
-	easy-build.vala
+	easy-build.vala \
+	module-bzip.vala \
+	module-desktop.vala \
+	module-dpkg.vala \
+	module-gcc.vala \
+	module-gnome.vala \
+	module-gsettings.vala \
+	module-gzip.vala \
+	module-intltool.vala \
+	module-java.vala \
+	module-man.vala \
+	module-package.vala \
+	module-rpm.vala \
+	module-vala.vala \
+	module-xzip.vala
 
 eb_VALAFLAGS = \
 	--pkg=glib-2.0 \
