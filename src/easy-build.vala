@@ -600,7 +600,7 @@ public class EasyBuild
             foreach (var input in rule.inputs)
             {
                 /* Can't depend on ourselves */
-                if (input == release_dir)
+                if (input == release_dir + "/")
                     continue;
 
                 /* Ignore generated files */
