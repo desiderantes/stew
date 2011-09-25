@@ -88,7 +88,7 @@ public class IntltoolModule : BuildModule
                 pot_rule.commands.append (gettext_command);
                 build_file.rules.append (pot_rule);
 
-                var languages = load_languages (translation_directory);
+                var languages = load_languages (Path.build_filename (build_file.dirname, translation_directory));
 
                 foreach (var language in languages)
                 {
