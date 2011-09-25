@@ -11,7 +11,7 @@ public class DesktopModule : BuildModule
                 build_file.install_rule.inputs.append (entry);
                 var dir = "%s/applications".printf (data_directory);
                 build_file.install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (dir)));
-                build_file.install_rule.commands.append ("@install %s %s/applications/%s".printf (entry, get_install_directory (dir), entry));
+                build_file.install_rule.commands.append ("@install %s %s/%s".printf (entry, get_install_directory (dir), entry));
             }
         }
    }
