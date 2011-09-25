@@ -1,5 +1,43 @@
 public class GCCModule : BuildModule
 {
+    private Regex include_regex;
+
+    public GCCModule ()
+    {
+        try
+        {
+            include_regex = new Regex ("#include\\s+\"(.+)\"");
+        }
+        catch (RegexError e)
+        {
+            critical ("Failed to make C include regex: %s", e.message);
+        }
+    }
+
+    // FIXME: Cache this with modification time in .cdepends
+    private List<string> get_includes (string filename)
+    {
+        List<string> includes = null;
+        string data;
+        try
+        {
+            FileUtils.get_contents (filename, out data);
+        }
+        catch (FileError e)
+        {
+            return includes;
+        }
+
+        foreach (var line in data.split ("\n"))
+        {
+            MatchInfo info;
+            if (include_regex.match (line, 0, out info))
+                includes.append (info.fetch (1));
+        }
+
+        return includes;
+    }
+
     public override void generate_rules (BuildFile build_file)
     {
         foreach (var program in build_file.programs)
@@ -49,9 +87,12 @@ public class GCCModule : BuildModule
 
                 linker = "g++";
                 objects.append (output);
-
+                
                 var rule = new Rule ();
                 rule.inputs.append (source);
+                var includes = get_includes (Path.build_filename (build_file.dirname, source));
+                foreach (var include in includes)
+                    rule.inputs.append (include);
                 rule.outputs.append (output);
                 var command = "@g++ -g -Wall";
                 if (cflags != null)
@@ -79,6 +120,9 @@ public class GCCModule : BuildModule
 
                 var rule = new Rule ();
                 rule.inputs.append (input);
+                var includes = get_includes (Path.build_filename (build_file.dirname, source));
+                foreach (var include in includes)
+                    rule.inputs.append (include);
                 rule.outputs.append (output);
                 var command = "@gcc -g -Wall";
                 if (cflags != null)

@@ -28,7 +28,7 @@ public class RPMModule : BuildModule
         var build_arch = "";
         try
         {
-            var build_arch_regex = new Regex ("build arch\\s+:(.*)");
+            var build_arch_regex = new Regex ("build arch\\s*:(.*)");
             MatchInfo info;
             if (build_arch_regex.match (rpmbuild_rc, 0, out info))
                 build_arch = info.fetch (1).strip ();

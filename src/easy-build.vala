@@ -581,16 +581,16 @@ public class EasyBuild
     }
 
     // FIXME: Move this into a module (but it needs to be run last or watch for rule changes)
-    public static void generate_release_rule (BuildFile buildfile, Rule release_rule, string temp_dir)
+    public static void generate_release_rules (BuildFile buildfile, Rule release_rule, string release_dir)
     {
         var relative_dirname = buildfile.get_relative_dirname ();
 
-        var dirname = Path.build_filename (temp_dir, relative_dirname);
+        var dirname = Path.build_filename (release_dir, relative_dirname);
         if (relative_dirname == ".")
-            dirname = temp_dir;
+            dirname = release_dir;
 
         /* Add files that are used */
-        add_release_file (release_rule, temp_dir, relative_dirname, "Buildfile");
+        add_release_file (release_rule, release_dir, relative_dirname, "Buildfile");
         foreach (var rule in buildfile.rules)
         {
             foreach (var input in rule.inputs)
@@ -607,12 +607,12 @@ public class EasyBuild
                 if (buildfile.get_buildfile_with_target (input) != buildfile)
                     continue;
 
-                add_release_file (release_rule, temp_dir, relative_dirname, input);
+                add_release_file (release_rule, release_dir, relative_dirname, input);
             }
         }
 
         foreach (var child in buildfile.children)
-            generate_release_rule (child, release_rule, temp_dir);
+            generate_release_rules (child, release_rule, release_dir);
     }
     
     private static void generate_rules (BuildFile build_file)
@@ -707,7 +707,7 @@ public class EasyBuild
         /* Generate release rules */
         var rule = new Rule ();
         rule.outputs.append (release_dir);
-        generate_release_rule (toplevel, rule, release_name);
+        generate_release_rules (toplevel, rule, release_name);
         toplevel.rules.append (rule);
 
         /* Generate clean rule */
