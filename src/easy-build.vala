@@ -211,6 +211,7 @@ public class BuildFile
     public List<Rule> rules;
     public Rule build_rule;
     public Rule install_rule;
+    public Rule clean_rule;
 
     public BuildFile (string filename) throws FileError, BuildError
     {
@@ -306,25 +307,20 @@ public class BuildFile
         }
 
         build_rule = new Rule ();
-        foreach (var child in children)
-            build_rule.inputs.append ("%s/build".printf (Path.get_basename (child.dirname)));
         build_rule.outputs.append ("%build");
         rules.append (build_rule);
 
         install_rule = new Rule ();
         install_rule.outputs.append ("%install");
-        foreach (var child in children)
-            install_rule.inputs.append ("%s/install".printf (Path.get_basename (child.dirname)));
         rules.append (install_rule);
+
+        clean_rule = new Rule ();
+        clean_rule.outputs.append ("%clean");
+        rules.append (clean_rule);
     }
 
     public void generate_clean_rule ()
     {
-        var clean_rule = new Rule ();
-        clean_rule.outputs.append ("%clean");
-        foreach (var child in children)
-            clean_rule.inputs.append ("%s/clean".printf (Path.get_basename (child.dirname)));
-        rules.append (clean_rule);
         foreach (var rule in rules)
         {
             foreach (var output in rule.outputs)
@@ -546,6 +542,14 @@ public class EasyBuild
                 c.parent = f;
                 f.children.append (c);
             }
+        }
+        
+        /* Make rules recurse */
+        foreach (var c in f.children)
+        {
+            f.build_rule.inputs.append ("%s/build".printf (Path.get_basename (c.dirname)));
+            f.install_rule.inputs.append ("%s/install".printf (Path.get_basename (c.dirname)));
+            f.clean_rule.inputs.append ("%s/clean".printf (Path.get_basename (c.dirname)));
         }
 
         return f;
