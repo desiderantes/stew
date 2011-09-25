@@ -2,6 +2,7 @@ Overview of changes in easy-build 0.0.3
 
     * Add mono (C#) support
     * Detect header file dependencies for C/C++ programs
+    * Build .pot and .mo files
 
 Overview of changes in easy-build 0.0.2
 

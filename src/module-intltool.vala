@@ -24,14 +24,68 @@ public class IntltoolModule : BuildModule
         return languages;
     }
 
+    private void get_gettext_sources (BuildFile build_file, ref List<string> sources)
+    {
+        foreach (var name in build_file.variables.get_keys ())
+        {
+            if (!name.has_prefix ("intltool."))
+                continue;
+
+            var tokens = name.split (".", 3);
+            if (tokens.length != 3)
+                continue;
+
+            //if (tokens[1] != gettext_domain)
+            //    continue;
+
+            if (tokens[2] != "c-sources")
+                continue;
+
+            var value = build_file.variables.lookup (name);
+            foreach (var source in value.split (" "))
+                sources.append (Path.build_filename (build_file.dirname, source));
+        }
+
+        foreach (var child in build_file.children)
+            get_gettext_sources (child, ref sources);
+    }
+
     public override void generate_rules (BuildFile build_file)
     {
         if (build_file.is_toplevel)
         {
-            var translation_directory = build_file.variables.lookup ("intltool.translation-directory");
+            // FIXME: Support multiple translation domains
+            string? translation_directory = null;
+            foreach (var name in build_file.variables.get_keys ())
+            {
+                if (name.has_prefix ("intltool.") && name.has_suffix (".translation-directory"))
+                {
+                    translation_directory = build_file.variables.lookup (name);
+                    break;
+                }
+            }
+
             if (translation_directory != null)
             {
-                //var pot_file = Path.build_filename (translation_directory, "%s.pot".printf (package_name));
+                var pot_file = Path.build_filename (translation_directory, "%s.pot".printf (package_name));
+                build_file.build_rule.inputs.append (pot_file);
+
+                var pot_rule = new Rule ();
+                pot_rule.outputs.append (pot_file);
+                List<string> gettext_sources = null;
+                get_gettext_sources (build_file, ref gettext_sources);
+                if (pretty_print)
+                    pot_rule.commands.append ("@echo '    GETTEXT %s'".printf (pot_file));
+                var gettext_command = "@xgettext --extract-all --from-code=utf-8 --output %s".printf (pot_file);
+                foreach (var source in gettext_sources)
+                {
+                    var s = get_relative_path (source);
+                    pot_rule.inputs.append (s);
+                    gettext_command += " %s".printf (s);
+                }
+                pot_rule.commands.append (gettext_command);
+                build_file.rules.append (pot_rule);
+
                 var linguas_file = Path.build_filename (translation_directory, "LINGUAS");
                 var languages = load_languages (linguas_file);
                 
