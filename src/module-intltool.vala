@@ -1,27 +1,29 @@
 public class IntltoolModule : BuildModule
 {
-    private List<string> load_languages (string linguas_file)
+    private List<string> load_languages (string translation_directory)
     {
+        Dir dir;
         List<string> languages = null;
-        string data;
         try
         {
-            FileUtils.get_contents (linguas_file, out data);
+            dir = Dir.open (translation_directory);
         }
         catch (FileError e)
         {
+            warning ("Failed to open translation directory %s: %s", translation_directory, e.message);
             return languages;
         }
 
-        foreach (var line in data.split ("\n"))
+        var suffix = ".po";
+        while (true)
         {
-            line = line.strip ();
-            if (line == "" || line.has_prefix ("#"))
-                continue;
-            languages.append (line);
-        }
+            var filename = dir.read_name ();
+            if (filename == null)
+                return languages;
 
-        return languages;
+            if (filename.has_suffix (suffix))
+                languages.append (filename.substring (0, filename.length - suffix.length));
+        }
     }
 
     private void get_gettext_sources (BuildFile build_file, ref List<string> sources)
@@ -86,9 +88,8 @@ public class IntltoolModule : BuildModule
                 pot_rule.commands.append (gettext_command);
                 build_file.rules.append (pot_rule);
 
-                var linguas_file = Path.build_filename (translation_directory, "LINGUAS");
-                var languages = load_languages (linguas_file);
-                
+                var languages = load_languages (translation_directory);
+
                 foreach (var language in languages)
                 {
                     var po_file = "%s/%s.po".printf (translation_directory, language);
