@@ -6,7 +6,7 @@ private string bin_directory;
 private string data_directory;
 private string package_data_directory;
 private string sysconf_directory;
-private string? target_directory = null;
+private string? destination_directory = null;
 private string package_version;
 private string package_name;
 private string release_name;
@@ -33,7 +33,7 @@ public string get_relative_path (string path)
     var current_dir = original_dir;
 
     /* Already relative */
-    if (!path.has_prefix ("/"))
+    if (!Path.is_absolute (path))
         return path;
     
     /* It is the current directory */
@@ -74,10 +74,10 @@ private string replace_extension (string filename, string extension)
 
 private string get_install_directory (string dir)
 {
-    if (target_directory == null)
+    if (destination_directory == null)
         return dir;
 
-    return "%s%s".printf (target_directory, dir);
+    return "%s%s".printf (destination_directory, dir);
 }
 
 public class Rule
@@ -472,7 +472,7 @@ public class EasyBuild
         { "system-config-directory", 0, 0, OptionArg.STRING, ref sysconf_directory,
           /* Help string for command line --system-config-directory flag */
           N_("Directory containing system configuration"), "DIRECTORY" },
-        { "destination-directory", 0, 0, OptionArg.STRING, ref target_directory,
+        { "destination-directory", 0, 0, OptionArg.STRING, ref destination_directory,
           /* Help string for command line --destination-directory flag */
           N_("Directory to copy installed files to"), "DIRECTORY" },
         { "verbose", 0, 0, OptionArg.NONE, ref show_verbose,
@@ -663,6 +663,9 @@ public class EasyBuild
         }
 
         pretty_print = !show_verbose;
+
+        if (destination_directory != null && !Path.is_absolute (destination_directory))
+            destination_directory = Path.build_filename (Environment.get_current_dir (), destination_directory);
 
         modules.append (new BZIPModule ());
         modules.append (new DesktopModule ());
