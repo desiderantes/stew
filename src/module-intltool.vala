@@ -106,7 +106,7 @@ public class IntltoolModule : BuildModule
                     var target_dir = get_install_directory (Path.build_filename (data_directory, "locale", language, "LC_MESSAGES"));
                     build_file.install_rule.inputs.append (mo_file);
                     build_file.install_rule.commands.append ("@mkdir -p %s".printf (target_dir));
-                    build_file.install_rule.commands.append ("@install %s %s/%s".printf (mo_file, target_dir, mo_file));
+                    build_file.install_rule.commands.append ("@install %s %s/%s.mo".printf (mo_file, target_dir, language));
                 }
             }
         }
