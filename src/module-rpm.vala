@@ -72,7 +72,10 @@ public class RPMModule : BuildModule
         rule.commands.append ("@echo \"%%install\" >> %s".printf (spec_file));
         rule.commands.append ("@echo \"eb install --destination-directory=\\$RPM_BUILD_ROOT --resource-directory=/usr\" >> %s".printf (spec_file));
         rule.commands.append ("@echo \"find \\$RPM_BUILD_ROOT -type f -print | sed \\\"s#^\\$RPM_BUILD_ROOT/*#/#\\\" > FILE-LIST\" >> %s".printf (spec_file));
+        rule.commands.append ("@echo \"sed -i 's/\\/man\\/man.*/&*/' FILE-LIST\" >> %s".printf (spec_file));
+        rule.commands.append ("@echo >> %s".printf (spec_file));
         rule.commands.append ("@echo \"%%files -f FILE-LIST\" >> %s".printf (spec_file));
+        rule.commands.append ("@echo >> %s".printf (spec_file));
         rule.commands.append ("@cd %s && tar --create --gzip --file ../%s %s".printf (build_dir, source_file, release_name));
         if (pretty_print)
             rule.commands.append ("@echo '    RPM %s'".printf (rpm_file));
