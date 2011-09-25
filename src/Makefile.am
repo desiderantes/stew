@@ -13,6 +13,7 @@ eb_SOURCES = \
 	module-intltool.vala \
 	module-java.vala \
 	module-man.vala \
+	module-mono.vala \
 	module-package.vala \
 	module-rpm.vala \
 	module-vala.vala \

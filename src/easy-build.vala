@@ -670,6 +670,7 @@ public class EasyBuild
         modules.append (new IntltoolModule ());
         modules.append (new JavaModule ());
         modules.append (new ManModule ());
+        modules.append (new MonoModule ());
         modules.append (new PackageModule ());
         modules.append (new RPMModule ());
         modules.append (new ValaModule ());
