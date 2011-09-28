@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(easy-build, 0.0.3~trunk)
+AC_INIT(easy-build, 0.0.3)
 AM_INIT_AUTOMAKE
 AM_PROG_VALAC([0.13.0])
 AM_PROG_CC_C_O
