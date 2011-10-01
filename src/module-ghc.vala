@@ -1,4 +1,4 @@
-public class HaskellModule : BuildModule
+public class GHCModule : BuildModule
 {
     public override void generate_rules (BuildFile build_file)
     {

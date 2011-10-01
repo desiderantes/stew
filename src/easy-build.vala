@@ -671,11 +671,11 @@ public class EasyBuild
         modules.append (new DesktopModule ());
         modules.append (new DpkgModule ());
         modules.append (new GCCModule ());
+        modules.append (new GHCModule ());
         modules.append (new GoModule ());
         modules.append (new GNOMEModule ());
         modules.append (new GSettingsModule ());
         modules.append (new GZIPModule ());
-        modules.append (new HaskellModule ());
         modules.append (new IntltoolModule ());
         modules.append (new JavaModule ());
         modules.append (new ManModule ());
