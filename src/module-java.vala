@@ -44,17 +44,24 @@ public class JavaModule : BuildModule
 
                 jar_rule.commands.append (jar_command);
                 build_file.rules.append (jar_rule);
+                build_file.build_rule.inputs.append (jar_file);
                 build_file.add_install_rule (jar_file, package_data_directory);
 
+                /* Script to run locally */
                 rule = new Rule ();
-                rule.inputs.append (jar_file);
                 rule.outputs.append (program);
                 rule.commands.append ("@echo '#!/bin/sh' > %s".printf (program));
-                rule.commands.append ("@echo 'exec java -jar %s' > %s".printf (jar_file, program));
+                rule.commands.append ("@echo 'exec java -jar %s' >> %s".printf (jar_file, program));
                 rule.commands.append ("@chmod +x %s".printf (program));
                 build_file.rules.append (rule);
-                build_file.add_install_rule (program, bin_directory);
                 build_file.build_rule.inputs.append (program);
+
+                /* Script to run when installed */
+		var script = get_install_directory (Path.build_filename (bin_directory, program));
+                build_file.install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (bin_directory)));
+                build_file.install_rule.commands.append ("@echo '#!/bin/sh' > %s".printf (script));
+                build_file.install_rule.commands.append ("@echo 'exec java -jar %s' >> %s".printf (Path.build_filename (package_data_directory, jar_file), script));
+                build_file.install_rule.commands.append ("@chmod +x %s".printf (script));
             }
         }
     }
