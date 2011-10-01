@@ -51,7 +51,6 @@ public class GCCModule : BuildModule
             var cflags = build_file.variables.lookup ("programs.%s.cflags".printf (program));
             var ldflags = build_file.variables.lookup ("programs.%s.ldflags".printf (program));
 
-            string? automatic_ldflags = null;
             string? package_cflags = null;
             string? package_ldflags = null;
             if (package_list != null)
@@ -75,10 +74,10 @@ public class GCCModule : BuildModule
                 }
             }
 
-            var linker = "gcc";
             List<string> objects = null;
 
             /* Compile */
+	    var compiler = "gcc";
             foreach (var source in sources)
             {
                 var input = source;
@@ -96,11 +95,16 @@ public class GCCModule : BuildModule
 		         source.has_suffix (".cp") ||
 		         source.has_suffix (".cxx"))
 		{
-		    automatic_ldflags = "-lstdc++";
+		    compiler = "g++";
 		}
 		/* Objective C */
 		else if (source.has_suffix (".m"))
 		{
+		}
+		/* Go */
+		else if (source.has_suffix (".go"))
+		{
+		    compiler = "gccgo";
 		}
 		/* Fortran */
 		else if (source.has_suffix (".f") ||
@@ -111,7 +115,7 @@ public class GCCModule : BuildModule
                          source.has_suffix (".f03") ||
                          source.has_suffix (".f08"))
 		{
-		    automatic_ldflags = "-lgfortran";
+		    compiler = "gfortran";
 		}
 		/* Vala */
                 // FIXME: Should be done in the Vala module
@@ -132,7 +136,7 @@ public class GCCModule : BuildModule
                 foreach (var include in includes)
                     rule.inputs.append (include);
                 rule.outputs.append (output);
-                var command = "@gcc -g -Wall";
+                var command = "@%s -g -Wall".printf (compiler);
                 if (cflags != null)
                     command += " %s".printf (cflags);
                 if (package_cflags != null)
@@ -153,13 +157,11 @@ public class GCCModule : BuildModule
                 foreach (var o in objects)
                     rule.inputs.append (o);
                 rule.outputs.append (program);
-                var command = "@%s -g -Wall".printf (linker);
+                var command = "@%s -g -Wall".printf (compiler);
                 foreach (var o in objects)
                     command += " %s".printf (o);
                 if (pretty_print)
                     rule.commands.append ("@echo '    LD %s'".printf (program));
-                if (automatic_ldflags != null)
-                    command += " %s".printf (automatic_ldflags);
                 if (ldflags != null)
                     command += " %s".printf (ldflags);
                 if (package_ldflags != null)
