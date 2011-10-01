@@ -16,7 +16,12 @@ public class JavaModule : BuildModule
 
             var jar_rule = new Rule ();
             jar_rule.outputs.append (jar_file);
-            var jar_command = "jar cf %s".printf (jar_file);
+            var jar_command = "jar cfe %s".printf (jar_file);
+
+            // FIXME: Would like a better way of determining this automatically
+            var entrypoint = build_file.variables.lookup ("programs.%s.entrypoint".printf (program));
+            if (entrypoint != null)
+                jar_command += " %s".printf (entrypoint);
 
             foreach (var source in sources)
             {
@@ -34,15 +39,22 @@ public class JavaModule : BuildModule
             }
             if (rule.outputs != null)
             {
-                build_file.build_rule.inputs.append (jar_file);
-
                 rule.commands.append (command);
                 build_file.rules.append (rule);
 
                 jar_rule.commands.append (jar_command);
                 build_file.rules.append (jar_rule);
-
                 build_file.add_install_rule (jar_file, package_data_directory);
+
+                rule = new Rule ();
+                rule.inputs.append (jar_file);
+                rule.outputs.append (program);
+                rule.commands.append ("@echo '#!/bin/sh' > %s".printf (program));
+                rule.commands.append ("@echo 'exec java -jar %s' > %s".printf (jar_file, program));
+                rule.commands.append ("@chmod +x %s".printf (program));
+                build_file.rules.append (rule);
+                build_file.add_install_rule (program, bin_directory);
+                build_file.build_rule.inputs.append (program);
             }
         }
     }

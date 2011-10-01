@@ -4,6 +4,8 @@ Overview of changes in easy-build 0.0.4
     * Add support for Haskell
     * Add support for objective C
     * Add support for Fortran
+    * Generate scripts for Java and C# programs
+    * Set entrypoint in jar files
 
 Overview of changes in easy-build 0.0.3
 

@@ -1,2 +1,4 @@
 package.name = example
-programs.Example.sources = Example.java
+programs.example.sources = Example.java
+programs.example.entrypoint = Example
+

@@ -24,12 +24,20 @@ public class MonoModule : BuildModule
             }
             if (rule.inputs == null)
                 return;
-
-            build_file.build_rule.inputs.append (exe_file);
             rule.commands.append (command);
             build_file.rules.append (rule);
-
             build_file.add_install_rule (exe_file, package_data_directory);
+
+            rule = new Rule ();
+	    rule.inputs.append (exe_file);
+	    rule.outputs.append (program);
+	    rule.commands.append ("@echo '#!/bin/sh' > %s".printf (program));
+	    rule.commands.append ("@echo 'exec mono %s' > %s".printf (exe_file, program));
+	    rule.commands.append ("@chmod +x %s".printf (program));
+            build_file.rules.append (rule);
+            build_file.add_install_rule (program, bin_directory);
+
+            build_file.build_rule.inputs.append (program);
         }
     }
 }
