@@ -29,9 +29,7 @@ public class MonoModule : BuildModule
             rule.commands.append (command);
             build_file.rules.append (rule);
 
-            build_file.install_rule.inputs.append (exe_file);
-            build_file.install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (package_data_directory)));
-            build_file.install_rule.commands.append ("@install %s %s/%s".printf (exe_file, get_install_directory (package_data_directory), exe_file));
+            build_file.add_install_rule (exe_file, package_data_directory);
         }
     }
 }

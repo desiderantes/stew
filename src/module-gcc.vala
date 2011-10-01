@@ -170,9 +170,7 @@ public class GCCModule : BuildModule
                 rule.commands.append (command);
                 build_file.rules.append (rule);
 
-                build_file.install_rule.inputs.append (program);
-                build_file.install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (bin_directory)));
-                build_file.install_rule.commands.append ("@install %s %s/%s".printf (program, get_install_directory (bin_directory), program));
+                build_file.add_install_rule (program, bin_directory);
             }
         }
     }

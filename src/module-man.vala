@@ -17,10 +17,8 @@ public class ManModule : BuildModule
                     warning ("Not a valid man page name '%s'", page);
                     continue;
                 }
-                build_file.install_rule.inputs.append (page);
                 var dir = "%s/man/man%d".printf  (data_directory, number);
-                build_file.install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (dir)));
-                build_file.install_rule.commands.append ("@install %s %s/%s".printf (page, get_install_directory (dir), page));
+                build_file.add_install_rule (page, dir);
             }
         }
     }

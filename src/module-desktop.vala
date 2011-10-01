@@ -8,10 +8,8 @@ public class DesktopModule : BuildModule
             var entries = desktop_entry_list.split (" ");
             foreach (var entry in entries)
             {
-                build_file.install_rule.inputs.append (entry);
                 var dir = "%s/applications".printf (data_directory);
-                build_file.install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (dir)));
-                build_file.install_rule.commands.append ("@install %s %s/%s".printf (entry, get_install_directory (dir), entry));
+                build_file.add_install_rule (entry, dir);
             }
         }
    }

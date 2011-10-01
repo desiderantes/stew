@@ -42,9 +42,7 @@ public class JavaModule : BuildModule
                 jar_rule.commands.append (jar_command);
                 build_file.rules.append (jar_rule);
 
-                build_file.install_rule.inputs.append (jar_file);
-                build_file.install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (package_data_directory)));
-                build_file.install_rule.commands.append ("@install %s %s/%s".printf (jar_file, get_install_directory (package_data_directory), jar_file));
+                build_file.add_install_rule (jar_file, package_data_directory);
             }
         }
     }
