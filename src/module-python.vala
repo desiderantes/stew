@@ -27,14 +27,24 @@ public class PythonModule : BuildModule
                 build_file.add_install_rule (output, package_data_directory);
             }
 
+            var main_file = replace_extension (sources[0], "pyc");
+
             /* Script to run locally */
             var rule = new Rule ();
+            rule.outputs.append (main_file);	    
             rule.outputs.append (program);
             rule.commands.append ("@echo '#!/bin/sh' > %s".printf (program));
-            rule.commands.append ("@echo 'python %s' >> %s".printf (sources[0], program));
+            rule.commands.append ("@echo 'exec python %s' >> %s".printf (main_file, program));
             rule.commands.append ("@chmod +x %s".printf (program));
             build_file.rules.append (rule);
             build_file.build_rule.inputs.append (program);
+
+            /* Script to run when installed */
+            var script = get_install_directory (Path.build_filename (bin_directory, program));
+            build_file.install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (bin_directory)));
+            build_file.install_rule.commands.append ("@echo '#!/bin/sh' > %s".printf (script));
+            build_file.install_rule.commands.append ("@echo 'exec python %s' >> %s".printf (Path.build_filename (package_data_directory, main_file), script));
+            build_file.install_rule.commands.append ("@chmod +x %s".printf (script));
         }
     }
 }
