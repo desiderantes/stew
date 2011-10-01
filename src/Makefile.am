@@ -7,6 +7,7 @@ eb_SOURCES = \
 	module-desktop.vala \
 	module-dpkg.vala \
 	module-gcc.vala \
+	module-go.vala \
 	module-gnome.vala \
 	module-gsettings.vala \
 	module-gzip.vala \

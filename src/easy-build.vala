@@ -671,6 +671,7 @@ public class EasyBuild
         modules.append (new DesktopModule ());
         modules.append (new DpkgModule ());
         modules.append (new GCCModule ());
+        modules.append (new GoModule ());
         modules.append (new GNOMEModule ());
         modules.append (new GSettingsModule ());
         modules.append (new GZIPModule ());
