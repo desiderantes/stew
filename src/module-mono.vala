@@ -13,7 +13,7 @@ public class MonoModule : BuildModule
 
             var rule = new Rule ();
             rule.outputs.append (exe_file);
-            var command = "gmcs";
+            var command = "gmcs -out:%s".printf (exe_file);
             foreach (var source in sources)
             {
                 if (!source.has_suffix (".cs"))
