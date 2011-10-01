@@ -11,6 +11,7 @@ eb_SOURCES = \
 	module-gnome.vala \
 	module-gsettings.vala \
 	module-gzip.vala \
+	module-haskell.vala \
 	module-intltool.vala \
 	module-java.vala \
 	module-man.vala \

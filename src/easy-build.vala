@@ -675,6 +675,7 @@ public class EasyBuild
         modules.append (new GNOMEModule ());
         modules.append (new GSettingsModule ());
         modules.append (new GZIPModule ());
+        modules.append (new HaskellModule ());
         modules.append (new IntltoolModule ());
         modules.append (new JavaModule ());
         modules.append (new ManModule ());
