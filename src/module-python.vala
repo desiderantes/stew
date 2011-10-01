@@ -12,9 +12,19 @@ public class PythonModule : BuildModule
             foreach (var source in sources)
             {
                 if (!source.has_suffix (".py"))
-		    return;
+                    return;
 
-                build_file.add_install_rule (source, package_data_directory);
+                var output = replace_extension (source, "pyc");
+                var rule = new Rule ();
+                rule.inputs.append (source);
+                rule.outputs.append (output);
+                if (pretty_print)
+                    rule.commands.append ("@echo '    PYC %s'".printf (source));		
+                rule.commands.append ("@pycompile %s".printf (source));
+                build_file.rules.append (rule);
+                build_file.build_rule.inputs.append (output);
+
+                build_file.add_install_rule (output, package_data_directory);
             }
 
             /* Script to run locally */
