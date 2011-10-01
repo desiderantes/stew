@@ -318,6 +318,14 @@ public class BuildFile
         clean_rule.outputs.append ("%clean");
         rules.append (clean_rule);
     }
+    
+    public void add_install_rule (string filename, string install_dir)
+    {
+        install_rule.inputs.append (filename);
+        var install_path = get_install_directory (Path.build_filename (install_dir, filename));
+        install_rule.commands.append ("@mkdir -p %s".printf (Path.get_dirname (install_path)));
+        install_rule.commands.append ("@install %s %s".printf (filename, install_path));
+    }
 
     public void generate_clean_rule ()
     {
@@ -672,7 +680,6 @@ public class EasyBuild
         modules.append (new DpkgModule ());
         modules.append (new GCCModule ());
         modules.append (new GHCModule ());
-        modules.append (new GoModule ());
         modules.append (new GNOMEModule ());
         modules.append (new GSettingsModule ());
         modules.append (new GZIPModule ());
@@ -681,6 +688,7 @@ public class EasyBuild
         modules.append (new ManModule ());
         modules.append (new MonoModule ());
         modules.append (new PackageModule ());
+        modules.append (new PythonModule ());
         modules.append (new RPMModule ());
         modules.append (new ValaModule ());
         modules.append (new XZIPModule ());

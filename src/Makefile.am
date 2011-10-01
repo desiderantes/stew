@@ -16,6 +16,7 @@ eb_SOURCES = \
 	module-man.vala \
 	module-mono.vala \
 	module-package.vala \
+	module-python.vala \
 	module-rpm.vala \
 	module-vala.vala \
 	module-xzip.vala
