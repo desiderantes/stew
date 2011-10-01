@@ -83,9 +83,11 @@ public class GCCModule : BuildModule
             {
                 var input = source;
 
+                /* C */
                 if (source.has_suffix (".c"))
 		{
 		}
+		/* C++ */
 		else if (source.has_suffix (".cpp") ||
 		         source.has_suffix (".C") ||
 		         source.has_suffix (".cc") ||
@@ -96,9 +98,22 @@ public class GCCModule : BuildModule
 		{
 		    automatic_ldflags = "-lstdc++";
 		}
+		/* Objective C */
 		else if (source.has_suffix (".m"))
 		{
 		}
+		/* Fortran */
+		else if (source.has_suffix (".f") ||
+                         source.has_suffix (".for") ||
+                         source.has_suffix (".ftn") ||
+                         source.has_suffix (".f90") ||
+                         source.has_suffix (".f95") ||
+                         source.has_suffix (".f03") ||
+                         source.has_suffix (".f08"))
+		{
+		    automatic_ldflags = "-lgfortran";
+		}
+		/* Vala */
                 // FIXME: Should be done in the Vala module
                 else if (source.has_suffix (".vala"))
 		{

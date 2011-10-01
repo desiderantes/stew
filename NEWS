@@ -3,6 +3,7 @@ Overview of changes in easy-build 0.0.4
     * Add support for Go
     * Add support for Haskell
     * Add support for objective C
+    * Add support for Fortran
 
 Overview of changes in easy-build 0.0.3
 
