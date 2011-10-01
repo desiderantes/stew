@@ -110,11 +110,15 @@ public class GCCModule : BuildModule
             foreach (var source in sources)
             {
                 // FIXME: Should be done in the Vala module
-                if (!source.has_suffix (".vala") && !source.has_suffix (".c"))
+                if (!source.has_suffix (".vala") && !source.has_suffix (".c") && !source.has_suffix (".m"))
                     continue;
 
-                var input = replace_extension (source, "c");
+                var input = source;
                 var output = replace_extension (source, "o");
+
+                // FIXME: Should be done in the Vala module
+		if (input.has_suffix (".vala"))
+                    input = replace_extension (source, "c");
 
                 objects.append (output);
 
