@@ -51,6 +51,7 @@ public class GCCModule : BuildModule
             var cflags = build_file.variables.lookup ("programs.%s.cflags".printf (program));
             var ldflags = build_file.variables.lookup ("programs.%s.ldflags".printf (program));
 
+            string? automatic_ldflags = null;
             string? package_cflags = null;
             string? package_ldflags = null;
             if (package_list != null)
@@ -77,48 +78,36 @@ public class GCCModule : BuildModule
             var linker = "gcc";
             List<string> objects = null;
 
-            /* C++ compile */
+            /* Compile */
             foreach (var source in sources)
             {
-                if (!source.has_suffix (".cpp") && !source.has_suffix (".C") || !source.has_suffix (".cc"))
-                    continue;
-
-                var output = replace_extension (source, "o");
-
-                linker = "g++";
-                objects.append (output);
-                
-                var rule = new Rule ();
-                rule.inputs.append (source);
-                var includes = get_includes (Path.build_filename (build_file.dirname, source));
-                foreach (var include in includes)
-                    rule.inputs.append (include);
-                rule.outputs.append (output);
-                var command = "@g++ -g -Wall";
-                if (cflags != null)
-                    command += " %s".printf (cflags);
-                if (package_cflags != null)
-                    command += " %s".printf (package_cflags);
-                command += " -c %s -o %s".printf (source, output);
-                if (pretty_print)
-                    rule.commands.append ("@echo '    CC %s'".printf (source));
-                rule.commands.append (command);
-                build_file.rules.append (rule);
-            }
-
-            /* C compile */
-            foreach (var source in sources)
-            {
-                // FIXME: Should be done in the Vala module
-                if (!source.has_suffix (".vala") && !source.has_suffix (".c") && !source.has_suffix (".m"))
-                    continue;
-
                 var input = source;
-                var output = replace_extension (source, "o");
 
+                if (source.has_suffix (".c"))
+		{
+		}
+		else if (source.has_suffix (".cpp") ||
+		         source.has_suffix (".C") ||
+		         source.has_suffix (".cc") ||
+		         source.has_suffix (".CPP") ||
+		         source.has_suffix (".c++") ||
+		         source.has_suffix (".cp") ||
+		         source.has_suffix (".cxx"))
+		{
+		    automatic_ldflags = "-lstdc++";
+		}
+		else if (source.has_suffix (".m"))
+		{
+		}
                 // FIXME: Should be done in the Vala module
-		if (input.has_suffix (".vala"))
+                else if (source.has_suffix (".vala"))
+		{
                     input = replace_extension (source, "c");
+		}
+		else
+		    return;
+
+                var output = replace_extension (source, "o");
 
                 objects.append (output);
 
@@ -154,6 +143,8 @@ public class GCCModule : BuildModule
                     command += " %s".printf (o);
                 if (pretty_print)
                     rule.commands.append ("@echo '    LD %s'".printf (program));
+                if (automatic_ldflags != null)
+                    command += " %s".printf (automatic_ldflags);
                 if (ldflags != null)
                     command += " %s".printf (ldflags);
                 if (package_ldflags != null)
