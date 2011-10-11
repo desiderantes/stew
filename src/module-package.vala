@@ -5,7 +5,7 @@ public class PackageModule : BuildModule
         var file_list = build_file.variables.lookup ("package.files");
         if (file_list != null)
         {
-            foreach (var file in file_list.split (" "))
+            foreach (var file in split_variable (file_list))
                 build_file.add_install_rule (file, package_data_directory);
         }
     }

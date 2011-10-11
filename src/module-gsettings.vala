@@ -5,7 +5,7 @@ public class GSettingsModule : BuildModule
         var gsettings_schema_list = build_file.variables.lookup ("gsettings.schemas");
         if (gsettings_schema_list != null)
         {
-            var schemas = gsettings_schema_list.split (" ");
+            var schemas = split_variable (gsettings_schema_list);
             foreach (var schema in schemas)
             {
                 var dir = "%s/glib-2.0/schemas".printf (data_directory);

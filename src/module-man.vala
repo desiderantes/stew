@@ -5,7 +5,7 @@ public class ManModule : BuildModule
         var man_page_list = build_file.variables.lookup ("man.pages");
         if (man_page_list != null)
         {
-            var pages = man_page_list.split (" ");
+            var pages = split_variable (man_page_list);
             foreach (var page in pages)
             {
                 var i = page.last_index_of_char ('.');

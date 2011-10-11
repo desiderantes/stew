@@ -28,6 +28,27 @@ private void change_directory (string dirname)
     Environment.set_current_dir (dirname);
 }
 
+public List<string> split_variable (string value)
+{
+    List<string> values = null;
+
+    var start = 0;
+    while (true)
+    {
+        while (value[start].isspace ())
+            start++;
+        if (value[start] == '\0')
+            return values;
+
+        var end = start + 1;
+        while (value[end] != '\0' && !value[end].isspace ())
+            end++;
+
+        values.append (value.substring (start, end - start));
+        start = end;
+    }
+}
+
 public string get_relative_path (string path)
 {
     var current_dir = original_dir;
@@ -225,17 +246,26 @@ public class BuildFile
         var line_number = 0;
         var in_rule = false;
         string? rule_indent = null;
+        var continued_line = "";
         foreach (var line in lines)
         {
             line_number++;
+            
+            line = line.chomp ();
+            if (line.has_suffix ("\\"))
+            {
+                continued_line += line.substring (0, line.length - 1) + "\n";
+                continue;
+            }
+
+            line = continued_line + line;
+            continued_line = "";
 
             var i = 0;
             while (line[i].isspace ())
                 i++;
             var indent = line.substring (0, i);
             var statement = line.substring (i);
-
-            statement = statement.chomp ();
 
             if (in_rule)
             {
@@ -290,11 +320,11 @@ public class BuildFile
                 var rule = new Rule ();
 
                 var input_list = statement.substring (0, index).chomp ();
-                foreach (var output in input_list.split (" "))
+                foreach (var output in split_variable (input_list))
                     rule.outputs.append (output);
 
                 var output_list = statement.substring (index + 1).strip ();
-                foreach (var input in output_list.split (" "))
+                foreach (var input in split_variable (output_list))
                     rule.inputs.append (input);
 
                 rules.append (rule);

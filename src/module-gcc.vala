@@ -45,7 +45,7 @@ public class GCCModule : BuildModule
             var source_list = build_file.variables.lookup ("programs.%s.sources".printf (program));
             if (source_list == null)
                 continue;
-            var sources = source_list.split (" ");
+            var sources = split_variable (source_list);
 
             var package_list = build_file.variables.lookup ("programs.%s.packages".printf (program));
             var cflags = build_file.variables.lookup ("programs.%s.cflags".printf (program));
@@ -56,7 +56,7 @@ public class GCCModule : BuildModule
             if (package_list != null)
             {
                 /* Stip out the posix module used in Vala (has no cflags/libs) */
-                var packages = package_list.split (" ");
+                var packages = split_variable (package_list);
                 var clean_package_list = "";
                 foreach (var p in packages)
                 {
@@ -140,7 +140,10 @@ public class GCCModule : BuildModule
                     continue;
                 }
                 else
+                {
+                    warning ("Unknown extension '%s'", source);
                     return;
+                }
 
                 var output = replace_extension (source, "o");
 

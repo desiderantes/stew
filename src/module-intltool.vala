@@ -44,7 +44,7 @@ public class IntltoolModule : BuildModule
                 continue;
 
             var value = build_file.variables.lookup (name);
-            foreach (var source in value.split (" "))
+            foreach (var source in split_variable (value))
                 sources.append (Path.build_filename (build_file.dirname, source));
         }
 
@@ -117,7 +117,7 @@ public class IntltoolModule : BuildModule
             if (name.has_suffix (".xml-sources"))
             {
                 var source_list = build_file.variables.lookup (name);
-                var sources = source_list.split (" ");
+                var sources = split_variable (source_list);
                 foreach (var source in sources)
                 {
                     var rule = new Rule ();
@@ -134,7 +134,7 @@ public class IntltoolModule : BuildModule
             if (name.has_suffix (".desktop-sources"))
             {
                 var source_list = build_file.variables.lookup (name);
-                var sources = source_list.split (" ");
+                var sources = split_variable (source_list);
                 foreach (var source in sources)
                 {
                     var rule = new Rule ();

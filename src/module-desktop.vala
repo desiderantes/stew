@@ -5,7 +5,7 @@ public class DesktopModule : BuildModule
         var desktop_entry_list = build_file.variables.lookup ("desktop.entries");
         if (desktop_entry_list != null)
         {
-            var entries = desktop_entry_list.split (" ");
+            var entries = split_variable (desktop_entry_list);
             foreach (var entry in entries)
             {
                 var dir = "%s/applications".printf (data_directory);

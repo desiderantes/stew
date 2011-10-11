@@ -7,7 +7,7 @@ public class MonoModule : BuildModule
             var source_list = build_file.variables.lookup ("programs.%s.sources".printf (program));
             if (source_list == null)
                 continue;
-            var sources = source_list.split (" ");
+            var sources = split_variable (source_list);
 
             var exe_file = "%s.exe".printf (program);
 

@@ -7,7 +7,7 @@ public class ValaModule : BuildModule
             var source_list = build_file.variables.lookup ("programs.%s.sources".printf (program));
             if (source_list == null)
                 continue;
-            var sources = source_list.split (" ");
+            var sources = split_variable (source_list);
 
             var rule = new Rule ();
             var command = "valac -C";
@@ -15,7 +15,7 @@ public class ValaModule : BuildModule
             var package_list = build_file.variables.lookup ("programs.%s.packages".printf (program));
             if (package_list != null)
             {
-                foreach (var package in package_list.split (" "))
+                foreach (var package in split_variable (package_list))
                     command += " --pkg %s".printf (package);
             }
             foreach (var source in sources)

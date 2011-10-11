@@ -7,7 +7,7 @@ public class PythonModule : BuildModule
             var source_list = build_file.variables.lookup ("programs.%s.sources".printf (program));
             if (source_list == null)
                 continue;
-            var sources = source_list.split (" ");
+            var sources = split_variable (source_list);
 
             foreach (var source in sources)
             {
@@ -27,7 +27,7 @@ public class PythonModule : BuildModule
                 build_file.add_install_rule (output, package_data_directory);
             }
 
-            var main_file = replace_extension (sources[0], "pyc");
+            var main_file = replace_extension (sources.nth_data (0), "pyc");
 
             /* Script to run locally */
             var rule = new Rule ();
