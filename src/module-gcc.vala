@@ -55,10 +55,22 @@ public class GCCModule : BuildModule
             string? package_ldflags = null;
             if (package_list != null)
             {
+                /* Stip out the posix module used in Vala (has no cflags/libs) */
+                var packages = package_list.split (" ");
+                var clean_package_list = "";
+                foreach (var p in packages)
+                {
+                    if (p == "posix")
+                        continue;
+                    if (clean_package_list != "")
+                        clean_package_list += " ";
+                    clean_package_list += p;
+                }
+
                 int exit_status;
                 try
                 {
-                    Process.spawn_command_line_sync ("pkg-config --cflags %s".printf (package_list), out package_cflags, null, out exit_status);
+                    Process.spawn_command_line_sync ("pkg-config --cflags %s".printf (clean_package_list), out package_cflags, null, out exit_status);
                     package_cflags = package_cflags.strip ();
                 }
                 catch (SpawnError e)
@@ -66,7 +78,7 @@ public class GCCModule : BuildModule
                 }
                 try
                 {
-                    Process.spawn_command_line_sync ("pkg-config --libs %s".printf (package_list), out package_ldflags, null, out exit_status);
+                    Process.spawn_command_line_sync ("pkg-config --libs %s".printf (clean_package_list), out package_ldflags, null, out exit_status);
                     package_ldflags = package_ldflags.strip ();
                 }
                 catch (SpawnError e)
@@ -77,7 +89,7 @@ public class GCCModule : BuildModule
             List<string> objects = null;
 
             /* Compile */
-	    var compiler = "gcc";
+    var compiler = "gcc";
             foreach (var source in sources)
             {
                 var input = source;
@@ -122,6 +134,10 @@ public class GCCModule : BuildModule
                 else if (source.has_suffix (".vala"))
 		{
                     input = replace_extension (source, "c");
+		}
+                else if (source.has_suffix (".vapi"))
+		{
+                    continue;
 		}
 		else
 		    return;

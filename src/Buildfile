@@ -1,0 +1,3 @@
+programs.easy-build.sources = config.vapi easy-build.vala module-bzip.vala module-desktop.vala module-dpkg.vala module-gcc.vala module-ghc.vala module-gnome.vala module-gsettings.vala module-gzip.vala module-intltool.vala module-java.vala module-man.vala module-mono.vala module-package.vala module-python.vala module-rpm.vala module-vala.vala module-xzip.vala
+programs.easy-build.packages = glib-2.0 gio-2.0 posix
+programs.easy-build.cflags = -DGETTEXT_PACKAGE=\"easy-build\" -DVERSION=\"0.0.4~bzr\"
