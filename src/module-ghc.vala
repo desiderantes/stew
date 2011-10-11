@@ -11,7 +11,7 @@ public class GHCModule : BuildModule
 
             var link_rule = new Rule ();
             link_rule.outputs.append (program);
-	    var link_pretty_command = "@echo '    LINK";
+            var link_pretty_command = "@echo '    LINK";
             var link_command = "@ghc -o %s".printf (program);
             foreach (var source in sources)
             {
@@ -21,26 +21,26 @@ public class GHCModule : BuildModule
                 var output = replace_extension (source, "o");
                 var interface_file = replace_extension (source, "hi");
 
-		var rule = new Rule ();
-		rule.inputs.append (source);
-		rule.outputs.append (output);
-		rule.outputs.append (interface_file);
+                var rule = new Rule ();
+                rule.inputs.append (source);
+                rule.outputs.append (output);
+                rule.outputs.append (interface_file);
                 if (pretty_print)
-		    rule.commands.append ("@echo '    HC %s'".printf (source));
-		rule.commands.append ("@ghc -c %s".printf (source));
-		build_file.rules.append (rule);
+                    rule.commands.append ("@echo '    HC %s'".printf (source));
+                rule.commands.append ("@ghc -c %s".printf (source));
+                build_file.rules.append (rule);
 
                 link_rule.inputs.append (output);
-		link_pretty_command += " %s".printf (output);
+                link_pretty_command += " %s".printf (output);
                 link_command += " %s".printf (output);
             }
             if (link_rule.inputs == null)
                 return;
 
             build_file.build_rule.inputs.append (program);
-	    link_pretty_command += "'";
+            link_pretty_command += "'";
             if (pretty_print)
-    	        link_rule.commands.append (link_pretty_command);
+                    link_rule.commands.append (link_pretty_command);
             link_rule.commands.append (link_command);
             build_file.rules.append (link_rule);
 
