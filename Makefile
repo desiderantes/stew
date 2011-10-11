@@ -30,6 +30,9 @@ eb-bootstrap:
 install: eb-bootstrap
 	./eb-bootstrap install
 
+release-gzip: eb-bootstrap
+	./eb-bootstrap release-gzip
+
 clean: eb-bootstrap
 	./eb-bootstrap clean
 	rm eb-bootstrap
