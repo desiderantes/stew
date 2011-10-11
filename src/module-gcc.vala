@@ -89,58 +89,58 @@ public class GCCModule : BuildModule
             List<string> objects = null;
 
             /* Compile */
-    var compiler = "gcc";
+            var compiler = "gcc";
             foreach (var source in sources)
             {
                 var input = source;
 
                 /* C */
                 if (source.has_suffix (".c"))
-		{
-		}
-		/* C++ */
-		else if (source.has_suffix (".cpp") ||
-		         source.has_suffix (".C") ||
-		         source.has_suffix (".cc") ||
-		         source.has_suffix (".CPP") ||
-		         source.has_suffix (".c++") ||
-		         source.has_suffix (".cp") ||
-		         source.has_suffix (".cxx"))
-		{
-		    compiler = "g++";
-		}
-		/* Objective C */
-		else if (source.has_suffix (".m"))
-		{
-		}
-		/* Go */
-		else if (source.has_suffix (".go"))
-		{
-		    compiler = "gccgo";
-		}
-		/* Fortran */
-		else if (source.has_suffix (".f") ||
+                {
+                }
+                /* C++ */
+                else if (source.has_suffix (".cpp") ||
+                         source.has_suffix (".C") ||
+                         source.has_suffix (".cc") ||
+                         source.has_suffix (".CPP") ||
+                         source.has_suffix (".c++") ||
+                         source.has_suffix (".cp") ||
+                         source.has_suffix (".cxx"))
+                {
+                    compiler = "g++";
+                }
+                /* Objective C */
+                else if (source.has_suffix (".m"))
+                {
+                }
+                /* Go */
+                else if (source.has_suffix (".go"))
+                {
+                    compiler = "gccgo";
+                }
+                /* Fortran */
+                else if (source.has_suffix (".f") ||
                          source.has_suffix (".for") ||
                          source.has_suffix (".ftn") ||
                          source.has_suffix (".f90") ||
                          source.has_suffix (".f95") ||
                          source.has_suffix (".f03") ||
                          source.has_suffix (".f08"))
-		{
-		    compiler = "gfortran";
-		}
-		/* Vala */
+                {
+                    compiler = "gfortran";
+                }
+                /* Vala */
                 // FIXME: Should be done in the Vala module
                 else if (source.has_suffix (".vala"))
-		{
+                {
                     input = replace_extension (source, "c");
-		}
+                }
                 else if (source.has_suffix (".vapi"))
-		{
+                {
                     continue;
-		}
-		else
-		    return;
+                }
+                else
+                    return;
 
                 var output = replace_extension (source, "o");
 
