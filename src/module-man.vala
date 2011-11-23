@@ -17,7 +17,7 @@ public class ManModule : BuildModule
                     warning ("Not a valid man page name '%s'", page);
                     continue;
                 }
-                var dir = "%s/man/man%d".printf  (data_directory, number);
+                var dir = "%s/man/man%d".printf  (build_file.data_directory, number);
                 build_file.add_install_rule (page, dir);
             }
         }

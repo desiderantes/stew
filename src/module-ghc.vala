@@ -44,7 +44,7 @@ public class GHCModule : BuildModule
             link_rule.commands.append (link_command);
             build_file.rules.append (link_rule);
 
-            build_file.add_install_rule (program, bin_directory);
+            build_file.add_install_rule (program, build_file.binary_directory);
         }
     }
 }

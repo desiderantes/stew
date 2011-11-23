@@ -156,6 +156,9 @@ public class GCCModule : BuildModule
                     rule.inputs.append (include);
                 rule.outputs.append (output);
                 var command = "@%s -g -Wall".printf (compiler);
+                /* Vala generates a lot of unused variables */
+                if (source.has_suffix (".vala"))
+                    command += " -Wno-unused";
                 if (cflags != null)
                     command += " %s".printf (cflags);
                 if (package_cflags != null)
@@ -189,7 +192,7 @@ public class GCCModule : BuildModule
                 rule.commands.append (command);
                 build_file.rules.append (rule);
 
-                build_file.add_install_rule (program, bin_directory);
+                build_file.add_install_rule (program, build_file.binary_directory);
             }
         }
     }

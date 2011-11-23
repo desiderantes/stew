@@ -8,7 +8,7 @@ public class DesktopModule : BuildModule
             var entries = split_variable (desktop_entry_list);
             foreach (var entry in entries)
             {
-                var dir = "%s/applications".printf (data_directory);
+                var dir = "%s/applications".printf (build_file.data_directory);
                 build_file.add_install_rule (entry, dir);
             }
         }

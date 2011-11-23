@@ -1,12 +1,7 @@
+private bool do_configure = false;
 private bool do_expand = false;
 private bool debug_enabled = false;
 private bool pretty_print = true;
-private string resource_directory;
-private string bin_directory;
-private string data_directory;
-private string package_data_directory;
-private string sysconf_directory;
-private string? destination_directory = null;
 private string package_version;
 private string package_name;
 private string release_name;
@@ -91,14 +86,6 @@ private string replace_extension (string filename, string extension)
         return "%s.%s".printf (filename, extension);
 
     return "%.*s.%s".printf (i, filename, extension);
-}
-
-private string get_install_directory (string dir)
-{
-    if (destination_directory == null)
-        return dir;
-
-    return "%s%s".printf (destination_directory, dir);
 }
 
 public class Rule
@@ -218,7 +205,6 @@ public class Rule
 public errordomain BuildError 
 {
     NO_BUILDFILE,
-    NO_TOPLEVEL,
     INVALID
 }
 
@@ -233,6 +219,11 @@ public class BuildFile
     public Rule build_rule;
     public Rule install_rule;
     public Rule clean_rule;
+
+    public string install_directory { get { return variables.lookup ("install-directory"); } }    
+    public string binary_directory { get { return variables.lookup ("binary-directory"); } }
+    public string data_directory { get { return variables.lookup ("data-directory"); } }
+    public string package_data_directory { get { return variables.lookup ("package-data-directory"); } }
 
     public BuildFile (string filename) throws FileError, BuildError
     {
@@ -348,11 +339,19 @@ public class BuildFile
         clean_rule.outputs.append ("%clean");
         rules.append (clean_rule);
     }
-    
+
+    public string get_install_path (string path)
+    {
+        if (install_directory == null || install_directory == "")
+            return path;
+        else
+            return "%s%s".printf (install_directory, path);
+    }
+
     public void add_install_rule (string filename, string install_dir)
     {
         install_rule.inputs.append (filename);
-        var install_path = get_install_directory (Path.build_filename (install_dir, filename));
+        var install_path = get_install_path (Path.build_filename (install_dir, filename));
         install_rule.commands.append ("@mkdir -p %s".printf (Path.get_dirname (install_path)));
         install_rule.commands.append ("@install %s %s".printf (filename, install_path));
     }
@@ -498,21 +497,15 @@ public class EasyBuild
     private static bool show_verbose = false;
     public static const OptionEntry[] options =
     {
+        { "configure", 0, 0, OptionArg.NONE, ref do_configure,
+          /* Help string for command line --configure flag */
+          N_("Configure build options"), null},
         { "expand", 0, 0, OptionArg.NONE, ref do_expand,
           /* Help string for command line --expand flag */
           N_("Expand current Buildfile and print to stdout"), null},
         { "version", 'v', 0, OptionArg.NONE, ref show_version,
           /* Help string for command line --version flag */
           N_("Show release version"), null},
-        { "resource-directory", 0, 0, OptionArg.STRING, ref resource_directory,
-          /* Help string for command line --resource-directory flag */
-          N_("Directory to install resources to"), "DIRECTORY" },
-        { "system-config-directory", 0, 0, OptionArg.STRING, ref sysconf_directory,
-          /* Help string for command line --system-config-directory flag */
-          N_("Directory containing system configuration"), "DIRECTORY" },
-        { "destination-directory", 0, 0, OptionArg.STRING, ref destination_directory,
-          /* Help string for command line --destination-directory flag */
-          N_("Directory to copy installed files to"), "DIRECTORY" },
         { "verbose", 0, 0, OptionArg.NONE, ref show_verbose,
           /* Help string for command line --verbose flag */
           N_("Show verbose output"), null},
@@ -529,7 +522,7 @@ public class EasyBuild
         if (debug_enabled)
             debug ("Loading %s", filename);
 
-        BuildFile f;
+        BuildFile f = null;
         try
         {
             f = new BuildFile (filename);
@@ -540,19 +533,9 @@ public class EasyBuild
             {
                 if (child == null)
                     throw new BuildError.NO_BUILDFILE ("No Buildfile in current directory");
-                else
-                    throw new BuildError.NO_TOPLEVEL ("%s is missing package.name variable",
-                                                      get_relative_path (child.dirname + "/Buildfile"));
             }
             else
                 throw e;
-        }
-
-        /* Find the toplevel buildfile */
-        if (!f.is_toplevel)
-        {
-            var parent_dir = Path.get_dirname (f.dirname);
-            f.parent = load_buildfiles (Path.build_filename (parent_dir, "Buildfile"), f);
         }
 
         /* Load children */
@@ -672,12 +655,45 @@ public class EasyBuild
             generate_clean_rules (child);
     }
 
+    private static void write_configure_file (BuildFile build_file, string contents)
+    {
+        var filename = Path.build_filename (build_file.dirname, "Buildfile.conf");
+        try
+        {
+            FileUtils.set_contents (filename, contents);
+        }
+        catch (FileError e)
+        {
+        }
+
+        foreach (var child in build_file.children)
+            write_configure_file (child, contents);
+    }
+
+    private static bool configure (BuildFile build_file)
+    {
+        var contents = "";
+
+        var install_directory = "/";
+        var resource_directory = "/usr/local";
+
+        contents += "# This file is automatically generated by the easy-build configure stage\n";
+        contents += "install-directory=%s\n".printf (install_directory);
+        contents += "resource-directory=%s\n".printf (resource_directory);
+        contents += "system-config-directory=/etc\n";
+        contents += "binary-directory=%s/bin\n".printf (resource_directory);
+        contents += "data-directory=%s/share\n".printf (resource_directory);
+        contents += "package-data-directory=%s/share/%s\n".printf (resource_directory, package_name);
+
+        write_configure_file (build_file, contents);
+
+        return true;
+    }
+
     public static int main (string[] args)
     {
         original_dir = Environment.get_current_dir ();
 
-        resource_directory = "/usr/local";
-        sysconf_directory = "/etc";
         var c = new OptionContext (/* Arguments and description for --help text */
                                    _("[TARGET] - Build system"));
         c.add_main_entries (options, Config.GETTEXT_PACKAGE);
@@ -702,9 +718,6 @@ public class EasyBuild
 
         pretty_print = !show_verbose;
 
-        if (destination_directory != null && !Path.is_absolute (destination_directory))
-            destination_directory = Path.build_filename (Environment.get_current_dir (), destination_directory);
-
         modules.append (new BZIPModule ());
         modules.append (new DesktopModule ());
         modules.append (new DpkgModule ());
@@ -724,24 +737,19 @@ public class EasyBuild
         modules.append (new XZIPModule ());
 
         var filename = Path.build_filename (Environment.get_current_dir (), "Buildfile");
-        BuildFile f;
+        BuildFile toplevel;
         try
         {
-            f = load_buildfiles (filename);
+            toplevel = load_buildfiles (filename);
         }
         catch (Error e)
         {
             printerr ("Unable to build: %s\n", e.message);
             return Posix.EXIT_FAILURE;
         }
-        var toplevel = f.toplevel;
 
         package_name = toplevel.variables.lookup ("package.name");
         package_version = toplevel.variables.lookup ("package.version");
-
-        bin_directory = "%s/bin".printf (resource_directory);
-        data_directory = "%s/share".printf (resource_directory);
-        package_data_directory = "%s/%s".printf (data_directory, package_name);
 
         release_name = package_name;
         if (package_version != null)
@@ -762,15 +770,31 @@ public class EasyBuild
 
         if (do_expand)
         {
-            f.print ();
+            toplevel.print ();
             return Posix.EXIT_SUCCESS;
+        }
+        
+/*        if (!do_configure && ?)
+        {
+            do_configure = true;
+        }*/
+
+        if (do_configure)
+        {
+            //if (install_directory != null && !Path.is_absolute (install_directory))
+            //    install_directory = Path.build_filename (Environment.get_current_dir (), install_directory);
+
+            if (configure (toplevel))
+                return Posix.EXIT_SUCCESS;
+            else
+                return Posix.EXIT_FAILURE;
         }
 
         string target = "build";
         if (args.length >= 2)
             target = args[1];
 
-        if (f.build_target (target))
+        if (toplevel.build_target (target))
             return Posix.EXIT_SUCCESS;
         else
             return Posix.EXIT_FAILURE;

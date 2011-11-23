@@ -6,7 +6,7 @@ public class PackageModule : BuildModule
         if (file_list != null)
         {
             foreach (var file in split_variable (file_list))
-                build_file.add_install_rule (file, package_data_directory);
+                build_file.add_install_rule (file, build_file.package_data_directory);
         }
     }
 }

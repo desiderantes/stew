@@ -8,7 +8,7 @@ public class GSettingsModule : BuildModule
             var schemas = split_variable (gsettings_schema_list);
             foreach (var schema in schemas)
             {
-                var dir = "%s/glib-2.0/schemas".printf (data_directory);
+                var dir = "%s/glib-2.0/schemas".printf (build_file.data_directory);
                 build_file.add_install_rule (schema, dir);
             }
         }

@@ -103,7 +103,7 @@ public class IntltoolModule : BuildModule
 
                     build_file.build_rule.inputs.append (mo_file);
 
-                    var target_dir = get_install_directory (Path.build_filename (data_directory, "locale", language, "LC_MESSAGES"));
+                    var target_dir = build_file.get_install_path (Path.build_filename (build_file.data_directory, "locale", language, "LC_MESSAGES"));
                     build_file.add_install_rule (mo_file, target_dir);
                 }
             }

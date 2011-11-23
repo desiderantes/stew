@@ -27,22 +27,22 @@ public class MonoModule : BuildModule
             rule.commands.append (command);
             build_file.rules.append (rule);
             build_file.build_rule.inputs.append (exe_file);
-            build_file.add_install_rule (exe_file, package_data_directory);
+            build_file.add_install_rule (exe_file, build_file.package_data_directory);
 
             /* Script to run locally */
             rule = new Rule ();
-	    rule.outputs.append (program);
-	    rule.commands.append ("@echo '#!/bin/sh' > %s".printf (program));
-	    rule.commands.append ("@echo 'exec mono %s' >> %s".printf (exe_file, program));
-	    rule.commands.append ("@chmod +x %s".printf (program));
+            rule.outputs.append (program);
+            rule.commands.append ("@echo '#!/bin/sh' > %s".printf (program));
+            rule.commands.append ("@echo 'exec mono %s' >> %s".printf (exe_file, program));
+            rule.commands.append ("@chmod +x %s".printf (program));
             build_file.rules.append (rule);
             build_file.build_rule.inputs.append (program);
 
             /* Script to run when installed */
-            var script = get_install_directory (Path.build_filename (bin_directory, program));
-            build_file.install_rule.commands.append ("@mkdir -p %s".printf (get_install_directory (bin_directory)));
+            var script = build_file.get_install_path (Path.build_filename (build_file.binary_directory, program));
+            build_file.install_rule.commands.append ("@mkdir -p %s".printf (build_file.get_install_path (build_file.binary_directory)));
             build_file.install_rule.commands.append ("@echo '#!/bin/sh' > %s".printf (script));
-            build_file.install_rule.commands.append ("@echo 'exec mono %s' >> %s".printf (Path.build_filename (package_data_directory, exe_file), script));
+            build_file.install_rule.commands.append ("@echo 'exec mono %s' >> %s".printf (Path.build_filename (build_file.package_data_directory, exe_file), script));
             build_file.install_rule.commands.append ("@chmod +x %s".printf (script));
         }
     }
