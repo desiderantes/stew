@@ -6,6 +6,7 @@ Overview of changes in easy-build 0.0.4
     * Add support for objective C
     * Add support for Fortran
     * Generate scripts for Java, C# and Python programs
+    * Compile with -Wno-unused for Vala programs
     * Set entrypoint in jar files
     * Build easy-build with easy-build
     * Allow multiple line variables using trailing backslash
