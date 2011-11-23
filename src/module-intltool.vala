@@ -69,7 +69,7 @@ public class IntltoolModule : BuildModule
 
             if (translation_directory != null)
             {
-                var pot_file = Path.build_filename (translation_directory, "%s.pot".printf (package_name));
+                var pot_file = Path.build_filename (translation_directory, "%s.pot".printf (build_file.package_name));
                 build_file.build_rule.inputs.append (pot_file);
 
                 var pot_rule = new Rule ();
