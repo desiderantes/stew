@@ -1,8 +1,4 @@
-private bool do_configure = false;
-private bool do_expand = false;
-private bool debug_enabled = false;
 private bool pretty_print = true;
-
 private string original_dir;
 
 public abstract class BuildModule
@@ -15,7 +11,7 @@ private void change_directory (string dirname)
     if (Environment.get_current_dir () == dirname)
         return;
 
-    GLib.print ("\x1B[1m[Entering directory %s]\x1B[21m\n", get_relative_path (dirname));
+    GLib.print ("\x1B[1m[Entering directory %s]\x1B[0m\n", get_relative_path (dirname));
     Environment.set_current_dir (dirname);
 }
 
@@ -410,7 +406,7 @@ public class BuildFile
     
     public bool is_toplevel
     {
-        get { return variables.lookup ("package.name") != null; }
+        get { return variables.lookup ("package.name") != null; } // FIXME
     }
 
     public BuildFile toplevel
@@ -496,7 +492,7 @@ public class BuildFile
         /* Run the commands */
         change_directory (dirname);
         if (rule.has_output)
-            GLib.print ("\x1B[1m[Building %s]\x1B[21m\n", target);
+            GLib.print ("\x1B[1m[Building %s]\x1B[0m\n", target);
         return rule.build ();
     }
 
@@ -523,6 +519,9 @@ public class EasyBuild
 {
     private static bool show_version = false;
     private static bool show_verbose = false;
+    private static bool do_configure = false;
+    private static bool do_expand = false;
+    private static bool debug_enabled = false;
     public static const OptionEntry[] options =
     {
         { "configure", 0, 0, OptionArg.NONE, ref do_configure,
@@ -542,6 +541,7 @@ public class EasyBuild
           N_("Print debugging messages"), null},
         { null }
     };
+    private static bool need_configure = false;
 
     public static List<BuildModule> modules;
 
@@ -565,6 +565,8 @@ public class EasyBuild
             else
                 throw e;
         }
+
+        need_configure = !FileUtils.test ("%s.conf".printf (filename), FileTest.EXISTS);
 
         /* Load children */
         var dir = Dir.open (f.dirname);
@@ -756,28 +758,16 @@ public class EasyBuild
             return Posix.EXIT_FAILURE;
         }
 
-        /* Generate implicit rules */
-        generate_rules (toplevel);
-
-        /* Generate release rules */
-        var rule = new Rule ();
-        rule.outputs.append ("%s/".printf (toplevel.release_name));
-        generate_release_rules (toplevel, rule, toplevel.release_name);
-        toplevel.rules.append (rule);
-
-        /* Generate clean rule */
-        generate_clean_rules (toplevel);
-
-        if (do_expand)
-        {
-            toplevel.print ();
-            return Posix.EXIT_SUCCESS;
-        }
-        
-        if (do_configure)// || need_configure)
+        if (do_configure || need_configure)
         {
             var variables = new HashTable<string, string> (str_hash, str_equal);
             
+            if (toplevel.package_name == null)
+            {
+                printerr ("No Buildfile.conf and not a toplevel buildfile.  Change to the toplevel direction and run again\n");
+                return Posix.EXIT_FAILURE;
+            }
+           
             /* Default values */
             variables.insert ("resource-directory", "/usr/local");
             variables.insert ("system-config-directory", "/etc");
@@ -803,15 +793,17 @@ public class EasyBuild
                 variables.insert (name, value);
             }
 
+            GLib.print ("\x1B[1m[Configuring]\x1B[0m\n");
+
             /* Derived values */
             var resource_directory = variables.lookup ("resource-directory");
             if (variables.lookup ("binary-directory") == null)
-                variables.insert ("binary-directory", "%s/bin\n".printf (resource_directory));
+                variables.insert ("binary-directory", "%s/bin".printf (resource_directory));
             if (variables.lookup ("data-directory") == null)
-                variables.insert ("data-directory", "%s/share\n".printf (resource_directory));
+                variables.insert ("data-directory", "%s/share".printf (resource_directory));
             var data_directory = variables.lookup ("data-directory");
             if (variables.lookup ("package-data-directory") == null)
-                variables.insert ("package-data-directory", "%s/%s\n".printf (data_directory, toplevel.package_name));
+                variables.insert ("package-data-directory", "%s/%s".printf (data_directory, toplevel.package_name));
 
             /* Make directories absolute */
             // FIXME
@@ -831,15 +823,52 @@ public class EasyBuild
 
             if (do_configure)
                 return Posix.EXIT_SUCCESS;
+
+            /* Reload buildfiles */
+            try
+            {
+                toplevel = load_buildfiles (filename);
+            }
+            catch (Error e)
+            {
+                printerr ("Unable to build: %s\n", e.message);
+                return Posix.EXIT_FAILURE;
+            }
         }
 
+        /* Generate implicit rules */
+        generate_rules (toplevel);
+
+        /* Generate release rules */
+        var rule = new Rule ();
+        rule.outputs.append ("%s/".printf (toplevel.release_name));
+        generate_release_rules (toplevel, rule, toplevel.release_name);
+        toplevel.rules.append (rule);
+
+        /* Generate clean rule */
+        generate_clean_rules (toplevel);
+
+        if (do_expand)
+        {
+            toplevel.print ();
+            return Posix.EXIT_SUCCESS;
+        }
+        
         string target = "build";
         if (args.length >= 2)
             target = args[1];
 
+        GLib.print ("\x1B[1m[Building target %s]\x1B[0m\n", target);
+
         if (toplevel.build_target (target))
+        {
+            GLib.print ("\x1B[1m\x1B[32m[Build complete]\x1B[0m\n");
             return Posix.EXIT_SUCCESS;
+        }
         else
+        {
+            GLib.print ("\x1B[1m\x1B[31m[Build failed]\x1B[0m\n");
             return Posix.EXIT_FAILURE;
+        }
     }
 }

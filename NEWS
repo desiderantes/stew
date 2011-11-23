@@ -1,5 +1,6 @@
 Overview of changes in easy-build 0.0.4
 
+    * Add a configure stage
     * Add support for Go
     * Add support for Haskell
     * Add support for objective C
@@ -8,6 +9,7 @@ Overview of changes in easy-build 0.0.4
     * Set entrypoint in jar files
     * Build easy-build with easy-build
     * Allow multiple line variables using trailing backslash
+    * Add colored message if build successful/failed
 
 Overview of changes in easy-build 0.0.3
 
