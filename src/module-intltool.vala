@@ -81,7 +81,7 @@ public class IntltoolModule : BuildModule
                 var gettext_command = "@xgettext --extract-all --from-code=utf-8 --output %s".printf (pot_file);
                 foreach (var source in gettext_sources)
                 {
-                    var s = get_relative_path (source);
+                    var s = get_relative_path (original_dir, source);
                     pot_rule.inputs.append (s);
                     gettext_command += " %s".printf (s);
                 }

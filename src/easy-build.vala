@@ -11,7 +11,7 @@ private void change_directory (string dirname)
     if (Environment.get_current_dir () == dirname)
         return;
 
-    GLib.print ("\x1B[1m[Entering directory %s]\x1B[0m\n", get_relative_path (dirname));
+    GLib.print ("\x1B[1m[Entering directory %s]\x1B[0m\n", get_relative_path (original_dir, dirname));
     Environment.set_current_dir (dirname);
 }
 
@@ -36,29 +36,28 @@ public List<string> split_variable (string value)
     }
 }
 
-public string get_relative_path (string path)
+public string get_relative_path (string source_path, string target_path)
 {
-    var current_dir = original_dir;
-
     /* Already relative */
-    if (!Path.is_absolute (path))
-        return path;
+    if (!Path.is_absolute (target_path))
+        return target_path;
     
     /* It is the current directory */
-    if (path == current_dir)
+    if (target_path == source_path)
         return ".";
 
-    var dir = current_dir + "/";
-    if (path.has_prefix (dir))
-        return path.substring (dir.length);
+    var dir = source_path + "/";
+    if (target_path.has_prefix (dir))
+        return target_path.substring (dir.length);
 
-    var relative_path = Path.get_basename (path);
+    var path = source_path;
+    var relative_path = Path.get_basename (target_path);
     while (true)
     {
-        current_dir = Path.get_dirname (current_dir);
+        path = Path.get_dirname (path);
         relative_path = "../" + relative_path;
 
-        if (path.has_prefix (current_dir + "/"))
+        if (target_path.has_prefix (path + "/"))
             return relative_path;
     }
 }
@@ -196,14 +195,13 @@ public class Rule
 
 public errordomain BuildError 
 {
-    NO_BUILDFILE,
     INVALID
 }
 
 public class BuildFile
 {
     public string dirname;
-    public BuildFile? parent;
+    public BuildFile? parent = null;
     public List<BuildFile> children;
     public HashTable<string, string> variables;
     public List<string> programs;
@@ -211,8 +209,9 @@ public class BuildFile
     public Rule build_rule;
     public Rule install_rule;
     public Rule clean_rule;
-    public bool has_configuration;
 
+    public string source_directory { get { return variables.lookup ("source-directory"); } }
+    public string top_source_directory { get { return variables.lookup ("top-source-directory"); } }
     public string install_directory { get { return variables.lookup ("install-directory"); } }    
     public string binary_directory { get { return variables.lookup ("binary-directory"); } }
     public string data_directory { get { return variables.lookup ("data-directory"); } }
@@ -231,28 +230,26 @@ public class BuildFile
         }
     }
 
-    public BuildFile (string filename) throws FileError, BuildError
+    public BuildFile (string filename, HashTable<string, string>? conf_variables = null, bool allow_rules = true) throws FileError, BuildError
     {
         dirname = Path.get_dirname (filename);
 
         variables = new HashTable<string, string> (str_hash, str_equal);
-
-        try
+        if (conf_variables != null)
         {
-            string contents;
-            var configuration_filename = "%s.conf".printf (filename);
-            FileUtils.get_contents (configuration_filename, out contents);
-            parse (configuration_filename, contents, false);
-            has_configuration = true;
-        }
-        catch (FileError e)
-        {
-            has_configuration = false;
+            var iter = HashTableIter<string, string> (conf_variables);
+            while (true)
+            {
+                string name, value;
+                if (!iter.next (out name, out value))
+                    break;
+                variables.insert (name, value);
+            }
         }
 
         string contents;
         FileUtils.get_contents (filename, out contents);
-        parse (filename, contents);
+        parse (filename, contents, allow_rules);
 
         build_rule = new Rule ();
         build_rule.outputs.append ("%build");
@@ -266,8 +263,8 @@ public class BuildFile
         clean_rule.outputs.append ("%clean");
         rules.append (clean_rule);
     }
-    
-    private void parse (string filename, string contents, bool allow_rules = false) throws BuildError
+
+    private void parse (string filename, string contents, bool allow_rules) throws BuildError
     {
         var lines = contents.split ("\n");
         var line_number = 0;
@@ -360,7 +357,7 @@ public class BuildFile
             }
 
             throw new BuildError.INVALID ("Invalid statement in %s line %d:\n%s",
-                                          get_relative_path (filename), line_number, statement);
+                                          get_relative_path (original_dir, filename), line_number, statement);
         }
     }
 
@@ -406,20 +403,17 @@ public class BuildFile
     
     public bool is_toplevel
     {
-        get { return variables.lookup ("package.name") != null; } // FIXME
+        get { return parent == null; }
     }
 
     public BuildFile toplevel
     {
-        get { if (is_toplevel) return this; else return parent.toplevel; }
+        get { if (parent == null) return this; else return parent.toplevel; }
     }
 
-    public string get_relative_dirname ()
+    public string relative_dirname
     {
-        if (is_toplevel)
-            return ".";
-        else
-            return dirname.substring (toplevel.dirname.length + 1);
+        owned get { return get_relative_path (toplevel.dirname, dirname); }
     }
 
     public Rule? find_rule (string output)
@@ -474,7 +468,7 @@ public class BuildFile
                 return true;
             else
             {
-                GLib.printerr ("No rule to build '%s'\n", get_relative_path (target));
+                GLib.printerr ("No rule to build '%s'\n", get_relative_path (original_dir, target));
                 return false;
             }
         }
@@ -541,32 +535,15 @@ public class EasyBuild
           N_("Print debugging messages"), null},
         { null }
     };
-    private static bool need_configure = false;
 
     public static List<BuildModule> modules;
 
-    public static BuildFile? load_buildfiles (string filename, BuildFile? child = null) throws Error
-    {    
+    public static BuildFile? load_buildfiles (string filename, HashTable<string, string> conf_variables) throws Error
+    {
         if (debug_enabled)
             debug ("Loading %s", filename);
 
-        BuildFile f = null;
-        try
-        {
-            f = new BuildFile (filename);
-        }
-        catch (FileError e)
-        {
-            if (e is FileError.NOENT)
-            {
-                if (child == null)
-                    throw new BuildError.NO_BUILDFILE ("No Buildfile in current directory");
-            }
-            else
-                throw e;
-        }
-
-        need_configure = !FileUtils.test ("%s.conf".printf (filename), FileTest.EXISTS);
+        var f = new BuildFile (filename, conf_variables);
 
         /* Load children */
         var dir = Dir.open (f.dirname);
@@ -576,20 +553,12 @@ public class EasyBuild
             if (child_dir == null)
                  break;
 
-            /* Already loaded */
-            if (child != null && Path.build_filename (f.dirname, child_dir) == child.dirname)
-            {
-                child.parent = f;
-                f.children.append (child);
-                continue;
-            }
-
             var child_filename = Path.build_filename (f.dirname, child_dir, "Buildfile");
             if (FileUtils.test (child_filename, FileTest.EXISTS))
             {
                 if (debug_enabled)
                     debug ("Loading %s", child_filename);
-                var c = new BuildFile (child_filename);
+                var c = new BuildFile (child_filename, conf_variables);
                 c.parent = f;
                 f.children.append (c);
             }
@@ -638,7 +607,7 @@ public class EasyBuild
     // FIXME: Move this into a module (but it needs to be run last or watch for rule changes)
     public static void generate_release_rules (BuildFile buildfile, Rule release_rule, string release_dir)
     {
-        var relative_dirname = buildfile.get_relative_dirname ();
+        var relative_dirname = buildfile.relative_dirname;
 
         var dirname = Path.build_filename (release_dir, relative_dirname);
         if (relative_dirname == ".")
@@ -685,31 +654,16 @@ public class EasyBuild
             generate_clean_rules (child);
     }
 
-    private static void write_configure_files (BuildFile build_file, string contents)
-    {
-        var filename = Path.build_filename (build_file.dirname, "Buildfile.conf");
-        try
-        {
-            FileUtils.set_contents (filename, contents);
-        }
-        catch (FileError e)
-        {
-        }
-
-        foreach (var child in build_file.children)
-            write_configure_files (child, contents);
-    }
-
     public static int main (string[] args)
     {
         original_dir = Environment.get_current_dir ();
 
-        var c = new OptionContext (/* Arguments and description for --help text */
-                                   _("[TARGET] - Build system"));
-        c.add_main_entries (options, Config.GETTEXT_PACKAGE);
+        var context = new OptionContext (/* Arguments and description for --help text */
+                                         _("[TARGET] - Build system"));
+        context.add_main_entries (options, Config.GETTEXT_PACKAGE);
         try
         {
-            c.parse (ref args);
+            context.parse (ref args);
         }
         catch (Error e)
         {
@@ -746,64 +700,90 @@ public class EasyBuild
         modules.append (new ValaModule ());
         modules.append (new XZIPModule ());
 
-        var filename = Path.build_filename (Environment.get_current_dir (), "Buildfile");
-        BuildFile toplevel;
+        /* Find the toplevel */
+        var toplevel_dir = Environment.get_current_dir ();
+        var is_toplevel = true;
+        string? package_name = null;
+        while (true)
+        {
+            try
+            {
+                var f = new BuildFile (Path.build_filename (toplevel_dir, "Buildfile"));
+                package_name = f.variables.lookup ("package.name");
+                if (package_name != null)
+                    break;
+            }
+            catch (Error e)
+            {
+                if (e is FileError.NOENT)
+                    printerr ("Unable to find toplevel buildfile\n");
+                else
+                    printerr ("Unable to build: %s\n", e.message);
+                return Posix.EXIT_FAILURE;
+            }
+            is_toplevel = false;
+            toplevel_dir = Path.get_dirname (toplevel_dir);
+        }
+
+        /* Load configuration */
+        var conf_variables = new HashTable<string, string> (str_hash, str_equal);
+        var need_configure = false;
+
         try
         {
-            toplevel = load_buildfiles (filename);
+            var conf_file = new BuildFile (Path.build_filename (toplevel_dir, "Buildfile.conf"), null, false);
+            conf_variables = conf_file.variables;
         }
         catch (Error e)
         {
-            printerr ("Unable to build: %s\n", e.message);
-            return Posix.EXIT_FAILURE;
+            if (e is FileError.NOENT)
+                need_configure = true;
+            else
+            {
+                printerr ("Failed to load configuration: %s\n", e.message);
+                return Posix.EXIT_FAILURE;
+            }
         }
 
         if (do_configure || need_configure)
-        {
-            var variables = new HashTable<string, string> (str_hash, str_equal);
-            
-            if (toplevel.package_name == null)
-            {
-                printerr ("No Buildfile.conf and not a toplevel buildfile.  Change to the toplevel direction and run again\n");
-                return Posix.EXIT_FAILURE;
-            }
-           
+        {           
             /* Default values */
-            variables.insert ("resource-directory", "/usr/local");
-            variables.insert ("system-config-directory", "/etc");
-            variables.insert ("package.name", toplevel.package_name);
-            variables.insert ("package.version", toplevel.package_version);
+            conf_variables.insert ("resource-directory", "/usr/local");
+            conf_variables.insert ("system-config-directory", "/etc");
 
             /* Load args from the command line */
-            for (var i = 1; i < args.length; i++)
+            if (do_configure)
             {
-                var arg = args[i];
-                var index = arg.index_of ("=");
-                var name = "", value = "";
-                if (index >= 0)
+                for (var i = 1; i < args.length; i++)
                 {
-                    name = arg.substring (0, index).strip ();
-                    value = arg.substring (index + 1).strip ();
+                    var arg = args[i];
+                    var index = arg.index_of ("=");
+                    var name = "", value = "";
+                    if (index >= 0)
+                    {
+                        name = arg.substring (0, index).strip ();
+                        value = arg.substring (index + 1).strip ();
+                    }
+                    if (name == "" || value == "")
+                    {
+                        stderr.printf ("Invalid configure argument '%s'.  Arguments should be in the form name=value\n", arg);
+                        return Posix.EXIT_FAILURE;
+                    }
+                    conf_variables.insert (name, value);
                 }
-                if (name == "" || value == "")
-                {
-                    stderr.printf ("Invalid configure argument '%s'.  Arguments should be in the form name=value\n", arg);
-                    return Posix.EXIT_FAILURE;
-                }
-                variables.insert (name, value);
             }
 
             GLib.print ("\x1B[1m[Configuring]\x1B[0m\n");
 
             /* Derived values */
-            var resource_directory = variables.lookup ("resource-directory");
-            if (variables.lookup ("binary-directory") == null)
-                variables.insert ("binary-directory", "%s/bin".printf (resource_directory));
-            if (variables.lookup ("data-directory") == null)
-                variables.insert ("data-directory", "%s/share".printf (resource_directory));
-            var data_directory = variables.lookup ("data-directory");
-            if (variables.lookup ("package-data-directory") == null)
-                variables.insert ("package-data-directory", "%s/%s".printf (data_directory, toplevel.package_name));
+            var resource_directory = conf_variables.lookup ("resource-directory");
+            if (conf_variables.lookup ("binary-directory") == null)
+                conf_variables.insert ("binary-directory", "%s/bin".printf (resource_directory));
+            if (conf_variables.lookup ("data-directory") == null)
+                conf_variables.insert ("data-directory", "%s/share".printf (resource_directory));
+            var data_directory = conf_variables.lookup ("data-directory");
+            if (conf_variables.lookup ("package-data-directory") == null)
+                conf_variables.insert ("package-data-directory", "%s/%s".printf (data_directory, package_name));
 
             /* Make directories absolute */
             // FIXME
@@ -811,7 +791,7 @@ public class EasyBuild
             //    install_directory = Path.build_filename (Environment.get_current_dir (), install_directory);
 
             var contents = "# This file is automatically generated by the easy-build configure stage\n";
-            var iter = HashTableIter<string, string> (variables);
+            var iter = HashTableIter<string, string> (conf_variables);
             while (true)
             {
                 string name, value;
@@ -819,21 +799,33 @@ public class EasyBuild
                     break;
                 contents += "%s=%s\n".printf (name, value);
             }
-            write_configure_files (toplevel, contents);
 
-            if (do_configure)
-                return Posix.EXIT_SUCCESS;
-
-            /* Reload buildfiles */
             try
             {
-                toplevel = load_buildfiles (filename);
+                FileUtils.set_contents (Path.build_filename (toplevel_dir, "Buildfile.conf"), contents);
             }
-            catch (Error e)
+            catch (FileError e)
             {
-                printerr ("Unable to build: %s\n", e.message);
-                return Posix.EXIT_FAILURE;
+                printerr ("Failed to write configuration: %s\n", e.message);
+                return Posix.EXIT_SUCCESS;
             }
+
+            /* Stop if only configure stage requested */
+            if (do_configure)
+                return Posix.EXIT_SUCCESS;
+        }
+
+        /* Load the buildfile tree */
+        var filename = Path.build_filename (toplevel_dir, "Buildfile");
+        BuildFile toplevel;
+        try
+        {
+            toplevel = load_buildfiles (filename, conf_variables);
+        }
+        catch (Error e)
+        {
+            printerr ("Unable to build: %s\n", e.message);
+            return Posix.EXIT_FAILURE;
         }
 
         /* Generate implicit rules */
@@ -848,19 +840,33 @@ public class EasyBuild
         /* Generate clean rule */
         generate_clean_rules (toplevel);
 
+        /* Find the buildfile in the current directory */
+        var build_file = toplevel;
+        while (build_file.dirname != original_dir)
+        {
+            foreach (var c in build_file.children)
+            {
+                if (original_dir.has_prefix (c.dirname))
+                {
+                    build_file = c;
+                    break;
+                }
+            }
+        }
+
         if (do_expand)
         {
-            toplevel.print ();
+            build_file.print ();
             return Posix.EXIT_SUCCESS;
         }
-        
+
         string target = "build";
         if (args.length >= 2)
             target = args[1];
 
         GLib.print ("\x1B[1m[Building target %s]\x1B[0m\n", target);
 
-        if (toplevel.build_target (target))
+        if (build_file.build_target (target))
         {
             GLib.print ("\x1B[1m\x1B[32m[Build complete]\x1B[0m\n");
             return Posix.EXIT_SUCCESS;
