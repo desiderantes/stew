@@ -1,10 +1,10 @@
 public class GHCModule : BuildModule
 {
-    public override void generate_rules (BuildFile build_file)
+    public override void generate_rules (Recipe recipe)
     {
-        foreach (var program in build_file.programs)
+        foreach (var program in recipe.programs)
         {
-            var source_list = build_file.variables.lookup ("programs.%s.sources".printf (program));
+            var source_list = recipe.variables.lookup ("programs.%s.sources".printf (program));
             if (source_list == null)
                 continue;
             var sources = split_variable (source_list);
@@ -28,7 +28,7 @@ public class GHCModule : BuildModule
                 if (pretty_print)
                     rule.commands.append ("@echo '    HC %s'".printf (source));
                 rule.commands.append ("@ghc -c %s".printf (source));
-                build_file.rules.append (rule);
+                recipe.rules.append (rule);
 
                 link_rule.inputs.append (output);
                 link_pretty_command += " %s".printf (output);
@@ -37,14 +37,14 @@ public class GHCModule : BuildModule
             if (link_rule.inputs == null)
                 return;
 
-            build_file.build_rule.inputs.append (program);
+            recipe.build_rule.inputs.append (program);
             link_pretty_command += "'";
             if (pretty_print)
                     link_rule.commands.append (link_pretty_command);
             link_rule.commands.append (link_command);
-            build_file.rules.append (link_rule);
+            recipe.rules.append (link_rule);
 
-            build_file.add_install_rule (program, build_file.binary_directory);
+            recipe.add_install_rule (program, recipe.binary_directory);
         }
     }
 }

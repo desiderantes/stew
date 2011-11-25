@@ -1,8 +1,8 @@
 public class ManModule : BuildModule
 {
-    public override void generate_rules (BuildFile build_file)
+    public override void generate_rules (Recipe recipe)
     {
-        var man_page_list = build_file.variables.lookup ("man.pages");
+        var man_page_list = recipe.variables.lookup ("man.pages");
         if (man_page_list != null)
         {
             var pages = split_variable (man_page_list);
@@ -17,8 +17,8 @@ public class ManModule : BuildModule
                     warning ("Not a valid man page name '%s'", page);
                     continue;
                 }
-                var dir = "%s/man/man%d".printf  (build_file.data_directory, number);
-                build_file.add_install_rule (page, dir);
+                var dir = "%s/man/man%d".printf  (recipe.data_directory, number);
+                recipe.add_install_rule (page, dir);
             }
         }
     }

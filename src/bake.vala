@@ -3,7 +3,7 @@ private string original_dir;
 
 public abstract class BuildModule
 {
-    public abstract void generate_rules (BuildFile build_file);
+    public abstract void generate_rules (Recipe recipe);
 }
 
 private void change_directory (string dirname)
@@ -198,11 +198,11 @@ public errordomain BuildError
     INVALID
 }
 
-public class BuildFile
+public class Recipe
 {
     public string dirname;
-    public BuildFile? parent = null;
-    public List<BuildFile> children;
+    public Recipe? parent = null;
+    public List<Recipe> children;
     public HashTable<string, string> variables;
     public List<string> programs;
     public List<Rule> rules;
@@ -230,7 +230,7 @@ public class BuildFile
         }
     }
 
-    public BuildFile (string filename, HashTable<string, string>? conf_variables = null, bool allow_rules = true) throws FileError, BuildError
+    public Recipe (string filename, HashTable<string, string>? conf_variables = null, bool allow_rules = true) throws FileError, BuildError
     {
         dirname = Path.get_dirname (filename);
 
@@ -406,7 +406,7 @@ public class BuildFile
         get { return parent == null; }
     }
 
-    public BuildFile toplevel
+    public Recipe toplevel
     {
         get { if (parent == null) return this; else return parent.toplevel; }
     }
@@ -432,7 +432,7 @@ public class BuildFile
         return null;
     }
     
-    public BuildFile get_buildfile_with_target (string target)
+    public Recipe get_recipe_with_target (string target)
     {
         // FIXME: Directories are broken
         if (target.has_suffix ("/"))
@@ -455,9 +455,9 @@ public class BuildFile
     
     public bool build_target (string target)
     {
-        var buildfile = get_buildfile_with_target (target);
-        if (buildfile != this)
-            return buildfile.build_target (Path.get_basename (target));
+        var recipe = get_recipe_with_target (target);
+        if (recipe != this)
+            return recipe.build_target (Path.get_basename (target));
 
         var rule = find_rule (target);
         if (rule == null)
@@ -509,7 +509,7 @@ public class BuildFile
     }
 }
 
-public class EasyBuild
+public class Bake
 {
     private static bool show_version = false;
     private static bool show_verbose = false;
@@ -523,7 +523,7 @@ public class EasyBuild
           N_("Configure build options"), null},
         { "expand", 0, 0, OptionArg.NONE, ref do_expand,
           /* Help string for command line --expand flag */
-          N_("Expand current Buildfile and print to stdout"), null},
+          N_("Expand current recipe and print to stdout"), null},
         { "version", 'v', 0, OptionArg.NONE, ref show_version,
           /* Help string for command line --version flag */
           N_("Show release version"), null},
@@ -538,12 +538,12 @@ public class EasyBuild
 
     public static List<BuildModule> modules;
 
-    public static BuildFile? load_buildfiles (string filename, HashTable<string, string> conf_variables) throws Error
+    public static Recipe? load_recipes (string filename, HashTable<string, string> conf_variables) throws Error
     {
         if (debug_enabled)
             debug ("Loading %s", filename);
 
-        var f = new BuildFile (filename, conf_variables);
+        var f = new Recipe (filename, conf_variables);
 
         /* Load children */
         var dir = Dir.open (f.dirname);
@@ -553,12 +553,12 @@ public class EasyBuild
             if (child_dir == null)
                  break;
 
-            var child_filename = Path.build_filename (f.dirname, child_dir, "Buildfile");
+            var child_filename = Path.build_filename (f.dirname, child_dir, "Recipe");
             if (FileUtils.test (child_filename, FileTest.EXISTS))
             {
                 if (debug_enabled)
                     debug ("Loading %s", child_filename);
-                var c = new BuildFile (child_filename, conf_variables);
+                var c = new Recipe (child_filename, conf_variables);
                 c.parent = f;
                 f.children.append (c);
             }
@@ -605,17 +605,17 @@ public class EasyBuild
     }
 
     // FIXME: Move this into a module (but it needs to be run last or watch for rule changes)
-    public static void generate_release_rules (BuildFile buildfile, Rule release_rule, string release_dir)
+    public static void generate_release_rules (Recipe recipe, Rule release_rule, string release_dir)
     {
-        var relative_dirname = buildfile.relative_dirname;
+        var relative_dirname = recipe.relative_dirname;
 
         var dirname = Path.build_filename (release_dir, relative_dirname);
         if (relative_dirname == ".")
             dirname = release_dir;
 
         /* Add files that are used */
-        add_release_file (release_rule, release_dir, relative_dirname, "Buildfile");
-        foreach (var rule in buildfile.rules)
+        add_release_file (release_rule, release_dir, relative_dirname, "Recipe");
+        foreach (var rule in recipe.rules)
         {
             foreach (var input in rule.inputs)
             {
@@ -624,33 +624,33 @@ public class EasyBuild
                     continue;
 
                 /* Ignore generated files */
-                if (buildfile.find_rule (input) != null)
+                if (recipe.find_rule (input) != null)
                     continue;
 
-                /* Ignore files built in other buildfiles */
-                if (buildfile.get_buildfile_with_target (input) != buildfile)
+                /* Ignore files built in other recipes */
+                if (recipe.get_recipe_with_target (input) != recipe)
                     continue;
 
                 add_release_file (release_rule, release_dir, relative_dirname, input);
             }
         }
 
-        foreach (var child in buildfile.children)
+        foreach (var child in recipe.children)
             generate_release_rules (child, release_rule, release_dir);
     }
     
-    private static void generate_rules (BuildFile build_file)
+    private static void generate_rules (Recipe recipe)
     {
         foreach (var module in modules)
-            module.generate_rules (build_file);
-        foreach (var child in build_file.children)
+            module.generate_rules (recipe);
+        foreach (var child in recipe.children)
             generate_rules (child);
     }
 
-    private static void generate_clean_rules (BuildFile build_file)
+    private static void generate_clean_rules (Recipe recipe)
     {
-        build_file.generate_clean_rule ();
-        foreach (var child in build_file.children)
+        recipe.generate_clean_rule ();
+        foreach (var child in recipe.children)
             generate_clean_rules (child);
     }
 
@@ -676,7 +676,7 @@ public class EasyBuild
         if (show_version)
         {
             /* Note, not translated so can be easily parsed */
-            stderr.printf ("easy-build %s\n", Config.VERSION);
+            stderr.printf ("bake %s\n", Config.VERSION);
             return Posix.EXIT_SUCCESS;
         }
 
@@ -708,7 +708,7 @@ public class EasyBuild
         {
             try
             {
-                var f = new BuildFile (Path.build_filename (toplevel_dir, "Buildfile"));
+                var f = new Recipe (Path.build_filename (toplevel_dir, "Recipe"));
                 package_name = f.variables.lookup ("package.name");
                 if (package_name != null)
                     break;
@@ -716,7 +716,7 @@ public class EasyBuild
             catch (Error e)
             {
                 if (e is FileError.NOENT)
-                    printerr ("Unable to find toplevel buildfile\n");
+                    printerr ("Unable to find toplevel recipe\n");
                 else
                     printerr ("Unable to build: %s\n", e.message);
                 return Posix.EXIT_FAILURE;
@@ -731,7 +731,7 @@ public class EasyBuild
 
         try
         {
-            var conf_file = new BuildFile (Path.build_filename (toplevel_dir, "Buildfile.conf"), null, false);
+            var conf_file = new Recipe (Path.build_filename (toplevel_dir, "Recipe.conf"), null, false);
             conf_variables = conf_file.variables;
         }
         catch (Error e)
@@ -790,7 +790,7 @@ public class EasyBuild
             //if (install_directory != null && !Path.is_absolute (install_directory))
             //    install_directory = Path.build_filename (Environment.get_current_dir (), install_directory);
 
-            var contents = "# This file is automatically generated by the easy-build configure stage\n";
+            var contents = "# This file is automatically generated by the Bake configure stage\n";
             var iter = HashTableIter<string, string> (conf_variables);
             while (true)
             {
@@ -802,7 +802,7 @@ public class EasyBuild
 
             try
             {
-                FileUtils.set_contents (Path.build_filename (toplevel_dir, "Buildfile.conf"), contents);
+                FileUtils.set_contents (Path.build_filename (toplevel_dir, "Recipe.conf"), contents);
             }
             catch (FileError e)
             {
@@ -815,12 +815,12 @@ public class EasyBuild
                 return Posix.EXIT_SUCCESS;
         }
 
-        /* Load the buildfile tree */
-        var filename = Path.build_filename (toplevel_dir, "Buildfile");
-        BuildFile toplevel;
+        /* Load the recipe tree */
+        var filename = Path.build_filename (toplevel_dir, "Recipe");
+        Recipe toplevel;
         try
         {
-            toplevel = load_buildfiles (filename, conf_variables);
+            toplevel = load_recipes (filename, conf_variables);
         }
         catch (Error e)
         {
@@ -840,15 +840,15 @@ public class EasyBuild
         /* Generate clean rule */
         generate_clean_rules (toplevel);
 
-        /* Find the buildfile in the current directory */
-        var build_file = toplevel;
-        while (build_file.dirname != original_dir)
+        /* Find the recipe in the current directory */
+        var recipe = toplevel;
+        while (recipe.dirname != original_dir)
         {
-            foreach (var c in build_file.children)
+            foreach (var c in recipe.children)
             {
                 if (original_dir.has_prefix (c.dirname))
                 {
-                    build_file = c;
+                    recipe = c;
                     break;
                 }
             }
@@ -856,7 +856,7 @@ public class EasyBuild
 
         if (do_expand)
         {
-            build_file.print ();
+            recipe.print ();
             return Posix.EXIT_SUCCESS;
         }
 
@@ -866,7 +866,7 @@ public class EasyBuild
 
         GLib.print ("\x1B[1m[Building target %s]\x1B[0m\n", target);
 
-        if (build_file.build_target (target))
+        if (recipe.build_target (target))
         {
             GLib.print ("\x1B[1m\x1B[32m[Build complete]\x1B[0m\n");
             return Posix.EXIT_SUCCESS;

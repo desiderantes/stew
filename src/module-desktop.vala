@@ -1,15 +1,15 @@
 public class DesktopModule : BuildModule
 {
-    public override void generate_rules (BuildFile build_file)
+    public override void generate_rules (Recipe recipe)
     {
-        var desktop_entry_list = build_file.variables.lookup ("desktop.entries");
+        var desktop_entry_list = recipe.variables.lookup ("desktop.entries");
         if (desktop_entry_list != null)
         {
             var entries = split_variable (desktop_entry_list);
             foreach (var entry in entries)
             {
-                var dir = "%s/applications".printf (build_file.data_directory);
-                build_file.add_install_rule (entry, dir);
+                var dir = "%s/applications".printf (recipe.data_directory);
+                recipe.add_install_rule (entry, dir);
             }
         }
    }

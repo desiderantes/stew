@@ -1,11 +1,11 @@
-all: eb-bootstrap
-	./eb-bootstrap
+all: bake-bootstrap
+	./bake-bootstrap
 
 PACKAGES = --pkg=glib-2.0 \
            --pkg=gio-2.0 \
            --pkg=posix
-SOURCES = src/config.vapi \
-          src/easy-build.vala \
+SOURCES = src/bake.vala \
+          src/config.vapi \
           src/module-bzip.vala \
           src/module-desktop.vala \
           src/module-dpkg.vala \
@@ -24,15 +24,15 @@ SOURCES = src/config.vapi \
           src/module-vala.vala \
           src/module-xzip.vala
 
-eb-bootstrap:
-	valac -o eb-bootstrap $(PACKAGES) --Xcc='-DGETTEXT_PACKAGE="C"' --Xcc='-DVERSION="0.0.bootstrap"' $(SOURCES)
+bake-bootstrap:
+	valac -o bake-bootstrap $(PACKAGES) --Xcc='-DGETTEXT_PACKAGE="C"' --Xcc='-DVERSION="0.0.bootstrap"' $(SOURCES)
 
-install: eb-bootstrap
-	./eb-bootstrap install
+install: bake-bootstrap
+	./bake-bootstrap install
 
-release-gzip: eb-bootstrap
-	./eb-bootstrap release-gzip
+release-gzip: bake-bootstrap
+	./bake-bootstrap release-gzip
 
-clean: eb-bootstrap
-	./eb-bootstrap clean
-	rm eb-bootstrap
+clean: bake-bootstrap
+	./bake-bootstrap clean
+	rm bake-bootstrap

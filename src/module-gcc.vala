@@ -38,18 +38,18 @@ public class GCCModule : BuildModule
         return includes;
     }
 
-    public override void generate_rules (BuildFile build_file)
+    public override void generate_rules (Recipe recipe)
     {
-        foreach (var program in build_file.programs)
+        foreach (var program in recipe.programs)
         {
-            var source_list = build_file.variables.lookup ("programs.%s.sources".printf (program));
+            var source_list = recipe.variables.lookup ("programs.%s.sources".printf (program));
             if (source_list == null)
                 continue;
             var sources = split_variable (source_list);
 
-            var package_list = build_file.variables.lookup ("programs.%s.packages".printf (program));
-            var cflags = build_file.variables.lookup ("programs.%s.cflags".printf (program));
-            var ldflags = build_file.variables.lookup ("programs.%s.ldflags".printf (program));
+            var package_list = recipe.variables.lookup ("programs.%s.packages".printf (program));
+            var cflags = recipe.variables.lookup ("programs.%s.cflags".printf (program));
+            var ldflags = recipe.variables.lookup ("programs.%s.ldflags".printf (program));
 
             string? package_cflags = null;
             string? package_ldflags = null;
@@ -151,7 +151,7 @@ public class GCCModule : BuildModule
 
                 var rule = new Rule ();
                 rule.inputs.append (input);
-                var includes = get_includes (Path.build_filename (build_file.dirname, source));
+                var includes = get_includes (Path.build_filename (recipe.dirname, source));
                 foreach (var include in includes)
                     rule.inputs.append (include);
                 rule.outputs.append (output);
@@ -167,13 +167,13 @@ public class GCCModule : BuildModule
                 if (pretty_print)
                     rule.commands.append ("@echo '    CC %s'".printf (input));
                 rule.commands.append (command);
-                build_file.rules.append (rule);
+                recipe.rules.append (rule);
             }
 
             /* Link */
             if (objects.length () > 0)
             {
-                build_file.build_rule.inputs.append (program);
+                recipe.build_rule.inputs.append (program);
 
                 var rule = new Rule ();
                 foreach (var o in objects)
@@ -190,9 +190,9 @@ public class GCCModule : BuildModule
                     command += " %s".printf (package_ldflags);
                 command += " -o %s".printf (program);
                 rule.commands.append (command);
-                build_file.rules.append (rule);
+                recipe.rules.append (rule);
 
-                build_file.add_install_rule (program, build_file.binary_directory);
+                recipe.add_install_rule (program, recipe.binary_directory);
             }
         }
     }

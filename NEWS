@@ -1,5 +1,6 @@
-Overview of changes in easy-build 0.0.4
+Overview of changes in bake 0.0.4
 
+    * Rename to Bake
     * Add a configure stage
     * Add support for Go
     * Add support for Haskell

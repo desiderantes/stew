@@ -26,9 +26,9 @@ public class IntltoolModule : BuildModule
         }
     }
 
-    private void get_gettext_sources (BuildFile build_file, ref List<string> sources)
+    private void get_gettext_sources (Recipe recipe, ref List<string> sources)
     {
-        foreach (var name in build_file.variables.get_keys ())
+        foreach (var name in recipe.variables.get_keys ())
         {
             if (!name.has_prefix ("intltool."))
                 continue;
@@ -43,39 +43,39 @@ public class IntltoolModule : BuildModule
             if (tokens[2] != "c-sources")
                 continue;
 
-            var value = build_file.variables.lookup (name);
+            var value = recipe.variables.lookup (name);
             foreach (var source in split_variable (value))
-                sources.append (Path.build_filename (build_file.dirname, source));
+                sources.append (Path.build_filename (recipe.dirname, source));
         }
 
-        foreach (var child in build_file.children)
+        foreach (var child in recipe.children)
             get_gettext_sources (child, ref sources);
     }
 
-    public override void generate_rules (BuildFile build_file)
+    public override void generate_rules (Recipe recipe)
     {
-        if (build_file.is_toplevel)
+        if (recipe.is_toplevel)
         {
             // FIXME: Support multiple translation domains
             string? translation_directory = null;
-            foreach (var name in build_file.variables.get_keys ())
+            foreach (var name in recipe.variables.get_keys ())
             {
                 if (name.has_prefix ("intltool.") && name.has_suffix (".translation-directory"))
                 {
-                    translation_directory = build_file.variables.lookup (name);
+                    translation_directory = recipe.variables.lookup (name);
                     break;
                 }
             }
 
             if (translation_directory != null)
             {
-                var pot_file = Path.build_filename (translation_directory, "%s.pot".printf (build_file.package_name));
-                build_file.build_rule.inputs.append (pot_file);
+                var pot_file = Path.build_filename (translation_directory, "%s.pot".printf (recipe.package_name));
+                recipe.build_rule.inputs.append (pot_file);
 
                 var pot_rule = new Rule ();
                 pot_rule.outputs.append (pot_file);
                 List<string> gettext_sources = null;
-                get_gettext_sources (build_file, ref gettext_sources);
+                get_gettext_sources (recipe, ref gettext_sources);
                 if (pretty_print)
                     pot_rule.commands.append ("@echo '    GETTEXT %s'".printf (pot_file));
                 var gettext_command = "@xgettext --extract-all --from-code=utf-8 --output %s".printf (pot_file);
@@ -86,9 +86,9 @@ public class IntltoolModule : BuildModule
                     gettext_command += " %s".printf (s);
                 }
                 pot_rule.commands.append (gettext_command);
-                build_file.rules.append (pot_rule);
+                recipe.rules.append (pot_rule);
 
-                var languages = load_languages (Path.build_filename (build_file.dirname, translation_directory));
+                var languages = load_languages (Path.build_filename (recipe.dirname, translation_directory));
 
                 foreach (var language in languages)
                 {
@@ -99,24 +99,24 @@ public class IntltoolModule : BuildModule
                     rule.inputs.append (po_file);
                     rule.outputs.append (mo_file);
                     rule.commands.append ("@msgfmt %s --output-file=%s".printf (po_file, mo_file));
-                    build_file.rules.append (rule);
+                    recipe.rules.append (rule);
 
-                    build_file.build_rule.inputs.append (mo_file);
+                    recipe.build_rule.inputs.append (mo_file);
 
-                    var target_dir = build_file.get_install_path (Path.build_filename (build_file.data_directory, "locale", language, "LC_MESSAGES"));
-                    build_file.add_install_rule (mo_file, target_dir);
+                    var target_dir = recipe.get_install_path (Path.build_filename (recipe.data_directory, "locale", language, "LC_MESSAGES"));
+                    recipe.add_install_rule (mo_file, target_dir);
                 }
             }
         }
 
-        foreach (var name in build_file.variables.get_keys ())
+        foreach (var name in recipe.variables.get_keys ())
         {
             if (!name.has_prefix ("intltool."))
                 continue;
 
             if (name.has_suffix (".xml-sources"))
             {
-                var source_list = build_file.variables.lookup (name);
+                var source_list = recipe.variables.lookup (name);
                 var sources = split_variable (source_list);
                 foreach (var source in sources)
                 {
@@ -125,15 +125,15 @@ public class IntltoolModule : BuildModule
                     var output = remove_extension (source);
                     rule.outputs.append (output);
                     rule.commands.append ("LC_ALL=C intltool-merge --xml-style /dev/null %s %s".printf (source, output));
-                    build_file.rules.append (rule);
+                    recipe.rules.append (rule);
 
-                    build_file.build_rule.inputs.append (output);
+                    recipe.build_rule.inputs.append (output);
                 }
             }
 
             if (name.has_suffix (".desktop-sources"))
             {
-                var source_list = build_file.variables.lookup (name);
+                var source_list = recipe.variables.lookup (name);
                 var sources = split_variable (source_list);
                 foreach (var source in sources)
                 {
@@ -142,9 +142,9 @@ public class IntltoolModule : BuildModule
                     var output = remove_extension (source);
                     rule.outputs.append (output);
                     rule.commands.append ("LC_ALL=C intltool-merge --desktop-style -u /dev/null %s %s".printf (source, output));
-                    build_file.rules.append (rule);
+                    recipe.rules.append (rule);
 
-                    build_file.build_rule.inputs.append (output);
+                    recipe.build_rule.inputs.append (output);
                 }
             }
         }

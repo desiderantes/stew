@@ -4,11 +4,11 @@
          xmlns:gnome="http://api.gnome.org/doap-extensions#"
          xmlns="http://usefulinc.com/ns/doap#">
 
-  <name xml:lang="en">Easy Build</name>
+  <name xml:lang="en">Bake</name>
   <shortdesc xml:lang="en">Build System</shortdesc>
-  <homepage rdf:resource="https://launchpad.net/easy-build" />
-  <download-page rdf:resource="https://launchpad.net/easy-build/+download" />
-  <bug-database rdf:resource="https://bugs.launchpad.net/easy-build" />
+  <homepage rdf:resource="https://launchpad.net/bake" />
+  <download-page rdf:resource="https://launchpad.net/bake/+download" />
+  <bug-database rdf:resource="https://bugs.launchpad.net/bake" />
   <category rdf:resource="http://api.gnome.org/doap-extensions#desktop" />
 
   <maintainer>

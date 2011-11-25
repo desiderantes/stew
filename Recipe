@@ -1,29 +1,29 @@
-package.name = easy-build
+package.name = bake
 package.version = 0.0.4~bzr
 
 extra-dist = Makefile \
-             easy-build.doap \
+             bake.doap \
              NEWS \
-             examples/fortran/Buildfile \
+             examples/fortran/Recipe \
              examples/fortran/example.f \
-             examples/c-sharp/Buildfile \
+             examples/c-sharp/Recipe \
              examples/c-sharp/Example.cs \
-             examples/java/Buildfile \
+             examples/java/Recipe \
              examples/java/Example.java \
-             examples/go/Buildfile \
+             examples/go/Recipe \
              examples/go/example.go \
-             examples/c/Buildfile \
+             examples/c/Recipe \
              examples/c/example.h \
              examples/c/example.c \
-             examples/c++/Buildfile \
+             examples/c++/Recipe \
              examples/c++/example.cpp \
-             examples/objective-c/Buildfile \
+             examples/objective-c/Recipe \
              examples/objective-c/example.m \
-             examples/ada/Buildfile \
+             examples/ada/Recipe \
              examples/ada/example.adb \
              examples/python/example.py \
-             examples/python/Buildfile \
+             examples/python/Recipe \
              examples/vala/example.vala \
-             examples/vala/Buildfile \
-             examples/haskell/Buildfile \
+             examples/vala/Recipe \
+             examples/haskell/Recipe \
              examples/haskell/example.hs

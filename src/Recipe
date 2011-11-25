@@ -1,0 +1,21 @@
+programs.bake.sources = bake.vala \
+                        config.vapi \
+                        module-bzip.vala \
+                        module-desktop.vala \
+                        module-dpkg.vala \
+                        module-gcc.vala \
+                        module-ghc.vala \
+                        module-gnome.vala \
+                        module-gsettings.vala \
+                        module-gzip.vala \
+                        module-intltool.vala \
+                        module-java.vala \
+                        module-man.vala \
+                        module-mono.vala \
+                        module-package.vala \
+                        module-python.vala \
+                        module-rpm.vala \
+                        module-vala.vala \
+                        module-xzip.vala
+programs.bake.packages = glib-2.0 gio-2.0 posix
+programs.bake.cflags = -DGETTEXT_PACKAGE=\"bake\" -DVERSION=\"0.0.4~bzr\"

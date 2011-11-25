@@ -1,16 +1,16 @@
 public class RPMModule : BuildModule
 {
-    public override void generate_rules (BuildFile build_file)
+    public override void generate_rules (Recipe recipe)
     {
-        if (!build_file.is_toplevel)
+        if (!recipe.is_toplevel)
             return;
 
-        if (build_file.package_version == null || Environment.find_program_in_path ("rpmbuild") == null)
+        if (recipe.package_version == null || Environment.find_program_in_path ("rpmbuild") == null)
             return;
 
         var release = "1";
-        var summary = "Summary of %s".printf (build_file.package_name);
-        var description = "Description of %s".printf (build_file.package_name);
+        var summary = "Summary of %s".printf (recipe.package_name);
+        var description = "Description of %s".printf (recipe.package_name);
         var license = "unknown";
 
         string rpmbuild_rc = "";
@@ -39,10 +39,10 @@ public class RPMModule : BuildModule
         }
 
         var build_dir = ".eb-rpm-builddir";
-        var gzip_file = "%s.tar.gz".printf (build_file.release_name);
-        var source_file = "%s.rpm.tar.gz".printf (build_file.package_name);
-        var spec_file = "%s/%s/%s.spec".printf (build_dir, build_file.release_name, build_file.package_name);
-        var rpm_file = "%s-%s-%s.%s.rpm".printf (build_file.package_name, build_file.package_version, release, build_arch);
+        var gzip_file = "%s.tar.gz".printf (recipe.release_name);
+        var source_file = "%s.rpm.tar.gz".printf (recipe.package_name);
+        var spec_file = "%s/%s/%s.spec".printf (build_dir, recipe.release_name, recipe.package_name);
+        var rpm_file = "%s-%s-%s.%s.rpm".printf (recipe.package_name, recipe.package_version, release, build_arch);
 
         var rule = new Rule ();
         rule.inputs.append (gzip_file);
@@ -51,10 +51,10 @@ public class RPMModule : BuildModule
         rule.commands.append ("@mkdir %s".printf (build_dir));
         rule.commands.append ("@cd %s && tar --extract --gzip --file ../%s".printf (build_dir, gzip_file));
         if (pretty_print)
-            rule.commands.append ("@echo '    Writing %s.spec'".printf (build_file.package_name));
+            rule.commands.append ("@echo '    Writing %s.spec'".printf (recipe.package_name));
         rule.commands.append ("@echo \"Summary: %s\" > %s".printf (summary, spec_file));
-        rule.commands.append ("@echo \"Name: %s\" >> %s".printf (build_file.package_name, spec_file));
-        rule.commands.append ("@echo \"Version: %s\" >> %s".printf (build_file.package_version, spec_file));
+        rule.commands.append ("@echo \"Name: %s\" >> %s".printf (recipe.package_name, spec_file));
+        rule.commands.append ("@echo \"Version: %s\" >> %s".printf (recipe.package_version, spec_file));
         rule.commands.append ("@echo \"Release: %s\" >> %s".printf (release, spec_file));
         rule.commands.append ("@echo \"License: %s\" >> %s".printf (license, spec_file));
         rule.commands.append ("@echo \"Source: %s\" >> %s".printf (source_file, spec_file));
@@ -76,18 +76,18 @@ public class RPMModule : BuildModule
         rule.commands.append ("@echo >> %s".printf (spec_file));
         rule.commands.append ("@echo \"%%files -f FILE-LIST\" >> %s".printf (spec_file));
         rule.commands.append ("@echo >> %s".printf (spec_file));
-        rule.commands.append ("@cd %s && tar --create --gzip --file ../%s %s".printf (build_dir, source_file, build_file.release_name));
+        rule.commands.append ("@cd %s && tar --create --gzip --file ../%s %s".printf (build_dir, source_file, recipe.release_name));
         if (pretty_print)
             rule.commands.append ("@echo '    RPM %s'".printf (rpm_file));
         rule.commands.append ("@rpmbuild -tb %s".printf (source_file));
         rule.commands.append ("@cp %s/rpmbuild/RPMS/%s/%s .".printf (Environment.get_home_dir (), build_arch, rpm_file));
         rule.commands.append ("@rm -f %s".printf (source_file));
         rule.commands.append ("@rm -rf %s".printf (build_dir));
-        build_file.rules.append (rule);
+        recipe.rules.append (rule);
 
         rule = new Rule ();
         rule.inputs.append (rpm_file);
         rule.outputs.append ("%release-rpm");
-        build_file.rules.append (rule);
+        recipe.rules.append (rule);
    }
 }
