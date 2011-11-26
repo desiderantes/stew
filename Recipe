@@ -1,5 +1,5 @@
 package.name = bake
-package.version = 0.0.4
+package.version = 0.0.5
 package.ppa = lp:~bake-team/releases
 
 package.files = Makefile \
@@ -32,7 +32,7 @@ package.files = Makefile \
                 examples/haskell/Recipe \
                 examples/haskell/example.hs
 
-%release: release-tarball
+%release: release-tarball release-ppa
 
 %release-tarball: release-gzip
-    echo lp-project-upload bake $(package.version) $(gzip.release-filename)
+    lp-project-upload bake $(package.version) $(gzip.release-filename)
