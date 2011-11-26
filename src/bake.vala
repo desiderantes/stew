@@ -554,12 +554,20 @@ public class Bake
 
     public static List<BuildModule> modules;
 
-    public static Recipe? load_recipes (string filename, HashTable<string, string> conf_variables) throws Error
+    public static Recipe? load_recipes (string filename, HashTable<string, string> conf_variables, bool is_toplevel = true) throws Error
     {
         if (debug_enabled)
             debug ("Loading %s", filename);
 
         var f = new Recipe (filename, conf_variables);
+
+        /* Children can't be new toplevel recipes */
+        if (!is_toplevel && f.package_name != null)
+        {
+            if (debug_enabled)
+                debug ("Ignoring toplevel recipe %s", filename);
+            return null;
+        }
 
         /* Load children */
         var dir = Dir.open (f.dirname);
@@ -572,11 +580,12 @@ public class Bake
             var child_filename = Path.build_filename (f.dirname, child_dir, "Recipe");
             if (FileUtils.test (child_filename, FileTest.EXISTS))
             {
-                if (debug_enabled)
-                    debug ("Loading %s", child_filename);
-                var c = new Recipe (child_filename, conf_variables);
-                c.parent = f;
-                f.children.append (c);
+                var c = load_recipes (child_filename, conf_variables, false);
+                if (c != null)
+                {
+                    c.parent = f;
+                    f.children.append (c);
+                }
             }
         }
         
@@ -731,7 +740,7 @@ public class Bake
             try
             {
                 var f = new Recipe (Path.build_filename (toplevel_dir, "Recipe"));
-                package_name = f.variables.lookup ("package.name");
+                package_name = f.package_name;
                 if (package_name != null)
                     break;
             }
