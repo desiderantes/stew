@@ -6,6 +6,7 @@ Overview of changes in bake 0.0.5
     * Add a --unconfigure option
     * Add pretty output for valac
     * Allow custom build, install and clean rules
+    * Fix rules in subdirectories always being run
     * Only log directory changes if something occurs
 
 Overview of changes in bake 0.0.4
