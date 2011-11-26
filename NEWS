@@ -11,6 +11,7 @@ Overview of changes in bake 0.0.5
     * Add variable substitution
     * Add library support
     * Add support for .bzrignore
+    * Use fastvapi to speed up Vala builds
 
 Overview of changes in bake 0.0.4
 
