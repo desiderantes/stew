@@ -22,7 +22,11 @@ public class BuildModule
         return false;
     }
 
-    public virtual void rules_complete (Recipe recipe)
+    public virtual void recipe_complete (Recipe recipe)
+    {
+    }
+
+    public virtual void rules_complete (Recipe toplevel)
     {
     }
 }
@@ -683,74 +687,13 @@ public class Bake
         return f;
     }
 
-    private static void add_release_file (Rule release_rule, string temp_dir, string directory, string filename)
+    public static void recipe_complete (Recipe recipe)
     {
-        var input_filename = Path.build_filename (directory, filename);
-        var output_filename = Path.build_filename (temp_dir, directory, filename);
-        if (directory == ".")
-        {
-            input_filename = filename;
-            output_filename = Path.build_filename (temp_dir, filename);
-        }
-
-        var has_dir = false;
-        foreach (var input in release_rule.inputs)
-        {
-            /* Ignore if already being copied */
-            if (input == input_filename)
-                return;
-
-            if (!has_dir && Path.get_dirname (input) == Path.get_dirname (input_filename))
-                has_dir = true;
-        }
-
-        /* Generate directory if a new one */
-        if (!has_dir)
-            release_rule.commands.append ("@mkdir -p %s".printf (Path.get_dirname (output_filename)));
-
-        release_rule.inputs.append (input_filename);
-        release_rule.commands.append ("@cp %s %s".printf (input_filename, output_filename));
-    }
-
-    // FIXME: Move this into a module (but it needs to be run last or watch for rule changes)
-    public static void generate_release_rules (Recipe recipe, Rule release_rule, string release_dir)
-    {
-        var relative_dirname = recipe.relative_dirname;
-
-        var dirname = Path.build_filename (release_dir, relative_dirname);
-        if (relative_dirname == ".")
-            dirname = release_dir;
-
-        /* Add files that are used */
-        add_release_file (release_rule, release_dir, relative_dirname, "Recipe");
-        foreach (var rule in recipe.rules)
-        {
-            foreach (var input in rule.inputs)
-            {
-                /* Can't depend on ourselves */
-                if (input == release_dir + "/")
-                    continue;
-
-                /* Ignore generated files */
-                if (recipe.find_rule (input) != null)
-                    continue;
-
-                /* Ignore files built in other recipes */
-                if (recipe.get_recipe_with_target (input) != recipe)
-                    continue;
-
-                add_release_file (release_rule, release_dir, relative_dirname, input);
-            }
-        }
-
-        /* Release files explicitly listed */
-        var extra_files = recipe.variables.lookup ("package.files");
-        if (extra_files != null)
-            foreach (var file in split_variable (extra_files))
-                add_release_file (release_rule, release_dir, relative_dirname, file);
+        foreach (var module in modules)
+            module.recipe_complete (recipe);
 
         foreach (var child in recipe.children)
-            generate_release_rules (child, release_rule, release_dir);
+            recipe_complete (child);
     }
 
     private static void add_global_variables (Recipe recipe)
@@ -855,10 +798,12 @@ public class Bake
         pretty_print = !show_verbose;
 
         modules.append (new BZIPModule ());
+        modules.append (new BZRModule ());
         modules.append (new DesktopModule ());
         modules.append (new DpkgModule ());
         modules.append (new GCCModule ());
         modules.append (new GHCModule ());
+        modules.append (new GITModule ());
         modules.append (new GNOMEModule ());
         modules.append (new GSettingsModule ());
         modules.append (new GZIPModule ());
@@ -867,6 +812,7 @@ public class Bake
         modules.append (new ManModule ());
         modules.append (new MonoModule ());
         modules.append (new PythonModule ());
+        modules.append (new ReleaseModule ());
         modules.append (new RPMModule ());
         modules.append (new ValaModule ());
         modules.append (new XZIPModule ());
@@ -1021,13 +967,12 @@ public class Bake
             return Posix.EXIT_FAILURE;
         }
 
-        /* Generate release rules */
-        var rule = toplevel.add_rule ();
-        rule.outputs.append ("%s/".printf (toplevel.release_name));
-        generate_release_rules (toplevel, rule, toplevel.release_name);
-
         /* Generate clean rule */
         generate_clean_rules (toplevel);
+
+        recipe_complete (toplevel);
+        foreach (var module in modules)
+            module.rules_complete (toplevel);
 
         /* Find the recipe in the current directory */
         var recipe = toplevel;

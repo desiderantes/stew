@@ -7,11 +7,13 @@ PACKAGES = --pkg=glib-2.0 \
 SOURCES = src/bake.vala \
           src/config.vapi \
           src/module-bzip.vala \
+          src/module-bzr.vala \
           src/module-desktop.vala \
           src/module-dpkg.vala \
           src/module-gcc.vala \
           src/module-gnome.vala \
           src/module-ghc.vala \
+          src/module-git.vala \
           src/module-gsettings.vala \
           src/module-gzip.vala \
           src/module-intltool.vala \
@@ -19,6 +21,7 @@ SOURCES = src/bake.vala \
           src/module-man.vala \
           src/module-mono.vala \
           src/module-python.vala \
+          src/module-release.vala \
           src/module-rpm.vala \
           src/module-vala.vala \
           src/module-xzip.vala

@@ -120,7 +120,9 @@ public class GCCModule : BuildModule
                 return false;
         }
 
-        List<string> objects = null;
+        var link_rule = recipe.add_rule ();
+        link_rule.outputs.append (program);
+        var link_command = "@gcc ";
 
         /* Compile */
         foreach (var source in sources)
@@ -129,8 +131,6 @@ public class GCCModule : BuildModule
             var compiler = get_compiler (source);
                 
             var output = replace_extension (source, "o");
-
-            objects.append (output);
 
             var rule = recipe.add_rule ();
             rule.inputs.append (input);
@@ -147,29 +147,21 @@ public class GCCModule : BuildModule
             if (pretty_print)
                 rule.commands.append ("@echo '    CC %s'".printf (input));
             rule.commands.append (command);
-        }
 
-        /* Link */
-        if (objects.length () == 0)
-            return false;
+            link_rule.inputs.append (output);
+            link_command += " %s".printf (output);
+        }
 
         recipe.build_rule.inputs.append (program);
 
-        var rule = recipe.add_rule ();
-        foreach (var o in objects)
-            rule.inputs.append (o);
-        rule.outputs.append (program);
-        var command = "@gcc ";
-        foreach (var o in objects)
-            command += " %s".printf (o);
         if (pretty_print)
-            rule.commands.append ("@echo '    LD %s'".printf (program));
+            link_rule.commands.append ("@echo '    LD %s'".printf (program));
         if (ldflags != null)
-            command += " %s".printf (ldflags);
+            link_command += " %s".printf (ldflags);
         if (package_ldflags != null)
-            command += " %s".printf (package_ldflags);
-        command += " -o %s".printf (program);
-        rule.commands.append (command);
+            link_command += " %s".printf (package_ldflags);
+        link_command += " -o %s".printf (program);
+        link_rule.commands.append (link_command);
 
         recipe.add_install_rule (program, recipe.binary_directory);
 
@@ -182,6 +174,13 @@ public class GCCModule : BuildModule
         if (source_list == null)
             return false;
         var sources = split_variable (source_list);
+        /* Only support C libraries currently */
+        foreach (var source in sources)
+            if (!source.has_suffix (".c"))
+                return false;
+
+        if (Environment.find_program_in_path ("gcc") == null)
+            return false;
 
         var so_name = "lib%s.so".printf (library);
 
@@ -213,23 +212,16 @@ public class GCCModule : BuildModule
             }
         }
 
-        List<string> objects = null;
+        var link_rule = recipe.add_rule ();
+        link_rule.outputs.append (so_name);
+        var link_command = "@gcc -shared ";
 
         /* Compile */
-        var compiler = "gcc";
-        if (Environment.find_program_in_path (compiler) == null)
-            return false;
         foreach (var source in sources)
         {
             var input = source;
 
-            /* Only support C libraries currently */
-            if (!source.has_suffix (".c"))
-                return false;
-
             var output = replace_extension (source, "o");
-
-            objects.append (output);
 
             var rule = recipe.add_rule ();
             rule.inputs.append (input);
@@ -237,7 +229,7 @@ public class GCCModule : BuildModule
             foreach (var include in includes)
                 rule.inputs.append (include);
             rule.outputs.append (output);
-            var command = "@%s -fPIC".printf (compiler);
+            var command = "@gcc -fPIC";
             if (cflags != null)
                 command += " %s".printf (cflags);
             if (package_cflags != null)
@@ -246,29 +238,21 @@ public class GCCModule : BuildModule
             if (pretty_print)
                 rule.commands.append ("@echo '    CC %s'".printf (input));
             rule.commands.append (command);
-        }
 
-        /* Link */
-        if (objects.length () == 0)
-            return false;
+            link_rule.inputs.append (output);
+            link_command += " %s".printf (output);
+        }
 
         recipe.build_rule.inputs.append (so_name);
                 
-        var rule = recipe.add_rule ();
-        foreach (var o in objects)
-            rule.inputs.append (o);
-        rule.outputs.append (so_name);
-        var command = "@%s -shared ".printf (compiler);
-        foreach (var o in objects)
-            command += " %s".printf (o);
         if (pretty_print)
-            rule.commands.append ("@echo '    LD %s'".printf (so_name));
+            link_rule.commands.append ("@echo '    LD %s'".printf (so_name));
         if (ldflags != null)
-            command += " %s".printf (ldflags);
+            link_command += " %s".printf (ldflags);
         if (package_ldflags != null)
-            command += " %s".printf (package_ldflags);
-        command += " -o %s".printf (so_name);
-        rule.commands.append (command);
+            link_command += " %s".printf (package_ldflags);
+        link_command += " -o %s".printf (so_name);
+        link_rule.commands.append (link_command);
 
         recipe.add_install_rule (so_name, recipe.library_directory);
 
@@ -295,7 +279,7 @@ public class GCCModule : BuildModule
         if (requires == null)
             requires = "";
 
-        rule = recipe.add_rule ();
+        var rule = recipe.add_rule ();
         recipe.build_rule.inputs.append (filename);
         rule.outputs.append (filename);
         rule.commands.append ("@echo \"Name: %s\" > %s".printf (name, filename));        

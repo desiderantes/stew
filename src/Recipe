@@ -1,10 +1,12 @@
 programs.bake.sources = bake.vala \
                         config.vapi \
                         module-bzip.vala \
+                        module-bzr.vala \
                         module-desktop.vala \
                         module-dpkg.vala \
                         module-gcc.vala \
                         module-ghc.vala \
+                        module-git.vala \
                         module-gnome.vala \
                         module-gsettings.vala \
                         module-gzip.vala \
@@ -13,6 +15,7 @@ programs.bake.sources = bake.vala \
                         module-man.vala \
                         module-mono.vala \
                         module-python.vala \
+                        module-release.vala \
                         module-rpm.vala \
                         module-vala.vala \
                         module-xzip.vala

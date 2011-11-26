@@ -26,6 +26,7 @@ public class ValaModule : BuildModule
         var valac_command = "@valac -C";
         var pretty_valac_command = "@echo '    VALAC";
         var link_rule = recipe.add_rule ();
+        link_rule.outputs.append (program);
         var link_command = "@gcc";
 
         var package_list = recipe.variables.lookup ("programs.%s.packages".printf (program));
@@ -77,6 +78,7 @@ public class ValaModule : BuildModule
         foreach (var source in sources)
         {
             valac_rule.inputs.append (source);
+            valac_command += " %s".printf (source);
 
             if (!source.has_suffix (".vala"))
                 continue;
@@ -85,12 +87,13 @@ public class ValaModule : BuildModule
             var o_filename = replace_extension (source, "o");
 
             valac_rule.outputs.append (c_filename);
-            valac_command += " %s".printf (source);
             pretty_valac_command += " %s".printf (source);
 
             /* Compile C code */
             var rule = recipe.add_rule ();
-            var command = "@gcc -Wno-unused ".printf ();
+            rule.inputs.append (c_filename);
+            rule.outputs.append (o_filename);
+            var command = "@gcc -Wno-unused".printf ();
             if (cflags != null)
                 command += " %s".printf (cflags);
             if (package_cflags != null)
