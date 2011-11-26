@@ -8,6 +8,9 @@ package.files = Makefile \
                 examples/fortran/example.f \
                 examples/c-sharp/Recipe \
                 examples/c-sharp/Example.cs \
+                examples/custom/Recipe \
+                examples/custom/example.c.in \
+                examples/custom/example.h \
                 examples/java/Recipe \
                 examples/java/Example.java \
                 examples/go/Recipe \
