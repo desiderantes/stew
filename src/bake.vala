@@ -1,5 +1,6 @@
 private bool pretty_print = true;
 private string original_dir;
+private static bool directory_changed;
 
 public abstract class BuildModule
 {
@@ -11,8 +12,15 @@ private void change_directory (string dirname)
     if (Environment.get_current_dir () == dirname)
         return;
 
-    GLib.print ("\x1B[1m[Entering directory %s]\x1B[0m\n", get_relative_path (original_dir, dirname));
+    directory_changed = true;
     Environment.set_current_dir (dirname);
+}
+
+private void log_directory_change ()
+{
+    if (directory_changed)
+        GLib.print ("\x1B[1m[Entering directory %s]\x1B[0m\n", get_relative_path (original_dir, Environment.get_current_dir ()));
+    directory_changed = false;
 }
 
 public List<string> split_variable (string value)
@@ -474,6 +482,8 @@ public class Recipe
             }
         }
 
+        change_directory (dirname);
+
         if (!rule.needs_build ())
             return true;
 
@@ -485,7 +495,8 @@ public class Recipe
         }
 
         /* Run the commands */
-        change_directory (dirname);
+        if (rule.commands != null)
+            log_directory_change ();
         if (rule.has_output)
             GLib.print ("\x1B[1m[Building %s]\x1B[0m\n", target);
         return rule.build ();
