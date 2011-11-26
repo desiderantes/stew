@@ -221,6 +221,7 @@ public class Recipe
     public List<Recipe> children;
     public HashTable<string, string> variables;
     public List<string> programs;
+    public List<string> libraries;
     public List<Rule> rules;
     public Rule build_rule;
     public Rule install_rule;
@@ -231,6 +232,7 @@ public class Recipe
     public string install_directory { get { return variables.lookup ("install-directory"); } }    
     public string binary_directory { get { return variables.lookup ("binary-directory"); } }
     public string data_directory { get { return variables.lookup ("data-directory"); } }
+    public string include_directory { get { return variables.lookup ("include-directory"); } }
     public string package_data_directory { get { return variables.lookup ("package-data-directory"); } }
 
     public string package_name { get { return variables.lookup ("package.name"); } }
@@ -332,20 +334,39 @@ public class Recipe
                 variables.insert (name, statement.substring (index + 1).strip ());
 
                 var tokens = name.split (".");
-                if (tokens.length > 1 && tokens[0] == "programs")
+                if (tokens.length > 1)
                 {
-                    var program_name = tokens[1];
-                    var has_name = false;
-                    foreach (var p in programs)
+                    switch (tokens[0])
                     {
-                        if (p == program_name)
+                    case "programs":
+                        var program_name = tokens[1];
+                        var has_name = false;
+                        foreach (var p in programs)
                         {
-                            has_name = true;
-                            break;
+                            if (p == program_name)
+                            {
+                                has_name = true;
+                                break;
+                            }
                         }
+                        if (!has_name)
+                            programs.append (program_name);
+                        break;
+                    case "libraries":
+                        var library_name = tokens[1];
+                        var has_name = false;
+                        foreach (var p in libraries)
+                        {
+                            if (p == library_name)
+                            {
+                                has_name = true;
+                                break;
+                            }
+                        }
+                        if (!has_name)
+                            libraries.append (library_name);
+                        break;
                     }
-                    if (!has_name)
-                        programs.append (program_name);
                 }
 
                 continue;
@@ -895,6 +916,8 @@ public class Bake
             conf_variables.insert ("binary-directory", "%s/bin".printf (resource_directory));
         if (conf_variables.lookup ("data-directory") == null)
             conf_variables.insert ("data-directory", "%s/share".printf (resource_directory));
+        if (conf_variables.lookup ("include-directory") == null)
+            conf_variables.insert ("include-directory", "%s/include".printf (resource_directory));
         var data_directory = conf_variables.lookup ("data-directory");
         if (conf_variables.lookup ("package-data-directory") == null)
             conf_variables.insert ("package-data-directory", "%s/$(package.name)".printf (data_directory));

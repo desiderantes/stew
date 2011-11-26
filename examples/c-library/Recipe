@@ -1,0 +1,4 @@
+package.name = example
+package.version = 0.0.1
+libraries.example.sources = example.c
+libraries.example.headers = example.h

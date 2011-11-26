@@ -9,6 +9,7 @@ Overview of changes in bake 0.0.5
     * Fix rules in subdirectories always being run
     * Only log directory changes if something occurs
     * Add variable substitution
+    * Add library support
 
 Overview of changes in bake 0.0.4
 
