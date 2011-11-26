@@ -247,10 +247,6 @@ public class Recipe
             }
         }
 
-        string contents;
-        FileUtils.get_contents (filename, out contents);
-        parse (filename, contents, allow_rules);
-
         build_rule = new Rule ();
         build_rule.outputs.append ("%build");
         rules.append (build_rule);
@@ -262,6 +258,10 @@ public class Recipe
         clean_rule = new Rule ();
         clean_rule.outputs.append ("%clean");
         rules.append (clean_rule);
+
+        string contents;
+        FileUtils.get_contents (filename, out contents);
+        parse (filename, contents, allow_rules);
     }
 
     private void parse (string filename, string contents, bool allow_rules) throws BuildError
