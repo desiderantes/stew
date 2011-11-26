@@ -283,13 +283,43 @@ public class GCCModule : BuildModule
         command += " -o %s".printf (so_name);
         rule.commands.append (command);
 
-        recipe.add_install_rule (so_name, recipe.binary_directory);
+        recipe.add_install_rule (so_name, recipe.library_directory);
 
         /* Install headers */
+        var include_directory = Path.build_filename (recipe.include_directory, library);
         if (header_list != null)
             foreach (var header in split_variable (header_list))
-                recipe.add_install_rule (header, recipe.include_directory);
-        
+                recipe.add_install_rule (header, include_directory);
+
+        /* Generate pkg-config file */
+        var filename = "%s.pc".printf (library);
+        var name = recipe.variables.lookup ("libraries.%s.name".printf (library));
+        if (name == null)
+            name = library;
+        var description = recipe.variables.lookup ("libraries.%s.description".printf (library));
+        if (description == null)
+            description = "";
+        var version = recipe.variables.lookup ("libraries.%s.version".printf (library));
+        if (version == null)
+            version = recipe.toplevel.package_version;
+        if (version == null)
+            version = "0";
+        var requires = recipe.variables.lookup ("libraries.%s.requires".printf (library));
+        if (requires == null)
+            requires = "";
+
+        rule = recipe.add_rule ();
+        recipe.build_rule.inputs.append (filename);
+        rule.outputs.append (filename);
+        rule.commands.append ("@echo \"Name: %s\" > %s".printf (name, filename));        
+        rule.commands.append ("@echo \"Description: %s\" >> %s".printf (description, filename));
+        rule.commands.append ("@echo \"Version: %s\" >> %s".printf (version, filename));
+        rule.commands.append ("@echo \"Requires: %s\" >> %s".printf (requires, filename));
+        rule.commands.append ("@echo \"Libs: -L%s -l%s\" >> %s".printf (recipe.library_directory, library, filename));
+        rule.commands.append ("@echo \"Cflags: -I%s\" >> %s".printf (include_directory, filename));
+
+        recipe.add_install_rule (filename, Path.build_filename (recipe.library_directory, "pkgconfig"));
+
         return true;
     }
 

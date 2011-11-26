@@ -231,6 +231,9 @@ public class Recipe
     public string top_source_directory { get { return variables.lookup ("top-source-directory"); } }
     public string install_directory { get { return variables.lookup ("install-directory"); } }    
     public string binary_directory { get { return variables.lookup ("binary-directory"); } }
+    public string system_binary_directory { get { return variables.lookup ("system-binary-directory"); } }
+    public string library_directory { get { return variables.lookup ("library-directory"); } }
+    public string system_library_directory { get { return variables.lookup ("system-library-directory"); } }
     public string data_directory { get { return variables.lookup ("data-directory"); } }
     public string include_directory { get { return variables.lookup ("include-directory"); } }
     public string package_data_directory { get { return variables.lookup ("package-data-directory"); } }
@@ -855,6 +858,7 @@ public class Bake
             conf_variables.insert ("resource-directory", "/usr/local");
             conf_variables.insert ("system-config-directory", "/etc");
             conf_variables.insert ("system-binary-directory", "/sbin");
+            conf_variables.insert ("system-library-directory", "/lib");
 
             /* Load args from the command line */
             if (do_configure)
@@ -914,6 +918,8 @@ public class Bake
         var resource_directory = conf_variables.lookup ("resource-directory");
         if (conf_variables.lookup ("binary-directory") == null)
             conf_variables.insert ("binary-directory", "%s/bin".printf (resource_directory));
+        if (conf_variables.lookup ("library-directory") == null)
+            conf_variables.insert ("library-directory", "%s/lib".printf (resource_directory));
         if (conf_variables.lookup ("data-directory") == null)
             conf_variables.insert ("data-directory", "%s/share".printf (resource_directory));
         if (conf_variables.lookup ("include-directory") == null)
