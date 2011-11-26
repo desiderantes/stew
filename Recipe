@@ -1,29 +1,29 @@
 package.name = bake
 package.version = 0.0.4
 
-extra-dist = Makefile \
-             bake.doap \
-             NEWS \
-             examples/fortran/Recipe \
-             examples/fortran/example.f \
-             examples/c-sharp/Recipe \
-             examples/c-sharp/Example.cs \
-             examples/java/Recipe \
-             examples/java/Example.java \
-             examples/go/Recipe \
-             examples/go/example.go \
-             examples/c/Recipe \
-             examples/c/example.h \
-             examples/c/example.c \
-             examples/c++/Recipe \
-             examples/c++/example.cpp \
-             examples/objective-c/Recipe \
-             examples/objective-c/example.m \
-             examples/ada/Recipe \
-             examples/ada/example.adb \
-             examples/python/example.py \
-             examples/python/Recipe \
-             examples/vala/example.vala \
-             examples/vala/Recipe \
-             examples/haskell/Recipe \
-             examples/haskell/example.hs
+package.files = Makefile \
+                bake.doap \
+                NEWS \
+                examples/fortran/Recipe \
+                examples/fortran/example.f \
+                examples/c-sharp/Recipe \
+                examples/c-sharp/Example.cs \
+                examples/java/Recipe \
+                examples/java/Example.java \
+                examples/go/Recipe \
+                examples/go/example.go \
+                examples/c/Recipe \
+                examples/c/example.h \
+                examples/c/example.c \
+                examples/c++/Recipe \
+                examples/c++/example.cpp \
+                examples/objective-c/Recipe \
+                examples/objective-c/example.m \
+                examples/ada/Recipe \
+                examples/ada/example.adb \
+                examples/python/example.py \
+                examples/python/Recipe \
+                examples/vala/example.vala \
+                examples/vala/Recipe \
+                examples/haskell/Recipe \
+                examples/haskell/example.hs

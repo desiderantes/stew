@@ -635,6 +635,12 @@ public class Bake
             }
         }
 
+        /* Release files explicitly listed */
+        var extra_files = recipe.variables.lookup ("package.files");
+        if (extra_files != null)
+            foreach (var file in split_variable (extra_files))
+                add_release_file (release_rule, release_dir, relative_dirname, file);
+
         foreach (var child in recipe.children)
             generate_release_rules (child, release_rule, release_dir);
     }

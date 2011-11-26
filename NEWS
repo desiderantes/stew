@@ -1,3 +1,7 @@
+Overview of changes in bake 0.0.5
+
+    * Add package.files variable that adds arbitrary files
+
 Overview of changes in bake 0.0.4
 
     * Rename to Bake
