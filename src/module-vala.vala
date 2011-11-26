@@ -22,9 +22,7 @@ public class ValaModule : BuildModule
         if (Environment.find_program_in_path ("valac") == null || Environment.find_program_in_path ("gcc") == null)
             return false;
 
-        var valac_rule = recipe.add_rule ();
-        var valac_command = "@valac -C";
-        var pretty_valac_command = "@echo '    VALAC";
+        var valac_command = "@valac ";
         var link_rule = recipe.add_rule ();
         link_rule.outputs.append (program);
         var link_command = "@gcc";
@@ -77,23 +75,53 @@ public class ValaModule : BuildModule
         }
         foreach (var source in sources)
         {
-            valac_rule.inputs.append (source);
-            valac_command += " %s".printf (source);
-
             if (!source.has_suffix (".vala"))
                 continue;
+
+            var vapi_filename = replace_extension (source, "vapi");
+
+            /* Build a fastvapi file */
+            var rule = recipe.add_rule ();
+            rule.inputs.append (source);
+            rule.outputs.append (vapi_filename);
+            if (pretty_print)
+                rule.commands.append ("@echo '    VALAC %s'".printf (vapi_filename));            
+            rule.commands.append ("@valac --fast-vapi=%s %s".printf (vapi_filename, source));
 
             var c_filename = replace_extension (source, "c");
             var o_filename = replace_extension (source, "o");
 
-            valac_rule.outputs.append (c_filename);
-            pretty_valac_command += " %s".printf (source);
+            /* Build a C file */
+            rule = recipe.add_rule ();
+            rule.inputs.append (source);
+            rule.outputs.append (c_filename);
+            var command = valac_command + " -C %s".printf (source);
+            foreach (var s in sources)
+            {
+                if (s == source)
+                    continue;
+
+                if (s.has_suffix (".vapi"))
+                {
+                    command += " %s".printf (s);
+                    rule.inputs.append (s);
+                }
+                else
+                {
+                    var other_vapi_filename = replace_extension (s, "vapi");
+                    command += " --use-fast-vapi=%s".printf (other_vapi_filename);
+                    rule.inputs.append (other_vapi_filename);
+                }
+            }
+            if (pretty_print)
+                rule.commands.append ("@echo '    VALAC %s'".printf (source));            
+            rule.commands.append (command);
 
             /* Compile C code */
-            var rule = recipe.add_rule ();
+            rule = recipe.add_rule ();
             rule.inputs.append (c_filename);
             rule.outputs.append (o_filename);
-            var command = "@gcc -Wno-unused".printf ();
+            command = "@gcc -Wno-unused".printf ();
             if (cflags != null)
                 command += " %s".printf (cflags);
             if (package_cflags != null)
@@ -106,11 +134,6 @@ public class ValaModule : BuildModule
             link_rule.inputs.append (o_filename);
             link_command += " %s".printf (o_filename);
         }
-        pretty_valac_command += "'";
-
-        if (pretty_print)
-            valac_rule.commands.append (pretty_valac_command);
-        valac_rule.commands.append (valac_command);
 
         /* Link */
         recipe.build_rule.inputs.append (program);

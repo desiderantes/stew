@@ -616,7 +616,7 @@ public class Bake
     private static bool do_unconfigure = false;
     private static bool do_expand = false;
     private static bool debug_enabled = false;
-    public static const OptionEntry[] options =
+    private static const OptionEntry[] options =
     {
         { "configure", 0, 0, OptionArg.NONE, ref do_configure,
           /* Help string for command line --configure flag */
