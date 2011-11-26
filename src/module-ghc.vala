@@ -40,7 +40,7 @@ public class GHCModule : BuildModule
             recipe.build_rule.inputs.append (program);
             link_pretty_command += "'";
             if (pretty_print)
-                    link_rule.commands.append (link_pretty_command);
+                link_rule.commands.append (link_pretty_command);
             link_rule.commands.append (link_command);
             recipe.rules.append (link_rule);
 

@@ -4,6 +4,7 @@ Overview of changes in bake 0.0.5
     * Allow rules without any commands
     * Allow indent to differ between rules
     * Add a --unconfigure option
+    * Add pretty output for valac
 
 Overview of changes in bake 0.0.4
 
