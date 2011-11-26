@@ -1,10 +1,7 @@
 public class XZIPModule : BuildModule
 {
-    public override void generate_rules (Recipe recipe)
+    public override void generate_toplevel_rules (Recipe recipe)
     {
-        if (!recipe.is_toplevel)
-            return;
-
         var filename = "%s.tar.xz".printf (recipe.release_name);
         recipe.variables.insert ("xzip.release-filename", filename);
 
@@ -18,5 +15,5 @@ public class XZIPModule : BuildModule
         rule = recipe.add_rule ();
         rule.outputs.append ("%release-xzip");
         rule.inputs.append (filename);
-   }
+    }
 }

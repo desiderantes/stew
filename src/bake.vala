@@ -2,9 +2,29 @@ private bool pretty_print = true;
 private string original_dir;
 private static bool directory_changed;
 
-public abstract class BuildModule
+public class BuildModule
 {
-    public abstract void generate_rules (Recipe recipe);
+    public virtual void generate_toplevel_rules (Recipe toplevel)
+    {
+    }
+
+    public virtual void generate_rules (Recipe recipe)
+    {
+    }
+    
+    public virtual bool generate_program_rules (Recipe recipe, string program)
+    {
+        return false;
+    }
+
+    public virtual bool generate_library_rules (Recipe recipe, string library)
+    {
+        return false;
+    }
+
+    public virtual void rules_complete (Recipe recipe)
+    {
+    }
 }
 
 private void change_directory (string dirname)
@@ -216,7 +236,7 @@ public errordomain BuildError
 
 public class Recipe
 {
-    public string dirname;
+    public string filename;
     public Recipe? parent = null;
     public List<Recipe> children;
     public HashTable<string, string> variables;
@@ -226,6 +246,8 @@ public class Recipe
     public Rule build_rule;
     public Rule install_rule;
     public Rule clean_rule;
+    
+    public string dirname { owned get { return Path.get_dirname (filename); } }
 
     public string source_directory { get { return variables.lookup ("source-directory"); } }
     public string top_source_directory { get { return variables.lookup ("top-source-directory"); } }
@@ -253,7 +275,7 @@ public class Recipe
 
     public Recipe (string filename, HashTable<string, string>? conf_variables = null, bool allow_rules = true) throws FileError, BuildError
     {
-        dirname = Path.get_dirname (filename);
+        this.filename = filename;
 
         variables = new HashTable<string, string> (str_hash, str_equal);
         if (conf_variables != null)
@@ -740,13 +762,61 @@ public class Bake
         foreach (var child in recipe.children)
             add_global_variables (child);
     }
-
-    private static void generate_rules (Recipe recipe)
+    
+    private static bool generate_program_rules (Recipe recipe, string program)
     {
         foreach (var module in modules)
+        {
+            if (module.generate_program_rules (recipe, program))
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool generate_library_rules (Recipe recipe, string library)
+    {
+        foreach (var module in modules)
+        {
+            if (module.generate_library_rules (recipe, library))
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool generate_rules (Recipe recipe)
+    {
+        /* Generate rules for the programs and libraries (must have a match for all) */
+        foreach (var program in recipe.programs)
+        {
+            if (!generate_program_rules (recipe, program))
+            {
+                printerr ("Unable to generate rules for program %s in file %s\n", program, get_relative_path (original_dir, recipe.filename));
+                return false;
+            }
+        }
+        foreach (var library in recipe.libraries)
+        {
+            if (!generate_library_rules (recipe, library))
+            {
+                printerr ("Unable to generate rules for library %s in file %s\n", library, get_relative_path (original_dir, recipe.filename));
+                return false;
+            }
+        }
+
+        /* Generate other rules */
+        foreach (var module in modules)
             module.generate_rules (recipe);
+
+        /* Traverse the recipe tree */
         foreach (var child in recipe.children)
-            generate_rules (child);
+        {
+            if (!generate_rules (child))
+                return false;
+        }
+
+        return true;
     }
 
     private static void generate_clean_rules (Recipe recipe)
@@ -796,7 +866,6 @@ public class Bake
         modules.append (new JavaModule ());
         modules.append (new ManModule ());
         modules.append (new MonoModule ());
-        modules.append (new PackageModule ());
         modules.append (new PythonModule ());
         modules.append (new RPMModule ());
         modules.append (new ValaModule ());
@@ -944,7 +1013,13 @@ public class Bake
         add_global_variables (toplevel);
 
         /* Generate implicit rules */
-        generate_rules (toplevel);
+        foreach (var module in modules)
+            module.generate_toplevel_rules (toplevel);
+        if (!generate_rules (toplevel))
+        {
+            GLib.print ("\x1B[1m\x1B[31m[Build failed]\x1B[0m\n");
+            return Posix.EXIT_FAILURE;
+        }
 
         /* Generate release rules */
         var rule = toplevel.add_rule ();

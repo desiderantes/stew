@@ -52,61 +52,61 @@ public class IntltoolModule : BuildModule
             get_gettext_sources (child, ref sources);
     }
 
-    public override void generate_rules (Recipe recipe)
+    public override void generate_toplevel_rules (Recipe recipe)
     {
-        if (recipe.is_toplevel)
+        // FIXME: Support multiple translation domains
+        string? translation_directory = null;
+        foreach (var name in recipe.variables.get_keys ())
         {
-            // FIXME: Support multiple translation domains
-            string? translation_directory = null;
-            foreach (var name in recipe.variables.get_keys ())
+            if (name.has_prefix ("intltool.") && name.has_suffix (".translation-directory"))
             {
-                if (name.has_prefix ("intltool.") && name.has_suffix (".translation-directory"))
-                {
-                    translation_directory = recipe.variables.lookup (name);
-                    break;
-                }
-            }
-
-            if (translation_directory != null)
-            {
-                var pot_file = Path.build_filename (translation_directory, "%s.pot".printf (recipe.package_name));
-                recipe.build_rule.inputs.append (pot_file);
-
-                var pot_rule = recipe.add_rule ();
-                pot_rule.outputs.append (pot_file);
-                List<string> gettext_sources = null;
-                get_gettext_sources (recipe, ref gettext_sources);
-                if (pretty_print)
-                    pot_rule.commands.append ("@echo '    GETTEXT %s'".printf (pot_file));
-                var gettext_command = "@xgettext --extract-all --from-code=utf-8 --output %s".printf (pot_file);
-                foreach (var source in gettext_sources)
-                {
-                    var s = get_relative_path (original_dir, source);
-                    pot_rule.inputs.append (s);
-                    gettext_command += " %s".printf (s);
-                }
-                pot_rule.commands.append (gettext_command);
-
-                var languages = load_languages (Path.build_filename (recipe.dirname, translation_directory));
-
-                foreach (var language in languages)
-                {
-                    var po_file = "%s/%s.po".printf (translation_directory, language);
-                    var mo_file = "%s/%s.mo".printf (translation_directory, language);
-
-                    var rule = recipe.add_rule ();
-                    rule.inputs.append (po_file);
-                    rule.outputs.append (mo_file);
-                    rule.commands.append ("@msgfmt %s --output-file=%s".printf (po_file, mo_file));
-
-                    recipe.build_rule.inputs.append (mo_file);
-
-                    var target_dir = recipe.get_install_path (Path.build_filename (recipe.data_directory, "locale", language, "LC_MESSAGES"));
-                    recipe.add_install_rule (mo_file, target_dir);
-                }
+                translation_directory = recipe.variables.lookup (name);
+                break;
             }
         }
 
+        if (translation_directory != null)
+        {
+            var pot_file = Path.build_filename (translation_directory, "%s.pot".printf (recipe.package_name));
+            recipe.build_rule.inputs.append (pot_file);
+
+            var pot_rule = recipe.add_rule ();
+            pot_rule.outputs.append (pot_file);
+            List<string> gettext_sources = null;
+            get_gettext_sources (recipe, ref gettext_sources);
+            if (pretty_print)
+                pot_rule.commands.append ("@echo '    GETTEXT %s'".printf (pot_file));
+            var gettext_command = "@xgettext --extract-all --from-code=utf-8 --output %s".printf (pot_file);
+            foreach (var source in gettext_sources)
+            {
+                var s = get_relative_path (original_dir, source);
+                pot_rule.inputs.append (s);
+                gettext_command += " %s".printf (s);
+            }
+            pot_rule.commands.append (gettext_command);
+
+            var languages = load_languages (Path.build_filename (recipe.dirname, translation_directory));
+
+            foreach (var language in languages)
+            {
+                var po_file = "%s/%s.po".printf (translation_directory, language);
+                var mo_file = "%s/%s.mo".printf (translation_directory, language);
+
+                var rule = recipe.add_rule ();
+                rule.inputs.append (po_file);
+                rule.outputs.append (mo_file);
+                rule.commands.append ("@msgfmt %s --output-file=%s".printf (po_file, mo_file));
+
+                recipe.build_rule.inputs.append (mo_file);
+
+                var target_dir = recipe.get_install_path (Path.build_filename (recipe.data_directory, "locale", language, "LC_MESSAGES"));
+                recipe.add_install_rule (mo_file, target_dir);
+            }
+        }
+    }
+
+    public override void generate_rules (Recipe recipe)
+    {
         foreach (var name in recipe.variables.get_keys ())
         {
             if (!name.has_prefix ("intltool."))

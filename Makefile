@@ -18,7 +18,6 @@ SOURCES = src/bake.vala \
           src/module-java.vala \
           src/module-man.vala \
           src/module-mono.vala \
-          src/module-package.vala \
           src/module-python.vala \
           src/module-rpm.vala \
           src/module-vala.vala \

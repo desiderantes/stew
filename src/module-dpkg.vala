@@ -1,10 +1,7 @@
 public class DpkgModule : BuildModule
 {
-    public override void generate_rules (Recipe recipe)
+    public override void generate_toplevel_rules (Recipe recipe)
     {
-        if (!recipe.is_toplevel)
-            return;
-
         if (recipe.package_version == null || Environment.find_program_in_path ("dpkg-buildpackage") == null)
             return;
 

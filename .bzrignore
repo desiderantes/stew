@@ -1,9 +1,6 @@
-./eb-bootstrap
 examples/c/example
 examples/cpp/example
 examples/java/Example.class
 examples/java/Example.jar
 examples/vala/example
 examples/vala/example.c
-src/*.c
-src/eb

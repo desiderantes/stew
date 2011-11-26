@@ -37,13 +37,55 @@ public class GCCModule : BuildModule
 
         return includes;
     }
+
+    private string? get_compiler (string source)
+    {
+        /* C */
+        if (source.has_suffix (".c"))
+            return "gcc";
+        /* C++ */
+        else if (source.has_suffix (".cpp") ||
+                 source.has_suffix (".C") ||
+                 source.has_suffix (".cc") ||
+                 source.has_suffix (".CPP") ||
+                 source.has_suffix (".c++") ||
+                 source.has_suffix (".cp") ||
+                 source.has_suffix (".cxx"))
+            return "g++";
+        /* Objective C */
+        else if (source.has_suffix (".m"))
+            return "gcc";
+        /* Go */
+        else if (source.has_suffix (".go"))
+            return "gccgo";
+        /* Fortran */
+        else if (source.has_suffix (".f") ||
+                 source.has_suffix (".for") ||
+                 source.has_suffix (".ftn") ||
+                 source.has_suffix (".f90") ||
+                 source.has_suffix (".f95") ||
+                 source.has_suffix (".f03") ||
+                 source.has_suffix (".f08"))
+            return "gfortran";
+        else
+            return null;   
+    }
     
-    public bool generate_program_rules (Recipe recipe, string program)
+    public override bool generate_program_rules (Recipe recipe, string program)
     {
         var source_list = recipe.variables.lookup ("programs.%s.sources".printf (program));
         if (source_list == null)
             return false;
         var sources = split_variable (source_list);
+
+        if (Environment.find_program_in_path ("gcc") == null)
+            return false;
+        foreach (var source in sources)
+        {
+            var compiler = get_compiler (source);
+            if (compiler == null || Environment.find_program_in_path (compiler) == null)
+                return false;
+        }
 
         var package_list = recipe.variables.lookup ("programs.%s.packages".printf (program));
         var cflags = recipe.variables.lookup ("programs.%s.cflags".printf (program));
@@ -53,93 +95,39 @@ public class GCCModule : BuildModule
         string? package_ldflags = null;
         if (package_list != null)
         {
-            /* Stip out the posix module used in Vala (has no cflags/libs) */
-            var packages = split_variable (package_list);
-            var clean_package_list = "";
-            foreach (var p in packages)
-            {
-                if (p == "posix")
-                    continue;
-                if (clean_package_list != "")
-                    clean_package_list += " ";
-                clean_package_list += p;
-            }
-
             int exit_status;
             try
             {
-                Process.spawn_command_line_sync ("pkg-config --cflags %s".printf (clean_package_list), out package_cflags, null, out exit_status);
+                Process.spawn_command_line_sync ("pkg-config --cflags %s".printf (package_list), out package_cflags, null, out exit_status);
                 package_cflags = package_cflags.strip ();
             }
             catch (SpawnError e)
             {
+                return false;
             }
+            if (exit_status != 0)
+                return false;
             try
             {
-                Process.spawn_command_line_sync ("pkg-config --libs %s".printf (clean_package_list), out package_ldflags, null, out exit_status);
+                Process.spawn_command_line_sync ("pkg-config --libs %s".printf (package_list), out package_ldflags, null, out exit_status);
                 package_ldflags = package_ldflags.strip ();
             }
             catch (SpawnError e)
             {
+                return false;
             }
+            if (exit_status != 0)
+                return false;
         }
 
         List<string> objects = null;
 
         /* Compile */
-        var compiler = "gcc";
         foreach (var source in sources)
         {
             var input = source;
-
-            /* C */
-            if (source.has_suffix (".c"))
-            {
-            }
-            /* C++ */
-            else if (source.has_suffix (".cpp") ||
-                     source.has_suffix (".C") ||
-                     source.has_suffix (".cc") ||
-                     source.has_suffix (".CPP") ||
-                     source.has_suffix (".c++") ||
-                     source.has_suffix (".cp") ||
-                     source.has_suffix (".cxx"))
-            {
-                compiler = "g++";
-            }
-            /* Objective C */
-            else if (source.has_suffix (".m"))
-            {
-            }
-            /* Go */
-            else if (source.has_suffix (".go"))
-            {
-                compiler = "gccgo";
-            }
-            /* Fortran */
-            else if (source.has_suffix (".f") ||
-                     source.has_suffix (".for") ||
-                     source.has_suffix (".ftn") ||
-                     source.has_suffix (".f90") ||
-                     source.has_suffix (".f95") ||
-                     source.has_suffix (".f03") ||
-                     source.has_suffix (".f08"))
-            {
-                compiler = "gfortran";
-            }
-            /* Vala */
-            // FIXME: Should be done in the Vala module
-            else if (source.has_suffix (".vala"))
-            {
-                input = replace_extension (source, "c");
-            }
-            else if (source.has_suffix (".vapi"))
-            {
-                continue;
-            }
-            else
-                return false;
-
+            var compiler = get_compiler (source);
+                
             var output = replace_extension (source, "o");
 
             objects.append (output);
@@ -150,10 +138,7 @@ public class GCCModule : BuildModule
             foreach (var include in includes)
                 rule.inputs.append (include);
             rule.outputs.append (output);
-            var command = "@%s -g -Wall".printf (compiler);
-            /* Vala generates a lot of unused variables */
-            if (source.has_suffix (".vala"))
-                command += " -Wno-unused";
+            var command = "@%s ".printf (compiler);
             if (cflags != null)
                 command += " %s".printf (cflags);
             if (package_cflags != null)
@@ -167,14 +152,14 @@ public class GCCModule : BuildModule
         /* Link */
         if (objects.length () == 0)
             return false;
-            
+
         recipe.build_rule.inputs.append (program);
 
         var rule = recipe.add_rule ();
         foreach (var o in objects)
             rule.inputs.append (o);
         rule.outputs.append (program);
-        var command = "@%s -g -Wall".printf (compiler);
+        var command = "@gcc ";
         foreach (var o in objects)
             command += " %s".printf (o);
         if (pretty_print)
@@ -191,7 +176,7 @@ public class GCCModule : BuildModule
         return true;
     }
 
-    public bool generate_library_rules (Recipe recipe, string library)
+    public override bool generate_library_rules (Recipe recipe, string library)
     {
         var source_list = recipe.variables.lookup ("libraries.%s.sources".printf (library));
         if (source_list == null)
@@ -232,6 +217,8 @@ public class GCCModule : BuildModule
 
         /* Compile */
         var compiler = "gcc";
+        if (Environment.find_program_in_path (compiler) == null)
+            return false;
         foreach (var source in sources)
         {
             var input = source;
@@ -321,14 +308,5 @@ public class GCCModule : BuildModule
         recipe.add_install_rule (filename, Path.build_filename (recipe.library_directory, "pkgconfig"));
 
         return true;
-    }
-
-    public override void generate_rules (Recipe recipe)
-    {
-        foreach (var program in recipe.programs)
-            generate_program_rules (recipe, program);
-
-        foreach (var library in recipe.libraries)
-            generate_library_rules (recipe, library);
     }
 }
