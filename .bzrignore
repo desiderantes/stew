@@ -8,6 +8,8 @@ bake-0.0.5.tar.gz
 bake-0.0.5/
 bake-0.0.5-1.x86_64.rpm
 bake-0.0.5.tar.xz
+bake-bootstrap
+Recipe.conf
 src/bake
 src/bake.vapi
 src/bake.c
