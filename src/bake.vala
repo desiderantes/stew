@@ -296,13 +296,14 @@ public class Recipe
                 if (rule_indent == null)
                     rule_indent = indent;
 
-                if (indent == rule_indent)
+                if (indent == rule_indent && statement != "")
                 {
                     var rule = rules.last ().data;
                     rule.commands.append (statement);
                     continue;
                 }
                 in_rule = false;
+                rule_indent = null;
             }
 
             if (statement == "")
@@ -356,8 +357,8 @@ public class Recipe
                 continue;
             }
 
-            throw new BuildError.INVALID ("Invalid statement in %s line %d:\n%s",
-                                          get_relative_path (original_dir, filename), line_number, statement);
+            throw new BuildError.INVALID ("Invalid statement in file %s line %d:\n%s",
+                                          get_relative_path (original_dir, filename), line_number, line);
         }
     }
 
