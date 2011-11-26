@@ -38,7 +38,7 @@ public class RPMModule : BuildModule
             warning ("Failed to make rpmbuild regex");
         }
 
-        var build_dir = ".eb-rpm-builddir";
+        var build_dir = ".bake-rpm-builddir";
         var gzip_file = "%s.tar.gz".printf (recipe.release_name);
         var source_file = "%s.rpm.tar.gz".printf (recipe.package_name);
         var spec_file = "%s/%s/%s.spec".printf (build_dir, recipe.release_name, recipe.package_name);
@@ -67,10 +67,11 @@ public class RPMModule : BuildModule
         rule.commands.append ("@echo \"%%setup -q\" >> %s".printf (spec_file));
         rule.commands.append ("@echo >> %s".printf (spec_file));
         rule.commands.append ("@echo \"%%build\" >> %s".printf (spec_file));
-        rule.commands.append ("@echo \"eb --resource-directory=/usr\" >> %s".printf (spec_file));
+        rule.commands.append ("@echo \"bake --configure resource-directory=/usr install-directory=\\$RPM_BUILD_ROOT\" >> %s".printf (spec_file));
+        rule.commands.append ("@echo \"bake\" >> %s".printf (spec_file));
         rule.commands.append ("@echo >> %s".printf (spec_file));
         rule.commands.append ("@echo \"%%install\" >> %s".printf (spec_file));
-        rule.commands.append ("@echo \"eb install --destination-directory=\\$RPM_BUILD_ROOT --resource-directory=/usr\" >> %s".printf (spec_file));
+        rule.commands.append ("@echo \"bake install\" >> %s".printf (spec_file));
         rule.commands.append ("@echo \"find \\$RPM_BUILD_ROOT -type f -print | sed \\\"s#^\\$RPM_BUILD_ROOT/*#/#\\\" > FILE-LIST\" >> %s".printf (spec_file));
         rule.commands.append ("@echo \"sed -i 's/\\/man\\/man.*/&*/' FILE-LIST\" >> %s".printf (spec_file));
         rule.commands.append ("@echo >> %s".printf (spec_file));

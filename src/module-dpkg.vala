@@ -22,7 +22,7 @@ public class DpkgModule : BuildModule
             warning ("Failed to get dpkg build arch");
         }
 
-        var build_dir = ".eb-dpkg-builddir";
+        var build_dir = ".bake-dpkg-builddir";
         var gzip_file = "%s.tar.gz".printf (recipe.release_name);
         var orig_file = "%s_%s.orig.tar.gz".printf (recipe.package_name, recipe.package_version);
         var debian_file = "%s_%s-%s.debian.tar.gz".printf (recipe.package_name, recipe.package_version, debian_revision);
@@ -70,20 +70,21 @@ public class DpkgModule : BuildModule
         rule.commands.append ("@echo '\tdh $@' >> %s".printf (rules_file));
         rule.commands.append ("@echo >> %s".printf (rules_file));
         rule.commands.append ("@echo \"override_dh_auto_configure:\" >> %s".printf (rules_file));
+        rule.commands.append ("@echo \"\tbake --configure resource-directory=/usr install-directory=debian/tmp\" >> %s".printf (rules_file));
         rule.commands.append ("@echo >> %s".printf (rules_file));
         rule.commands.append ("@echo \"override_dh_auto_build:\" >> %s".printf (rules_file));
-        rule.commands.append ("@echo \"\teb --resource-directory=/usr\" >> %s".printf (rules_file));
+        rule.commands.append ("@echo \"\tbake\" >> %s".printf (rules_file));
         rule.commands.append ("@echo >> %s".printf (rules_file));
         rule.commands.append ("@echo \"override_dh_auto_install:\" >> %s".printf (rules_file));
-        rule.commands.append ("@echo '\teb install --destination-directory=$(CURDIR)/debian/tmp --resource-directory=/usr' >> %s".printf (rules_file));
+        rule.commands.append ("@echo '\tbake install' >> %s".printf (rules_file));
         rule.commands.append ("@echo >> %s".printf (rules_file));
         rule.commands.append ("@echo \"override_dh_auto_clean:\" >> %s".printf (rules_file));
-        rule.commands.append ("@echo \"\teb clean\" >> %s".printf (rules_file));
+        rule.commands.append ("@echo \"\tbake clean\" >> %s".printf (rules_file));
         rule.commands.append ("@echo chmod +x %s".printf (rules_file));
 
         /* Generate debian/control */
         var control_file = "%s/debian/control".printf (build_dir);
-        var build_depends = "debhelper";// bake";
+        var build_depends = "debhelper"; // "bake"
         var short_description = "Short description of %s".printf (recipe.package_name);
         var long_description = "Long description of %s".printf (recipe.package_name);
         if (pretty_print)
