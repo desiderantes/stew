@@ -10,7 +10,7 @@ Overview of changes in bake 0.0.5
     * Only log directory changes if something occurs
     * Add variable substitution
     * Add library support
-    * Add support for .bzrignore
+    * Add support for .bzrignore, .gitignore
     * Use fastvapi to speed up Vala builds
 
 Overview of changes in bake 0.0.4
