@@ -80,6 +80,7 @@ public class DpkgModule : BuildModule
         rule.commands.append ("@echo >> %s".printf (rules_file));
         rule.commands.append ("@echo \"override_dh_auto_clean:\" >> %s".printf (rules_file));
         rule.commands.append ("@echo \"\tbake clean\" >> %s".printf (rules_file));
+        rule.commands.append ("@echo \"\tbake --unconfigure\" >> %s".printf (rules_file));
         rule.commands.append ("@echo chmod +x %s".printf (rules_file));
 
         /* Generate debian/control */

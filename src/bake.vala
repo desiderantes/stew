@@ -515,6 +515,7 @@ public class Bake
     private static bool show_version = false;
     private static bool show_verbose = false;
     private static bool do_configure = false;
+    private static bool do_unconfigure = false;
     private static bool do_expand = false;
     private static bool debug_enabled = false;
     public static const OptionEntry[] options =
@@ -522,6 +523,9 @@ public class Bake
         { "configure", 0, 0, OptionArg.NONE, ref do_configure,
           /* Help string for command line --configure flag */
           N_("Configure build options"), null},
+        { "unconfigure", 0, 0, OptionArg.NONE, ref do_unconfigure,
+          /* Help string for command line --unconfigure flag */
+          N_("Clear configuration"), null},
         { "expand", 0, 0, OptionArg.NONE, ref do_expand,
           /* Help string for command line --expand flag */
           N_("Expand current recipe and print to stdout"), null},
@@ -730,6 +734,12 @@ public class Bake
             }
             is_toplevel = false;
             toplevel_dir = Path.get_dirname (toplevel_dir);
+        }
+
+        if (do_unconfigure)
+        {
+            FileUtils.unlink (Path.build_filename (toplevel_dir, "Recipe.conf"));
+            return Posix.EXIT_SUCCESS;
         }
 
         /* Load configuration */
