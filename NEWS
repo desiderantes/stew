@@ -8,6 +8,7 @@ Overview of changes in bake 0.0.5
     * Allow custom build, install and clean rules
     * Fix rules in subdirectories always being run
     * Only log directory changes if something occurs
+    * Add variable substitution
 
 Overview of changes in bake 0.0.4
 

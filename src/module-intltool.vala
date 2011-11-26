@@ -72,7 +72,7 @@ public class IntltoolModule : BuildModule
                 var pot_file = Path.build_filename (translation_directory, "%s.pot".printf (recipe.package_name));
                 recipe.build_rule.inputs.append (pot_file);
 
-                var pot_rule = new Rule ();
+                var pot_rule = recipe.add_rule ();
                 pot_rule.outputs.append (pot_file);
                 List<string> gettext_sources = null;
                 get_gettext_sources (recipe, ref gettext_sources);
@@ -86,7 +86,6 @@ public class IntltoolModule : BuildModule
                     gettext_command += " %s".printf (s);
                 }
                 pot_rule.commands.append (gettext_command);
-                recipe.rules.append (pot_rule);
 
                 var languages = load_languages (Path.build_filename (recipe.dirname, translation_directory));
 
@@ -95,11 +94,10 @@ public class IntltoolModule : BuildModule
                     var po_file = "%s/%s.po".printf (translation_directory, language);
                     var mo_file = "%s/%s.mo".printf (translation_directory, language);
 
-                    var rule = new Rule ();
+                    var rule = recipe.add_rule ();
                     rule.inputs.append (po_file);
                     rule.outputs.append (mo_file);
                     rule.commands.append ("@msgfmt %s --output-file=%s".printf (po_file, mo_file));
-                    recipe.rules.append (rule);
 
                     recipe.build_rule.inputs.append (mo_file);
 
@@ -120,12 +118,11 @@ public class IntltoolModule : BuildModule
                 var sources = split_variable (source_list);
                 foreach (var source in sources)
                 {
-                    var rule = new Rule ();
+                    var rule = recipe.add_rule ();
                     rule.inputs.append (source);
                     var output = remove_extension (source);
                     rule.outputs.append (output);
                     rule.commands.append ("LC_ALL=C intltool-merge --xml-style /dev/null %s %s".printf (source, output));
-                    recipe.rules.append (rule);
 
                     recipe.build_rule.inputs.append (output);
                 }
@@ -137,12 +134,11 @@ public class IntltoolModule : BuildModule
                 var sources = split_variable (source_list);
                 foreach (var source in sources)
                 {
-                    var rule = new Rule ();
+                    var rule = recipe.add_rule ();
                     rule.inputs.append (source);
                     var output = remove_extension (source);
                     rule.outputs.append (output);
                     rule.commands.append ("LC_ALL=C intltool-merge --desktop-style -u /dev/null %s %s".printf (source, output));
-                    recipe.rules.append (rule);
 
                     recipe.build_rule.inputs.append (output);
                 }

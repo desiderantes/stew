@@ -15,13 +15,12 @@ public class PythonModule : BuildModule
                     return;
 
                 var output = replace_extension (source, "pyc");
-                var rule = new Rule ();
+                var rule = recipe.add_rule ();
                 rule.inputs.append (source);
                 rule.outputs.append (output);
                 if (pretty_print)
                     rule.commands.append ("@echo '    PYC %s'".printf (source));		
                 rule.commands.append ("@pycompile %s".printf (source));
-                recipe.rules.append (rule);
                 recipe.build_rule.inputs.append (output);
 
                 recipe.add_install_rule (output, recipe.package_data_directory);
@@ -30,13 +29,12 @@ public class PythonModule : BuildModule
             var main_file = replace_extension (sources.nth_data (0), "pyc");
 
             /* Script to run locally */
-            var rule = new Rule ();
+            var rule = recipe.add_rule ();
             rule.outputs.append (main_file);	    
             rule.outputs.append (program);
             rule.commands.append ("@echo '#!/bin/sh' > %s".printf (program));
             rule.commands.append ("@echo 'exec python %s' >> %s".printf (main_file, program));
             rule.commands.append ("@chmod +x %s".printf (program));
-            recipe.rules.append (rule);
             recipe.build_rule.inputs.append (program);
 
             /* Script to run when installed */

@@ -11,10 +11,10 @@ public class JavaModule : BuildModule
 
             var jar_file = "%s.jar".printf (program);
 
-            var rule = new Rule ();
+            var rule = recipe.add_rule ();
             var command = "javac";
 
-            var jar_rule = new Rule ();
+            var jar_rule = recipe.add_rule ();
             jar_rule.outputs.append (jar_file);
             var jar_command = "jar cfe %s".printf (jar_file);
 
@@ -37,32 +37,33 @@ public class JavaModule : BuildModule
                 rule.outputs.append (class_file);
                 command += " %s".printf (source);
             }
-            if (rule.outputs != null)
+            if (rule.outputs == null)
             {
-                rule.commands.append (command);
-                recipe.rules.append (rule);
-
-                jar_rule.commands.append (jar_command);
-                recipe.rules.append (jar_rule);
-                recipe.build_rule.inputs.append (jar_file);
-                recipe.add_install_rule (jar_file, recipe.package_data_directory);
-
-                /* Script to run locally */
-                rule = new Rule ();
-                rule.outputs.append (program);
-                rule.commands.append ("@echo '#!/bin/sh' > %s".printf (program));
-                rule.commands.append ("@echo 'exec java -jar %s' >> %s".printf (jar_file, program));
-                rule.commands.append ("@chmod +x %s".printf (program));
-                recipe.rules.append (rule);
-                recipe.build_rule.inputs.append (program);
-
-                /* Script to run when installed */
-                var script = recipe.get_install_path (Path.build_filename (recipe.binary_directory, program));
-                recipe.install_rule.commands.append ("@mkdir -p %s".printf (recipe.get_install_path (recipe.binary_directory)));
-                recipe.install_rule.commands.append ("@echo '#!/bin/sh' > %s".printf (script));
-                recipe.install_rule.commands.append ("@echo 'exec java -jar %s' >> %s".printf (Path.build_filename (recipe.package_data_directory, jar_file), script));
-                recipe.install_rule.commands.append ("@chmod +x %s".printf (script));
+                recipe.rules.remove (rule);
+                recipe.rules.remove (jar_rule);
+                continue;
             }
+
+            rule.commands.append (command);
+
+            jar_rule.commands.append (jar_command);
+            recipe.build_rule.inputs.append (jar_file);
+            recipe.add_install_rule (jar_file, recipe.package_data_directory);
+
+            /* Script to run locally */
+            rule = recipe.add_rule ();
+            rule.outputs.append (program);
+            rule.commands.append ("@echo '#!/bin/sh' > %s".printf (program));
+            rule.commands.append ("@echo 'exec java -jar %s' >> %s".printf (jar_file, program));
+            rule.commands.append ("@chmod +x %s".printf (program));
+            recipe.build_rule.inputs.append (program);
+
+            /* Script to run when installed */
+            var script = recipe.get_install_path (Path.build_filename (recipe.binary_directory, program));
+            recipe.install_rule.commands.append ("@mkdir -p %s".printf (recipe.get_install_path (recipe.binary_directory)));
+            recipe.install_rule.commands.append ("@echo '#!/bin/sh' > %s".printf (script));
+            recipe.install_rule.commands.append ("@echo 'exec java -jar %s' >> %s".printf (Path.build_filename (recipe.package_data_directory, jar_file), script));
+            recipe.install_rule.commands.append ("@chmod +x %s".printf (script));
         }
     }
 }

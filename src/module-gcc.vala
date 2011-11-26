@@ -149,7 +149,7 @@ public class GCCModule : BuildModule
 
                 objects.append (output);
 
-                var rule = new Rule ();
+                var rule = recipe.add_rule ();
                 rule.inputs.append (input);
                 var includes = get_includes (Path.build_filename (recipe.dirname, source));
                 foreach (var include in includes)
@@ -167,7 +167,6 @@ public class GCCModule : BuildModule
                 if (pretty_print)
                     rule.commands.append ("@echo '    CC %s'".printf (input));
                 rule.commands.append (command);
-                recipe.rules.append (rule);
             }
 
             /* Link */
@@ -175,7 +174,7 @@ public class GCCModule : BuildModule
             {
                 recipe.build_rule.inputs.append (program);
 
-                var rule = new Rule ();
+                var rule = recipe.add_rule ();
                 foreach (var o in objects)
                     rule.inputs.append (o);
                 rule.outputs.append (program);
@@ -190,7 +189,6 @@ public class GCCModule : BuildModule
                     command += " %s".printf (package_ldflags);
                 command += " -o %s".printf (program);
                 rule.commands.append (command);
-                recipe.rules.append (rule);
 
                 recipe.add_install_rule (program, recipe.binary_directory);
             }

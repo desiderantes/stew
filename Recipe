@@ -1,5 +1,6 @@
 package.name = bake
 package.version = 0.0.4
+package.ppa = lp:~bake-team/releases
 
 package.files = Makefile \
                 bake.doap \
@@ -30,3 +31,8 @@ package.files = Makefile \
                 examples/vala/Recipe \
                 examples/haskell/Recipe \
                 examples/haskell/example.hs
+
+%release: release-tarball
+
+%release-tarball: release-gzip
+    echo lp-project-upload bake $(package.version) $(gzip.release-filename)

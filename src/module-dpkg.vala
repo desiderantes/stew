@@ -29,17 +29,15 @@ public class DpkgModule : BuildModule
         var changes_file = "%s_%s-%s_source.changes".printf (recipe.package_name, recipe.package_version, debian_revision);
         var dsc_file = "%s_%s-%s.dsc".printf (recipe.package_name, recipe.package_version, debian_revision);
         var deb_file = "%s_%s-%s_%s.deb".printf (recipe.package_name, recipe.package_version, debian_revision, build_arch);
-         var rule = new Rule ();
+        var rule = recipe.add_rule ();
         rule.outputs.append (orig_file);
         rule.inputs.append (gzip_file);
         rule.commands.append ("@cp %s %s".printf (gzip_file, orig_file));
-        recipe.rules.append (rule);
 
-        rule = new Rule ();
+        rule = recipe.add_rule ();
         rule.outputs.append (debian_file);
         rule.commands.append ("@rm -rf %s".printf (build_dir));
         rule.commands.append ("@mkdir -p %s/debian".printf (build_dir));
-        recipe.rules.append (rule);
 
         /* Generate debian/changelog */
         var changelog_file = "%s/debian/changelog".printf (build_dir);
@@ -116,7 +114,7 @@ public class DpkgModule : BuildModule
         rule.commands.append ("@rm -rf %s".printf (build_dir));
 
         /* Source build */
-        rule = new Rule ();
+        rule = recipe.add_rule ();
         rule.outputs.append (dsc_file);
         rule.outputs.append (changes_file);
         rule.inputs.append (orig_file);
@@ -131,10 +129,9 @@ public class DpkgModule : BuildModule
         rule.commands.append ("@cd %s/%s && dpkg-buildpackage -S".printf (build_dir, recipe.release_name));
         rule.commands.append ("@mv %s/%s %s/%s .".printf (build_dir, dsc_file, build_dir, changes_file));
         rule.commands.append ("@rm -rf %s".printf (build_dir));
-        recipe.rules.append (rule);
 
         /* Binary build */
-        rule = new Rule ();
+        rule = recipe.add_rule ();
         rule.outputs.append (deb_file);
         rule.inputs.append (orig_file);
         rule.inputs.append (debian_file);
@@ -148,22 +145,19 @@ public class DpkgModule : BuildModule
         rule.commands.append ("@cd %s/%s && dpkg-buildpackage -b".printf (build_dir, recipe.release_name));
         rule.commands.append ("@mv %s/%s .".printf (build_dir, deb_file));
         rule.commands.append ("@rm -rf %s".printf (build_dir));
-        recipe.rules.append (rule);
 
-        rule = new Rule ();
+        rule = recipe.add_rule ();
         rule.inputs.append (deb_file);
         rule.outputs.append ("%release-deb");
-        recipe.rules.append (rule);
 
         // FIXME: Move into module-ppa
         var ppa_name = recipe.variables.lookup ("package.ppa");
         if (ppa_name != null)
         {
-            rule = new Rule ();
+            rule = recipe.add_rule ();
             rule.outputs.append ("%release-ppa");
             rule.inputs.append (changes_file);
             rule.commands.append ("dput ppa:%s %s".printf (ppa_name, changes_file));
-            recipe.rules.append (rule);
         }
     }
 }

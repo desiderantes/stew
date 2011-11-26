@@ -11,7 +11,7 @@ public class MonoModule : BuildModule
 
             var exe_file = "%s.exe".printf (program);
 
-            var rule = new Rule ();
+            var rule = recipe.add_rule ();
             rule.outputs.append (exe_file);
             var command = "gmcs -out:%s".printf (exe_file);
             foreach (var source in sources)
@@ -23,19 +23,20 @@ public class MonoModule : BuildModule
                 command += " %s".printf (source);
             }
             if (rule.inputs == null)
-                return;
+            {
+                recipe.rules.remove (rule);
+                continue;
+            }
             rule.commands.append (command);
-            recipe.rules.append (rule);
             recipe.build_rule.inputs.append (exe_file);
             recipe.add_install_rule (exe_file, recipe.package_data_directory);
 
             /* Script to run locally */
-            rule = new Rule ();
+            rule = recipe.add_rule ();
             rule.outputs.append (program);
             rule.commands.append ("@echo '#!/bin/sh' > %s".printf (program));
             rule.commands.append ("@echo 'exec mono %s' >> %s".printf (exe_file, program));
             rule.commands.append ("@chmod +x %s".printf (program));
-            recipe.rules.append (rule);
             recipe.build_rule.inputs.append (program);
 
             /* Script to run when installed */

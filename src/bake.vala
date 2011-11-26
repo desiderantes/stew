@@ -89,6 +89,7 @@ private string replace_extension (string filename, string extension)
 
 public class Rule
 {
+    public Recipe recipe;
     public List<string> inputs;
     public List<string> outputs;
     public List<string> commands;
@@ -96,6 +97,11 @@ public class Rule
     public bool has_output
     {
         get { return outputs.length () > 0 && !outputs.nth_data (0).has_prefix ("%"); }
+    }
+    
+    public Rule (Recipe recipe)
+    {
+        this.recipe = recipe;
     }
 
     private TimeVal? get_modification_time (string filename) throws Error
@@ -171,6 +177,8 @@ public class Rule
                 c = c.substring (1);
                 show_output = !pretty_print;
             }
+
+            c = recipe.substitute_variables (c);
 
             if (show_output)
                 print ("    %s\n", c);
@@ -255,17 +263,14 @@ public class Recipe
             }
         }
 
-        build_rule = new Rule ();
+        build_rule = add_rule ();
         build_rule.outputs.append ("%build");
-        rules.append (build_rule);
 
-        install_rule = new Rule ();
+        install_rule = add_rule ();
         install_rule.outputs.append ("%install");
-        rules.append (install_rule);
 
-        clean_rule = new Rule ();
+        clean_rule = add_rule ();
         clean_rule.outputs.append ("%clean");
-        rules.append (clean_rule);
 
         string contents;
         FileUtils.get_contents (filename, out contents);
@@ -350,7 +355,7 @@ public class Recipe
             index = statement.index_of (":");
             if (index > 0 && allow_rules)
             {
-                var rule = new Rule ();
+                var rule = add_rule ();
 
                 var input_list = statement.substring (0, index).chomp ();
                 foreach (var output in split_variable (input_list))
@@ -360,7 +365,6 @@ public class Recipe
                 foreach (var input in split_variable (output_list))
                     rule.inputs.append (input);
 
-                rules.append (rule);
                 in_rule = true;
                 continue;
             }
@@ -368,6 +372,39 @@ public class Recipe
             throw new BuildError.INVALID ("Invalid statement in file %s line %d:\n%s",
                                           get_relative_path (original_dir, filename), line_number, line);
         }
+    }
+    
+    public Rule add_rule ()
+    {
+        var rule = new Rule (this);
+        rules.append (rule);
+        return rule;
+    }
+
+    public string substitute_variables (string line)
+    {
+        var new_line = line;
+        while (true)
+        {
+            var start = new_line.index_of ("$(");
+            if (start < 0)
+                break;
+            var end = new_line.index_of (")", start);
+            if (end < 0)
+                break;
+
+            var prefix = new_line.substring (0, start);
+            var variable = new_line.substring (start + 2, end - start - 2);
+            var suffix = new_line.substring (end + 1);
+
+            var value = variables.lookup (variable);
+            if (value == null)
+                value = "";
+            
+            new_line = prefix + value + suffix;
+        }
+
+        return new_line;
     }
 
     public string get_install_path (string path)
@@ -669,7 +706,17 @@ public class Bake
         foreach (var child in recipe.children)
             generate_release_rules (child, release_rule, release_dir);
     }
-    
+
+    private static void add_global_variables (Recipe recipe)
+    {
+        var toplevel = recipe.toplevel;
+        recipe.variables.insert ("package.name", toplevel.package_name);
+        if (toplevel.package_version != null)
+            recipe.variables.insert ("package.version", toplevel.package_version);
+        foreach (var child in recipe.children)
+            add_global_variables (child);
+    }
+
     private static void generate_rules (Recipe recipe)
     {
         foreach (var module in modules)
@@ -734,14 +781,13 @@ public class Bake
         /* Find the toplevel */
         var toplevel_dir = Environment.get_current_dir ();
         var is_toplevel = true;
-        string? package_name = null;
+        Recipe? toplevel = null;
         while (true)
         {
             try
             {
-                var f = new Recipe (Path.build_filename (toplevel_dir, "Recipe"));
-                package_name = f.package_name;
-                if (package_name != null)
+                toplevel = new Recipe (Path.build_filename (toplevel_dir, "Recipe"));
+                if (toplevel.package_name != null)
                     break;
             }
             catch (Error e)
@@ -787,6 +833,7 @@ public class Bake
             /* Default values */
             conf_variables.insert ("resource-directory", "/usr/local");
             conf_variables.insert ("system-config-directory", "/etc");
+            conf_variables.insert ("system-binary-directory", "/sbin");
 
             /* Load args from the command line */
             if (do_configure)
@@ -811,16 +858,6 @@ public class Bake
             }
 
             GLib.print ("\x1B[1m[Configuring]\x1B[0m\n");
-
-            /* Derived values */
-            var resource_directory = conf_variables.lookup ("resource-directory");
-            if (conf_variables.lookup ("binary-directory") == null)
-                conf_variables.insert ("binary-directory", "%s/bin".printf (resource_directory));
-            if (conf_variables.lookup ("data-directory") == null)
-                conf_variables.insert ("data-directory", "%s/share".printf (resource_directory));
-            var data_directory = conf_variables.lookup ("data-directory");
-            if (conf_variables.lookup ("package-data-directory") == null)
-                conf_variables.insert ("package-data-directory", "%s/%s".printf (data_directory, package_name));
 
             /* Make directories absolute */
             // FIXME
@@ -852,9 +889,18 @@ public class Bake
                 return Posix.EXIT_SUCCESS;
         }
 
+        /* Derived values */
+        var resource_directory = conf_variables.lookup ("resource-directory");
+        if (conf_variables.lookup ("binary-directory") == null)
+            conf_variables.insert ("binary-directory", "%s/bin".printf (resource_directory));
+        if (conf_variables.lookup ("data-directory") == null)
+            conf_variables.insert ("data-directory", "%s/share".printf (resource_directory));
+        var data_directory = conf_variables.lookup ("data-directory");
+        if (conf_variables.lookup ("package-data-directory") == null)
+            conf_variables.insert ("package-data-directory", "%s/$(package.name)".printf (data_directory));
+
         /* Load the recipe tree */
         var filename = Path.build_filename (toplevel_dir, "Recipe");
-        Recipe toplevel;
         try
         {
             toplevel = load_recipes (filename, conf_variables);
@@ -865,14 +911,16 @@ public class Bake
             return Posix.EXIT_FAILURE;
         }
 
+        /* Add global variables */
+        add_global_variables (toplevel);
+
         /* Generate implicit rules */
         generate_rules (toplevel);
 
         /* Generate release rules */
-        var rule = new Rule ();
+        var rule = toplevel.add_rule ();
         rule.outputs.append ("%s/".printf (toplevel.release_name));
         generate_release_rules (toplevel, rule, toplevel.release_name);
-        toplevel.rules.append (rule);
 
         /* Generate clean rule */
         generate_clean_rules (toplevel);

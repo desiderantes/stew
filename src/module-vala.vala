@@ -9,7 +9,7 @@ public class ValaModule : BuildModule
                 continue;
             var sources = split_variable (source_list);
 
-            var rule = new Rule ();
+            var rule = recipe.add_rule ();
             var command = "@valac -C";
             var pretty_command = "@echo '    VALAC";
 
@@ -31,13 +31,15 @@ public class ValaModule : BuildModule
                 pretty_command += " %s".printf (source);
             }
             pretty_command += "'";
-            if (rule.outputs != null)
+            if (rule.outputs == null)
             {
-                if (pretty_print)
-                    rule.commands.append (pretty_command);
-                rule.commands.append (command);
-                recipe.rules.append (rule);
+                recipe.rules.remove (rule);
+                continue;
             }
+
+            if (pretty_print)
+                rule.commands.append (pretty_command);
+            rule.commands.append (command);
         }
     }
 }

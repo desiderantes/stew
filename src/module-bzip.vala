@@ -5,17 +5,18 @@ public class BZIPModule : BuildModule
         if (!recipe.is_toplevel)
             return;
 
-        var rule = new Rule ();
-        rule.inputs.append ("%s/".printf (recipe.release_name));
-        rule.outputs.append ("%s.tar.bz2".printf (recipe.release_name));
-        if (pretty_print)
-            rule.commands.append ("@echo '    COMPRESS %s.tar.bz2'".printf (recipe.release_name));
-        rule.commands.append ("@tar --create --bzip2 --file %s.tar.bz2 %s".printf (recipe.release_name, recipe.release_name));
-        recipe.rules.append (rule);
+        var filename = "%s.tar.bz2".printf (recipe.release_name);
+        recipe.variables.insert ("bzip.release-filename", filename);
 
-        rule = new Rule ();
+        var rule = recipe.add_rule ();
+        rule.inputs.append ("%s/".printf (recipe.release_name));
+        rule.outputs.append (filename);
+        if (pretty_print)
+            rule.commands.append ("@echo '    COMPRESS %s'".printf (filename));
+        rule.commands.append ("@tar --create --bzip2 --file %s %s".printf (filename, recipe.release_name));
+
+        rule = recipe.add_rule ();
         rule.outputs.append ("%release-bzip");
-        rule.inputs.append ("%s.tar.bz2".printf (recipe.release_name));
-        recipe.rules.append (rule);
+        rule.inputs.append (filename);
    }
 }

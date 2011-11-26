@@ -5,17 +5,18 @@ public class XZIPModule : BuildModule
         if (!recipe.is_toplevel)
             return;
 
-        var rule = new Rule ();
-        rule.inputs.append ("%s/".printf (recipe.release_name));
-        rule.outputs.append ("%s.tar.xz".printf (recipe.release_name));
-        if (pretty_print)
-            rule.commands.append ("@echo '    COMPRESS %s.tar.xz'".printf (recipe.release_name));
-        rule.commands.append ("@tar --create --xz --file %s.tar.xz %s".printf (recipe.release_name, recipe.release_name));
-        recipe.rules.append (rule);
+        var filename = "%s.tar.xz".printf (recipe.release_name);
+        recipe.variables.insert ("xzip.release-filename", filename);
 
-        rule = new Rule ();
+        var rule = recipe.add_rule ();
+        rule.inputs.append ("%s/".printf (recipe.release_name));
+        rule.outputs.append (filename);
+        if (pretty_print)
+            rule.commands.append ("@echo '    COMPRESS %s'".printf (filename));
+        rule.commands.append ("@tar --create --xz --file %s %s".printf (filename, recipe.release_name));
+
+        rule = recipe.add_rule ();
         rule.outputs.append ("%release-xzip");
-        rule.inputs.append ("%s.tar.xz".printf (recipe.release_name));
-        recipe.rules.append (rule);
+        rule.inputs.append (filename);
    }
 }

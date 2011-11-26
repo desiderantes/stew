@@ -44,7 +44,7 @@ public class RPMModule : BuildModule
         var spec_file = "%s/%s/%s.spec".printf (build_dir, recipe.release_name, recipe.package_name);
         var rpm_file = "%s-%s-%s.%s.rpm".printf (recipe.package_name, recipe.package_version, release, build_arch);
 
-        var rule = new Rule ();
+        var rule = recipe.add_rule ();
         rule.inputs.append (gzip_file);
         rule.outputs.append (rpm_file);
         rule.commands.append ("@rm -rf %s".printf (build_dir));
@@ -84,11 +84,9 @@ public class RPMModule : BuildModule
         rule.commands.append ("@cp %s/rpmbuild/RPMS/%s/%s .".printf (Environment.get_home_dir (), build_arch, rpm_file));
         rule.commands.append ("@rm -f %s".printf (source_file));
         rule.commands.append ("@rm -rf %s".printf (build_dir));
-        recipe.rules.append (rule);
 
-        rule = new Rule ();
+        rule = recipe.add_rule ();
         rule.inputs.append (rpm_file);
         rule.outputs.append ("%release-rpm");
-        recipe.rules.append (rule);
    }
 }
