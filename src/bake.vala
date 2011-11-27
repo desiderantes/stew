@@ -830,6 +830,7 @@ public class Bake
         modules.append (new GZIPModule ());
         modules.append (new IntltoolModule ());
         modules.append (new JavaModule ());
+        modules.append (new LaunchpadModule ());
         modules.append (new ManModule ());
         modules.append (new MonoModule ());
         modules.append (new PythonModule ());

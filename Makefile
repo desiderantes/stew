@@ -18,6 +18,7 @@ SOURCES = src/bake.vala \
           src/module-gzip.vala \
           src/module-intltool.vala \
           src/module-java.vala \
+          src/module-launchpad.vala \
           src/module-man.vala \
           src/module-mono.vala \
           src/module-python.vala \
