@@ -1,5 +1,12 @@
 public class BZRModule : BuildModule
 {
+    public override void generate_toplevel_rules (Recipe recipe)
+    {
+        var rule = recipe.add_rule ();
+        rule.outputs.append ("%tag-bzr");
+        rule.commands.append ("bzr tag %s".printf (recipe.package_version));
+    }
+
     public override void recipe_complete (Recipe recipe)
     {
         if (!FileUtils.test (Path.build_filename (recipe.toplevel.dirname, ".bzr"), FileTest.EXISTS))
