@@ -33,8 +33,9 @@ bake-bootstrap: $(SOURCES)
 install: bake-bootstrap
 	./bake-bootstrap install
 
-release-gzip: bake-bootstrap
-	./bake-bootstrap release-gzip
+release: bake-bootstrap
+	./bake-bootstrap tag-bzr
+	./bake-bootstrap release-launchpad
 
 clean: bake-bootstrap
 	./bake-bootstrap clean
