@@ -255,9 +255,19 @@ public class Recipe
     
     public string dirname { owned get { return Path.get_dirname (filename); } }
 
+    public string install_directory
+    {
+        owned get
+        {
+            var dir = variables.lookup ("install-directory");
+            if (dir == null || Path.is_absolute (dir))
+                return dir;
+            return Path.build_filename (original_dir, dir);
+        }
+    }
+
     public string source_directory { get { return variables.lookup ("source-directory"); } }
     public string top_source_directory { get { return variables.lookup ("top-source-directory"); } }
-    public string install_directory { get { return variables.lookup ("install-directory"); } }    
     public string binary_directory { get { return variables.lookup ("binary-directory"); } }
     public string system_binary_directory { get { return variables.lookup ("system-binary-directory"); } }
     public string library_directory { get { return variables.lookup ("library-directory"); } }
