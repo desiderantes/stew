@@ -32,22 +32,6 @@ public class BuildModule
     }
 }
 
-private void change_directory (string dirname)
-{
-    if (Environment.get_current_dir () == dirname)
-        return;
-
-    directory_changed = true;
-    Environment.set_current_dir (dirname);
-}
-
-private void log_directory_change ()
-{
-    if (directory_changed)
-        GLib.print ("\x1B[1m[Entering directory %s]\x1B[0m\n", get_relative_path (original_dir, Environment.get_current_dir ()));
-    directory_changed = false;
-}
-
 public List<string> split_variable (string value)
 {
     List<string> values = null;
@@ -564,6 +548,22 @@ public class Recipe
         }
 
         return this;
+    }
+
+    private void change_directory (string dirname)
+    {
+        if (Environment.get_current_dir () == dirname)
+            return;
+
+        directory_changed = true;
+        Environment.set_current_dir (dirname);
+    }
+
+    private void log_directory_change ()
+    {
+        if (directory_changed)
+            GLib.print ("\x1B[1m[Entering directory %s]\x1B[0m\n", get_relative_path (original_dir, Environment.get_current_dir ()));
+        directory_changed = false;
     }
     
     public void build_target (string target) throws BuildError
