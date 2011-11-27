@@ -1,4 +1,5 @@
 private bool pretty_print = true;
+private bool debug_enabled = false;
 private string original_dir;
 private static bool directory_changed;
 
@@ -94,7 +95,7 @@ public string get_relative_path (string source_path, string target_path)
     }
 }
 
-private string remove_extension (string filename)
+public string remove_extension (string filename)
 {
     var i = filename.last_index_of_char ('.');
     if (i < 0)
@@ -102,13 +103,21 @@ private string remove_extension (string filename)
     return filename.substring (0, i);
 }
 
-private string replace_extension (string filename, string extension)
+public string replace_extension (string filename, string extension)
 {
     var i = filename.last_index_of_char ('.');
     if (i < 0)
         return "%s.%s".printf (filename, extension);
 
     return "%.*s.%s".printf (i, filename, extension);
+}
+
+public errordomain BuildError 
+{
+    INVALID,
+    NO_RULE,
+    COMMAND_FAILED,
+    MISSING_OUTPUT
 }
 
 public class Rule
@@ -149,49 +158,74 @@ public class Rule
 
     public bool needs_build ()
     {
-       TimeVal max_input_time = { 0, 0 };
-       foreach (var input in inputs)
-       {
-           TimeVal modification_time;
-           try
-           {
-               modification_time = get_modification_time (input);
-           }
-           catch (Error e)
-           {
-               if (!(e is IOError.NOT_FOUND))
-                   warning ("Unable to access input file %s: %s", input, e.message);
-               return true;
-           }
-           if (timeval_cmp (modification_time, max_input_time) > 0)
-               max_input_time = modification_time;
-       }
+        /* Find the most recently changed input */
+        TimeVal max_input_time = { 0, 0 };
+        string? youngest_input = null;
+        foreach (var input in inputs)
+        {
+            try
+            {
+                var modification_time = get_modification_time (input);
+                if (timeval_cmp (modification_time, max_input_time) > 0)
+                {
+                    max_input_time = modification_time;
+                    youngest_input = input;
+                }
+            }
+            catch (Error e)
+            {
+                if (e is IOError.NOT_FOUND)
+                {
+                    if (debug_enabled)
+                        debug ("Input %s is missing", get_relative_path (original_dir, Path.build_filename (recipe.dirname, input)));
+                }
+                else
+                    warning ("Unable to access input file %s: %s", input, e.message);
 
-       var do_build = false;
-       foreach (var output in outputs)
-       {
-           if (output.has_prefix ("%"))
-               return true;
+                /* Something has gone wrong, run the rule anyway and it should fail */
+                return true;
+            }
+        }
 
-           TimeVal modification_time;
-           try
-           {
-               modification_time = get_modification_time (output);
-           }
-           catch (Error e)
-           {
-               // FIXME: Only if opened
-               do_build = true;
-               continue;
-           }
-           if (timeval_cmp (modification_time, max_input_time) < 0)
-              do_build = true;
-       }
+        /* Rebuild if any of the outputs are missing */
+        TimeVal max_output_time = { 0, 0 };
+        string? youngest_output = null;
+        foreach (var output in outputs)
+        {
+            /* Always rebuild if doesn't produce output */
+            if (output.has_prefix ("%"))
+                return true;
 
-       return do_build;
+            try
+            {
+                var modification_time = get_modification_time (output);
+                if (timeval_cmp (modification_time, max_output_time) > 0)
+                {
+                    max_output_time = modification_time;
+                    youngest_output = output;
+                }
+            }
+            catch (Error e)
+            {
+                if (debug_enabled && e is IOError.NOT_FOUND)
+                    debug ("Output %s is missing", get_relative_path (original_dir, Path.build_filename (recipe.dirname, output)));
+                return true;
+            }
+        }
+
+        if (timeval_cmp (max_input_time, max_output_time) > 0)
+        {
+            if (debug_enabled)
+                debug ("Rebuilding %s as %s is newer",
+                       get_relative_path (original_dir, Path.build_filename (recipe.dirname, youngest_output)),
+                       get_relative_path (original_dir, Path.build_filename (recipe.dirname, youngest_input)));
+            return true;
+        }
+
+        return false;
     }
 
-    public bool build ()
+    public void build () throws BuildError
     {
         foreach (var c in commands)
         {
@@ -209,33 +243,17 @@ public class Rule
 
             var exit_status = Posix.system (c);
             if (Process.if_signaled (exit_status))
-            {
-                printerr ("Build stopped with signal %d\n", Process.term_sig (exit_status));
-                return false;
-            }
+                throw new BuildError.COMMAND_FAILED ("Build stopped with signal %d", Process.term_sig (exit_status));
             if (Process.if_exited (exit_status) && Process.exit_status (exit_status) != 0)
-            {
-                printerr ("Build stopped with return value %d\n", Process.exit_status (exit_status));               
-                return false;
-            }
+                throw new BuildError.COMMAND_FAILED ("Build stopped with return value %d", Process.exit_status (exit_status));               
         }
 
         foreach (var output in outputs)
         {
             if (!output.has_prefix ("%") && !FileUtils.test (output, FileTest.EXISTS))
-            {
-                GLib.printerr ("Failed to build file %s\n", output);
-                return false;
-            }
+                throw new BuildError.MISSING_OUTPUT ("Failed to build file %s", output);
         }
-
-       return true;
     }
-}
-
-public errordomain BuildError 
-{
-    INVALID
 }
 
 public class Recipe
@@ -419,8 +437,7 @@ public class Recipe
                 continue;
             }
 
-            throw new BuildError.INVALID ("Invalid statement in file %s line %d:\n%s",
-                                          get_relative_path (original_dir, filename), line_number, line);
+            throw new BuildError.INVALID ("Invalid statement in file %s line %d:\n%s", get_relative_path (original_dir, filename), line_number, line);
         }
     }
     
@@ -549,44 +566,49 @@ public class Recipe
         return this;
     }
     
-    public bool build_target (string target)
+    public void build_target (string target) throws BuildError
     {
+        if (debug_enabled)
+            debug ("Considering target %s", get_relative_path (original_dir, Path.build_filename (dirname, target)));
+
+        /* If the rule comes from another recipe, use it to build */
         var recipe = get_recipe_with_target (target);
         if (recipe != this)
-            return recipe.build_target (Path.get_basename (target));
+        {
+            recipe.build_target (Path.get_basename (target));
+            return;
+        }
 
+        /* Find a for this target */
         var rule = find_rule (target);
         if (rule == null)
         {
+            /* If it's already there then don't need to do anything */
             var path = Path.build_filename (dirname, target);
-
             if (FileUtils.test (path, FileTest.EXISTS))
-                return true;
-            else
-            {
-                GLib.printerr ("No rule to build '%s'\n", get_relative_path (original_dir, target));
-                return false;
-            }
+                return;
+
+            /* If doesn't exist then we can't continue */
+            throw new BuildError.NO_RULE ("No rule to build '%s'", get_relative_path (original_dir, target));
         }
 
-        change_directory (dirname);
-
-        if (!rule.needs_build ())
-            return true;
-
-        /* Build all the inputs */
+        /* Check the inputs first */
         foreach (var input in rule.inputs)
-        {
-            if (!build_target (input))
-                return false;
-        }
+            build_target (input);
 
-        /* Run the commands */
+        /* Don't bother if it's already up to date */
+        change_directory (dirname);
+        if (!rule.needs_build ())
+            return;
+
+        /* If we're about to do something then note which directory we are in and what we're building */
         if (rule.commands != null)
             log_directory_change ();
         if (rule.has_output)
             GLib.print ("\x1B[1m[Building %s]\x1B[0m\n", target);
-        return rule.build ();
+
+        /* Run the commands */
+        rule.build ();
     }
 
     public void print ()
@@ -615,7 +637,6 @@ public class Bake
     private static bool do_configure = false;
     private static bool do_unconfigure = false;
     private static bool do_expand = false;
-    private static bool debug_enabled = false;
     private static const OptionEntry[] options =
     {
         { "configure", 0, 0, OptionArg.NONE, ref do_configure,
@@ -644,7 +665,7 @@ public class Bake
     public static Recipe? load_recipes (string filename, HashTable<string, string> conf_variables, bool is_toplevel = true) throws Error
     {
         if (debug_enabled)
-            debug ("Loading %s", filename);
+            debug ("Loading %s", get_relative_path (original_dir, filename));
 
         var f = new Recipe (filename, conf_variables);
 
@@ -1000,15 +1021,18 @@ public class Bake
 
         GLib.print ("\x1B[1m[Building target %s]\x1B[0m\n", target);
 
-        if (recipe.build_target (target))
+        try
         {
-            GLib.print ("\x1B[1m\x1B[32m[Build complete]\x1B[0m\n");
-            return Posix.EXIT_SUCCESS;
+            recipe.build_target (target);
         }
-        else
+        catch (BuildError e)
         {
+            printerr ("%s\n", e.message);
             GLib.print ("\x1B[1m\x1B[31m[Build failed]\x1B[0m\n");
             return Posix.EXIT_FAILURE;
         }
+
+        GLib.print ("\x1B[1m\x1B[32m[Build complete]\x1B[0m\n");
+        return Posix.EXIT_SUCCESS;
     }
 }

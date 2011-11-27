@@ -12,6 +12,7 @@ Overview of changes in bake 0.0.5
     * Add library support
     * Add support for .bzrignore, .gitignore
     * Use fastvapi to speed up Vala builds
+    * Fix rules not running when inputs are modified
 
 Overview of changes in bake 0.0.4
 

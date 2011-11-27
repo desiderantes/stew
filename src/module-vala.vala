@@ -79,22 +79,26 @@ public class ValaModule : BuildModule
                 continue;
 
             var vapi_filename = replace_extension (source, "vapi");
+            var vapi_stamp_filename = ".%s-stamp".printf (vapi_filename);
 
             /* Build a fastvapi file */
             var rule = recipe.add_rule ();
             rule.inputs.append (source);
             rule.outputs.append (vapi_filename);
+            rule.outputs.append (vapi_stamp_filename);
             if (pretty_print)
                 rule.commands.append ("@echo '    VALAC %s'".printf (vapi_filename));            
             rule.commands.append ("@valac --fast-vapi=%s %s".printf (vapi_filename, source));
+            rule.commands.append ("@touch %s".printf (vapi_stamp_filename));
 
             var c_filename = replace_extension (source, "c");
             var o_filename = replace_extension (source, "o");
+            var c_stamp_filename = ".%s-stamp".printf (c_filename);
 
             /* Build a C file */
             rule = recipe.add_rule ();
-            rule.inputs.append (source);
             rule.outputs.append (c_filename);
+            rule.outputs.append (c_stamp_filename);
             var command = valac_command + " -C %s".printf (source);
             foreach (var s in sources)
             {
@@ -116,6 +120,7 @@ public class ValaModule : BuildModule
             if (pretty_print)
                 rule.commands.append ("@echo '    VALAC %s'".printf (source));            
             rule.commands.append (command);
+            rule.commands.append ("@touch %s".printf (c_stamp_filename));
 
             /* Compile C code */
             rule = recipe.add_rule ();
