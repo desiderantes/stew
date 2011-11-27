@@ -26,7 +26,7 @@ public class BZRModule : BuildModule
             foreach (var output in rule.outputs)
             {
                 /* Ignore non producing targets and relative paths */
-                if (output.has_prefix ("%") || output.has_prefix ("."))
+                if (output.has_prefix ("%") || output.has_prefix ("./") || output.has_prefix ("../"))
                     continue;
 
                 var output_path = Path.build_filename (recipe.dirname, output);
