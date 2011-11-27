@@ -78,8 +78,8 @@ public class ValaModule : BuildModule
             if (!source.has_suffix (".vala"))
                 continue;
 
-            var vapi_filename = replace_extension (source, "vapi");
-            var vapi_stamp_filename = ".%s-stamp".printf (vapi_filename);
+            var vapi_filename = ".%s".printf (replace_extension (source, "vapi"));
+            var vapi_stamp_filename = "%s-stamp".printf (vapi_filename);
 
             /* Build a fastvapi file */
             var rule = recipe.add_rule ();
@@ -97,6 +97,7 @@ public class ValaModule : BuildModule
 
             /* Build a C file */
             rule = recipe.add_rule ();
+            rule.inputs.append (source);
             rule.outputs.append (c_filename);
             rule.outputs.append (c_stamp_filename);
             var command = valac_command + " -C %s".printf (source);
@@ -112,7 +113,7 @@ public class ValaModule : BuildModule
                 }
                 else
                 {
-                    var other_vapi_filename = replace_extension (s, "vapi");
+                    var other_vapi_filename = ".%s".printf (replace_extension (s, "vapi"));
                     command += " --use-fast-vapi=%s".printf (other_vapi_filename);
                     rule.inputs.append (other_vapi_filename);
                 }
