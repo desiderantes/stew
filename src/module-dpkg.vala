@@ -65,7 +65,7 @@ public class DpkgModule : BuildModule
         rule.commands.append ("@echo '\tdh $@' >> %s".printf (rules_file));
         rule.commands.append ("@echo >> %s".printf (rules_file));
         rule.commands.append ("@echo \"override_dh_auto_configure:\" >> %s".printf (rules_file));
-        rule.commands.append ("@echo \"\tbake --configure resource-directory=/usr install-directory=debian/tmp\" >> %s".printf (rules_file));
+        rule.commands.append ("@echo \"\tbake --configure resource-directory=/usr install-directory=debian/%s\" >> %s".printf (recipe.package_name, rules_file));
         rule.commands.append ("@echo >> %s".printf (rules_file));
         rule.commands.append ("@echo \"override_dh_auto_build:\" >> %s".printf (rules_file));
         rule.commands.append ("@echo \"\tbake\" >> %s".printf (rules_file));
