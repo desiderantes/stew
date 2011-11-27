@@ -1,6 +1,7 @@
 Overview of changes in bake 0.0.6
 
     * Add Launchpad support
+    * Fix install rule for Vala programs
 
 Overview of changes in bake 0.0.5
 

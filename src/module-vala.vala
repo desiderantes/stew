@@ -152,6 +152,8 @@ public class ValaModule : BuildModule
         link_command += " -o %s".printf (program);
         link_rule.commands.append (link_command);
 
+        recipe.add_install_rule (program, recipe.binary_directory);
+
         return true;
     }
 }
