@@ -308,6 +308,10 @@ public class Recipe
             }
         }
 
+        string contents;
+        FileUtils.get_contents (filename, out contents);
+        parse (filename, contents, allow_rules);
+
         build_rule = find_rule ("%build");
         if (build_rule == null)
         {
@@ -335,10 +339,6 @@ public class Recipe
             test_rule = add_rule ();
             test_rule.outputs.append ("%test");
         }
-
-        string contents;
-        FileUtils.get_contents (filename, out contents);
-        parse (filename, contents, allow_rules);
     }
 
     private void parse (string filename, string contents, bool allow_rules) throws BuildError
