@@ -1,0 +1,7 @@
+#!/bin/sh -e
+
+echo "package.name=test
+programs.c.sources=a.c" >> Recipe
+echo "a" >> a.c
+
+bake

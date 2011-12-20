@@ -1,0 +1,21 @@
+#!/bin/sh -ev
+
+echo "package.name=test
+b: a
+    cp a b
+c: b
+    cp b c
+%build : c" >> Recipe
+echo "a" >> a
+
+# Build the result, touch the inputs and check the output rebuilds
+bake
+ls a b c
+touch b
+bake
+ls a b c
+# FIXME Check c is newer than b
+touch a
+bake
+ls a b c
+# FIXME Check b and c are newer than a

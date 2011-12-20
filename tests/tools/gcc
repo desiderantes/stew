@@ -1,0 +1,9 @@
+#!/bin/sh
+
+while [ $# -gt 0 ]
+do
+    case "$1" in
+        -o) touch $2; shift;;
+    esac
+    shift
+done

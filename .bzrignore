@@ -119,3 +119,13 @@ src/.module-test.vapi-stamp
 src/module-test.c
 src/.module-test.c-stamp
 src/module-test.o
+bake-0.0.7~bzr.tar.bz2
+bake_0.0.7~bzr.orig.tar.gz
+bake_0.0.7~bzr-0.debian.tar.gz
+bake_0.0.7~bzr-0.dsc
+bake_0.0.7~bzr-0_source.changes
+bake_0.0.7~bzr-0_amd64.deb
+bake-0.0.7~bzr.tar.gz
+bake-0.0.7~bzr/
+bake-0.0.7~bzr-1.x86_64.rpm
+bake-0.0.7~bzr.tar.xz

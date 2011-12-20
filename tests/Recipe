@@ -1,0 +1,6 @@
+tests.rule.command = ./test-bake test-rule
+tests.build-rule.command = ./test-bake test-build-rule
+tests.build-missing.command = ./test-bake test-build-missing
+tests.build-changed.command = ./test-bake test-build-changed
+tests.clean.command = ./test-bake test-clean
+tests.gcc.command = ./test-bake test-gcc

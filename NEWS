@@ -2,6 +2,7 @@ Overview of changes in bake 0.0.7
 
     * Add a test module
     * Don't override existing build, install, clean rules
+    * Add regression tests
 
 Overview of changes in bake 0.0.6
 
