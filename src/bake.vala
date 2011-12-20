@@ -248,10 +248,12 @@ public class Recipe
     public HashTable<string, string> variables;
     public List<string> programs;
     public List<string> libraries;
+    public List<string> tests;
     public List<Rule> rules;
     public Rule build_rule;
     public Rule install_rule;
     public Rule clean_rule;
+    public Rule test_rule;
     
     public string dirname { owned get { return Path.get_dirname (filename); } }
 
@@ -306,14 +308,33 @@ public class Recipe
             }
         }
 
-        build_rule = add_rule ();
-        build_rule.outputs.append ("%build");
+        build_rule = find_rule ("%build");
+        if (build_rule == null)
+        {
+            build_rule = add_rule ();
+            build_rule.outputs.append ("%build");
+        }
 
-        install_rule = add_rule ();
-        install_rule.outputs.append ("%install");
+        install_rule = find_rule ("%install");
+        if (install_rule == null)
+        {
+            install_rule = add_rule ();
+            install_rule.outputs.append ("%install");
+        }
 
-        clean_rule = add_rule ();
-        clean_rule.outputs.append ("%clean");
+        clean_rule = find_rule ("%clean");
+        if (clean_rule == null)
+        {
+            clean_rule = add_rule ();
+            clean_rule.outputs.append ("%clean");
+        }
+
+        test_rule = find_rule ("%test");
+        if (test_rule == null)
+        {
+            test_rule = add_rule ();
+            test_rule.outputs.append ("%test");
+        }
 
         string contents;
         FileUtils.get_contents (filename, out contents);
@@ -406,6 +427,20 @@ public class Recipe
                         }
                         if (!has_name)
                             libraries.append (library_name);
+                        break;
+                    case "tests":
+                        var test_name = tokens[1];
+                        var has_name = false;
+                        foreach (var p in libraries)
+                        {
+                            if (p == test_name)
+                            {
+                                has_name = true;
+                                break;
+                            }
+                        }
+                        if (!has_name)
+                            tests.append (test_name);
                         break;
                     }
                 }
@@ -713,6 +748,7 @@ public class Bake
             f.build_rule.inputs.append ("%s/build".printf (Path.get_basename (c.dirname)));
             f.install_rule.inputs.append ("%s/install".printf (Path.get_basename (c.dirname)));
             f.clean_rule.inputs.append ("%s/clean".printf (Path.get_basename (c.dirname)));
+            f.test_rule.inputs.append ("%s/test".printf (Path.get_basename (c.dirname)));
         }
 
         return f;
@@ -846,6 +882,7 @@ public class Bake
         modules.append (new PythonModule ());
         modules.append (new ReleaseModule ());
         modules.append (new RPMModule ());
+        modules.append (new TestModule ());
         modules.append (new ValaModule ());
         modules.append (new XZIPModule ());
 

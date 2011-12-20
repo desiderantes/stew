@@ -1,3 +1,8 @@
+Overview of changes in bake 0.0.7
+
+    * Add a test module
+    * Don't override existing build, install, clean rules
+
 Overview of changes in bake 0.0.6
 
     * Add Launchpad support
