@@ -1,0 +1,23 @@
+#!/bin/sh -ev
+
+assert_exists ()
+{
+    if [ ! -e $1 ]
+    then
+        exit 1
+    fi
+}
+
+echo "package.name=test
+a:
+    touch a
+b:
+    touch b
+c: a b
+    cat a b > c" >> Recipe
+
+# Build the target
+bake c
+assert_exists a
+assert_exists b
+assert_exists c
