@@ -1,0 +1,13 @@
+<page xmlns="http://projectmallard.org/1.0/"
+      type="guide"
+      id="index">
+
+	<info>
+		<credit type="author">
+			<name>Robert Ancell</name>
+			<email>robert.ancell@gmail.com</email>
+		</credit>
+	</info>
+
+	<title>Bake Help</title>
+</page>

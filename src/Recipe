@@ -13,6 +13,7 @@ programs.bake.sources = bake.vala \
                         module-intltool.vala \
                         module-java.vala \
                         module-launchpad.vala \
+                        module-mallard.vala \
                         module-man.vala \
                         module-mono.vala \
                         module-python.vala \

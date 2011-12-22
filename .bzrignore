@@ -129,3 +129,8 @@ bake-0.0.7~bzr.tar.gz
 bake-0.0.7~bzr/
 bake-0.0.7~bzr-1.x86_64.rpm
 bake-0.0.7~bzr.tar.xz
+src/.module-mallard.vapi
+src/.module-mallard.vapi-stamp
+src/module-mallard.c
+src/.module-mallard.c-stamp
+src/module-mallard.o
