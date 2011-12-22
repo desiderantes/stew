@@ -1,0 +1,26 @@
+#!/bin/sh -ev
+
+assert_exists ()
+{
+    if [ ! -e $1 ]
+    then
+        exit 1
+    fi
+}
+
+echo "package.name=test
+a:
+    touch a
+b: a
+    cp a b" >> Recipe
+
+# Build the target
+bake b
+assert_exists a
+assert_exists b
+
+# Remove the input, check both are rebuild again
+rm a
+bake b
+assert_exists a
+assert_exists b

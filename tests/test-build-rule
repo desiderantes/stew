@@ -1,11 +1,18 @@
 #!/bin/sh -ev
 
-echo "package.name=test
-b: a
-    cp a b
-%build: b" >> Recipe
-echo "a" >> a
+assert_exists ()
+{
+    if [ ! -e $1 ]
+    then
+        exit 1
+    fi
+}
 
-# Build the result and check it exists
+echo "package.name=test
+a:
+    touch a
+%build: a" >> Recipe
+
+# Check running with no arguments builds a
 bake
-ls b
+assert_exists a

@@ -1,10 +1,17 @@
 #!/bin/sh -ev
 
-echo "package.name=test
-b: a
-    cp a b" >> Recipe
-echo "a" >> a
+assert_exists ()
+{
+    if [ ! -e $1 ]
+    then
+        exit 1
+    fi
+}
 
-# Build the result and check it exists
-bake b
-ls b
+echo "package.name=test
+a:
+    touch a" >> Recipe
+
+# Check the rule is run and produces the output
+bake a
+assert_exists a
