@@ -145,7 +145,7 @@ public class GCCModule : BuildModule
                 command += " %s".printf (package_cflags);
             command += " -c %s -o %s".printf (input, output);
             if (pretty_print)
-                rule.commands.append ("@echo '    CC %s'".printf (input));
+                rule.commands.append ("@echo '    GCC %s'".printf (input));
             rule.commands.append (command);
 
             link_rule.inputs.append (output);
@@ -155,7 +155,7 @@ public class GCCModule : BuildModule
         recipe.build_rule.inputs.append (program);
 
         if (pretty_print)
-            link_rule.commands.append ("@echo '    LD %s'".printf (program));
+            link_rule.commands.append ("@echo '    GCC-LINK %s'".printf (program));
         if (ldflags != null)
             link_command += " %s".printf (ldflags);
         if (package_ldflags != null)
@@ -236,7 +236,7 @@ public class GCCModule : BuildModule
                 command += " %s".printf (package_cflags);
             command += " -c %s -o %s".printf (input, output);
             if (pretty_print)
-                rule.commands.append ("@echo '    CC %s'".printf (input));
+                rule.commands.append ("@echo '    GCC %s'".printf (input));
             rule.commands.append (command);
 
             link_rule.inputs.append (output);
@@ -244,9 +244,9 @@ public class GCCModule : BuildModule
         }
 
         recipe.build_rule.inputs.append (so_name);
-                
+
         if (pretty_print)
-            link_rule.commands.append ("@echo '    LD %s'".printf (so_name));
+            link_rule.commands.append ("@echo '    GCC-LINK %s'".printf (so_name));
         if (ldflags != null)
             link_command += " %s".printf (ldflags);
         if (package_ldflags != null)
@@ -282,6 +282,8 @@ public class GCCModule : BuildModule
         var rule = recipe.add_rule ();
         recipe.build_rule.inputs.append (filename);
         rule.outputs.append (filename);
+        if (pretty_print)
+            rule.commands.append ("@echo '    PKG-CONFIG %s'".printf (filename));
         rule.commands.append ("@echo \"Name: %s\" > %s".printf (name, filename));        
         rule.commands.append ("@echo \"Description: %s\" >> %s".printf (description, filename));
         rule.commands.append ("@echo \"Version: %s\" >> %s".printf (version, filename));

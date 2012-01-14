@@ -649,8 +649,8 @@ public class Recipe
         /* If we're about to do something then note which directory we are in and what we're building */
         if (rule.commands != null)
             log_directory_change ();
-        if (rule.has_output)
-            GLib.print ("\x1B[1m[Building %s]\x1B[0m\n", target);
+        //if (rule.has_output)
+        //    GLib.print ("\x1B[1m[Building %s]\x1B[0m\n", target);
 
         /* Run the commands */
         rule.build ();
