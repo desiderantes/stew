@@ -4,6 +4,9 @@ public class LaunchpadModule : BuildModule
     {
         if (Environment.find_program_in_path ("lp-project-upload") == null)
             return;
+            
+        if (recipe.package_version == null)
+            return;
 
         var rule = recipe.add_rule ();
         rule.outputs.append ("%release-launchpad");
