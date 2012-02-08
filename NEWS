@@ -5,6 +5,7 @@ Overview of changes in bake 0.0.7
     * Add regression tests
     * Add support for Mallard documentation
     * Simplify build output
+    * Store intermediate output in .built
 
 Overview of changes in bake 0.0.6
 
