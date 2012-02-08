@@ -2,9 +2,12 @@ public class BZRModule : BuildModule
 {
     public override void generate_toplevel_rules (Recipe recipe)
     {
-        var rule = recipe.add_rule ();
-        rule.outputs.append ("%tag-bzr");
-        rule.commands.append ("bzr tag %s".printf (recipe.package_version));
+        if (recipe.package_version != null)
+        {
+            var rule = recipe.add_rule ();
+            rule.outputs.append ("%tag-bzr");
+            rule.commands.append ("bzr tag %s".printf (recipe.package_version));
+        }
     }
 
     public override void recipe_complete (Recipe recipe)

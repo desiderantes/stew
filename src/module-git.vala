@@ -2,9 +2,12 @@ public class GITModule : BuildModule
 {
     public override void generate_toplevel_rules (Recipe recipe)
     {
-        var rule = recipe.add_rule ();
-        rule.outputs.append ("%tag-git");
-        rule.commands.append ("git tag %s".printf (recipe.package_version));
+        if (recipe.package_version != null)
+        {
+            var rule = recipe.add_rule ();
+            rule.outputs.append ("%tag-git");
+            rule.commands.append ("git tag %s".printf (recipe.package_version));
+        }
     }
 
     public override void rules_complete (Recipe recipe)
