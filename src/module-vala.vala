@@ -8,6 +8,40 @@ public class ValaModule : BuildModule
         var sources = split_variable (source_list);
         if (sources == null)
             return false;
+
+        var packages = recipe.variables.lookup ("programs.%s.packages".printf (program));
+        if (packages == null)
+            packages = "";
+        var package_list = split_variable (packages);
+        var cflags = recipe.variables.lookup ("programs.%s.cflags".printf (program));
+        var ldflags = recipe.variables.lookup ("programs.%s.ldflags".printf (program));
+
+        return generate_compile_rules (recipe, program, sources, package_list, cflags, ldflags, false);
+    }
+
+    public override bool generate_library_rules (Recipe recipe, string library)
+    {
+        var source_list = recipe.variables.lookup ("libraries.%s.sources".printf (library));
+        if (source_list == null)
+            return false;
+        var sources = split_variable (source_list);
+        if (sources == null)
+            return false;
+
+        var packages = recipe.variables.lookup ("libraries.%s.packages".printf (library));
+        if (packages == null)
+            packages = "";
+        var package_list = split_variable (packages);
+        var cflags = recipe.variables.lookup ("libraries.%s.cflags".printf (library));
+        var ldflags = recipe.variables.lookup ("libraries.%s.ldflags".printf (library));
+
+        var so_name = "lib%s.so".printf (library);
+
+        return generate_compile_rules (recipe, so_name, sources, package_list, cflags, ldflags, true);
+    }
+
+    private bool generate_compile_rules (Recipe recipe, string name, List<string> sources, List<string> package_list, string? cflags, string? ldflags, bool is_library)
+    {
         var have_vala = false;
         foreach (var source in sources)
         {
@@ -24,22 +58,22 @@ public class ValaModule : BuildModule
 
         var valac_command = "@valac";
         var link_rule = recipe.add_rule ();
-        link_rule.outputs.append (program);
+        link_rule.outputs.append (name);
         var link_command = "@gcc";
+        if (is_library)
+            link_command += " -shared";
 
-        var package_list = recipe.variables.lookup ("programs.%s.packages".printf (program));
-        var cflags = recipe.variables.lookup ("programs.%s.cflags".printf (program));
-        var ldflags = recipe.variables.lookup ("programs.%s.ldflags".printf (program));
         string? package_cflags = null;
         string? package_ldflags = null;
+
         if (package_list != null)
         {
-            foreach (var package in split_variable (package_list))
+            foreach (var package in package_list)
                 valac_command += " --pkg %s".printf (package);
 
             /* Stip out the posix module used in Vala (has no cflags/libs) */
             var clean_package_list = "";
-            foreach (var package in split_variable (package_list))
+            foreach (var package in package_list)
             {
                 if (package == "posix")
                     continue;
@@ -73,6 +107,7 @@ public class ValaModule : BuildModule
             if (exit_status != 0)
                 return false;
         }
+
         foreach (var source in sources)
         {
             if (!source.has_suffix (".vala"))
@@ -129,7 +164,9 @@ public class ValaModule : BuildModule
             rule = recipe.add_rule ();
             rule.inputs.append (c_filename);
             rule.outputs.append (o_filename);
-            command = "@gcc -Wno-unused".printf ();
+            command = "@gcc -Wno-unused";
+            if (is_library)
+                command += " -fPIC";
             if (cflags != null)
                 command += " %s".printf (cflags);
             if (package_cflags != null)
@@ -144,17 +181,17 @@ public class ValaModule : BuildModule
         }
 
         /* Link */
-        recipe.build_rule.inputs.append (program);
+        recipe.build_rule.inputs.append (name);
         if (pretty_print)
-            link_rule.commands.append ("@echo '    LD %s'".printf (program));
+            link_rule.commands.append ("@echo '    LD %s'".printf (name));
         if (ldflags != null)
             link_command += " %s".printf (ldflags);
         if (package_ldflags != null)
             link_command += " %s".printf (package_ldflags);
-        link_command += " -o %s".printf (program);
+        link_command += " -o %s".printf (name);
         link_rule.commands.append (link_command);
 
-        recipe.add_install_rule (program, recipe.binary_directory);
+        recipe.add_install_rule (name, recipe.binary_directory);
 
         return true;
     }

@@ -33,7 +33,9 @@ package.files = Makefile \
                 examples/python/example.py \
                 examples/python/Recipe \
                 examples/vala/example.vala \
-                examples/vala/Recipe
+                examples/vala/Recipe \
+                examples/vala-library/example.vala \
+                examples/vala-library/Recipe
 
 %release: release-tarball release-ppa
 
