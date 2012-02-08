@@ -20,6 +20,7 @@ public class GITModule : BuildModule
         }
         catch (FileError e)
         {
+            contents = "";
         }
         contents = contents.strip ();
 
@@ -28,6 +29,14 @@ public class GITModule : BuildModule
             matches.append (match);
 
         var changed = false;
+
+        /* Ignore all the build directories */
+        if (!have_match (matches, ".built"))
+        {
+            matches.append (".built");
+            changed = true;
+        }
+
         foreach (var rule in recipe.rules)
         {
             foreach (var output in rule.outputs)
@@ -37,6 +46,11 @@ public class GITModule : BuildModule
                     continue;
 
                 var output_path = Path.build_filename (recipe.dirname, output);
+
+                /* Ignore files in the .built directories */
+                if (Path.get_dirname (output_path).has_suffix ("/.built"))
+                    continue;
+
                 var relative_path = get_relative_path (recipe.toplevel.dirname, output_path);
                 if (!have_match (matches, relative_path))
                 {

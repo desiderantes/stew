@@ -119,7 +119,7 @@ public class ValaModule : BuildModule
                 }
             }
             if (pretty_print)
-                rule.commands.append ("@echo '    VALAC %s'".printf (source));            
+                rule.commands.append ("@echo '    VALAC %s'".printf (source));
             rule.commands.append (command);
             /* valac always writes the c files into the same directory, so move them */
             rule.commands.append ("@mv %s %s".printf (replace_extension (source, "c"), c_filename));
