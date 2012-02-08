@@ -35,6 +35,9 @@ bake-bootstrap: $(SOURCES)
 install: bake-bootstrap
 	./bake-bootstrap install
 
+test: bake-bootstrap
+	./bake-bootstrap test
+
 release: bake-bootstrap
 	./bake-bootstrap tag-bzr
 	./bake-bootstrap release-launchpad
