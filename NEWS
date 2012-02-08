@@ -1,3 +1,7 @@
+Overview of changes in bake 0.0.8
+
+    * Install mallard files into /usr/share/help
+
 Overview of changes in bake 0.0.7
 
     * Add a test module
