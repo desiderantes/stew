@@ -78,13 +78,15 @@ public class GCCModule : BuildModule
             return false;
         var sources = split_variable (source_list);
 
-        if (Environment.find_program_in_path ("gcc") == null)
-            return false;
+        var have_cpp = false;
         foreach (var source in sources)
         {
             var compiler = get_compiler (source);
             if (compiler == null || Environment.find_program_in_path (compiler) == null)
                 return false;
+                
+            if (compiler == "g++")
+                have_cpp = true;
         }
 
         var package_list = recipe.variables.lookup ("programs.%s.packages".printf (program));
@@ -122,7 +124,9 @@ public class GCCModule : BuildModule
 
         var link_rule = recipe.add_rule ();
         link_rule.outputs.append (program);
-        var link_command = "@gcc ";
+        var link_command = "@gcc";
+        if (have_cpp)
+            link_command = "@g++";
 
         /* Compile */
         foreach (var source in sources)
@@ -138,7 +142,7 @@ public class GCCModule : BuildModule
             foreach (var include in includes)
                 rule.inputs.append (include);
             rule.outputs.append (output);
-            var command = "@%s ".printf (compiler);
+            var command = "@%s".printf (compiler);
             if (cflags != null)
                 command += " %s".printf (cflags);
             if (package_cflags != null)
