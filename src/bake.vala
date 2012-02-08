@@ -124,12 +124,8 @@ public class Rule
     private TimeVal? get_modification_time (string filename) throws Error
     {
         var f = File.new_for_path (filename);
-        var info = f.query_info (FILE_ATTRIBUTE_TIME_MODIFIED, FileQueryInfoFlags.NONE);
-
-        GLib.TimeVal modification_time;
-        info.get_modification_time (out modification_time);
-
-        return modification_time;
+        var info = f.query_info (FileAttribute.TIME_MODIFIED, FileQueryInfoFlags.NONE);
+        return info.get_modification_time ();
     }
     
     private static int timeval_cmp (TimeVal a, TimeVal b)
@@ -257,6 +253,8 @@ public class Recipe
     
     public string dirname { owned get { return Path.get_dirname (filename); } }
 
+    public string build_directory { owned get { return Path.build_filename (dirname, ".built"); } }
+
     public string install_directory
     {
         owned get
@@ -312,10 +310,15 @@ public class Recipe
         FileUtils.get_contents (filename, out contents);
         parse (filename, contents, allow_rules);
 
+        var build_dir_rule = add_rule ();
+        build_dir_rule.outputs.append (".built/");
+        build_dir_rule.commands.append ("@mkdir .built");
+
         build_rule = find_rule ("%build");
         if (build_rule == null)
         {
             build_rule = add_rule ();
+            build_rule.inputs.prepend (".built/");
             build_rule.outputs.append ("%build");
         }
 
@@ -503,6 +506,14 @@ public class Recipe
         return new_line;
     }
 
+    public string get_build_path (string path, bool important = false)
+    {
+        if (important)
+            return path;
+        else
+            return get_relative_path (dirname, Path.build_filename (build_directory, path));
+    }
+
     public string get_install_path (string path)
     {
         if (install_directory == null || install_directory == "")
@@ -527,18 +538,30 @@ public class Recipe
             {
                 if (output.has_prefix ("%"))
                     continue;
-                if (pretty_print)                    
-                    clean_rule.commands.append ("@echo '    RM %s'".printf (output));
+
                 if (output.has_suffix ("/"))
                 {
                     /* Don't accidentally delete someone's entire hard-disk */
                     if (output.has_prefix ("/"))
                         warning ("Not making clean rule for absolute directory %s", output);
                     else
+                    {
+                        if (pretty_print)
+                            clean_rule.commands.append ("@echo '    RM %s'".printf (output));
                         clean_rule.commands.append ("@rm -rf %s".printf (output));
+                    }
                 }
                 else
-                    clean_rule.commands.append ("@rm -f %s".printf (output));
+                {
+                    var build_dir = get_relative_path (dirname, build_directory);
+
+                    if (!output.has_prefix (build_dir + "/"))
+                    {
+                        if (pretty_print)
+                            clean_rule.commands.append ("@echo '    RM %s'".printf (output));
+                        clean_rule.commands.append ("@rm -f %s".printf (output));
+                    }
+                }
             }
         }
     }

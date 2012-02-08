@@ -130,7 +130,7 @@ public class GCCModule : BuildModule
             var input = source;
             var compiler = get_compiler (source);
                 
-            var output = replace_extension (source, "o");
+            var output = recipe.get_build_path (replace_extension (source, "o"));
 
             var rule = recipe.add_rule ();
             rule.inputs.append (input);
@@ -221,7 +221,7 @@ public class GCCModule : BuildModule
         {
             var input = source;
 
-            var output = replace_extension (source, "o");
+            var output = recipe.get_build_path (replace_extension (source, "o"));
 
             var rule = recipe.add_rule ();
             rule.inputs.append (input);

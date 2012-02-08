@@ -22,7 +22,7 @@ public class ValaModule : BuildModule
         if (Environment.find_program_in_path ("valac") == null || Environment.find_program_in_path ("gcc") == null)
             return false;
 
-        var valac_command = "@valac ";
+        var valac_command = "@valac";
         var link_rule = recipe.add_rule ();
         link_rule.outputs.append (program);
         var link_command = "@gcc";
@@ -78,7 +78,7 @@ public class ValaModule : BuildModule
             if (!source.has_suffix (".vala"))
                 continue;
 
-            var vapi_filename = ".%s".printf (replace_extension (source, "vapi"));
+            var vapi_filename = recipe.get_build_path ("%s".printf (replace_extension (source, "vapi")));
             var vapi_stamp_filename = "%s-stamp".printf (vapi_filename);
 
             /* Build a fastvapi file */
@@ -91,9 +91,9 @@ public class ValaModule : BuildModule
             rule.commands.append ("@valac --fast-vapi=%s %s".printf (vapi_filename, source));
             rule.commands.append ("@touch %s".printf (vapi_stamp_filename));
 
-            var c_filename = replace_extension (source, "c");
-            var o_filename = replace_extension (source, "o");
-            var c_stamp_filename = ".%s-stamp".printf (c_filename);
+            var c_filename = recipe.get_build_path (replace_extension (source, "c"));
+            var o_filename = recipe.get_build_path (replace_extension (source, "o"));
+            var c_stamp_filename = "%s-stamp".printf (c_filename);
 
             /* Build a C file */
             rule = recipe.add_rule ();
@@ -113,7 +113,7 @@ public class ValaModule : BuildModule
                 }
                 else
                 {
-                    var other_vapi_filename = ".%s".printf (replace_extension (s, "vapi"));
+                    var other_vapi_filename = recipe.get_build_path ("%s".printf (replace_extension (s, "vapi")));
                     command += " --use-fast-vapi=%s".printf (other_vapi_filename);
                     rule.inputs.append (other_vapi_filename);
                 }
@@ -121,6 +121,8 @@ public class ValaModule : BuildModule
             if (pretty_print)
                 rule.commands.append ("@echo '    VALAC %s'".printf (source));            
             rule.commands.append (command);
+            /* valac always writes the c files into the same directory, so move them */
+            rule.commands.append ("@mv %s %s".printf (replace_extension (source, "c"), c_filename));
             rule.commands.append ("@touch %s".printf (c_stamp_filename));
 
             /* Compile C code */
