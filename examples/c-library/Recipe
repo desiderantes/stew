@@ -1,6 +1,7 @@
 package.name = example
 package.version = 0.0.1
 
+libraries.example.version = 0.0.1
 libraries.example.sources = example.c
 libraries.example.name = example
 libraries.example.description = Example Library
