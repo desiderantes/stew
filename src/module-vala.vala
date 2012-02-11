@@ -246,7 +246,7 @@ public class ValaModule : BuildModule
                 command += " %s".printf (package_cflags);
             command += " -c %s -o %s".printf (c_filename, o_filename);
             if (pretty_print)
-                rule.commands.append ("@echo '    CC %s'".printf (c_filename));
+                rule.commands.append ("@echo '    GCC %s'".printf (c_filename));
             rule.commands.append (command);
 
             link_rule.inputs.append (o_filename);
@@ -256,7 +256,7 @@ public class ValaModule : BuildModule
         /* Link */
         recipe.build_rule.inputs.append (binary_name);
         if (pretty_print)
-            link_rule.commands.append ("@echo '    LD %s'".printf (binary_name));
+            link_rule.commands.append ("@echo '    GCC-LINK %s'".printf (binary_name));
         if (ldflags != null)
             link_command += " %s".printf (ldflags);
         if (package_ldflags != null)
