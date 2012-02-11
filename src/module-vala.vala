@@ -147,7 +147,6 @@ public class ValaModule : BuildModule
 
         Rule? header_rule = null;
         string header_command = null;
-        string header_rm_command = null;
         if (is_library)
         {
             var h_filename = "%s.h".printf (name);
@@ -159,7 +158,6 @@ public class ValaModule : BuildModule
             if (pretty_print)
                 header_rule.commands.append ("@echo '    VALAC %s %s'".printf (h_filename, vapi_filename));
             header_command = valac_command + " --ccode --header=%s --vapi=%s".printf (h_filename, vapi_filename);
-            header_rm_command = "@rm";
 
             recipe.build_rule.inputs.append (h_filename);
             var include_directory = Path.build_filename (recipe.include_directory, name);
@@ -190,13 +188,8 @@ public class ValaModule : BuildModule
             /* Combine the vapi files into a header */
             if (is_library)
             {
-                /* FIXME: Should use the fast vapi but valac wants a full .vala file to work */
-                /*header_rule.inputs.append (vapi_filename);
-                header_command += " --fast-vapi=%s".printf (vapi_filename);*/
-                header_rule.inputs.append (source);
-                header_command += " %s".printf (source);
-                /* FIXME: We have to generate C files so delete them once done */
-                header_rm_command += " %s".printf (replace_extension (source, "c"));
+                header_rule.inputs.append (vapi_filename);
+                header_command += " --use-fast-vapi=%s".printf (vapi_filename);
             }
 
             var c_filename = recipe.get_build_path (replace_extension (source, "c"));
@@ -267,10 +260,7 @@ public class ValaModule : BuildModule
         recipe.add_install_rule (binary_name, recipe.binary_directory);
         
         if (is_library)
-        {
             header_rule.commands.append (header_command);
-            header_rule.commands.append (header_rm_command);
-        }
 
         return true;
     }
