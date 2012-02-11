@@ -35,13 +35,15 @@ public class ValaModule : BuildModule
         var cflags = recipe.variables.lookup ("libraries.%s.cflags".printf (library));
         var ldflags = recipe.variables.lookup ("libraries.%s.ldflags".printf (library));
 
-        var so_name = "lib%s.so".printf (library);
-
-        return generate_compile_rules (recipe, so_name, sources, package_list, cflags, ldflags, true);
+        return generate_compile_rules (recipe, library, sources, package_list, cflags, ldflags, true);
     }
 
     private bool generate_compile_rules (Recipe recipe, string name, List<string> sources, List<string> package_list, string? cflags, string? ldflags, bool is_library)
     {
+        var binary_name = name;
+        if (is_library)
+            binary_name = "lib%s.so".printf (name);
+
         var have_vala = false;
         foreach (var source in sources)
         {
@@ -58,7 +60,7 @@ public class ValaModule : BuildModule
 
         var valac_command = "@valac";
         var link_rule = recipe.add_rule ();
-        link_rule.outputs.append (name);
+        link_rule.outputs.append (binary_name);
         var link_command = "@gcc";
         if (is_library)
             link_command += " -shared";
@@ -108,6 +110,15 @@ public class ValaModule : BuildModule
                 return false;
         }
 
+        var h_filename = "%s.h".printf (name);
+        Rule? header_rule = null;
+        string header_command = null;
+        if (is_library)
+        {
+            header_rule = recipe.add_rule ();
+            header_rule.outputs.append (h_filename);
+            header_command = "@valac --ccode --header=%s".printf (h_filename);
+        }
         foreach (var source in sources)
         {
             if (!source.has_suffix (".vala"))
@@ -125,6 +136,16 @@ public class ValaModule : BuildModule
                 rule.commands.append ("@echo '    VALAC %s'".printf (vapi_filename));            
             rule.commands.append ("@valac --fast-vapi=%s %s".printf (vapi_filename, source));
             rule.commands.append ("@touch %s".printf (vapi_stamp_filename));
+
+            /* Combine the vapi files into a header */
+            if (is_library)
+            {
+                /* FIXME: Should use the fast vapi but valac wants a full .vala file to work */
+                /*header_rule.inputs.append (vapi_filename);
+                header_command += " --fast-vapi=%s".printf (vapi_filename);*/
+                header_rule.inputs.append (source);
+                header_command += " %s".printf (source);
+            }
 
             var c_filename = recipe.get_build_path (replace_extension (source, "c"));
             var o_filename = recipe.get_build_path (replace_extension (source, "o"));
@@ -181,17 +202,25 @@ public class ValaModule : BuildModule
         }
 
         /* Link */
-        recipe.build_rule.inputs.append (name);
+        recipe.build_rule.inputs.append (binary_name);
         if (pretty_print)
-            link_rule.commands.append ("@echo '    LD %s'".printf (name));
+            link_rule.commands.append ("@echo '    LD %s'".printf (binary_name));
         if (ldflags != null)
             link_command += " %s".printf (ldflags);
         if (package_ldflags != null)
             link_command += " %s".printf (package_ldflags);
-        link_command += " -o %s".printf (name);
+        link_command += " -o %s".printf (binary_name);
         link_rule.commands.append (link_command);
 
-        recipe.add_install_rule (name, recipe.binary_directory);
+        recipe.add_install_rule (binary_name, recipe.binary_directory);
+        
+        if (is_library)
+        {
+            recipe.build_rule.inputs.append (h_filename);
+            header_rule.commands.append (header_command);
+            var include_directory = Path.build_filename (recipe.include_directory, name);
+            recipe.add_install_rule (h_filename, include_directory);
+        }
 
         return true;
     }

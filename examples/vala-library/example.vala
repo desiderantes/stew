@@ -1,4 +1,4 @@
-public class Vala
+public class Vala : Object
 {
     public void hello ()
     {
