@@ -145,14 +145,29 @@ public class ValaModule : BuildModule
                 return false;
         }
 
-        var h_filename = "%s.h".printf (name);
         Rule? header_rule = null;
         string header_command = null;
+        string header_rm_command = null;
         if (is_library)
         {
+            var h_filename = "%s.h".printf (name);
+            var vapi_filename = "%s.vapi".printf (name);
+
             header_rule = recipe.add_rule ();
             header_rule.outputs.append (h_filename);
-            header_command = "@valac --ccode --header=%s".printf (h_filename);
+            header_rule.outputs.append (vapi_filename);
+            if (pretty_print)
+                header_rule.commands.append ("@echo '    VALAC %s %s'".printf (h_filename, vapi_filename));
+            header_command = valac_command + " --ccode --header=%s --vapi=%s".printf (h_filename, vapi_filename);
+            header_rm_command = "@rm";
+
+            recipe.build_rule.inputs.append (h_filename);
+            var include_directory = Path.build_filename (recipe.include_directory, name);
+            recipe.add_install_rule (h_filename, include_directory);
+
+            recipe.build_rule.inputs.append (vapi_filename);
+            var vapi_directory = Path.build_filename (recipe.data_directory, "vala", "vapi");
+            recipe.add_install_rule (vapi_filename, vapi_directory);
         }
         foreach (var source in sources)
         {
@@ -180,6 +195,8 @@ public class ValaModule : BuildModule
                 header_command += " --fast-vapi=%s".printf (vapi_filename);*/
                 header_rule.inputs.append (source);
                 header_command += " %s".printf (source);
+                /* FIXME: We have to generate C files so delete them once done */
+                header_rm_command += " %s".printf (replace_extension (source, "c"));
             }
 
             var c_filename = recipe.get_build_path (replace_extension (source, "c"));
@@ -191,7 +208,7 @@ public class ValaModule : BuildModule
             rule.inputs.append (source);
             rule.outputs.append (c_filename);
             rule.outputs.append (c_stamp_filename);
-            var command = valac_command + " -C %s".printf (source);
+            var command = valac_command + " --ccode %s".printf (source);
             foreach (var s in sources)
             {
                 if (s == source)
@@ -251,10 +268,8 @@ public class ValaModule : BuildModule
         
         if (is_library)
         {
-            recipe.build_rule.inputs.append (h_filename);
             header_rule.commands.append (header_command);
-            var include_directory = Path.build_filename (recipe.include_directory, name);
-            recipe.add_install_rule (h_filename, include_directory);
+            header_rule.commands.append (header_rm_command);
         }
 
         return true;
