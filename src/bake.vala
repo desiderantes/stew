@@ -1073,7 +1073,8 @@ public class Bake
         {
             foreach (var c in recipe.children)
             {
-                if (original_dir.has_prefix (c.dirname))
+                var dir = original_dir + "/";
+                if (dir.has_prefix (c.dirname + "/"))
                 {
                     recipe = c;
                     break;
