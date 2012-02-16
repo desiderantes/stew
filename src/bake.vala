@@ -157,7 +157,7 @@ public class Rule
                 if (e is IOError.NOT_FOUND)
                 {
                     if (debug_enabled)
-                        debug ("Input %s is missing", get_relative_path (original_dir, Path.build_filename (recipe.dirname, input)));
+                        stderr.printf ("Input %s is missing\n", get_relative_path (original_dir, Path.build_filename (recipe.dirname, input)));
                 }
                 else
                     warning ("Unable to access input file %s: %s", input, e.message);
@@ -188,7 +188,7 @@ public class Rule
             catch (Error e)
             {
                 if (debug_enabled && e is IOError.NOT_FOUND)
-                    debug ("Output %s is missing", get_relative_path (original_dir, Path.build_filename (recipe.dirname, output)));
+                    stderr.printf ("Output %s is missing\n", get_relative_path (original_dir, Path.build_filename (recipe.dirname, output)));
                 return true;
             }
         }
@@ -196,7 +196,7 @@ public class Rule
         if (timeval_cmp (max_input_time, max_output_time) > 0)
         {
             if (debug_enabled)
-                debug ("Rebuilding %s as %s is newer",
+                stderr.printf ("Rebuilding %s as %s is newer\n",
                        get_relative_path (original_dir, Path.build_filename (recipe.dirname, youngest_output)),
                        get_relative_path (original_dir, Path.build_filename (recipe.dirname, youngest_input)));
             return true;
@@ -661,7 +661,7 @@ public class Recipe
     public void build_target (string target) throws BuildError
     {
         if (debug_enabled)
-            debug ("Considering target %s", get_relative_path (original_dir, Path.build_filename (dirname, target)));
+            stderr.printf ("Considering target %s\n", get_relative_path (original_dir, Path.build_filename (dirname, target)));
 
         /* If the rule comes from another recipe, use it to build */
         var recipe = get_recipe_with_target (target);
@@ -681,6 +681,7 @@ public class Recipe
                 return;
 
             /* If doesn't exist then we can't continue */
+            stderr.printf ("'%s'\n", path);
             throw new BuildError.NO_RULE ("No rule to build '%s'", get_relative_path (original_dir, target));
         }
 
@@ -757,7 +758,7 @@ public class Bake
     public static Recipe? load_recipes (string filename, HashTable<string, string> conf_variables, bool is_toplevel = true) throws Error
     {
         if (debug_enabled)
-            debug ("Loading %s", get_relative_path (original_dir, filename));
+            stderr.printf ("Loading %s\n", get_relative_path (original_dir, filename));
 
         var f = new Recipe (filename, conf_variables);
 
@@ -765,7 +766,7 @@ public class Bake
         if (!is_toplevel && f.package_name != null)
         {
             if (debug_enabled)
-                debug ("Ignoring toplevel recipe %s", filename);
+                stderr.printf ("Ignoring toplevel recipe %s\n", filename);
             return null;
         }
 
