@@ -597,8 +597,32 @@ public class Recipe
         return null;
     }
     
-    public Recipe get_recipe_with_target (string target)
+    public Rule? find_rule_recursive (string output)
     {
+        var rule = find_rule (output);
+        if (rule != null)
+            return rule;
+
+        foreach (var child in children)
+        {
+            rule = child.find_rule_recursive (output);
+            if (rule != null)
+                return rule;
+        }
+
+        return null;
+    }
+
+    public Recipe? get_recipe_with_target (string target)
+    {
+        if (target.has_prefix ("../"))
+        {
+            if (parent == null)
+                return null;
+
+            return parent.get_recipe_with_target (target.substring (3));
+        }
+
         // FIXME: Directories are broken
         if (target.has_suffix ("/"))
             return this;
@@ -796,49 +820,69 @@ public class Bake
             add_global_variables (child);
     }
     
-    private static bool generate_program_rules (Recipe recipe, string program)
+    private static bool generate_library_rules (Recipe recipe)
     {
-        foreach (var module in modules)
-        {
-            if (module.generate_program_rules (recipe, program))
-                return true;
-        }
-
-        return false;
-    }
-
-    private static bool generate_library_rules (Recipe recipe, string library)
-    {
-        foreach (var module in modules)
-        {
-            if (module.generate_library_rules (recipe, library))
-                return true;
-        }
-
-        return false;
-    }
-
-    private static bool generate_rules (Recipe recipe)
-    {
-        /* Generate rules for the programs and libraries (must have a match for all) */
-        foreach (var program in recipe.programs)
-        {
-            if (!generate_program_rules (recipe, program))
-            {
-                printerr ("Unable to generate rules for program %s in file %s\n", program, get_relative_path (original_dir, recipe.filename));
-                return false;
-            }
-        }
         foreach (var library in recipe.libraries)
         {
-            if (!generate_library_rules (recipe, library))
+            var matched = false;
+            foreach (var module in modules)
+            {
+                if (module.generate_library_rules (recipe, library))
+                {
+                    matched = true;
+                    break;
+                }
+            }
+
+            if (!matched)
             {
                 printerr ("Unable to generate rules for library %s in file %s\n", library, get_relative_path (original_dir, recipe.filename));
                 return false;
             }
         }
 
-        /* Generate other rules */
+        /* Traverse the recipe tree */
+        foreach (var child in recipe.children)
+        {
+            if (!generate_library_rules (child))
+                return false;
+        }
+
+        return true;
+    }
+
+    private static bool generate_program_rules (Recipe recipe)
+    {
+        foreach (var program in recipe.programs)
+        {
+            var matched = false;
+            foreach (var module in modules)
+            {
+                if (module.generate_program_rules (recipe, program))
+                {
+                    matched = true;
+                    break;
+                }
+            }
+            if (!matched)
+            {
+                printerr ("Unable to generate rules for program %s in file %s\n", program, get_relative_path (original_dir, recipe.filename));
+                return false;
+            }
+        }
+
+        /* Traverse the recipe tree */
+        foreach (var child in recipe.children)
+        {
+            if (!generate_program_rules (child))
+                return false;
+        }
+
+        return true;
+    }
+
+    private static bool generate_rules (Recipe recipe)
+    {
         foreach (var module in modules)
             module.generate_rules (recipe);
 
@@ -1054,7 +1098,11 @@ public class Bake
         /* Generate implicit rules */
         foreach (var module in modules)
             module.generate_toplevel_rules (toplevel);
-        if (!generate_rules (toplevel))
+
+        /* Generate libraries first (as other things may depend on it) then the other rules */
+        if (!generate_library_rules (toplevel) ||
+            !generate_program_rules (toplevel) ||
+            !generate_rules (toplevel))
         {
             GLib.print ("\x1B[1m\x1B[31m[Build failed]\x1B[0m\n");
             return Posix.EXIT_FAILURE;

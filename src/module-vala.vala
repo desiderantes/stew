@@ -94,55 +94,74 @@ public class ValaModule : BuildModule
             return false;
 
         var valac_command = "@valac";
+        var valac_inputs = new List<string> ();
         var link_rule = recipe.add_rule ();
         link_rule.outputs.append (binary_name);
         var link_command = "@gcc";
         if (is_library)
             link_command += " -shared";
 
-        string? package_cflags = null;
-        string? package_ldflags = null;
-
+        string? package_cflags = "";
+        string? package_ldflags = "";
         if (package_list != null)
         {
-            foreach (var package in package_list)
-                valac_command += " --pkg %s".printf (package);
-
-            /* Stip out the posix module used in Vala (has no cflags/libs) */
-            var clean_package_list = "";
+            var pkg_config_list = "";
             foreach (var package in package_list)
             {
+                /* Strip out the posix module used in Vala (has no cflags/libs) */
                 if (package == "posix")
+                {
+                    valac_command += " --pkg=%s".printf (package);
                     continue;
-                clean_package_list += " " + package;
+                }
+
+                /* Look for locally generated libraries */
+                var vapi_name = "%s.vapi".printf (package);
+                var library_rule = recipe.toplevel.find_rule_recursive (vapi_name);
+                if (library_rule != null)
+                {
+                    var rel_dir = get_relative_path (recipe.dirname, library_rule.recipe.dirname);
+                    valac_command += " --vapidir=%s --pkg=%s".printf (rel_dir, package);
+                    valac_inputs.append (Path.build_filename (rel_dir, vapi_name));
+                    continue;
+                }
+
+                /* Otherwise look for it externally */
+                valac_command += " --pkg=%s".printf (package);
+                pkg_config_list += " " + package;
             }
 
-            int exit_status;
-            try
+            if (pkg_config_list != "")
             {
-                Process.spawn_command_line_sync ("pkg-config --cflags %s".printf (clean_package_list), out package_cflags, null, out exit_status);
-                package_cflags = package_cflags.strip ();
+                int exit_status;
+                try
+                {
+                    string pkg_config_cflags;
+                    Process.spawn_command_line_sync ("pkg-config --cflags %s".printf (pkg_config_list), out pkg_config_cflags, null, out exit_status);
+                    package_cflags += pkg_config_cflags.strip ();
+                }
+                catch (SpawnError e)
+                {
+                    return false;
+                }
+                if (exit_status != 0)
+                {
+                    printerr ("Packages %s not available", pkg_config_list);
+                    return false;
+                }
+                try
+                {
+                    string pkg_config_ldflags;
+                    Process.spawn_command_line_sync ("pkg-config --libs %s".printf (pkg_config_list), out pkg_config_ldflags, null, out exit_status);
+                    package_ldflags += pkg_config_ldflags.strip ();
+                }
+                catch (SpawnError e)
+                {
+                    return false;
+                }
+                if (exit_status != 0)
+                    return false;
             }
-            catch (SpawnError e)
-            {
-                return false;
-            }
-            if (exit_status != 0)
-            {
-                printerr ("Packages %s not available", clean_package_list);
-                return false;
-            }
-            try
-            {
-                Process.spawn_command_line_sync ("pkg-config --libs %s".printf (clean_package_list), out package_ldflags, null, out exit_status);
-                package_ldflags = package_ldflags.strip ();
-            }
-            catch (SpawnError e)
-            {
-                return false;
-            }
-            if (exit_status != 0)
-                return false;
         }
 
         Rule? header_rule = null;
@@ -153,6 +172,8 @@ public class ValaModule : BuildModule
             var vapi_filename = "%s.vapi".printf (name);
 
             header_rule = recipe.add_rule ();
+            foreach (var input in valac_inputs)
+                header_rule.inputs.append (input);
             header_rule.outputs.append (h_filename);
             header_rule.outputs.append (vapi_filename);
             if (pretty_print)
@@ -178,6 +199,7 @@ public class ValaModule : BuildModule
             /* Build a fastvapi file */
             var rule = recipe.add_rule ();
             rule.inputs.append (source);
+            rule.inputs.append (get_relative_path (recipe.dirname, "%s/".printf (recipe.build_directory)));
             rule.outputs.append (vapi_filename);
             rule.outputs.append (vapi_stamp_filename);
             if (pretty_print)
@@ -199,6 +221,8 @@ public class ValaModule : BuildModule
             /* Build a C file */
             rule = recipe.add_rule ();
             rule.inputs.append (source);
+            foreach (var input in valac_inputs)
+                rule.inputs.append (input);
             rule.outputs.append (c_filename);
             rule.outputs.append (c_stamp_filename);
             var command = valac_command + " --ccode %s".printf (source);
@@ -235,7 +259,7 @@ public class ValaModule : BuildModule
                 command += " -fPIC";
             if (cflags != null)
                 command += " %s".printf (cflags);
-            if (package_cflags != null)
+            if (package_cflags != "")
                 command += " %s".printf (package_cflags);
             command += " -c %s -o %s".printf (c_filename, o_filename);
             if (pretty_print)
@@ -252,7 +276,7 @@ public class ValaModule : BuildModule
             link_rule.commands.append ("@echo '    GCC-LINK %s'".printf (binary_name));
         if (ldflags != null)
             link_command += " %s".printf (ldflags);
-        if (package_ldflags != null)
+        if (package_ldflags != "")
             link_command += " %s".printf (package_ldflags);
         link_command += " -o %s".printf (binary_name);
         link_rule.commands.append (link_command);

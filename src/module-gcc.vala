@@ -97,6 +97,7 @@ public class GCCModule : BuildModule
         string? package_ldflags = null;
         if (package_list != null)
         {
+            /* Otherwise look for it externally */
             int exit_status;
             try
             {
