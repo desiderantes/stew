@@ -2,6 +2,7 @@ Overview of changes in bake 0.0.8
 
     * Install mallard files into /usr/share/help
     * Build Vala libraries
+    * Fix searching for current Recipe in similarly named directories
 
 Overview of changes in bake 0.0.7
 
