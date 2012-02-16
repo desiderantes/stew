@@ -116,13 +116,17 @@ public class ValaModule : BuildModule
                 }
 
                 /* Look for locally generated libraries */
-                var vapi_name = "%s.vapi".printf (package);
-                var library_rule = recipe.toplevel.find_rule_recursive (vapi_name);
+                var vapi_filename = "%s.vapi".printf (package);
+                var library_filename = "lib%s.so".printf (package);
+                var library_rule = recipe.toplevel.find_rule_recursive (vapi_filename);
                 if (library_rule != null)
                 {
                     var rel_dir = get_relative_path (recipe.dirname, library_rule.recipe.dirname);
                     valac_command += " --vapidir=%s --pkg=%s".printf (rel_dir, package);
-                    valac_inputs.append (Path.build_filename (rel_dir, vapi_name));
+                    valac_inputs.append (Path.build_filename (rel_dir, vapi_filename));
+                    package_cflags += " -I%s".printf (rel_dir);
+                    link_rule.inputs.append (Path.build_filename (rel_dir, library_filename));
+                    package_ldflags += " -L%s -l%s".printf (rel_dir, package);
                     continue;
                 }
 
@@ -138,7 +142,7 @@ public class ValaModule : BuildModule
                 {
                     string pkg_config_cflags;
                     Process.spawn_command_line_sync ("pkg-config --cflags %s".printf (pkg_config_list), out pkg_config_cflags, null, out exit_status);
-                    package_cflags += pkg_config_cflags.strip ();
+                    package_cflags += " %s".printf (pkg_config_cflags.strip ());
                 }
                 catch (SpawnError e)
                 {
@@ -153,7 +157,7 @@ public class ValaModule : BuildModule
                 {
                     string pkg_config_ldflags;
                     Process.spawn_command_line_sync ("pkg-config --libs %s".printf (pkg_config_list), out pkg_config_ldflags, null, out exit_status);
-                    package_ldflags += pkg_config_ldflags.strip ();
+                    package_ldflags += " %s".printf (pkg_config_ldflags.strip ());
                 }
                 catch (SpawnError e)
                 {
@@ -260,7 +264,7 @@ public class ValaModule : BuildModule
             if (cflags != null)
                 command += " %s".printf (cflags);
             if (package_cflags != "")
-                command += " %s".printf (package_cflags);
+                command += " %s".printf (package_cflags.substring (1));
             command += " -c %s -o %s".printf (c_filename, o_filename);
             if (pretty_print)
                 rule.commands.append ("@echo '    GCC %s'".printf (c_filename));
@@ -277,7 +281,7 @@ public class ValaModule : BuildModule
         if (ldflags != null)
             link_command += " %s".printf (ldflags);
         if (package_ldflags != "")
-            link_command += " %s".printf (package_ldflags);
+            link_command += " %s".printf (package_ldflags.substring (1));
         link_command += " -o %s".printf (binary_name);
         link_rule.commands.append (link_command);
 
