@@ -61,7 +61,8 @@ public class ReleaseModule : BuildModule
                     continue;
 
                 /* Ignore files built in other recipes */
-                if (recipe.get_recipe_with_target (input) != recipe)
+                var build_recipe = recipe.get_recipe_with_target (input);
+                if (build_recipe != null && build_recipe != recipe)
                     continue;
 
                 add_release_file (release_rule, release_dir, relative_dirname, input);

@@ -111,11 +111,6 @@ public class Rule
     public List<string> outputs;
     public List<string> commands;
 
-    public bool has_output
-    {
-        get { return outputs.length () > 0 && !outputs.nth_data (0).has_prefix ("%"); }
-    }
-    
     public Rule (Recipe recipe)
     {
         this.recipe = recipe;
@@ -536,6 +531,7 @@ public class Recipe
         {
             foreach (var output in rule.outputs)
             {
+                /* Ignore virtual outputs */
                 if (output.has_prefix ("%"))
                     continue;
 
@@ -587,8 +583,6 @@ public class Recipe
         {
             foreach (var o in rule.outputs)
             {
-                if (o.has_prefix ("%"))
-                    o = o.substring (1);
                 if (o == output)
                     return rule;
             }
@@ -613,33 +607,35 @@ public class Recipe
         return null;
     }
 
+    /* Find the recipe that builds this target or null if no recipe builds it */
     public Recipe? get_recipe_with_target (string target)
     {
+        /* See if we have a rule */
+        foreach (var rule in rules)
+        {
+            foreach (var output in rule.outputs)
+                if (output == target)
+                    return this;
+        }
+
+        /* Could be in a parent recipe... */
         if (target.has_prefix ("../"))
         {
             if (parent == null)
                 return null;
-
             return parent.get_recipe_with_target (target.substring (3));
         }
 
-        // FIXME: Directories are broken
-        if (target.has_suffix ("/"))
-            return this;
-
-        /* Build in the directory that contains this */
-        var dir = Path.get_dirname (target);
-        if (dir != ".")
+        /* ...or a child recipe */
+        foreach (var child in children)
         {
-            var child_dir = Path.build_filename (dirname, dir);
-            foreach (var child in children)
-            {
-                if (child.dirname == child_dir)
-                    return child;
-            }
+            var child_dir = "%s/".printf (get_relative_path (dirname, child.dirname));
+            if (target.has_prefix (child_dir) && target != child_dir)
+                return child.get_recipe_with_target (target.substring (child_dir.length));
         }
 
-        return this;
+        /* There's no rule to build this */
+        return null;
     }
 
     private void change_directory (string dirname)
@@ -665,14 +661,20 @@ public class Recipe
 
         /* If the rule comes from another recipe, use it to build */
         var recipe = get_recipe_with_target (target);
-        if (recipe != this)
+        if (recipe != null && recipe != this)
         {
+            if (debug_enabled)
+                stderr.printf ("Target %s defined in recipe %s\n",
+                               get_relative_path (original_dir, Path.build_filename (dirname, target)),
+                               get_relative_path (original_dir, recipe.filename));
             recipe.build_target (Path.get_basename (target));
             return;
         }
 
         /* Find a for this target */
         var rule = find_rule (target);
+        if (rule == null)
+            rule = find_rule ("%" + target);
         if (rule == null)
         {
             /* If it's already there then don't need to do anything */
@@ -681,7 +683,6 @@ public class Recipe
                 return;
 
             /* If doesn't exist then we can't continue */
-            stderr.printf ("'%s'\n", path);
             throw new BuildError.NO_RULE ("No rule to build '%s'", get_relative_path (original_dir, target));
         }
 
@@ -697,8 +698,6 @@ public class Recipe
         /* If we're about to do something then note which directory we are in and what we're building */
         if (rule.commands != null)
             log_directory_change ();
-        //if (rule.has_output)
-        //    GLib.print ("\x1B[1m[Building %s]\x1B[0m\n", target);
 
         /* Run the commands */
         rule.build ();
@@ -793,10 +792,10 @@ public class Bake
         /* Make rules recurse */
         foreach (var c in f.children)
         {
-            f.build_rule.inputs.append ("%s/build".printf (Path.get_basename (c.dirname)));
-            f.install_rule.inputs.append ("%s/install".printf (Path.get_basename (c.dirname)));
-            f.clean_rule.inputs.append ("%s/clean".printf (Path.get_basename (c.dirname)));
-            f.test_rule.inputs.append ("%s/test".printf (Path.get_basename (c.dirname)));
+            f.build_rule.inputs.append ("%s/%%build".printf (Path.get_basename (c.dirname)));
+            f.install_rule.inputs.append ("%s/%%install".printf (Path.get_basename (c.dirname)));
+            f.clean_rule.inputs.append ("%s/%%clean".printf (Path.get_basename (c.dirname)));
+            f.test_rule.inputs.append ("%s/%%test".printf (Path.get_basename (c.dirname)));
         }
 
         return f;
