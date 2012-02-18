@@ -174,12 +174,14 @@ public class ValaModule : BuildModule
         {
             var h_filename = "%s.h".printf (name);
             var vapi_filename = "%s.vapi".printf (name);
+            var deps_filename = "%s.deps".printf (name);
 
             header_rule = recipe.add_rule ();
             foreach (var input in valac_inputs)
                 header_rule.inputs.append (input);
             header_rule.outputs.append (h_filename);
             header_rule.outputs.append (vapi_filename);
+            header_rule.outputs.append (deps_filename);
             if (pretty_print)
                 header_rule.commands.append ("@echo '    VALAC %s %s'".printf (h_filename, vapi_filename));
             header_command = valac_command + " --ccode --header=%s --vapi=%s".printf (h_filename, vapi_filename);
@@ -191,6 +193,7 @@ public class ValaModule : BuildModule
             recipe.build_rule.inputs.append (vapi_filename);
             var vapi_directory = Path.build_filename (recipe.data_directory, "vala", "vapi");
             recipe.add_install_rule (vapi_filename, vapi_directory);
+            recipe.add_install_rule (deps_filename, vapi_directory);
         }
         foreach (var source in sources)
         {
