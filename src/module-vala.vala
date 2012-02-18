@@ -285,7 +285,10 @@ public class ValaModule : BuildModule
         link_command += " -o %s".printf (binary_name);
         link_rule.commands.append (link_command);
 
-        recipe.add_install_rule (binary_name, recipe.binary_directory);
+        if (is_library)
+            recipe.add_install_rule (binary_name, recipe.library_directory);
+        else
+            recipe.add_install_rule (binary_name, recipe.binary_directory);
         
         if (is_library)
             header_rule.commands.append (header_command);
