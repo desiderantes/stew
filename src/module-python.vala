@@ -65,7 +65,7 @@ public class PythonModule : BuildModule
             return false;
 
         var install_directory = recipe.variables.lookup ("libraries.%s.install-directory".printf (library));
-        var install_sources = recipe.variables.lookup ("libraries.%s.install-sources".printf (program)) == "true";
+        var install_sources = recipe.variables.lookup ("libraries.%s.install-sources".printf (library)) == "true";
         if (install_directory == null)
         {
             var version = get_version ();
