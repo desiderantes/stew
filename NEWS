@@ -7,6 +7,7 @@ Overview of changes in bake 0.0.8
     * Fix --debug output not being printed
     * Improve error message on failed build
     * Support Python libraries
+    * Install .py files if .install-sources=true
 
 Overview of changes in bake 0.0.7
 

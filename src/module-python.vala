@@ -13,6 +13,7 @@ public class PythonModule : BuildModule
         if (Environment.find_program_in_path ("pycompile") == null)
             return false;
 
+        var install_sources = recipe.variables.lookup ("programs.%s.install-sources".printf (program)) == "true";
         foreach (var source in sources)
         {
             var output = replace_extension (source, "pyc");
@@ -24,6 +25,8 @@ public class PythonModule : BuildModule
             rule.commands.append ("@pycompile %s".printf (source));
             recipe.build_rule.inputs.append (output);
 
+            if (install_sources)
+                recipe.add_install_rule (source, recipe.package_data_directory);
             recipe.add_install_rule (output, recipe.package_data_directory);
         }
 
@@ -62,6 +65,7 @@ public class PythonModule : BuildModule
             return false;
 
         var install_directory = recipe.variables.lookup ("libraries.%s.install-directory".printf (library));
+        var install_sources = recipe.variables.lookup ("libraries.%s.install-sources".printf (program)) == "true";
         if (install_directory == null)
         {
             var version = get_version ();
@@ -75,7 +79,20 @@ public class PythonModule : BuildModule
         }
 
         foreach (var source in sources)
-            recipe.add_install_rule (source, install_directory);
+        {
+            var output = replace_extension (source, "pyc");
+            var rule = recipe.add_rule ();
+            rule.inputs.append (source);
+            rule.outputs.append (output);
+            if (pretty_print)
+                rule.commands.append ("@echo '    PYC %s'".printf (source));		
+            rule.commands.append ("@pycompile %s".printf (source));
+            recipe.build_rule.inputs.append (output);
+
+            if (install_sources)
+                recipe.add_install_rule (source, install_directory);
+            recipe.add_install_rule (output, install_directory);
+        }
 
         return true;
     }
