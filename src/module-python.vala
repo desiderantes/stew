@@ -61,16 +61,21 @@ public class PythonModule : BuildModule
         if (Environment.find_program_in_path ("pycompile") == null)
             return false;
 
-        var version = get_version ();
-        if (version == null)
-            return false;
-        var tokens = version.split (".");
-        if (tokens.length < 2)
-            return false;
+        var install_directory = recipe.variables.lookup ("libraries.%s.install-directory".printf (library));
+        if (install_directory == null)
+        {
+            var version = get_version ();
+            if (version == null)
+                return false;
+            var tokens = version.split (".");
+            if (tokens.length < 2)
+                return false;
+            /* FIXME: Define this once (python-directory) in the toplevel (need to make recipes inherit variables from parents) */
+            install_directory = Path.build_filename (recipe.library_directory, "python%s.%s".printf (tokens[0], tokens[1]), "site-packages", library);
+        }
 
-        var python_dir = Path.build_filename (recipe.library_directory, "python%s.%s".printf (tokens[0], tokens[1]), "site-packages", library);
         foreach (var source in sources)
-            recipe.add_install_rule (source, python_dir);
+            recipe.add_install_rule (source, install_directory);
 
         return true;
     }
