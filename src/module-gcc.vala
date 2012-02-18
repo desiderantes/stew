@@ -73,7 +73,7 @@ public class GCCModule : BuildModule
     
     public override bool generate_program_rules (Recipe recipe, string program)
     {
-        var source_list = recipe.variables.lookup ("programs.%s.sources".printf (program));
+        var source_list = recipe.get_variable ("programs.%s.sources".printf (program));
         if (source_list == null)
             return false;
         var sources = split_variable (source_list);
@@ -89,9 +89,9 @@ public class GCCModule : BuildModule
                 have_cpp = true;
         }
 
-        var package_list = recipe.variables.lookup ("programs.%s.packages".printf (program));
-        var cflags = recipe.variables.lookup ("programs.%s.cflags".printf (program));
-        var ldflags = recipe.variables.lookup ("programs.%s.ldflags".printf (program));
+        var package_list = recipe.get_variable ("programs.%s.packages".printf (program));
+        var cflags = recipe.get_variable ("programs.%s.cflags".printf (program));
+        var ldflags = recipe.get_variable ("programs.%s.ldflags".printf (program));
 
         string? package_cflags = null;
         string? package_ldflags = null;
@@ -175,7 +175,7 @@ public class GCCModule : BuildModule
 
     public override bool generate_library_rules (Recipe recipe, string library)
     {
-        var source_list = recipe.variables.lookup ("libraries.%s.sources".printf (library));
+        var source_list = recipe.get_variable ("libraries.%s.sources".printf (library));
         if (source_list == null)
             return false;
         var sources = split_variable (source_list);
@@ -189,10 +189,10 @@ public class GCCModule : BuildModule
 
         var so_name = "lib%s.so".printf (library);
 
-        var package_list = recipe.variables.lookup ("libraries.%s.packages".printf (library));
-        var header_list = recipe.variables.lookup ("libraries.%s.headers".printf (library));            
-        var cflags = recipe.variables.lookup ("libraries.%s.cflags".printf (library));
-        var ldflags = recipe.variables.lookup ("libraries.%s.ldflags".printf (library));
+        var package_list = recipe.get_variable ("libraries.%s.packages".printf (library));
+        var header_list = recipe.get_variable ("libraries.%s.headers".printf (library));            
+        var cflags = recipe.get_variable ("libraries.%s.cflags".printf (library));
+        var ldflags = recipe.get_variable ("libraries.%s.ldflags".printf (library));
 
         string? package_cflags = null;
         string? package_ldflags = null;
@@ -269,18 +269,18 @@ public class GCCModule : BuildModule
 
         /* Generate pkg-config file */
         var filename = "%s.pc".printf (library);
-        var name = recipe.variables.lookup ("libraries.%s.name".printf (library));
+        var name = recipe.get_variable ("libraries.%s.name".printf (library));
         if (name == null)
             name = library;
-        var description = recipe.variables.lookup ("libraries.%s.description".printf (library));
+        var description = recipe.get_variable ("libraries.%s.description".printf (library));
         if (description == null)
             description = "";
-        var version = recipe.variables.lookup ("libraries.%s.version".printf (library));
+        var version = recipe.get_variable ("libraries.%s.version".printf (library));
         if (version == null)
-            version = recipe.toplevel.package_version;
+            version = recipe.package_version;
         if (version == null)
             version = "0";
-        var requires = recipe.variables.lookup ("libraries.%s.requires".printf (library));
+        var requires = recipe.get_variable ("libraries.%s.requires".printf (library));
         if (requires == null)
             requires = "";
 

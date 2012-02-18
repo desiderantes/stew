@@ -9,6 +9,7 @@ Overview of changes in bake 0.0.8
     * Support Python libraries
     * Install .py files if .install-sources=true
     * Install package data with data.*.files
+    * Recipes now inherit variables from their parent
 
 Overview of changes in bake 0.0.7
 

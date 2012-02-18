@@ -2,7 +2,7 @@ public class DesktopModule : BuildModule
 {
     public override void generate_rules (Recipe recipe)
     {
-        var desktop_entry_list = recipe.variables.lookup ("desktop.entries");
+        var desktop_entry_list = recipe.get_variable ("desktop.entries");
         if (desktop_entry_list == null)
             return;
 

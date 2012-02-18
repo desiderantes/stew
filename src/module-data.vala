@@ -2,13 +2,14 @@ public class DataModule : BuildModule
 {
     public override void generate_rules (Recipe recipe)
     {
-        foreach (var data in recipe.data)
+        var data = recipe.get_variable_children ("data");
+        foreach (var data_type in data)
         {
-            var file_list = recipe.variables.lookup ("data.%s.files".printf (data));
+            var file_list = recipe.get_variable ("data.%s.files".printf (data_type));
             if (file_list == null)
                 continue;
 
-            var install_directory = recipe.variables.lookup ("data.%s.install-directory".printf (data));
+            var install_directory = recipe.get_variable ("data.%s.install-directory".printf (data_type));
             if (install_directory == null)
                 install_directory = recipe.package_data_directory;
 

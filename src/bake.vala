@@ -236,12 +236,7 @@ public class Recipe
     public string filename;
     public Recipe? parent = null;
     public List<Recipe> children;
-    public HashTable<string, string> variables;
-    /* FIXME: These should be looked up from a tree */
-    public List<string> programs;
-    public List<string> libraries;
-    public List<string> tests;
-    public List<string> data;
+    private HashTable<string, string> variables;
     public List<Rule> rules;
     public Rule build_rule;
     public Rule install_rule;
@@ -256,25 +251,25 @@ public class Recipe
     {
         owned get
         {
-            var dir = variables.lookup ("install-directory");
+            var dir = get_variable ("install-directory");
             if (dir == null || Path.is_absolute (dir))
                 return dir;
             return Path.build_filename (original_dir, dir);
         }
     }
 
-    public string source_directory { get { return variables.lookup ("source-directory"); } }
-    public string top_source_directory { get { return variables.lookup ("top-source-directory"); } }
-    public string binary_directory { get { return variables.lookup ("binary-directory"); } }
-    public string system_binary_directory { get { return variables.lookup ("system-binary-directory"); } }
-    public string library_directory { get { return variables.lookup ("library-directory"); } }
-    public string system_library_directory { get { return variables.lookup ("system-library-directory"); } }
-    public string data_directory { get { return variables.lookup ("data-directory"); } }
-    public string include_directory { get { return variables.lookup ("include-directory"); } }
-    public string package_data_directory { get { return variables.lookup ("package-data-directory"); } }
+    public string source_directory { owned get { return get_variable ("source-directory"); } }
+    public string top_source_directory { owned get { return get_variable ("top-source-directory"); } }
+    public string binary_directory { owned get { return get_variable ("binary-directory"); } }
+    public string system_binary_directory { owned get { return get_variable ("system-binary-directory"); } }
+    public string library_directory { owned get { return get_variable ("library-directory"); } }
+    public string system_library_directory { owned get { return get_variable ("system-library-directory"); } }
+    public string data_directory { owned get { return get_variable ("data-directory"); } }
+    public string include_directory { owned get { return get_variable ("include-directory"); } }
+    public string package_data_directory { owned get { return get_variable ("package-data-directory"); } }
 
-    public string package_name { get { return variables.lookup ("package.name"); } }
-    public string package_version { get { return variables.lookup ("package.version"); } }
+    public string package_name { owned get { return get_variable ("package.name"); } }
+    public string package_version { owned get { return get_variable ("package.version"); } }
     public string release_name
     {
         owned get
@@ -286,22 +281,11 @@ public class Recipe
         }
     }
 
-    public Recipe (string filename, HashTable<string, string>? conf_variables = null, bool allow_rules = true) throws FileError, BuildError
+    public Recipe (string filename, bool allow_rules = true) throws FileError, BuildError
     {
         this.filename = filename;
 
         variables = new HashTable<string, string> (str_hash, str_equal);
-        if (conf_variables != null)
-        {
-            var iter = HashTableIter<string, string> (conf_variables);
-            while (true)
-            {
-                string name, value;
-                if (!iter.next (out name, out value))
-                    break;
-                variables.insert (name, value);
-            }
-        }
 
         string contents;
         FileUtils.get_contents (filename, out contents);
@@ -339,6 +323,50 @@ public class Recipe
             test_rule = add_rule ();
             test_rule.outputs.append ("%test");
         }
+    }
+
+    public string? get_variable (string name)
+    {
+        var value = variables.lookup (name);
+        if (value == null && parent != null)
+            return parent.get_variable (name);
+        else
+           return value;
+    }
+
+    public List<string> get_variable_children (string name)
+    {
+        var children = new List<string> ();
+        var prefix = name + ".";
+        foreach (var variable_name in variables.get_keys ())
+        {
+            if (!variable_name.has_prefix (prefix))
+                continue;
+
+            var length = 0;
+            while (variable_name[prefix.length + 1 + length] != '.' && variable_name[prefix.length + 1 + length] != '\0')
+                length++;
+            var child_name = variable_name.substring (prefix.length, length + 1);
+            if (has_value (children, child_name))
+                continue;
+
+            children.append (child_name);
+        }
+
+        return children;
+    }
+
+    private bool has_value (List<string> list, string value)
+    {
+        foreach (var v in list)
+            if (v == value)
+                return true;
+        return false;
+    }
+
+    public void set_variable (string name, string value)
+    {
+        variables.insert (name, value);
     }
 
     private void parse (string filename, string contents, bool allow_rules) throws BuildError
@@ -392,73 +420,8 @@ public class Recipe
             var index = statement.index_of ("=");
             if (index > 0)
             {
-                var name = statement.substring (0, index).chomp ();
+                var name = statement.substring (0, index).strip ();
                 variables.insert (name, statement.substring (index + 1).strip ());
-
-                var tokens = name.split (".");
-                if (tokens.length > 1)
-                {
-                    switch (tokens[0])
-                    {
-                    case "programs":
-                        var program_name = tokens[1];
-                        var has_name = false;
-                        foreach (var p in programs)
-                        {
-                            if (p == program_name)
-                            {
-                                has_name = true;
-                                break;
-                            }
-                        }
-                        if (!has_name)
-                            programs.append (program_name);
-                        break;
-                    case "libraries":
-                        var library_name = tokens[1];
-                        var has_name = false;
-                        foreach (var p in libraries)
-                        {
-                            if (p == library_name)
-                            {
-                                has_name = true;
-                                break;
-                            }
-                        }
-                        if (!has_name)
-                            libraries.append (library_name);
-                        break;
-                    case "tests":
-                        var test_name = tokens[1];
-                        var has_name = false;
-                        foreach (var p in tests)
-                        {
-                            if (p == test_name)
-                            {
-                                has_name = true;
-                                break;
-                            }
-                        }
-                        if (!has_name)
-                            tests.append (test_name);
-                        break;
-                    case "data":
-                        var data_name = tokens[1];
-                        var has_name = false;
-                        foreach (var p in data)
-                        {
-                            if (p == data_name)
-                            {
-                                has_name = true;
-                                break;
-                            }
-                        }
-                        if (!has_name)
-                            data.append (data_name);
-                        break;
-                    }
-                }
-
                 continue;
             }
 
@@ -507,7 +470,7 @@ public class Recipe
             var variable = new_line.substring (start + 2, end - start - 2);
             var suffix = new_line.substring (end + 1);
 
-            var value = variables.lookup (variable);
+            var value = get_variable (variable);
             if (value == null)
                 value = "";
             
@@ -578,14 +541,9 @@ public class Recipe
         }
     }
     
-    public bool is_toplevel
-    {
-        get { return parent == null; }
-    }
-
     public Recipe toplevel
     {
-        get { if (parent == null) return this; else return parent.toplevel; }
+        get { if (parent.parent == null) return this; else return parent.toplevel; }
     }
 
     public string relative_dirname
@@ -722,18 +680,18 @@ public class Recipe
     public void print ()
     {
         foreach (var name in variables.get_keys ())
-            GLib.print ("%s=%s\n", name, variables.lookup (name));
+            stdout.printf ("%s=%s\n", name, get_variable (name));
         foreach (var rule in rules)
         {
-            GLib.print ("\n");
+            stdout.printf ("\n");
             foreach (var output in rule.outputs)
-                GLib.print ("%s ", output);
-            GLib.print (":");
+                stdout.printf ("%s ", output);
+            stdout.printf (":");
             foreach (var input in rule.inputs)
-                GLib.print (" %s", input);
-            GLib.print ("\n");
+                stdout.printf (" %s", input);
+            stdout.printf ("\n");
             foreach (var c in rule.commands)
-                GLib.print ("    %s\n", c);
+                stdout.printf ("    %s\n", c);
         }
     }
 }
@@ -770,12 +728,12 @@ public class Bake
 
     public static List<BuildModule> modules;
 
-    public static Recipe? load_recipes (string filename, HashTable<string, string> conf_variables, bool is_toplevel = true) throws Error
+    public static Recipe? load_recipes (string filename, bool is_toplevel = true) throws Error
     {
         if (debug_enabled)
             stderr.printf ("Loading %s\n", get_relative_path (original_dir, filename));
 
-        var f = new Recipe (filename, conf_variables);
+        var f = new Recipe (filename);
 
         /* Children can't be new toplevel recipes */
         if (!is_toplevel && f.package_name != null)
@@ -796,7 +754,7 @@ public class Bake
             var child_filename = Path.build_filename (f.dirname, child_dir, "Recipe");
             if (FileUtils.test (child_filename, FileTest.EXISTS))
             {
-                var c = load_recipes (child_filename, conf_variables, false);
+                var c = load_recipes (child_filename, false);
                 if (c != null)
                 {
                     c.parent = f;
@@ -826,19 +784,10 @@ public class Bake
             recipe_complete (child);
     }
 
-    private static void add_global_variables (Recipe recipe)
-    {
-        var toplevel = recipe.toplevel;
-        recipe.variables.insert ("package.name", toplevel.package_name);
-        if (toplevel.package_version != null)
-            recipe.variables.insert ("package.version", toplevel.package_version);
-        foreach (var child in recipe.children)
-            add_global_variables (child);
-    }
-    
     private static bool generate_library_rules (Recipe recipe)
     {
-        foreach (var library in recipe.libraries)
+        var libraries = recipe.get_variable_children ("libraries");
+        foreach (var library in libraries)
         {
             var matched = false;
             foreach (var module in modules)
@@ -869,7 +818,8 @@ public class Bake
 
     private static bool generate_program_rules (Recipe recipe)
     {
-        foreach (var program in recipe.programs)
+        var programs = recipe.get_variable_children ("programs");
+        foreach (var program in programs)
         {
             var matched = false;
             foreach (var module in modules)
@@ -1002,13 +952,11 @@ public class Bake
         }
 
         /* Load configuration */
-        var conf_variables = new HashTable<string, string> (str_hash, str_equal);
         var need_configure = false;
-
+        Recipe conf_file = null;
         try
         {
-            var conf_file = new Recipe (Path.build_filename (toplevel_dir, "Recipe.conf"), null, false);
-            conf_variables = conf_file.variables;
+            conf_file = new Recipe (Path.build_filename (toplevel_dir, "Recipe.conf"), false);
         }
         catch (Error e)
         {
@@ -1022,7 +970,9 @@ public class Bake
         }
 
         if (do_configure || need_configure)
-        {           
+        {
+            var conf_variables = new HashTable<string, string> (str_hash, str_equal);
+
             /* Default values */
             conf_variables.insert ("resource-directory", "/usr/local");
             conf_variables.insert ("system-config-directory", "/etc");
@@ -1075,33 +1025,43 @@ public class Bake
             catch (FileError e)
             {
                 printerr ("Failed to write configuration: %s\n", e.message);
-                return Posix.EXIT_SUCCESS;
+                return Posix.EXIT_FAILURE;
             }
 
             /* Stop if only configure stage requested */
             if (do_configure)
                 return Posix.EXIT_SUCCESS;
+
+            try
+            {
+                conf_file = new Recipe ("Recipe.conf");
+            }
+            catch (Error e)
+            {
+                printerr ("Failed to read back configuration: %s\n", e.message);
+                return Posix.EXIT_FAILURE;
+            }
         }
 
         /* Derived values */
-        var resource_directory = conf_variables.lookup ("resource-directory");
-        if (conf_variables.lookup ("binary-directory") == null)
-            conf_variables.insert ("binary-directory", "%s/bin".printf (resource_directory));
-        if (conf_variables.lookup ("library-directory") == null)
-            conf_variables.insert ("library-directory", "%s/lib".printf (resource_directory));
-        if (conf_variables.lookup ("data-directory") == null)
-            conf_variables.insert ("data-directory", "%s/share".printf (resource_directory));
-        if (conf_variables.lookup ("include-directory") == null)
-            conf_variables.insert ("include-directory", "%s/include".printf (resource_directory));
-        var data_directory = conf_variables.lookup ("data-directory");
-        if (conf_variables.lookup ("package-data-directory") == null)
-            conf_variables.insert ("package-data-directory", "%s/$(package.name)".printf (data_directory));
+        var resource_directory = conf_file.get_variable ("resource-directory");
+        if (conf_file.get_variable ("binary-directory") == null)
+            conf_file.set_variable ("binary-directory", "%s/bin".printf (resource_directory));
+        if (conf_file.get_variable ("library-directory") == null)
+            conf_file.set_variable ("library-directory", "%s/lib".printf (resource_directory));
+        if (conf_file.get_variable ("data-directory") == null)
+            conf_file.set_variable ("data-directory", "%s/share".printf (resource_directory));
+        if (conf_file.get_variable ("include-directory") == null)
+            conf_file.set_variable ("include-directory", "%s/include".printf (resource_directory));
+        var data_directory = conf_file.get_variable ("data-directory");
+        if (conf_file.get_variable ("package-data-directory") == null)
+            conf_file.set_variable ("package-data-directory", "%s/$(package.name)".printf (data_directory));
 
         /* Load the recipe tree */
         var filename = Path.build_filename (toplevel_dir, "Recipe");
         try
         {
-            toplevel = load_recipes (filename, conf_variables);
+            toplevel = load_recipes (filename);
         }
         catch (Error e)
         {
@@ -1109,8 +1069,9 @@ public class Bake
             return Posix.EXIT_FAILURE;
         }
 
-        /* Add global variables */
-        add_global_variables (toplevel);
+        /* Make the configuration the toplevel file so everything inherits from it */
+        conf_file.children.append (toplevel);
+        toplevel.parent = conf_file;
 
         /* Generate implicit rules */
         foreach (var module in modules)

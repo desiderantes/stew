@@ -2,7 +2,7 @@ public class GSettingsModule : BuildModule
 {
     public override void generate_rules (Recipe recipe)
     {
-        var gsettings_schema_list = recipe.variables.lookup ("gsettings.schemas");
+        var gsettings_schema_list = recipe.get_variable ("gsettings.schemas");
         if (gsettings_schema_list == null)
             return;
 

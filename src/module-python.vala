@@ -2,7 +2,7 @@ public class PythonModule : BuildModule
 {
     public override bool generate_program_rules (Recipe recipe, string program)
     {
-        var source_list = recipe.variables.lookup ("programs.%s.sources".printf (program));
+        var source_list = recipe.get_variable ("programs.%s.sources".printf (program));
         if (source_list == null)
             return false;
         var sources = split_variable (source_list);
@@ -13,7 +13,7 @@ public class PythonModule : BuildModule
         if (Environment.find_program_in_path ("pycompile") == null)
             return false;
 
-        var install_sources = recipe.variables.lookup ("programs.%s.install-sources".printf (program)) == "true";
+        var install_sources = recipe.get_variable ("programs.%s.install-sources".printf (program)) == "true";
         foreach (var source in sources)
         {
             var output = replace_extension (source, "pyc");
@@ -53,7 +53,7 @@ public class PythonModule : BuildModule
 
     public override bool generate_library_rules (Recipe recipe, string library)
     {
-        var source_list = recipe.variables.lookup ("libraries.%s.sources".printf (library));
+        var source_list = recipe.get_variable ("libraries.%s.sources".printf (library));
         if (source_list == null)
             return false;
         var sources = split_variable (source_list);
@@ -64,8 +64,8 @@ public class PythonModule : BuildModule
         if (Environment.find_program_in_path ("pycompile") == null)
             return false;
 
-        var install_directory = recipe.variables.lookup ("libraries.%s.install-directory".printf (library));
-        var install_sources = recipe.variables.lookup ("libraries.%s.install-sources".printf (library)) == "true";
+        var install_directory = recipe.get_variable ("libraries.%s.install-directory".printf (library));
+        var install_sources = recipe.get_variable ("libraries.%s.install-sources".printf (library)) == "true";
         if (install_directory == null)
         {
             var version = get_version ();

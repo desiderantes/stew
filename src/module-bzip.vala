@@ -3,7 +3,7 @@ public class BZIPModule : BuildModule
     public override void generate_toplevel_rules (Recipe recipe)
     {
         var filename = "%s.tar.bz2".printf (recipe.release_name);
-        recipe.variables.insert ("bzip.release-filename", filename);
+        recipe.set_variable ("bzip.release-filename", filename);
 
         var rule = recipe.add_rule ();
         rule.inputs.append ("%s/".printf (recipe.release_name));

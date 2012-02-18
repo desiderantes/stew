@@ -5,7 +5,7 @@ public class JavaModule : BuildModule
         if (Environment.find_program_in_path ("javac") == null || Environment.find_program_in_path ("jar") == null)
             return false;
 
-        var source_list = recipe.variables.lookup ("programs.%s.sources".printf (program));
+        var source_list = recipe.get_variable ("programs.%s.sources".printf (program));
         if (source_list == null)
             return false;
         var sources = split_variable (source_list);
@@ -24,7 +24,7 @@ public class JavaModule : BuildModule
         var jar_command = "jar cfe %s".printf (jar_file);
 
         // FIXME: Would like a better way of determining this automatically
-        var entrypoint = recipe.variables.lookup ("programs.%s.entrypoint".printf (program));
+        var entrypoint = recipe.get_variable ("programs.%s.entrypoint".printf (program));
         if (entrypoint != null)
             jar_command += " %s".printf (entrypoint);
 

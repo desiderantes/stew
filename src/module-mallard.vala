@@ -2,7 +2,7 @@ public class MallardModule : BuildModule
 {
     public override void generate_rules (Recipe recipe)
     {
-        var pages_list = recipe.variables.lookup ("mallard.pages");
+        var pages_list = recipe.get_variable ("mallard.pages");
         if (pages_list == null)
             return;
 

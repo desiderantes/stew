@@ -28,23 +28,14 @@ public class IntltoolModule : BuildModule
 
     private void get_gettext_sources (Recipe recipe, ref List<string> sources)
     {
-        foreach (var name in recipe.variables.get_keys ())
+        var entries = recipe.get_variable_children ("intltool");
+        foreach (var name in entries)
         {
-            if (!name.has_prefix ("intltool."))
+            var c_source_list = recipe.get_variable ("intltool.%s.c-sources".printf (name));
+            if (c_source_list == null)
                 continue;
 
-            var tokens = name.split (".", 3);
-            if (tokens.length != 3)
-                continue;
-
-            //if (tokens[1] != gettext_domain)
-            //    continue;
-
-            if (tokens[2] != "c-sources")
-                continue;
-
-            var value = recipe.variables.lookup (name);
-            foreach (var source in split_variable (value))
+            foreach (var source in split_variable (c_source_list))
                 sources.append (Path.build_filename (recipe.dirname, source));
         }
 
@@ -56,13 +47,12 @@ public class IntltoolModule : BuildModule
     {
         // FIXME: Support multiple translation domains
         string? translation_directory = null;
-        foreach (var name in recipe.variables.get_keys ())
+        var entries = recipe.get_variable_children ("intltool");
+        foreach (var name in entries)
         {
-            if (name.has_prefix ("intltool.") && name.has_suffix (".translation-directory"))
-            {
-                translation_directory = recipe.variables.lookup (name);
+            translation_directory = recipe.get_variable ("intltool.%s.translation-directory".printf (name));
+            if (translation_directory != null)
                 break;
-            }
         }
 
         if (translation_directory != null)
@@ -107,14 +97,12 @@ public class IntltoolModule : BuildModule
 
     public override void generate_rules (Recipe recipe)
     {
-        foreach (var name in recipe.variables.get_keys ())
+        var entries = recipe.get_variable_children ("intltool");
+        foreach (var name in entries)
         {
-            if (!name.has_prefix ("intltool."))
-                continue;
-
-            if (name.has_suffix (".xml-sources"))
+            var source_list = recipe.get_variable ("intltool.%s.xml-sources".printf (name));
+            if (source_list != null)
             {
-                var source_list = recipe.variables.lookup (name);
                 var sources = split_variable (source_list);
                 foreach (var source in sources)
                 {
@@ -128,9 +116,9 @@ public class IntltoolModule : BuildModule
                 }
             }
 
-            if (name.has_suffix (".desktop-sources"))
+            source_list = recipe.get_variable ("intltool.%s.desktop-sources".printf (name));
+            if (source_list != null)
             {
-                var source_list = recipe.variables.lookup (name);
                 var sources = split_variable (source_list);
                 foreach (var source in sources)
                 {

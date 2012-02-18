@@ -1,9 +1,9 @@
 public class ReleaseModule : BuildModule
 {
-    public override void generate_toplevel_rules (Recipe toplevel)
+    public override void generate_toplevel_rules (Recipe recipe)
     {
-        var rule = toplevel.add_rule ();
-        rule.outputs.append ("%s/".printf (toplevel.release_name));
+        var rule = recipe.add_rule ();
+        rule.outputs.append ("%s/".printf (recipe.release_name));
     }
 
     private static void add_release_file (Rule release_rule, string temp_dir, string directory, string filename)
@@ -38,7 +38,7 @@ public class ReleaseModule : BuildModule
     public override void recipe_complete (Recipe recipe)
     {
         var relative_dirname = recipe.relative_dirname;
-        var release_dir = "%s/".printf (recipe.toplevel.release_name);
+        var release_dir = "%s/".printf (recipe.release_name);
 
         var release_rule = recipe.toplevel.find_rule (release_dir);
 
@@ -70,7 +70,7 @@ public class ReleaseModule : BuildModule
         }
 
         /* Release files explicitly listed */
-        var extra_files = recipe.variables.lookup ("package.files");
+        var extra_files = recipe.get_variable ("package.files");
         if (extra_files != null)
             foreach (var file in split_variable (extra_files))
                 add_release_file (release_rule, release_dir, relative_dirname, file);

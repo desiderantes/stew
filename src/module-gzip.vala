@@ -3,7 +3,7 @@ public class GZIPModule : BuildModule
     public override void generate_toplevel_rules (Recipe recipe)
     {
         var filename = "%s.tar.gz".printf (recipe.release_name);
-        recipe.variables.insert ("gzip.release-filename", filename);
+        recipe.set_variable ("gzip.release-filename", filename);
 
         var rule = recipe.add_rule ();
         rule.inputs.append ("%s/".printf (recipe.release_name));

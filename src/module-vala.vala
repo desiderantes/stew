@@ -2,56 +2,56 @@ public class ValaModule : BuildModule
 {
     public override bool generate_program_rules (Recipe recipe, string program)
     {
-        var source_list = recipe.variables.lookup ("programs.%s.sources".printf (program));
+        var source_list = recipe.get_variable ("programs.%s.sources".printf (program));
         if (source_list == null)
             return false;
         var sources = split_variable (source_list);
         if (sources == null)
             return false;
 
-        var packages = recipe.variables.lookup ("programs.%s.packages".printf (program));
+        var packages = recipe.get_variable ("programs.%s.packages".printf (program));
         if (packages == null)
             packages = "";
         var package_list = split_variable (packages);
-        var cflags = recipe.variables.lookup ("programs.%s.cflags".printf (program));
-        var ldflags = recipe.variables.lookup ("programs.%s.ldflags".printf (program));
+        var cflags = recipe.get_variable ("programs.%s.cflags".printf (program));
+        var ldflags = recipe.get_variable ("programs.%s.ldflags".printf (program));
 
         return generate_compile_rules (recipe, program, sources, package_list, cflags, ldflags, false);
     }
 
     public override bool generate_library_rules (Recipe recipe, string library)
     {
-        var source_list = recipe.variables.lookup ("libraries.%s.sources".printf (library));
+        var source_list = recipe.get_variable ("libraries.%s.sources".printf (library));
         if (source_list == null)
             return false;
         var sources = split_variable (source_list);
         if (sources == null)
             return false;
 
-        var packages = recipe.variables.lookup ("libraries.%s.packages".printf (library));
+        var packages = recipe.get_variable ("libraries.%s.packages".printf (library));
         if (packages == null)
             packages = "";
         var package_list = split_variable (packages);
-        var cflags = recipe.variables.lookup ("libraries.%s.cflags".printf (library));
-        var ldflags = recipe.variables.lookup ("libraries.%s.ldflags".printf (library));
+        var cflags = recipe.get_variable ("libraries.%s.cflags".printf (library));
+        var ldflags = recipe.get_variable ("libraries.%s.ldflags".printf (library));
 
         if (!generate_compile_rules (recipe, library, sources, package_list, cflags, ldflags, true))
             return false;
 
         /* Generate pkg-config file */
         var filename = "%s.pc".printf (library);
-        var name = recipe.variables.lookup ("libraries.%s.name".printf (library));
+        var name = recipe.get_variable ("libraries.%s.name".printf (library));
         if (name == null)
             name = library;
-        var description = recipe.variables.lookup ("libraries.%s.description".printf (library));
+        var description = recipe.get_variable ("libraries.%s.description".printf (library));
         if (description == null)
             description = "";
-        var version = recipe.variables.lookup ("libraries.%s.version".printf (library));
+        var version = recipe.get_variable ("libraries.%s.version".printf (library));
         if (version == null)
-            version = recipe.toplevel.package_version;
+            version = recipe.package_version;
         if (version == null)
             version = "0";
-        var requires = recipe.variables.lookup ("libraries.%s.requires".printf (library));
+        var requires = recipe.get_variable ("libraries.%s.requires".printf (library));
         if (requires == null)
             requires = "";
 
