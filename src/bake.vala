@@ -903,12 +903,12 @@ public class Bake
         modules.append (new DesktopModule ());
         modules.append (new DpkgModule ());
         modules.append (new GCCModule ());
+        modules.append (new GettextModule ());
         modules.append (new GHCModule ());
         modules.append (new GITModule ());
         modules.append (new GNOMEModule ());
         modules.append (new GSettingsModule ());
         modules.append (new GZIPModule ());
-        modules.append (new IntltoolModule ());
         modules.append (new JavaModule ());
         modules.append (new LaunchpadModule ());
         modules.append (new MallardModule ());

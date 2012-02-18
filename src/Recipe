@@ -6,12 +6,12 @@ programs|bake|sources = bake.vala \
                         module-desktop.vala \
                         module-dpkg.vala \
                         module-gcc.vala \
+                        module-gettext.vala \
                         module-ghc.vala \
                         module-git.vala \
                         module-gnome.vala \
                         module-gsettings.vala \
                         module-gzip.vala \
-                        module-intltool.vala \
                         module-java.vala \
                         module-launchpad.vala \
                         module-mallard.vala \

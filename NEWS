@@ -11,6 +11,7 @@ Overview of changes in bake 0.1.0
     * Install package data with data.*.files
     * Recipes now inherit variables from their parent
     * Change variable separator from . to | so can use . for versioning
+    * Rename intltool rules to gettext
 
 Overview of changes in bake 0.0.7
 

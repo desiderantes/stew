@@ -1,4 +1,4 @@
-public class IntltoolModule : BuildModule
+public class GettextModule : BuildModule
 {
     private List<string> load_languages (string translation_directory)
     {
@@ -28,10 +28,10 @@ public class IntltoolModule : BuildModule
 
     private void get_gettext_sources (Recipe recipe, ref List<string> sources)
     {
-        var entries = recipe.get_variable_children ("intltool");
+        var entries = recipe.get_variable_children ("gettext");
         foreach (var name in entries)
         {
-            var c_source_list = recipe.get_variable ("intltool|%s|c-sources".printf (name));
+            var c_source_list = recipe.get_variable ("gettext|%s|c-sources".printf (name));
             if (c_source_list == null)
                 continue;
 
@@ -47,10 +47,10 @@ public class IntltoolModule : BuildModule
     {
         // FIXME: Support multiple translation domains
         string? translation_directory = null;
-        var entries = recipe.get_variable_children ("intltool");
-        foreach (var name in entries)
+        var domains = recipe.get_variable_children ("gettext");
+        foreach (var name in domains)
         {
-            translation_directory = recipe.get_variable ("intltool|%s|translation-directory".printf (name));
+            translation_directory = recipe.get_variable ("gettext|%s|translation-directory".printf (name));
             if (translation_directory != null)
                 break;
         }
@@ -97,10 +97,10 @@ public class IntltoolModule : BuildModule
 
     public override void generate_rules (Recipe recipe)
     {
-        var entries = recipe.get_variable_children ("intltool");
-        foreach (var name in entries)
+        var domains = recipe.get_variable_children ("gettext");
+        foreach (var name in domains)
         {
-            var source_list = recipe.get_variable ("intltool|%s|xml-sources".printf (name));
+            var source_list = recipe.get_variable ("gettext|%s|xml-sources".printf (name));
             if (source_list != null)
             {
                 var sources = split_variable (source_list);
@@ -116,7 +116,7 @@ public class IntltoolModule : BuildModule
                 }
             }
 
-            source_list = recipe.get_variable ("intltool|%s|desktop-sources".printf (name));
+            source_list = recipe.get_variable ("gettext|%s|desktop-sources".printf (name));
             if (source_list != null)
             {
                 var sources = split_variable (source_list);
