@@ -1,4 +1,4 @@
-package.name = example
-programs.example.sources = Example.java
-programs.example.entrypoint = Example
+package|name = example
+programs|example|sources = Example.java
+programs|example|entrypoint = Example
 

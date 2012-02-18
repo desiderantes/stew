@@ -2,7 +2,7 @@ public class GHCModule : BuildModule
 {
     public override bool generate_program_rules (Recipe recipe, string program)
     {
-        var source_list = recipe.get_variable ("programs.%s.sources".printf (program));
+        var source_list = recipe.get_variable ("programs|%s|sources".printf (program));
         if (source_list == null)
             return false;
         var sources = split_variable (source_list);

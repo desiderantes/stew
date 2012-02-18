@@ -7,7 +7,7 @@ public class TestModule : BuildModule
         {
             if (pretty_print)
                 recipe.test_rule.commands.append ("@echo '    TEST %s'".printf (test));
-            var command = "@%s".printf (recipe.get_variable ("tests.%s.command".printf (test)));
+            var command = "@%s".printf (recipe.get_variable ("tests|%s|command".printf (test)));
             recipe.test_rule.commands.append (command);
         }
     }

@@ -1,9 +1,9 @@
-package.name = example
-package.version = 0.0.1
+package|name = example
+package|version = 0.0.1
 
-libraries.example.version = 0.0.1
-libraries.example.sources = example.c
-libraries.example.name = example
-libraries.example.description = Example Library
-libraries.example.requires = glib-2.0
-libraries.example.headers = example.h
+libraries|example|version = 0.0.1
+libraries|example|sources = example.c
+libraries|example|name = example
+libraries|example|description = Example Library
+libraries|example|requires = glib-2.0
+libraries|example|headers = example.h

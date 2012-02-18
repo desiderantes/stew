@@ -1,4 +1,4 @@
-Overview of changes in bake 0.0.8
+Overview of changes in bake 0.1.0
 
     * Install mallard files into /usr/share/help
     * Build Vala libraries
@@ -10,6 +10,7 @@ Overview of changes in bake 0.0.8
     * Install .py files if .install-sources=true
     * Install package data with data.*.files
     * Recipes now inherit variables from their parent
+    * Change variable separator from . to | so can use . for versioning
 
 Overview of changes in bake 0.0.7
 

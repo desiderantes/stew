@@ -1,8 +1,8 @@
-package.name = bake
-package.version = 0.0.8~bzr
-package.ppa = lp:~bake-team/releases
+package|name = bake
+package|version = 0.0.8~bzr
+package|ppa = lp:~bake-team/releases
 
-package.files = Makefile \
+package|files = Makefile \
                 bake.doap \
                 NEWS \
                 examples/ada/Recipe \
