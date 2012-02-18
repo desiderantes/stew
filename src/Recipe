@@ -2,6 +2,7 @@ programs.bake.sources = bake.vala \
                         config.vapi \
                         module-bzip.vala \
                         module-bzr.vala \
+                        module-data.vala \
                         module-desktop.vala \
                         module-dpkg.vala \
                         module-gcc.vala \

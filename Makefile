@@ -8,6 +8,7 @@ SOURCES = src/bake.vala \
           src/config.vapi \
           src/module-bzip.vala \
           src/module-bzr.vala \
+          src/module-data.vala \
           src/module-desktop.vala \
           src/module-dpkg.vala \
           src/module-gcc.vala \

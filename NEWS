@@ -8,6 +8,7 @@ Overview of changes in bake 0.0.8
     * Improve error message on failed build
     * Support Python libraries
     * Install .py files if .install-sources=true
+    * Install package data with data.*.files
 
 Overview of changes in bake 0.0.7
 

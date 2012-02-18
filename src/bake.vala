@@ -237,9 +237,11 @@ public class Recipe
     public Recipe? parent = null;
     public List<Recipe> children;
     public HashTable<string, string> variables;
+    /* FIXME: These should be looked up from a tree */
     public List<string> programs;
     public List<string> libraries;
     public List<string> tests;
+    public List<string> data;
     public List<Rule> rules;
     public Rule build_rule;
     public Rule install_rule;
@@ -429,7 +431,7 @@ public class Recipe
                     case "tests":
                         var test_name = tokens[1];
                         var has_name = false;
-                        foreach (var p in libraries)
+                        foreach (var p in tests)
                         {
                             if (p == test_name)
                             {
@@ -439,6 +441,20 @@ public class Recipe
                         }
                         if (!has_name)
                             tests.append (test_name);
+                        break;
+                    case "data":
+                        var data_name = tokens[1];
+                        var has_name = false;
+                        foreach (var p in data)
+                        {
+                            if (p == data_name)
+                            {
+                                has_name = true;
+                                break;
+                            }
+                        }
+                        if (!has_name)
+                            data.append (data_name);
                         break;
                     }
                 }
@@ -933,6 +949,7 @@ public class Bake
 
         modules.append (new BZIPModule ());
         modules.append (new BZRModule ());
+        modules.append (new DataModule ());
         modules.append (new DesktopModule ());
         modules.append (new DpkgModule ());
         modules.append (new GCCModule ());
