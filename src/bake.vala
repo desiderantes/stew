@@ -496,10 +496,12 @@ public class Recipe
             return "%s%s".printf (install_directory, path);
     }
 
-    public void add_install_rule (string filename, string install_dir)
+    public void add_install_rule (string filename, string install_dir, string? target_filename = null)
     {
         install_rule.inputs.append (filename);
-        var install_path = get_install_path (Path.build_filename (install_dir, filename));
+        if (target_filename == null)
+            target_filename = filename;
+        var install_path = get_install_path (Path.build_filename (install_dir, target_filename));
         install_rule.commands.append ("@mkdir -p %s".printf (Path.get_dirname (install_path)));
         install_rule.commands.append ("@install %s %s".printf (filename, install_path));
     }

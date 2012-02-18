@@ -26,44 +26,59 @@ public class GettextModule : BuildModule
         }
     }
 
-    private void get_gettext_sources (Recipe recipe, ref List<string> sources)
+    private void get_gettext_sources (string domain, Recipe recipe, ref List<string> sources)
     {
-        var entries = recipe.get_variable_children ("gettext");
-        foreach (var name in entries)
+        var programs = recipe.get_variable_children ("programs");
+        foreach (var program in programs)
         {
-            var c_source_list = recipe.get_variable ("gettext|%s|c-sources".printf (name));
-            if (c_source_list == null)
+            var program_domain = recipe.get_variable ("programs|%s|gettext-domain".printf (program));
+            if (program_domain != domain)
                 continue;
 
-            foreach (var source in split_variable (c_source_list))
+            var source_list = recipe.get_variable ("programs|%s|sources".printf (program));
+            if (source_list == null)
+                continue;
+            foreach (var source in split_variable (source_list))
+                sources.append (Path.build_filename (recipe.dirname, source));
+        }
+        var libraries = recipe.get_variable_children ("libraries");
+        foreach (var program in libraries)
+        {
+            var library_domain = recipe.get_variable ("libraries|%s|gettext-domain".printf (program));
+            if (library_domain != domain)
+                continue;
+
+            var source_list = recipe.get_variable ("libraries|%s|sources".printf (program));
+            if (source_list == null)
+                continue;
+            foreach (var source in split_variable (source_list))
                 sources.append (Path.build_filename (recipe.dirname, source));
         }
 
         foreach (var child in recipe.children)
-            get_gettext_sources (child, ref sources);
+            get_gettext_sources (domain, child, ref sources);
     }
 
     public override void generate_toplevel_rules (Recipe recipe)
     {
-        // FIXME: Support multiple translation domains
-        string? translation_directory = null;
         var domains = recipe.get_variable_children ("gettext");
-        foreach (var name in domains)
-        {
-            translation_directory = recipe.get_variable ("gettext|%s|translation-directory".printf (name));
-            if (translation_directory != null)
-                break;
-        }
 
-        if (translation_directory != null)
+        /* Generate POT files */
+        foreach (var domain in domains)
         {
+            var translation_directory = recipe.get_variable ("gettext|%s|translation-directory".printf (domain));
+            if (translation_directory == null)
+                continue;
+
+            var gettext_sources = new List<string> ();
+            get_gettext_sources (domain, recipe, ref gettext_sources);
+            if (gettext_sources == null)
+                continue;
+
             var pot_file = Path.build_filename (translation_directory, "%s.pot".printf (recipe.package_name));
             recipe.build_rule.inputs.append (pot_file);
-
             var pot_rule = recipe.add_rule ();
             pot_rule.outputs.append (pot_file);
-            List<string> gettext_sources = null;
-            get_gettext_sources (recipe, ref gettext_sources);
             if (pretty_print)
                 pot_rule.commands.append ("@echo '    GETTEXT %s'".printf (pot_file));
             var gettext_command = "@xgettext --extract-all --from-code=utf-8 --output %s".printf (pot_file);
@@ -74,9 +89,16 @@ public class GettextModule : BuildModule
                 gettext_command += " %s".printf (s);
             }
             pot_rule.commands.append (gettext_command);
+        }
+
+        /* Compile and install translations */
+        foreach (var domain in domains)
+        {
+            var translation_directory = recipe.get_variable ("gettext|%s|translation-directory".printf (domain));
+            if (translation_directory == null)
+                continue;
 
             var languages = load_languages (Path.build_filename (recipe.dirname, translation_directory));
-
             foreach (var language in languages)
             {
                 var po_file = "%s/%s.po".printf (translation_directory, language);
@@ -90,46 +112,8 @@ public class GettextModule : BuildModule
                 recipe.build_rule.inputs.append (mo_file);
 
                 var target_dir = recipe.get_install_path (Path.build_filename (recipe.data_directory, "locale", language, "LC_MESSAGES"));
-                recipe.add_install_rule (mo_file, target_dir);
-            }
-        }
-    }
-
-    public override void generate_rules (Recipe recipe)
-    {
-        var domains = recipe.get_variable_children ("gettext");
-        foreach (var name in domains)
-        {
-            var source_list = recipe.get_variable ("gettext|%s|xml-sources".printf (name));
-            if (source_list != null)
-            {
-                var sources = split_variable (source_list);
-                foreach (var source in sources)
-                {
-                    var rule = recipe.add_rule ();
-                    rule.inputs.append (source);
-                    var output = remove_extension (source);
-                    rule.outputs.append (output);
-                    rule.commands.append ("LC_ALL=C intltool-merge --xml-style /dev/null %s %s".printf (source, output));
-
-                    recipe.build_rule.inputs.append (output);
-                }
-            }
-
-            source_list = recipe.get_variable ("gettext|%s|desktop-sources".printf (name));
-            if (source_list != null)
-            {
-                var sources = split_variable (source_list);
-                foreach (var source in sources)
-                {
-                    var rule = recipe.add_rule ();
-                    rule.inputs.append (source);
-                    var output = remove_extension (source);
-                    rule.outputs.append (output);
-                    rule.commands.append ("LC_ALL=C intltool-merge --desktop-style -u /dev/null %s %s".printf (source, output));
-
-                    recipe.build_rule.inputs.append (output);
-                }
+                var target_mo_file = "%s.mo".printf (domain);
+                recipe.add_install_rule (mo_file, target_dir, target_mo_file);
             }
         }
     }
