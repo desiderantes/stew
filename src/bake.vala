@@ -1078,6 +1078,7 @@ public class Bake
             module.generate_toplevel_rules (toplevel);
 
         /* Generate libraries first (as other things may depend on it) then the other rules */
+        /* FIXME: Stop this failing the build, instead print errors in the build rule */
         if (!generate_library_rules (toplevel) ||
             !generate_program_rules (toplevel) ||
             !generate_rules (toplevel))
@@ -1127,6 +1128,7 @@ public class Bake
         catch (BuildError e)
         {
             printerr ("%s\n", e.message);
+            /* FIXME: Say what rule we were trying to build */
             GLib.print ("\x1B[1m\x1B[31m[Build failed in directory %s]\x1B[0m\n".printf (get_relative_path (original_dir, Environment.get_current_dir ())));
             return Posix.EXIT_FAILURE;
         }
