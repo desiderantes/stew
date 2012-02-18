@@ -1104,7 +1104,7 @@ public class Bake
             !generate_program_rules (toplevel) ||
             !generate_rules (toplevel))
         {
-            GLib.print ("\x1B[1m\x1B[31m[Build failed]\x1B[0m\n");
+            GLib.print ("\x1B[1m\x1B[31m[Build failed in directory %s]\x1B[0m\n".printf (get_relative_path (original_dir, Environment.get_current_dir ())));
             return Posix.EXIT_FAILURE;
         }
 
@@ -1149,7 +1149,7 @@ public class Bake
         catch (BuildError e)
         {
             printerr ("%s\n", e.message);
-            GLib.print ("\x1B[1m\x1B[31m[Build failed]\x1B[0m\n");
+            GLib.print ("\x1B[1m\x1B[31m[Build failed in directory %s]\x1B[0m\n".printf (get_relative_path (original_dir, Environment.get_current_dir ())));
             return Posix.EXIT_FAILURE;
         }
 

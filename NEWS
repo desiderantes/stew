@@ -5,6 +5,7 @@ Overview of changes in bake 0.0.8
     * Fix searching for current Recipe in similarly named directories
     * Link against locally generated Vala libraries
     * Fix --debug output not being printed
+    * Improve error message on failed build
 
 Overview of changes in bake 0.0.7
 
