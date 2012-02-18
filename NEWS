@@ -6,6 +6,7 @@ Overview of changes in bake 0.0.8
     * Link against locally generated Vala libraries
     * Fix --debug output not being printed
     * Improve error message on failed build
+    * Support Python libraries
 
 Overview of changes in bake 0.0.7
 

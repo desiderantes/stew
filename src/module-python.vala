@@ -47,4 +47,54 @@ public class PythonModule : BuildModule
             
         return true;
     }
+
+    public override bool generate_library_rules (Recipe recipe, string library)
+    {
+        var source_list = recipe.variables.lookup ("libraries.%s.sources".printf (library));
+        if (source_list == null)
+            return false;
+        var sources = split_variable (source_list);
+        foreach (var source in sources)
+            if (!source.has_suffix (".py"))
+                return false;
+
+        if (Environment.find_program_in_path ("pycompile") == null)
+            return false;
+
+        var version = get_version ();
+        if (version == null)
+            return false;
+        var tokens = version.split (".");
+        if (tokens.length < 2)
+            return false;
+
+        var python_dir = Path.build_filename (recipe.library_directory, "python%s.%s".printf (tokens[0], tokens[1]), "site-packages", library);
+        foreach (var source in sources)
+            recipe.add_install_rule (source, python_dir);
+
+        return true;
+    }
+
+    private string? get_version ()
+    {
+        int exit_status;
+        string version_string;
+        try
+        {
+            Process.spawn_command_line_sync ("python --version", null, out version_string, out exit_status);
+        }
+        catch (SpawnError e)
+        {
+            return null;
+        }
+        if (exit_status != 0)
+            return null;
+
+        version_string = version_string.strip ();
+        var tokens = version_string.split (" ", 2);
+        if (tokens.length != 2)
+            return null;
+
+        return tokens[1];
+    }
 }
