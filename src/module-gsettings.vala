@@ -1,16 +1,11 @@
 public class GSettingsModule : BuildModule
 {
-    public override void generate_rules (Recipe recipe)
+    public override void generate_toplevel_rules (Recipe recipe)
     {
-        var gsettings_schema_list = recipe.get_variable ("gsettings.schemas");
-        if (gsettings_schema_list == null)
-            return;
+        var dir = Path.build_filename (recipe.data_directory, "glib-2.0", "schemas");
+        recipe.set_variable ("data|gsettings-schemas|install-directory", dir);
 
-        var schemas = split_variable (gsettings_schema_list);
-        foreach (var schema in schemas)
-        {
-            var dir = "%s/glib-2.0/schemas".printf (recipe.data_directory);
-            recipe.add_install_rule (schema, dir);
-        }
+        dir = Path.build_filename (recipe.data_directory, "GConf", "gsettings");
+        recipe.set_variable ("data|gsettings-data-convert|install-directory", dir);
     }
 }
