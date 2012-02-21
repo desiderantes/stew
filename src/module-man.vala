@@ -2,7 +2,7 @@ public class ManModule : BuildModule
 {
     public override void generate_rules (Recipe recipe)
     {
-        var man_page_list = recipe.get_variable ("man.pages");
+        var man_page_list = recipe.get_variable ("man|pages");
         if (man_page_list == null)
             return;
 
