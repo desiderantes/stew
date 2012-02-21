@@ -13,6 +13,7 @@ Overview of changes in bake 0.1.0
     * Change variable separator from . to | so can use . for versioning
     * Rename intltool rules to gettext
     * Add an easy way to define variables to be passed to programs/libraries
+    * Automatically generate .desktop files for desktop applications
 
 Overview of changes in bake 0.0.7
 
