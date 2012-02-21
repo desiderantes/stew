@@ -192,6 +192,7 @@ public class ValaModule : BuildModule
             var vapi_filename = "%s.vapi".printf (name);
             var deps_filename = "%s.deps".printf (name);
             var gir_filename = "%s-0.0.gir".printf (name);
+            var typelib_filename = "%s-0.0.typelib".printf (name);
 
             interface_rule = recipe.add_rule ();
             foreach (var input in valac_inputs)
@@ -215,6 +216,18 @@ public class ValaModule : BuildModule
 
             var gir_directory = Path.build_filename (recipe.data_directory, "gir-1.0");
             recipe.add_install_rule (gir_filename, gir_directory);
+
+            /* Build a typelib */
+            recipe.build_rule.inputs.append (typelib_filename);
+            var typelib_rule = recipe.add_rule ();
+            typelib_rule.inputs.append (gir_filename);
+            typelib_rule.inputs.append (binary_name);
+            typelib_rule.outputs.append (typelib_filename);
+            if (pretty_print)
+                typelib_rule.commands.append ("@echo '    G-IR-COMPILER %s'".printf (typelib_filename));
+            typelib_rule.commands.append ("@g-ir-compiler --shared-library=%s %s -o %s".printf (name, gir_filename, typelib_filename));
+            var typelib_directory = Path.build_filename (recipe.library_directory, "girepository-1.0");
+            recipe.add_install_rule (typelib_filename, typelib_directory);
         }
         foreach (var source in sources)
         {
