@@ -32,7 +32,7 @@ public class ValaModule : BuildModule
         rule.outputs.append (filename);
         if (pretty_print)
             rule.commands.append ("@echo '    PKG-CONFIG %s'".printf (filename));
-        rule.commands.append ("@echo \"Name: %s\" > %s".printf (name, filename));        
+        rule.commands.append ("@echo \"Name: %s\" > %s".printf (name, filename));
         rule.commands.append ("@echo \"Description: %s\" >> %s".printf (description, filename));
         rule.commands.append ("@echo \"Version: %s\" >> %s".printf (version, filename));
         rule.commands.append ("@echo \"Requires: %s\" >> %s".printf (requires, filename));
@@ -226,7 +226,7 @@ public class ValaModule : BuildModule
             rule.outputs.append (vapi_filename);
             rule.outputs.append (vapi_stamp_filename);
             if (pretty_print)
-                rule.commands.append ("@echo '    VALAC %s'".printf (vapi_filename));            
+                rule.commands.append ("@echo '    VALAC %s'".printf (vapi_filename));
             rule.commands.append ("@valac --fast-vapi=%s %s".printf (vapi_filename, source));
             rule.commands.append ("@touch %s".printf (vapi_stamp_filename));
 
@@ -304,7 +304,7 @@ public class ValaModule : BuildModule
             recipe.add_install_rule (binary_name, recipe.library_directory);
         else
             recipe.add_install_rule (binary_name, recipe.binary_directory);
-        
+
         if (is_library)
             header_rule.commands.append (header_command);
 
