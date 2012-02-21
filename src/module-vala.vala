@@ -184,23 +184,25 @@ public class ValaModule : BuildModule
             }
         }
 
-        Rule? header_rule = null;
-        string header_command = null;
+        Rule? interface_rule = null;
+        string interface_command = null;
         if (is_library)
         {
             var h_filename = "%s.h".printf (name);
             var vapi_filename = "%s.vapi".printf (name);
             var deps_filename = "%s.deps".printf (name);
+            var gir_filename = "%s-0.0.gir".printf (name);
 
-            header_rule = recipe.add_rule ();
+            interface_rule = recipe.add_rule ();
             foreach (var input in valac_inputs)
-                header_rule.inputs.append (input);
-            header_rule.outputs.append (h_filename);
-            header_rule.outputs.append (vapi_filename);
-            header_rule.outputs.append (deps_filename);
+                interface_rule.inputs.append (input);
+            interface_rule.outputs.append (h_filename);
+            interface_rule.outputs.append (vapi_filename);
+            interface_rule.outputs.append (deps_filename);
+            interface_rule.outputs.append (gir_filename);
             if (pretty_print)
-                header_rule.commands.append ("@echo '    VALAC %s %s'".printf (h_filename, vapi_filename));
-            header_command = valac_command + " --ccode --header=%s --vapi=%s".printf (h_filename, vapi_filename);
+                interface_rule.commands.append ("@echo '    VALAC %s %s'".printf (h_filename, vapi_filename));
+            interface_command = valac_command + " --ccode --header=%s --vapi=%s --library=%s --gir=%s".printf (h_filename, vapi_filename, name, gir_filename);
 
             recipe.build_rule.inputs.append (h_filename);
             var include_directory = Path.build_filename (recipe.include_directory, name);
@@ -210,6 +212,9 @@ public class ValaModule : BuildModule
             var vapi_directory = Path.build_filename (recipe.data_directory, "vala", "vapi");
             recipe.add_install_rule (vapi_filename, vapi_directory);
             recipe.add_install_rule (deps_filename, vapi_directory);
+
+            var gir_directory = Path.build_filename (recipe.data_directory, "gir-1.0");
+            recipe.add_install_rule (gir_filename, gir_directory);
         }
         foreach (var source in sources)
         {
@@ -233,8 +238,8 @@ public class ValaModule : BuildModule
             /* Combine the vapi files into a header */
             if (is_library)
             {
-                header_rule.inputs.append (vapi_filename);
-                header_command += " --use-fast-vapi=%s".printf (vapi_filename);
+                interface_rule.inputs.append (vapi_filename);
+                interface_command += " --use-fast-vapi=%s".printf (vapi_filename);
             }
 
             var c_filename = recipe.get_build_path (replace_extension (source, "c"));
@@ -306,7 +311,7 @@ public class ValaModule : BuildModule
             recipe.add_install_rule (binary_name, recipe.binary_directory);
 
         if (is_library)
-            header_rule.commands.append (header_command);
+            interface_rule.commands.append (interface_command);
 
         return true;
     }
