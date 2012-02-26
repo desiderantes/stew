@@ -1,7 +1,10 @@
-public class Vala : Object
+namespace Example
 {
-    public void hello ()
+    public class Vala : Object
     {
-        stdout.printf ("Hello World!\n");
+        public void hello ()
+        {
+            stdout.printf ("Hello World!\n");
+        }
     }
 }

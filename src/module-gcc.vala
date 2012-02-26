@@ -16,39 +16,57 @@ public class GCCModule : BuildModule
 
     public override bool generate_program_rules (Recipe recipe, string program)
     {
-        return generate_compile_rules (recipe, "programs", program, false);
+        var binary_name = program;
+        return generate_compile_rules (recipe, "programs", program, binary_name);
     }
 
     public override bool generate_library_rules (Recipe recipe, string library)
     {
-        if (!generate_compile_rules (recipe, "libraries", library, true))
+        var version = recipe.get_variable ("libraries|%s|version".printf (library));
+        if (version == null)
+            version = "0";
+        var major_version = version;
+        var index = version.index_of (".");
+        if (index > 0)
+            major_version = version.substring (0, index);
+
+        var binary_name = "lib%s.so.%s".printf (library, version);
+        var namespace = recipe.get_variable ("libraries|%s|namespace".printf (library));
+        if (!generate_compile_rules (recipe, "libraries", library, binary_name, namespace, true))
             return false;
+
+        /* Generate a symbolic link to the library and install both the link and the library */
+        var rule = recipe.add_rule ();
+        var unversioned_binary_name = "lib%s.so".printf (library);
+        recipe.build_rule.inputs.append (unversioned_binary_name);
+        rule.inputs.append (binary_name);
+        rule.outputs.append (unversioned_binary_name);
+        if (pretty_print)
+            rule.commands.append ("@echo '    LINK %s'".printf (unversioned_binary_name));
+        rule.commands.append ("@ln -s %s %s".printf (binary_name, unversioned_binary_name));
+        recipe.add_install_rule (unversioned_binary_name, recipe.library_directory);
+        recipe.add_install_rule (binary_name, recipe.library_directory);
 
         var header_list = recipe.get_variable ("libraries|%s|headers".printf (library));
         /* Install headers */
-        var include_directory = Path.build_filename (recipe.include_directory, library);
+        var include_directory = Path.build_filename (recipe.include_directory, "%s-%s".printf (library, major_version));
         if (header_list != null)
             foreach (var header in split_variable (header_list))
                 recipe.add_install_rule (header, include_directory);
 
         /* Generate pkg-config file */
-        var filename = "%s.pc".printf (library);
+        var filename = "%s-%s.pc".printf (library, major_version);
         var name = recipe.get_variable ("libraries|%s|name".printf (library));
         if (name == null)
             name = library;
         var description = recipe.get_variable ("libraries|%s|description".printf (library));
         if (description == null)
             description = "";
-        var version = recipe.get_variable ("libraries|%s|version".printf (library));
-        if (version == null)
-            version = recipe.package_version;
-        if (version == null)
-            version = "0";
         var requires = recipe.get_variable ("libraries|%s|requires".printf (library));
         if (requires == null)
             requires = "";
 
-        var rule = recipe.add_rule ();
+        rule = recipe.add_rule ();
         recipe.build_rule.inputs.append (filename);
         rule.outputs.append (filename);
         if (pretty_print)
@@ -59,18 +77,13 @@ public class GCCModule : BuildModule
         rule.commands.append ("@echo \"Requires: %s\" >> %s".printf (requires, filename));
         rule.commands.append ("@echo \"Libs: -L%s -l%s\" >> %s".printf (recipe.library_directory, library, filename));
         rule.commands.append ("@echo \"Cflags: -I%s\" >> %s".printf (include_directory, filename));
-
         recipe.add_install_rule (filename, Path.build_filename (recipe.library_directory, "pkgconfig"));
 
         return true;        
     }
 
-    private bool generate_compile_rules (Recipe recipe, string type_name, string name, bool is_library)
+    private bool generate_compile_rules (Recipe recipe, string type_name, string name, string binary_name, string? namespace = null, bool is_library = false)
     {
-        var binary_name = name;
-        if (is_library)
-            binary_name = "lib%s.so".printf (name);
-
         var source_list = recipe.get_variable ("%s|%s|sources".printf (type_name, name));
         if (source_list == null)
             return false;
@@ -126,6 +139,7 @@ public class GCCModule : BuildModule
                 if (library_rule != null)
                 {
                     var rel_dir = get_relative_path (recipe.dirname, library_rule.recipe.dirname);
+                    // FIXME: Actually use the .pc file
                     cflags += " -I%s".printf (rel_dir);
                     link_rule.inputs.append (Path.build_filename (rel_dir, library_filename));
                     ldflags += " -L%s -l%s".printf (rel_dir, package);

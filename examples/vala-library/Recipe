@@ -1,5 +1,6 @@
 package|name = example
-libraries|example|version = 0.0.1
+libraries|example|version = 0
+libraries|example|namespace = Example
 libraries|example|sources = example.vala
 libraries|example|packages = gobject-2.0 glib-2.0
 libraries|example|description = Example Library
