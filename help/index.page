@@ -20,6 +20,10 @@
     <title>Application Data</title>
 </section>
 
+<section id="releases" style="2column">
+    <title>Making Releases</title>
+</section>
+
 <section id="advanced" style="2column">
     <title>Advanced Options</title>
 </section>
