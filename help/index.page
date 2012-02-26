@@ -1,13 +1,30 @@
-<page xmlns="http://projectmallard.org/1.0/"
-      type="guide"
-      id="index">
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="index">
+<info>
+    <credit type="author">
+        <name>Robert Ancell</name>
+        <email>robert.ancell@gmail.com</email>
+    </credit>
+</info>
 
-	<info>
-		<credit type="author">
-			<name>Robert Ancell</name>
-			<email>robert.ancell@gmail.com</email>
-		</credit>
-	</info>
+<title>Bake Help</title>
 
-	<title>Bake Help</title>
+<section id="basics" style="2column">
+    <title>Getting Started</title>
+</section>
+
+<section id="programs-and-libraries" style="2column">
+    <title>Programs and Libraries</title>
+</section>
+
+<section id="data" style="2column">
+    <title>Application Data</title>
+</section>
+
+<section id="release" style="2column">
+    <title>Releasing</title>
+</section>
+
+<section id="advanced" style="2column">
+    <title>Advanced Options</title>
+</section>
 </page>
