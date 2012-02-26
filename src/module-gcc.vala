@@ -47,11 +47,12 @@ public class GCCModule : BuildModule
         recipe.add_install_rule (unversioned_binary_name, recipe.library_directory);
         recipe.add_install_rule (binary_name, recipe.library_directory);
 
-        var header_list = recipe.get_variable ("libraries|%s|headers".printf (library));
         /* Install headers */
+        var header_list = recipe.get_variable ("libraries|%s|headers".printf (library));
+        var headers = split_variable (header_list);
         var include_directory = Path.build_filename (recipe.include_directory, "%s-%s".printf (library, major_version));
         if (header_list != null)
-            foreach (var header in split_variable (header_list))
+            foreach (var header in headers)
                 recipe.add_install_rule (header, include_directory);
 
         /* Generate pkg-config file */
@@ -65,7 +66,6 @@ public class GCCModule : BuildModule
         var requires = recipe.get_variable ("libraries|%s|requires".printf (library));
         if (requires == null)
             requires = "";
-
         rule = recipe.add_rule ();
         recipe.build_rule.inputs.append (filename);
         rule.outputs.append (filename);
@@ -78,6 +78,51 @@ public class GCCModule : BuildModule
         rule.commands.append ("@echo \"Libs: -L%s -l%s\" >> %s".printf (recipe.library_directory, library, filename));
         rule.commands.append ("@echo \"Cflags: -I%s\" >> %s".printf (include_directory, filename));
         recipe.add_install_rule (filename, Path.build_filename (recipe.library_directory, "pkgconfig"));
+
+        /* Generate introspection */
+        if (namespace != null)
+        {
+            var source_list = recipe.get_variable ("libraries|%s|sources".printf (library));
+            var sources = split_variable (source_list);
+
+            /* Generate a .gir from the sources */
+            var gir_filename = "%s-%s.gir".printf (namespace, major_version);
+            recipe.build_rule.inputs.append (gir_filename);
+            var gir_rule = recipe.add_rule ();
+            gir_rule.inputs.append ("lib%s.so".printf (library));
+            gir_rule.outputs.append (gir_filename);
+            if (pretty_print)
+                gir_rule.commands.append ("@echo '    G-IR-SCANNER %s'".printf (gir_filename));
+            var scan_command = "@g-ir-scanner --no-libtool --namespace=%s --nsversion=%s --library=%s --output %s".printf (namespace, major_version, library, gir_filename);
+            // FIXME: Need to sort out inputs correctly
+            scan_command += " --include=GObject-2.0";
+            foreach (var source in sources)
+            {
+                gir_rule.inputs.append (source);
+                scan_command += " %s".printf (source);
+            }
+            foreach (var header in headers)
+            {
+                gir_rule.inputs.append (header);
+                scan_command += " %s".printf (header);
+            }
+            gir_rule.commands.append (scan_command);
+            var gir_directory = Path.build_filename (recipe.data_directory, "gir-1.0");
+            recipe.add_install_rule (gir_filename, gir_directory);
+
+            /* Compile the .gir into a typelib */
+            var typelib_filename = "%s-%s.typelib".printf (namespace, major_version);
+            recipe.build_rule.inputs.append (typelib_filename);
+            var typelib_rule = recipe.add_rule ();
+            typelib_rule.inputs.append (gir_filename);
+            typelib_rule.inputs.append ("lib%s.so".printf (library));
+            typelib_rule.outputs.append (typelib_filename);
+            if (pretty_print)
+                typelib_rule.commands.append ("@echo '    G-IR-COMPILER %s'".printf (typelib_filename));
+            typelib_rule.commands.append ("@g-ir-compiler --shared-library=%s %s -o %s".printf (library, gir_filename, typelib_filename));
+            var typelib_directory = Path.build_filename (recipe.library_directory, "girepository-1.0");
+            recipe.add_install_rule (typelib_filename, typelib_directory);
+        }
 
         return true;        
     }

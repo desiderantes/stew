@@ -14,6 +14,7 @@ Overview of changes in bake 0.1.0
     * Rename intltool rules to gettext
     * Add an easy way to define variables to be passed to programs/libraries
     * Automatically generate .desktop files for desktop applications
+    * Add C library GIR support
 
 Overview of changes in bake 0.0.7
 
