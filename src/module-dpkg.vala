@@ -47,8 +47,7 @@ public class DpkgModule : BuildModule
             email = "%s@%s".printf (Environment.get_user_name (), Environment.get_host_name ());
         var now = Time.local (time_t ());
         var release_date = now.format ("%a, %d %b %Y %H:%M:%S %z");
-        if (pretty_print)
-            rule.commands.append ("@echo '    Writing debian/changelog'");
+        rule.add_status_command ("Writing debian/changelog");
         rule.commands.append ("@echo \"%s (%s-%s) %s; urgency=low\" > %s".printf (recipe.package_name, recipe.package_version, debian_revision, distribution, changelog_file));
         rule.commands.append ("@echo >> %s".printf (changelog_file));
         rule.commands.append ("@echo \"  * Initial release.\" >> %s".printf (changelog_file));
@@ -57,8 +56,7 @@ public class DpkgModule : BuildModule
 
         /* Generate debian/rules */
         var rules_file = "%s/debian/rules".printf (build_dir);
-        if (pretty_print)
-            rule.commands.append ("@echo '    Writing debian/rules'");
+        rule.add_status_command ("Writing debian/rules");
         rule.commands.append ("@echo \"#!/usr/bin/make -f\" > %s".printf (rules_file));
         rule.commands.append ("@echo >> %s".printf (rules_file));
         rule.commands.append ("@echo \"%%:\" >> %s".printf (rules_file));
@@ -83,8 +81,7 @@ public class DpkgModule : BuildModule
         var build_depends = "debhelper"; // "bake"
         var short_description = "Short description of %s".printf (recipe.package_name);
         var long_description = "Long description of %s".printf (recipe.package_name);
-        if (pretty_print)
-            rule.commands.append ("@echo '    Writing debian/control'");
+        rule.add_status_command ("Writing debian/control");
         rule.commands.append ("@echo \"Source: %s\" > %s".printf (recipe.package_name, control_file));
         rule.commands.append ("@echo \"Maintainer: %s <%s>\" >> %s".printf (name, email, control_file));
         rule.commands.append ("@echo \"Build-Depends: %s\" >> %s".printf (build_depends, control_file));
@@ -97,13 +94,11 @@ public class DpkgModule : BuildModule
             rule.commands.append ("@echo \" %s\" >> %s".printf (line, control_file));
 
         /* Generate debian/source/format */
-        if (pretty_print)
-            rule.commands.append ("@echo '    Writing debian/compat'");
+        rule.add_status_command ("Writing debian/compat");
         rule.commands.append ("@echo \"7\" > %s/debian/compat".printf (build_dir));
 
         /* Generate debian/source/format */
-        if (pretty_print)
-            rule.commands.append ("@echo '    Writing debian/source/format'");
+        rule.add_status_command ("Writing debian/source/format");
         rule.commands.append ("@mkdir -p %s/debian/source".printf (build_dir));
         rule.commands.append ("@echo \"3.0 (quilt)\" > %s/debian/source/format".printf (build_dir));
 
@@ -116,8 +111,7 @@ public class DpkgModule : BuildModule
         rule.outputs.append (changes_file);
         rule.inputs.append (orig_file);
         rule.inputs.append (debian_file);
-        if (pretty_print)
-            rule.commands.append ("@echo '    DPKG'");
+        rule.add_status_command ("DPKG");
         rule.commands.append ("@rm -rf %s".printf (build_dir));
         rule.commands.append ("@mkdir -p %s".printf (build_dir));
         rule.commands.append ("@cp %s %s %s".printf (orig_file, debian_file, build_dir));
@@ -132,8 +126,7 @@ public class DpkgModule : BuildModule
         rule.outputs.append (deb_file);
         rule.inputs.append (orig_file);
         rule.inputs.append (debian_file);
-        if (pretty_print)
-            rule.commands.append ("@echo '    DPKG'");
+        rule.add_status_command ("DPKG");
         rule.commands.append ("@rm -rf %s".printf (build_dir));
         rule.commands.append ("@mkdir -p %s".printf (build_dir));
         rule.commands.append ("@cp %s %s %s".printf (orig_file, debian_file, build_dir));

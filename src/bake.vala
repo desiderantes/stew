@@ -229,6 +229,15 @@ public class Rule
                 throw new BuildError.MISSING_OUTPUT ("Failed to build file %s", output);
         }
     }
+
+    public void add_status_command (string status)
+    {
+        if (!pretty_print)
+            return;
+
+        // FIXME: Escape if necessary
+        commands.append ("@echo '    %s'".printf (status));
+    }
 }
 
 public class Recipe
@@ -523,8 +532,7 @@ public class Recipe
                         warning ("Not making clean rule for absolute directory %s", output);
                     else
                     {
-                        if (pretty_print)
-                            clean_rule.commands.append ("@echo '    RM %s'".printf (output));
+                        clean_rule.add_status_command ("RM %s".printf (output));
                         clean_rule.commands.append ("@rm -rf %s".printf (output));
                     }
                 }
@@ -534,8 +542,7 @@ public class Recipe
 
                     if (!output.has_prefix (build_dir + "/"))
                     {
-                        if (pretty_print)
-                            clean_rule.commands.append ("@echo '    RM %s'".printf (output));
+                        clean_rule.add_status_command ("RM %s".printf (output));
                         clean_rule.commands.append ("@rm -f %s".printf (output));
                     }
                 }

@@ -47,8 +47,7 @@ public class RPMModule : BuildModule
         rule.commands.append ("@rm -rf %s".printf (build_dir));
         rule.commands.append ("@mkdir %s".printf (build_dir));
         rule.commands.append ("@cd %s && tar --extract --gzip --file ../%s".printf (build_dir, gzip_file));
-        if (pretty_print)
-            rule.commands.append ("@echo '    Writing %s.spec'".printf (recipe.package_name));
+        rule.add_status_command ("Writing %s.spec".printf (recipe.package_name));
         rule.commands.append ("@echo \"Summary: %s\" > %s".printf (summary, spec_file));
         rule.commands.append ("@echo \"Name: %s\" >> %s".printf (recipe.package_name, spec_file));
         rule.commands.append ("@echo \"Version: %s\" >> %s".printf (recipe.package_version, spec_file));
@@ -75,8 +74,7 @@ public class RPMModule : BuildModule
         rule.commands.append ("@echo \"%%files -f FILE-LIST\" >> %s".printf (spec_file));
         rule.commands.append ("@echo >> %s".printf (spec_file));
         rule.commands.append ("@cd %s && tar --create --gzip --file ../%s %s".printf (build_dir, source_file, recipe.release_name));
-        if (pretty_print)
-            rule.commands.append ("@echo '    RPM %s'".printf (rpm_file));
+        rule.add_status_command ("RPM %s".printf (rpm_file));
         rule.commands.append ("@rpmbuild -tb %s".printf (source_file));
         rule.commands.append ("@cp %s/rpmbuild/RPMS/%s/%s .".printf (Environment.get_home_dir (), build_arch, rpm_file));
         rule.commands.append ("@rm -f %s".printf (source_file));

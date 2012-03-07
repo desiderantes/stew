@@ -41,8 +41,7 @@ public class GCCModule : BuildModule
         recipe.build_rule.inputs.append (unversioned_binary_name);
         rule.inputs.append (binary_name);
         rule.outputs.append (unversioned_binary_name);
-        if (pretty_print)
-            rule.commands.append ("@echo '    LINK %s'".printf (unversioned_binary_name));
+        rule.add_status_command ("LINK %s".printf (unversioned_binary_name));
         rule.commands.append ("@ln -s %s %s".printf (binary_name, unversioned_binary_name));
         recipe.add_install_rule (unversioned_binary_name, recipe.library_directory);
         recipe.add_install_rule (binary_name, recipe.library_directory);
@@ -69,8 +68,7 @@ public class GCCModule : BuildModule
         rule = recipe.add_rule ();
         recipe.build_rule.inputs.append (filename);
         rule.outputs.append (filename);
-        if (pretty_print)
-            rule.commands.append ("@echo '    PKG-CONFIG %s'".printf (filename));
+        rule.add_status_command ("PKG-CONFIG %s".printf (filename));
         rule.commands.append ("@echo \"Name: %s\" > %s".printf (name, filename));        
         rule.commands.append ("@echo \"Description: %s\" >> %s".printf (description, filename));
         rule.commands.append ("@echo \"Version: %s\" >> %s".printf (version, filename));
@@ -91,8 +89,7 @@ public class GCCModule : BuildModule
             var gir_rule = recipe.add_rule ();
             gir_rule.inputs.append ("lib%s.so".printf (library));
             gir_rule.outputs.append (gir_filename);
-            if (pretty_print)
-                gir_rule.commands.append ("@echo '    G-IR-SCANNER %s'".printf (gir_filename));
+            gir_rule.add_status_command ("G-IR-SCANNER %s".printf (gir_filename));
             var scan_command = "@g-ir-scanner --no-libtool --namespace=%s --nsversion=%s --library=%s --output %s".printf (namespace, major_version, library, gir_filename);
             // FIXME: Need to sort out inputs correctly
             scan_command += " --include=GObject-2.0";
@@ -117,8 +114,7 @@ public class GCCModule : BuildModule
             typelib_rule.inputs.append (gir_filename);
             typelib_rule.inputs.append ("lib%s.so".printf (library));
             typelib_rule.outputs.append (typelib_filename);
-            if (pretty_print)
-                typelib_rule.commands.append ("@echo '    G-IR-COMPILER %s'".printf (typelib_filename));
+            typelib_rule.add_status_command ("G-IR-COMPILER %s".printf (typelib_filename));
             typelib_rule.commands.append ("@g-ir-compiler --shared-library=%s %s -o %s".printf (library, gir_filename, typelib_filename));
             var typelib_directory = Path.build_filename (recipe.library_directory, "girepository-1.0");
             recipe.add_install_rule (typelib_filename, typelib_directory);
@@ -244,8 +240,7 @@ public class GCCModule : BuildModule
                 command += " -fPIC";
             command += cflags;
             command += " -c %s -o %s".printf (input, output);
-            if (pretty_print)
-                rule.commands.append ("@echo '    GCC %s'".printf (input));
+            rule.add_status_command ("GCC %s".printf (input));
             rule.commands.append (command);
 
             link_rule.inputs.append (output);
@@ -254,8 +249,7 @@ public class GCCModule : BuildModule
 
         recipe.build_rule.inputs.append (binary_name);
 
-        if (pretty_print)
-            link_rule.commands.append ("@echo '    GCC-LINK %s'".printf (binary_name));
+        link_rule.add_status_command ("GCC-LINK %s".printf (binary_name));
         link_command += ldflags;
         link_command += " -o %s".printf (binary_name);
         link_rule.commands.append (link_command);

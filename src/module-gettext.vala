@@ -26,8 +26,7 @@ public class GettextModule : BuildModule
             recipe.build_rule.inputs.append (pot_file);
             var pot_rule = recipe.add_rule ();
             pot_rule.outputs.append (pot_file);
-            if (pretty_print)
-                pot_rule.commands.append ("@echo '    GETTEXT %s'".printf (pot_file));
+            pot_rule.add_status_command ("GETTEXT %s".printf (pot_file));
             var gettext_command = "@xgettext --extract-all --from-code=utf-8 --output %s".printf (pot_file);
             foreach (var source in gettext_sources)
             {

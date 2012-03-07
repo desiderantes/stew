@@ -25,8 +25,7 @@ public class DesktopModule : BuildModule
             recipe.build_rule.inputs.append (filename);
             rule.outputs.append (filename);
 
-            if (pretty_print)
-                rule.commands.append ("@echo '    DESKTOP %s'".printf (filename));
+            rule.add_status_command ("DESKTOP %s".printf (filename));
             rule.commands.append ("@echo \"[Desktop Entry]\" > %s".printf (filename));
             rule.commands.append ("@echo \"Type=Application\" >> %s".printf (filename));
             if (categories != null)

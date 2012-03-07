@@ -12,7 +12,7 @@ public class GHCModule : BuildModule
 
         var link_rule = recipe.add_rule ();
         link_rule.outputs.append (program);
-        var link_pretty_command = "@echo '    LINK";
+        var link_pretty_command = "LINK";
         var link_command = "@ghc -o %s".printf (program);
         foreach (var source in sources)
         {
@@ -23,8 +23,7 @@ public class GHCModule : BuildModule
             rule.inputs.append (source);
             rule.outputs.append (output);
             rule.outputs.append (interface_file);
-            if (pretty_print)
-                rule.commands.append ("@echo '    HC %s'".printf (source));
+            rule.add_status_command ("HC %s".printf (source));
             rule.commands.append ("@ghc -c %s".printf (source));
 
             link_rule.inputs.append (output);
@@ -33,9 +32,7 @@ public class GHCModule : BuildModule
         }
 
         recipe.build_rule.inputs.append (program);
-        link_pretty_command += "'";
-        if (pretty_print)
-            link_rule.commands.append (link_pretty_command);
+        link_rule.add_status_command (link_pretty_command);
         link_rule.commands.append (link_command);
 
         recipe.add_install_rule (program, recipe.binary_directory);

@@ -20,8 +20,7 @@ public class PythonModule : BuildModule
             var rule = recipe.add_rule ();
             rule.inputs.append (source);
             rule.outputs.append (output);
-            if (pretty_print)
-                rule.commands.append ("@echo '    PYC %s'".printf (source));		
+            rule.add_status_command ("PYC %s".printf (source));		
             rule.commands.append ("@pycompile %s".printf (source));
             recipe.build_rule.inputs.append (output);
 
@@ -84,8 +83,7 @@ public class PythonModule : BuildModule
             var rule = recipe.add_rule ();
             rule.inputs.append (source);
             rule.outputs.append (output);
-            if (pretty_print)
-                rule.commands.append ("@echo '    PYC %s'".printf (source));		
+            rule.add_status_command ("PYC %s".printf (source));		
             rule.commands.append ("@pycompile %s".printf (source));
             recipe.build_rule.inputs.append (output);
 
