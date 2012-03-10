@@ -8,12 +8,21 @@
 
 <title>Bake Help</title>
 
+<p>
+Bake is a <em>build system</em> that takes a project that is made up of programs, applications and data and provides methods of compiling, testing, installing and distributing that project.
+To use Bake you need to generate <em>recipes</em> that describe how the components of your project fit together.
+</p>
+
 <section id="basics" style="2column">
-    <title>Getting Started</title>
+    <title>Writing Recipes</title>
+</section>
+
+<section id="targets" style="2column">
+    <title>Basic Usage</title>
 </section>
 
 <section id="programs-and-libraries" style="2column">
-    <title>Programs and Libraries</title>
+    <title>Language Support</title>
 </section>
 
 <section id="data" style="2column">

@@ -6,5 +6,22 @@
 <title>Uploading Releases</title>
 
 <p>
+Many projects are developed using a remote hosting service.
+Bake knows how some of these services work and makes targets in the toplevel recipe to make it releasing easy.
+Support services are Launchpad (targets <em>release-launchpad</em>, <em>release-ppa</em>) and GNOME (<em>release-gnome</em>).
 </p>
+<p>
+FIXME: Define special variables
+</p>
+<example>
+<p>
+For example, if your <em>foo</em> uses Launchpad for code hosting, go to the top level directory and type:
+</p>
+<code>
+bake release-launchpad
+</code>
+<p>
+This will build a file archive of the current project and upload it to the Launchpad project foo.
+</p>
+</example>
 </page>

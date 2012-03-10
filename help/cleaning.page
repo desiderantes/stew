@@ -1,10 +1,30 @@
 <page xmlns="http://projectmallard.org/1.0/" type="guide" id="cleaning">
 <info>
-    <link type="guide" xref="index#basics"/>
+    <link type="guide" xref="index#targets"/>
 </info>
 
 <title>Cleaning</title>
 
 <p>
+Cleaning is the process of removing any files that have been <link xref="building">generated</link> in your project.
+This is useful if you need to return your project directory to the original state before building or need to force a rebuild.
+The <em>clean</em> target deletes these file from the current recipe and any child recipes.
 </p>
+<example>
+<p>
+For example, if you run the command for a project that uses C source code:
+</p>
+<code>
+bake clean
+</code>
+<p>
+All the .o files and the project binaries that were compiled will be deleted.
+</p>
+</example>
+<note>
+<p>
+Cleaning does not remove the project configuration (the toplevel <em>Recipe.conf</em>).
+To do this you need to run <em>bake --unconfigure</em> or delete this file yourself.
+</p>
+</note>
 </page>

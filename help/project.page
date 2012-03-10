@@ -3,8 +3,42 @@
     <link type="guide" xref="index#basics"/>
 </info>
 
-<title>Starting a Bake Project</title>
+<title>Recipe Files</title>
 
 <p>
+To describe your project to Bake you need to have a <em>recipe</em> file in the toplevel directory of your project.
+This file is called <em>Recipe</em> (case sensitive) and defines the components of your project.
 </p>
+
+<p>
+There are two variables that are required in the toplevel file.
+<em>project|name</em> defines the name of the project.
+<em>project|version</em> defines the current version of this project.
+</p>
+<example>
+<p>
+For example, the <em>foo</em> project (version 0.0.1) has a file called <em>Recipe</em> in the toplevel of the project.
+This file contains:
+</p>
+<code>
+project|name = foo
+project|version = 0.0.1
+</code>
+</example>
+<p>
+To make your project more managable you can have recipe files in the subdirectories under the toplevel recipe file.
+When running bake it will automatically look for a recipe file in the current directory, look in find the toplevel recipe and load all the recipes that are decended from it.
+Each recipe inherits all the variables from the parent so you can define common values in one recipe and use them in any recipes below this one.
+</p>
+<example>
+<p>
+For example, projects are commonly structured to have source files in a <em>src</em> subdirectory and data files in a <em>data</em> subdirectory.
+In this case you would have three recipes, one for defining the project, one for defining how the source is compiled and one more for defining the data files:
+</p>
+<code>
+Recipe
+data/Recipe
+src/Recipe
+</code>
+</example>
 </page>

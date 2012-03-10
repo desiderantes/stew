@@ -1,0 +1,30 @@
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="installing">
+<info>
+    <link type="guide" xref="index#targets"/>
+</info>
+
+<title>Installing</title>
+
+<p>
+Installing is the process of taking your built project and copying the files to their specified locations so they can be used correctly.
+The <em>install</em> target does this for the recipe and its decendants.
+Running this target will automatically <link xref="building">build</link> any files that are needed.
+</p>
+<example>
+<p>
+If you project contains a single program called <em>foo</em>, then running the following:
+</p>
+<code>
+bake install
+</code>
+<p>
+will take this program and install it to /usr/bin/foo (on Unix systems)
+</p>
+</example>
+<note>
+<p>
+You must have sufficient privileges to be able to copy the files to their required locations.
+If you need to install the files into a local directory for testing set the <em>install-directory</em> variable when <link xref="config">configuring your project</link>.
+</p>
+</note>
+</page>

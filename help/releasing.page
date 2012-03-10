@@ -1,0 +1,14 @@
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="releasing">
+<info>
+    <link type="guide" xref="index#targets"/>
+</info>
+
+<title>Releasing</title>
+
+<p>
+Releasing is the process of taking your project and making it available to others.
+</p>
+<p>
+FIXME: Link to the releasing pages.
+</p>
+</page>

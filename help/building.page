@@ -1,10 +1,29 @@
 <page xmlns="http://projectmallard.org/1.0/" type="guide" id="building">
 <info>
-    <link type="guide" xref="index#basics"/>
+    <link type="guide" xref="index#targets"/>
 </info>
 
 <title>Building</title>
 
 <p>
+Building is the process of combining the files in your project to their final form suitable for running.
+This may include compiling source code into programs and libraries, generating system configuration and producing documentation.
+Building is done using the <em>build</em> target, however if you don't provide a target to bake it defaults to this.
 </p>
+<example>
+<p>
+For example, running the following for a C project:
+</p>
+<code>
+bake
+</code>
+<p>
+will take the C source code for this project and compile it to an executable file.
+</p>
+</example>
+<note>
+<p>
+You can remove any built files using the <link xref="cleaning">clean</link> target.
+</p>
+</note>
 </page>
