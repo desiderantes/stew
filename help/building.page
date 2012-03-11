@@ -10,6 +10,9 @@ Building is the process of combining the files in your project to their final fo
 This may include compiling source code into programs and libraries, generating system configuration and producing documentation.
 Building is done using the <em>build</em> target, however if you don't provide a target to bake it defaults to this.
 </p>
+<p>
+FIXME: Tell how to build any targets
+</p>
 <example>
 <p>
 For example, running the following for a C project:

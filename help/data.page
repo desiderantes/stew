@@ -6,7 +6,7 @@
 <title>Application Data</title>
 
 <p>
-Application data is data files that are used by your application for normal usage.
+<em>Application data</em> is non-executable files that are used by your application.
 Data can include things like configuration, UI definition, images and documentation.
 </p>
 </page>

@@ -7,7 +7,7 @@
 
 <p>
 Configuring is a process of providing options that will influence how the project is built.
-After a project is configured a file <em>Recipe.conf</em> is generated that contains variables specifying the configuration chosen.
+After a project is configured a file <em>Recipe.conf</em> is generated that contains <link xref="variables">variables</link> specifying the configuration chosen.
 These variables are available in all recipes like normal variables defined in the toplevel recipe.
 </p>
 <p>

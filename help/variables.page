@@ -6,5 +6,24 @@
 <title>Variables</title>
 
 <p>
+A <em>variable</em> allows you to specify a named value for use in a recipe.
 </p>
+<p>
+The syntax for a variable is:
+</p>
+<code>
+<em>name</em> = <em>value</em>
+</code>
+<p>
+Where <em>name</em> is a continuous set of printable characters and <em>value</em> can be anything.
+The variable statement is normally terminated by a newline, if a '\' is the last printable character on a line the value continues to the next line.
+</p>
+<example>
+<p>
+The following are all valid variables:
+</p>
+<code>
+FIXME
+</code>
+</example>
 </page>

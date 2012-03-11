@@ -7,7 +7,7 @@
 
 <p>
 To describe your project to Bake you need to have a <em>recipe</em> file in the toplevel directory of your project.
-This file is called <em>Recipe</em> (case sensitive) and defines the components of your project.
+This text file is called <em>Recipe</em> (case sensitive) and defines the components of your project using <link xref="variables">variables</link> and <link xref="rules">rules</link>.
 </p>
 
 <p>
@@ -41,4 +41,9 @@ data/Recipe
 src/Recipe
 </code>
 </example>
+<note>
+<p>
+You can put comments in your recipes by using the '#' symbol at the start of a line.
+</p>
+</note>
 </page>
