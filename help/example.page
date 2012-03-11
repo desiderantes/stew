@@ -1,0 +1,23 @@
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="example">
+<info>
+    <link type="guide" xref="index#recipes"/>
+</info>
+
+<title>Project Example</title>
+
+<p>
+Here is an example of a recipe for a project:
+</p>
+<code>
+# This is the recipe for the foo project
+
+project|name = foo
+project|version = 0.0.1
+project|files = README
+
+programs|app1|sources = app1.c
+
+data|images|files = image1.png
+data|images|install-directory = $(data|install-directory)/images
+</code>
+</page>

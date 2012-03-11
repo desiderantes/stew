@@ -1,10 +1,11 @@
 <page xmlns="http://projectmallard.org/1.0/" type="guide" id="tests">
 <info>
-    <link type="guide" xref="index#basics"/>
+    <link type="guide" xref="index#recipes"/>
 </info>
 
 <title>Tests</title>
 
 <p>
+Tests are programs that should be run on your project to confirm it is correct.
 </p>
 </page>

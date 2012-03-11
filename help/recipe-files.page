@@ -1,6 +1,6 @@
-<page xmlns="http://projectmallard.org/1.0/" type="guide" id="project">
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="recipe-files">
 <info>
-    <link type="guide" xref="index#basics"/>
+    <link type="guide" xref="index#recipes"/>
 </info>
 
 <title>Recipe Files</title>

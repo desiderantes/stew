@@ -1,6 +1,6 @@
 <page xmlns="http://projectmallard.org/1.0/" type="guide" id="config">
 <info>
-    <link type="guide" xref="index#targets"/>
+    <link type="guide" xref="index#using"/>
 </info>
 
 <title>Configuring</title>

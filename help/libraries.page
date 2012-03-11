@@ -1,10 +1,11 @@
 <page xmlns="http://projectmallard.org/1.0/" type="guide" id="libraries">
 <info>
-    <link type="guide" xref="index#basics"/>
+    <link type="guide" xref="index#recipes"/>
 </info>
 
 <title>Libraries</title>
 
 <p>
+A library is a piece of executable code that can be shared between different <link xref="programs">programs</link>.
 </p>
 </page>

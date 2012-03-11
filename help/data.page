@@ -1,10 +1,12 @@
 <page xmlns="http://projectmallard.org/1.0/" type="guide" id="data">
 <info>
-    <link type="guide" xref="index#basics"/>
+    <link type="guide" xref="index#recipes"/>
 </info>
 
 <title>Application Data</title>
 
 <p>
+Application data is data files that are used by your application for normal usage.
+Data can include things like configuration, UI definition, images and documentation.
 </p>
 </page>

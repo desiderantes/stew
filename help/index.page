@@ -13,12 +13,12 @@ Bake is a <em>build system</em> that takes a project that is made up of programs
 To use Bake you need to generate <em>recipes</em> that describe how the components of your project fit together.
 </p>
 
-<section id="basics" style="2column">
+<section id="recipes" style="2column">
     <title>Writing Recipes</title>
 </section>
 
-<section id="targets" style="2column">
-    <title>Basic Usage</title>
+<section id="using" style="2column">
+    <title>Using Bake</title>
 </section>
 
 <section id="programs-and-libraries" style="2column">
@@ -31,9 +31,5 @@ To use Bake you need to generate <em>recipes</em> that describe how the componen
 
 <section id="releases" style="2column">
     <title>Making Releases</title>
-</section>
-
-<section id="advanced" style="2column">
-    <title>Advanced Options</title>
 </section>
 </page>
