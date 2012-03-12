@@ -1,5 +1,7 @@
 <page xmlns="http://projectmallard.org/1.0/" type="guide" id="recipe-files">
 <info>
+    <!-- Place this at the start of the section -->
+    <title type="sort">0</title>
     <link type="guide" xref="index#recipes"/>
 </info>
 
@@ -27,13 +29,13 @@ project|version = 0.0.1
 </example>
 <p>
 To make your project more managable you can have recipe files in the subdirectories under the toplevel recipe file.
-When running bake it will automatically look for a recipe file in the current directory, look in find the toplevel recipe and load all the recipes that are decended from it.
 Each recipe inherits all the variables from the parent so you can define common values in one recipe and use them in any recipes below this one.
+You can run Bake from any directory containing a recipe; it will find the toplevel one itself and load all its decendendants.
 </p>
 <example>
 <p>
 For example, projects are commonly structured to have source files in a <em>src</em> subdirectory and data files in a <em>data</em> subdirectory.
-In this case you would have three recipes, one for defining the project, one for defining how the source is compiled and one more for defining the data files:
+In this case you would have three recipes, one for defining the project, one for defining the data files and one for defining how the source is compiled:
 </p>
 <code>
 Recipe
