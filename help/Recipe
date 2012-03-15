@@ -1,2 +1,2 @@
-mallard|pages = index.page
-mallard|gettext-domain = bake-help
+data|mallard|bake|pages = index.page
+data|mallard|bake|gettext-domain = bake-help
