@@ -23,11 +23,11 @@ If an install directory is not set, the files are installed to the predefined va
 For example, the foo project can specify images that are required to be installed with:
 </p>
 <code>
-data|mydata|files = image1.png image2.png
-data|mydata|install-directory = $(data|install-directory)/images
+data|images|files = image1.png
+data|images|install-directory = $(data|install-directory)/images
 </code>
 <p>
-When running <code>bake install</code>, Bake will copy these files to <code>/usr/share/foo/images</code>.
+When running the install rule Bake will copy these files to <code>/usr/share/foo/images</code>.
 </p>
 </example>
 </page>

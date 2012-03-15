@@ -8,4 +8,20 @@
 <p>
 A <em>program</em> is executable code that can be run by a user.
 </p>
+<p>
+FIXME: Define programs|<em>name</em>|sources.
+FIXME: Define name, description, desktop files
+</p>
+<example>
+<p>
+The following describes a simple C program that is built from one C file:
+</p>
+<code>
+programs|app1|sources = app1.c
+</code>
+<p>
+When running the <link xref="building">build rule</link> Bake will compile app1.c and produce the application <em>app1</em>.
+When running the <link xref="installing">install rule</link> Bake will install <em>app1</em> into the appropriate directory.
+</p>
+</example>
 </page>

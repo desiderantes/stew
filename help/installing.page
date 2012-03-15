@@ -7,7 +7,7 @@
 
 <p>
 Installing is the process of taking your built project and copying the files to their specified locations so they can be used correctly.
-The <em>install</em> target does this for the recipe and its decendants.
+The <link xref="rules"><em>install</em> rule</link> does this for the recipe and its decendants.
 Running this target will automatically <link xref="building">build</link> any files that are needed.
 </p>
 <example>
