@@ -3,9 +3,10 @@
     <link type="guide" xref="index#recipes"/>
 </info>
 
-<title>Translation</title>
+<title>Translations</title>
 
 <p>
+Your project can support multiple languages using the gettext translation system and Bake.
 FIXME
 </p>
 </page>

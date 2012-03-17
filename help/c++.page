@@ -6,5 +6,30 @@
 <title>C++ Language Support</title>
 
 <p>
+Bake supports <link xref="programs">programs</link> and <link xref="libraries">libraries</link> written in the C++ language.
+Only the GCC compiler is supported.
 </p>
+<p>
+C++ programs and libraries can set the following program <link xref="variables">variables</link> to control compiling:
+</p>
+<table frame="all" shade="rows">
+<thead>
+<tr>
+  <td><p>Name</p></td>
+  <td><p>Description</p></td>
+</tr>
+</thead>
+<tr>
+  <td><p>headers</p></td>
+  <td><p>Header files that specify the library interface (libraries only)</p></td>
+</tr>
+<tr>
+  <td><p>compile-flags</p></td>
+  <td><p>Additional command line flags to use when compiling</p></td>
+</tr>
+<tr>
+  <td><p>link-flags</p></td>
+  <td><p>Additional command line flags to use when linking</p></td>
+</tr>
+</table>
 </page>

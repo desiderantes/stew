@@ -108,12 +108,12 @@ public class ValaModule : BuildModule
         if (sources == null)
             return false;
 
-        var cflags = recipe.get_variable ("%s|%s|cflags".printf (type_name, name));
+        var cflags = recipe.get_variable ("%s|%s|compile-flags".printf (type_name, name));
         if (cflags == null)
             cflags = "";
         else
             cflags = " " + cflags;
-        var ldflags = recipe.get_variable ("%s|%s|ldflags".printf (type_name, name));
+        var ldflags = recipe.get_variable ("%s|%s|link-flags".printf (type_name, name));
         if (ldflags == null)
             ldflags = "";
         else

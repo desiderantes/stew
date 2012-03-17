@@ -27,6 +27,14 @@ The following variables are allowed:
   <td><p>version</p></td>
   <td><p>The version of the library</p></td>
 </tr>
+<tr>
+  <td><p>install-directory</p></td>
+  <td><p>Directory to install the library to</p></td>
+</tr>
+<tr>
+  <td><p>defines</p></td>
+  <td><p>Values to provide to ... FIXME</p></td>
+</tr>
 </table>
 <p>
 Bake will attempt to <link xref="building">build</link> your library by checking the filenames in the <code>sources</code> variable and generating the required <link xref="rules">rules</link>.

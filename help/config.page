@@ -7,7 +7,7 @@
 
 <p>
 Configuring is a process of providing options that will influence how the project is built.
-After a project is configured a file <em>Recipe.conf</em> is generated that contains <link xref="variables">variables</link> specifying the configuration chosen.
+After a project is configured the file <file>Recipe.conf</file> is generated that contains <link xref="variables">variables</link> specifying the configuration chosen.
 These variables are available in all recipes like normal variables defined in the toplevel recipe.
 </p>
 <p>
@@ -21,13 +21,13 @@ To configure your project to install all the project files into the directory ~/
 bake --configure install-directory=~/builds
 </code>
 <p>
-This will generate a file <em>Recipe.conf</em> that contains this variable and other default values.
+This will generate the file <file>Recipe.conf</file> that contains this variable and other default values.
 The install rules use this variable to determine where to copy files to.
 </p>
 </example>
 <note>
 <p>
-Configuring is an optional step for your project, Bake will configure the project using default values when it is run if not already configured.
+Configuring is an optional step, if run on an unconfigured project Bake will configure using default values.
 </p>
 </note>
 </page>

@@ -6,5 +6,21 @@
 <title>Vala Language Support</title>
 
 <p>
+Bake supports <link xref="programs">programs</link> and <link xref="libraries">libraries</link> written in the Vala language.
 </p>
+<p>
+Vala programs and libraries can set the following program <link xref="variables">variables</link> to control compiling:
+</p>
+<table frame="all" shade="rows">
+<thead>
+<tr>
+  <td><p>Name</p></td>
+  <td><p>Description</p></td>
+</tr>
+</thead>
+<tr>
+  <td><p>namespace</p></td>
+  <td><p>FIXME (libraries only)</p></td>
+</tr>
+</table>
 </page>
