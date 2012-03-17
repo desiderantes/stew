@@ -6,12 +6,9 @@
 <title>Building</title>
 
 <p>
-Building is the process of combining the files in your project to their final form suitable for running.
+Building is the process of producing all the files required to run your project.
 This may include compiling source code into programs and libraries, generating system configuration and producing documentation.
-Building is done using the <em>build</em> target, however if you don't provide a target to bake it defaults to this.
-</p>
-<p>
-FIXME: Tell how to build any targets
+Building is done using the <em>build</em> <link xref="rules">rule</link> which is the rule that is run by Bake when none is requested.
 </p>
 <example>
 <p>
@@ -26,7 +23,7 @@ will take the C source code for this project and compile it to an executable fil
 </example>
 <note>
 <p>
-You can remove any built files using the <link xref="cleaning">clean</link> target.
+You can remove any built files using the <link xref="cleaning">clean</link> rule.
 </p>
 </note>
 </page>

@@ -9,6 +9,40 @@
 A <em>library</em> is a piece of executable code that can be shared between different <link xref="programs">programs</link>.
 </p>
 <p>
-FIXME
+To specify a library you need to set <code>libraries|<em>name</em>|*</code> <link xref="variables">variables</link> where <em>name</em> is a unique name for the library.
+The following variables are allowed:
 </p>
+<table frame="all" shade="rows">
+<thead>
+<tr>
+  <td><p>Name</p></td>
+  <td><p>Description</p></td>
+</tr>
+</thead>
+<tr>
+  <td><p>sources</p></td>
+  <td><p>The files that make up this library (required)</p></td>
+</tr>
+<tr>
+  <td><p>version</p></td>
+  <td><p>The version of the library</p></td>
+</tr>
+</table>
+<p>
+Bake will attempt to <link xref="building">build</link> your library by checking the filenames in the <code>sources</code> variable and generating the required <link xref="rules">rules</link>.
+Depending on what <link xref="index#programs-and-libraries">language</link> your library uses additional variables may be allowed.
+</p>
+<example>
+<p>
+The following describes a simple <link xref="c">C library</link> that is built from one C file:
+</p>
+<code>
+libraries|lib1|sources = lib1.c
+libraries|lib1|type = desktop
+</code>
+<p>
+When building Bake will compile lib1.c and produce the library <em>lib1</em>.
+When <link xref="installing">installing</link> Bake will install <em>lib1</em> into the appropriate directory.
+</p>
+</example>
 </page>

@@ -7,8 +7,8 @@
 
 <p>
 Many projects are developed using a remote hosting service.
-Bake knows how some of these services work and makes targets in the toplevel recipe to make it releasing easy.
-Support services are Launchpad (targets <em>release-launchpad</em>, <em>release-ppa</em>) and GNOME (<em>release-gnome</em>).
+Bake knows how some of these services work and makes <link xref="rules">rules</link> in the toplevel recipe to make it releasing easy.
+Supported services are Launchpad (<em>release-launchpad</em> and <em>release-ppa</em> rules) and GNOME (<em>release-gnome</em> rule).
 </p>
 <p>
 FIXME: Define special variables

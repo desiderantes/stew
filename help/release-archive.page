@@ -8,9 +8,9 @@
 <p>
 A common way of distribution projects is to provide a <em>file archive</em> that you make available for download.
 The archive is a single compressed file that contains all the files necessary to build your project.
-Bake automatically determines the files required for this and provides targets in the toplevel recipe that produce file archives.
-If your system supports it the <em>release-gzip</em>, <em>release-bzip</em> and <em>release-xzip</em> targets are generated.
-Building this target produces a file called <em>name</em>-<em>version</em>.<em>extension</em>.
+Bake automatically determines the files required for this and provides <link xref="rules">rules</link> in the toplevel recipe that produce file archives.
+If your system supports it the <em>release-gzip</em>, <em>release-bzip</em> and <em>release-xzip</em> rules are generated.
+Building this rule produces a file called <em>name</em>-<em>version</em>.<em>extension</em>.
 </p>
 <example>
 <p>

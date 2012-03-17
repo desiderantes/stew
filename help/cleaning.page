@@ -8,7 +8,7 @@
 <p>
 Cleaning is the process of removing any files that have been <link xref="building">generated</link> in your project.
 This is useful if you need to return your project directory to the original state before building or need to force a rebuild.
-The <em>clean</em> target deletes these file from the current recipe and any child recipes.
+The <em>clean</em> <link xref="rules">rule</link> deletes these file from the current recipe and any child recipes.
 </p>
 <example>
 <p>

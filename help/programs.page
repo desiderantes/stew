@@ -9,19 +9,75 @@
 A <em>program</em> is executable code that can be run by a user.
 </p>
 <p>
-FIXME: Define programs|<em>name</em>|sources.
-FIXME: Define name, description, desktop files
+To specify a program you need to set <code>programs|<em>name</em>|*</code> <link xref="variables">variables</link> where <em>name</em> is a unique name for the program.
+The following variables are allowed:
+</p>
+<table frame="all" shade="rows">
+<thead>
+<tr>
+  <td><p>Name</p></td>
+  <td><p>Description</p></td>
+</tr>
+</thead>
+<tr>
+  <td><p>sources</p></td>
+  <td><p>The files that make up this program (required)</p></td>
+</tr>
+<tr>
+  <td><p>name</p></td>
+  <td><p>The name of this program</p></td>
+</tr>
+<tr>
+  <td><p>description</p></td>
+  <td><p>A description of this program</p></td>
+</tr>
+<tr>
+  <td><p>type</p></td>
+  <td><p>The type of this program</p></td>
+</tr>
+<tr>
+  <td><p>icon</p></td>
+  <td><p>File to use as the icon for this application</p></td>
+</tr>
+</table>
+<p>
+Bake will attempt to <link xref="building">build</link> your program by checking the filenames in the <code>sources</code> variable and generating the required <link xref="rules">rules</link>.
+Depending on what <link xref="index#programs-and-libraries">language</link> your program uses additional variables may be allowed.
+</p>
+<p>
+The following program types are known by Bake:
+</p>
+<table frame="all" shade="rows">
+<thead>
+<tr>
+  <td><p>Value</p></td>
+  <td><p>Description</p></td>
+</tr>
+</thead>
+<tr>
+  <td><p>terminal</p></td>
+  <td><p>A program intended to be run from a text terminal</p></td>
+</tr>
+<tr>
+  <td><p>desktop</p></td>
+  <td><p>A program run inside a GUI.</p></td>
+</tr>
+</table>
+<p>
+The type variable is optional, but if specified allows Bake to generate any additonal files require by the OS for this program.
+For desktop files a <file>.desktop</file> file is generated and installed describing the program.
 </p>
 <example>
 <p>
-The following describes a simple C program that is built from one C file:
+The following describes a simple <link xref="c">C program</link> that is built from one C file:
 </p>
 <code>
 programs|app1|sources = app1.c
+programs|app1|type = desktop
 </code>
 <p>
-When running the <link xref="building">build rule</link> Bake will compile app1.c and produce the application <em>app1</em>.
-When running the <link xref="installing">install rule</link> Bake will install <em>app1</em> into the appropriate directory.
+When building Bake will compile app1.c and produce the program <em>app1</em>.
+When <link xref="installing">installing</link> Bake will install <em>app1</em> into the appropriate directory.
 </p>
 </example>
 </page>

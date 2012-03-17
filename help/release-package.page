@@ -7,7 +7,7 @@
 
 <p>
 Most operating systems use a packaging format for distributing compiled applications.
-Bake knows about the common formats .deb (used in Debian based distributions like Ubuntu) and .rpm (used in distributions like Fedora) and makes the targets <em>release-deb</em> and <em>release-rpm</em> in the toplevel recipe.
+Bake knows about the common formats .deb (used in Debian based distributions like Ubuntu) and .rpm (used in distributions like Fedora) and makes the <link xref="rules">rules</link> <em>release-deb</em> and <em>release-rpm</em> in the toplevel recipe.
 These rules compile your project and produce an archive file that can be installed on those systems.
 </p>
 <p>

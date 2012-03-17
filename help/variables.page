@@ -6,7 +6,7 @@
 <title>Variables</title>
 
 <p>
-A <em>variable</em> allows you to specify a named value for use in a recipe.
+A <em>variable</em> allows you to specify a named value for use in a <link xref="recipe-files">recipe</link>.
 </p>
 <p>
 The syntax for a variable is:
