@@ -1,0 +1,23 @@
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="testing">
+<info>
+    <link type="guide" xref="index#using"/>
+</info>
+
+<title>Testing</title>
+
+<p>
+Installing is the process of running the <link xref="tests">tests</link> for your project to confirm it is correct.
+The <link xref="rules"><em>test</em> rule</link> does this for the recipe and its decendants.
+</p>
+<example>
+<p>
+Running the following on your project:
+</p>
+<code>
+bake test
+</code>
+<p>
+will return success if the tests pass or failure otherwise.
+</p>
+</example>
+</page>
