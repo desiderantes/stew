@@ -11,7 +11,7 @@ The manual pages need to be listed with the <code>data|man|pages</code> <link xr
 </p>
 <example>
 <p>
-For example, this <link xref="recipe-files">recipe</link> specified one manual page to be installed:
+For example, this <link xref="recipe-files">recipe</link> specifies one manual page to be installed:
 </p>
 <code>
 data|man|pages = example-program.1

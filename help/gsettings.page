@@ -11,7 +11,7 @@ The schemas need to be listed using the <code>data|gsettings|schemas</code> <lin
 </p>
 <example>
 <p>
-For example, this <link xref="recipe-files">recipe</link> specified one schema to be installed:
+For example, this <link xref="recipe-files">recipe</link> specifies one schema to be installed:
 </p>
 <code>
 data|gsettings|schemas = org.example.Example.gschema.xml

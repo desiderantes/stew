@@ -6,6 +6,16 @@
 <title>Mallard Documentation</title>
 
 <p>
-FIXME
+Projects that use Mallard for documentation need to <link xref="installing">install</link> these into a system location.
+The documentation files need to be listed with the <code>data|mallard|<em>name</em>|pages</code> <link xref="variables">variable</link>.
+<em>name</em> is the name of the help document.
 </p>
+<example>
+<p>
+For example, this <link xref="recipe-files">recipe</link> specifies the document <em>example</em> that has two pages:
+</p>
+<code>
+data|mallard|example|pages = index.page example.page
+</code>
+</example>
 </page>
