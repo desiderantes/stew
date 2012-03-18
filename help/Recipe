@@ -1,2 +1,27 @@
-data|mallard|bake|pages = index.page
+data|mallard|bake|pages = building.page \
+                          cleaning.page \
+                          config.page \
+                          c.page \
+                          c++.page \
+                          data.page \
+                          example.page \
+                          gsettings.page \
+                          index.page \
+                          installing.page \
+                          libraries.page \
+                          mallard.page \
+                          man.page \
+                          programs.page \
+                          python.page \
+                          recipe-files.page \
+                          release-archive.page \
+                          release-package.page \
+                          release-upload.page \
+                          releasing.page \
+                          rules.page \
+                          testing.page \
+                          tests.page \
+                          translation.page \
+                          vala.page \
+                          variables.page
 data|mallard|bake|gettext-domain = bake-help
