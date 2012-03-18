@@ -6,6 +6,15 @@
 <title>Manual Pages</title>
 
 <p>
-FIXME
+Projects that use Unix <em>manual pages</em> need to <link xref="installing">install</link> these into a system location.
+The manual pages need to be listed with the <code>data|man|pages</code> <link xref="variables">variable</link>.
 </p>
+<example>
+<p>
+For example, this <link xref="recipe-files">recipe</link> specified one manual page to be installed:
+</p>
+<code>
+data|man|pages = example-program.1
+</code>
+</example>
 </page>

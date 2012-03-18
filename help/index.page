@@ -9,7 +9,7 @@
 <title>Bake Help</title>
 
 <p>
-Bake is a <em>build system</em> that takes a project that is made up of programs, applications and data and provides methods of compiling, testing, installing and distributing that project.
+Bake is a <em>build system</em> that takes a project that is made up of programs, libraries and data and provides methods of compiling, testing, installing and distributing that project.
 To use Bake you need to generate <em>recipes</em> that describe how the components of your project fit together.
 </p>
 

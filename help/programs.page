@@ -29,11 +29,11 @@ The following variables are allowed:
 </tr>
 <tr>
   <td><p>name</p></td>
-  <td><p>The name of this program</p></td>
+  <td><p>The name of this program suitable for a label for this program</p></td>
 </tr>
 <tr>
   <td><p>description</p></td>
-  <td><p>A description of this program</p></td>
+  <td><p>A short description of this program</p></td>
 </tr>
 <tr>
   <td><p>type</p></td>
@@ -41,7 +41,7 @@ The following variables are allowed:
 </tr>
 <tr>
   <td><p>icon</p></td>
-  <td><p>File to use as the icon for this application</p></td>
+  <td><p>File to use as the icon for this program</p></td>
 </tr>
 <tr>
   <td><p>defines</p></td>
@@ -80,12 +80,12 @@ For desktop files a <file>.desktop</file> file is generated and installed descri
 The following describes a simple <link xref="c">C program</link> that is built from one C file:
 </p>
 <code>
-programs|app1|sources = app1.c
-programs|app1|type = desktop
+programs|example-program|sources = example-program.c
+programs|example-program|type = desktop
 </code>
 <p>
-When building Bake will compile app1.c and produce the program <em>app1</em>.
-When <link xref="installing">installing</link> Bake will install <em>app1</em> into the appropriate directory.
+When building Bake will compile example-program.c and produce the program <em>example-program</em>.
+When <link xref="installing">installing</link> Bake will install <em>example-program</em> into the appropriate directory.
 </p>
 </example>
 </page>

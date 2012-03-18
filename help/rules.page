@@ -7,7 +7,7 @@
 
 <p>
 A <em>rule</em> defines how to combine a number of <em>input</em> files into one or more <em>output</em> files.
-For simple projects you should not need to write any rules - where Bake knows about a type of application, library or data it can be used without you writing rules for them.
+For simple projects you should not need to write any rules - where Bake knows about the language or data type it can be used without you writing rules for them.
 </p>
 <p>
 The syntax for a rule is:

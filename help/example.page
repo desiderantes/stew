@@ -21,7 +21,7 @@ project|version = 0.0.1
 project|files = README
 
 # Describe the C program in this project
-programs|app1|sources = app1.c
+programs|example-program|sources = main.c module.c
 
 # Describe an image that is required for this project
 data|images|files = image1.png
@@ -39,8 +39,8 @@ The <em>project|files</em> variable states that there is a file called README th
 This file should be <link xref="releasing">distributed</link> with the project but is not installed or used in compilation.
 </p>
 <p>
-The <em>programs|app1|sources</em> variable describes a C <link xref="programs">program</link> that this project produces.
-This variable means that when <link xref="building">building</link> Bake will compile a C program called <em>app1</em> using the source file <em>app1.c</em>.
+The <em>programs|example-program|sources</em> variable describes a C <link xref="programs">program</link> that this project produces.
+This variable means that when <link xref="building">building</link> Bake will compile a C program called <em>example-program</em> using the source file <em>example-program.c</em>.
 The produced executable will be <link xref="installing">installed</link> into an appropriate location and the source file will be distributed with the project.
 </p>
 <p>

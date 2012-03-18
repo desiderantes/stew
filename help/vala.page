@@ -22,5 +22,23 @@ Vala programs and libraries can set the following program <link xref="variables"
   <td><p>namespace</p></td>
   <td><p>FIXME (libraries only)</p></td>
 </tr>
+<tr>
+  <td><p>compile-flags</p></td>
+  <td><p>Additional command line flags to use when compiling</p></td>
+</tr>
+<tr>
+  <td><p>link-flags</p></td>
+  <td><p>Additional command line flags to use when linking</p></td>
+</tr>
 </table>
+<example>
+<p>
+The following shows a recipe for a two file Vala program:
+</p>
+<code>
+programs|example-program|sources = main.vala module.vala
+programs|example-program|name = Example
+programs|example-program|description = An example Vala program
+</code>
+</example>
 </page>

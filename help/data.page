@@ -6,7 +6,7 @@
 <title>Application Data</title>
 
 <p>
-<em>Application data</em> is non-executable files that are used by your application.
+<em>Application data</em> is non-executable files that are used by your project.
 Data can include things like configuration, UI definition, images and documentation.
 </p>
 <p>
