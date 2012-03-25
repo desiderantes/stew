@@ -1,0 +1,23 @@
+programs|test-runner|sources = test-runner.vala
+programs|test-runner|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
+programs|test-runner|install = false
+
+programs|cp|sources = cp.vala
+programs|cp|packages = gobject-2.0 glib-2.0 posix
+programs|cp|install = false
+
+programs|mkdir|sources = mkdir.vala
+programs|mkdir|packages = gobject-2.0 glib-2.0 posix
+programs|mkdir|install = false
+
+programs|rm|sources = rm.vala
+programs|rm|packages = gobject-2.0 glib-2.0 posix
+programs|rm|install = false
+
+programs|install|sources = install.vala
+programs|install|packages = gobject-2.0 glib-2.0 posix
+programs|install|install = false
+
+programs|gcc|sources = gcc.vala
+programs|gcc|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
+programs|gcc|install = false
