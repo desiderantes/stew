@@ -2,7 +2,6 @@ public class TestRunner
 {
     public static MainLoop loop;
 
-    public static string[] env;
     public static string temp_dir;
     public static List<string> expected_commands;
     public static int expected_index = 0;
@@ -24,7 +23,7 @@ public class TestRunner
                 string[] argv;
                 int stdin_fd, stdout_fd;
                 Shell.parse_argv (command, out argv);
-                Process.spawn_async_with_pipes (temp_dir, argv, env, SpawnFlags.SEARCH_PATH | SpawnFlags.DO_NOT_REAP_CHILD, null, out pid, out stdin_fd, out stdout_fd, out stderr_fd);
+                Process.spawn_async_with_pipes (temp_dir, argv, null, SpawnFlags.SEARCH_PATH | SpawnFlags.DO_NOT_REAP_CHILD, null, out pid, out stdin_fd, out stdout_fd, out stderr_fd);
             }
             catch (Error e)
             {
@@ -97,6 +96,25 @@ public class TestRunner
     {
         check_command ("(exit %d)".printf (status));
     }
+    
+    public static void unlink_recursive (string dir) throws FileError
+    {
+        var d = Dir.open (dir);
+        while (true)
+        {
+            var name = d.read_name ();
+            if (name == null)
+                break;
+            var path = Path.build_filename (dir, name);
+
+            if (FileUtils.test (name, FileTest.IS_DIR))
+                unlink_recursive (path);
+            else
+                FileUtils.unlink (path);
+        }
+
+        DirUtils.remove (dir);
+    }
 
     public static int main (string[] args)
     {
@@ -164,10 +182,8 @@ public class TestRunner
         status_source.attach (null);
 
         /* Only run our special versions of the tools */
-        env = new string[3];
-        env[0] = "PATH=%s/../src:%s/src".printf (Environment.get_current_dir (), Environment.get_current_dir ());
-        env[1] = "BAKE_TEST_STATUS_SOCKET=%s".printf (status_socket_name);
-        env[2] = null;
+        Environment.set_variable ("PATH", "%s/../src:%s/src::%s".printf (Environment.get_current_dir (), Environment.get_current_dir (), Environment.get_variable ("PATH")), true);
+        Environment.set_variable ("BAKE_TEST_STATUS_SOCKET", status_socket_name, true);
 
         /* Run requested commands */
         run_commands ();
@@ -175,7 +191,14 @@ public class TestRunner
         loop.run ();
 
         /* Remove temporary directory */
-        Posix.system ("rm -r %s".printf (temp_dir));
+        try
+        {
+            unlink_recursive (temp_dir);
+        }
+        catch (Error e)
+        {
+            stderr.printf ("Failed to delete temporary directory %s: %s", temp_dir, e.message);
+        }
 
         /* Remove socket */
         FileUtils.unlink (status_socket_name);
