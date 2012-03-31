@@ -6,6 +6,7 @@ public class TestRunner
     public static string temp_dir;
     public static List<string> expected_commands;
     public static int expected_index = 0;
+    public static int stderr_fd;
 
     public static int return_code = Posix.EXIT_SUCCESS;
 
@@ -21,7 +22,7 @@ public class TestRunner
             try
             {
                 string[] argv;
-                int stdin_fd, stdout_fd, stderr_fd;
+                int stdin_fd, stdout_fd;
                 Shell.parse_argv (command, out argv);
                 Process.spawn_async_with_pipes (temp_dir, argv, env, SpawnFlags.SEARCH_PATH | SpawnFlags.DO_NOT_REAP_CHILD, null, out pid, out stdin_fd, out stdout_fd, out stderr_fd);
             }
@@ -45,6 +46,17 @@ public class TestRunner
                 stderr.printf ("%s\n", expected_commands.nth_data (i));
             stderr.printf ("%s\n", command);
             stderr.printf ("^^^^ expected \"%s\"\n", expected_commands.nth_data (expected_index));
+            stderr.printf ("Output of bake:\n");
+            var buffer = new uint8[1024];
+            while (true)
+            {
+                var n_read = Posix.read (stderr_fd, buffer, buffer.length - 1);
+                if (n_read <= 0)
+                    break;
+                buffer[n_read] = '\0';
+                stderr.printf ("%s", (string) buffer);
+            }
+
             return_code = Posix.EXIT_FAILURE;
             loop.quit ();
             return;
