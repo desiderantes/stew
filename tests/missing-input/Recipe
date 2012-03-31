@@ -1,0 +1,6 @@
+package|name = test
+
+a:
+    touch a
+b: a
+    cp a b

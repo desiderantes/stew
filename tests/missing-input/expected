@@ -1,0 +1,15 @@
+# Build b which depends on a
+!bake b
+touch a
+cp a b
+(exit 0)
+
+# Remove the input and check both input and output is rebuilt
+!rm a
+rm a
+(exit 0)
+!bake b
+touch a
+# FIXME: Doesn't work because the timestamp of b is the same as a (too fast)
+cp a b
+(exit 0)
