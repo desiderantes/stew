@@ -95,7 +95,7 @@ public class TestRunner
 
     public static void command_done_cb (Pid pid, int status)
     {
-        check_command ("exit %d".printf (status));
+        check_command ("(exit %d)".printf (status));
     }
 
     public static int main (string[] args)
