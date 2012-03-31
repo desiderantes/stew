@@ -1,17 +1,50 @@
 public class TestRunner
 {
     public static MainLoop loop;
-    
+
+    public static string[] env;
+    public static string temp_dir;
     public static List<string> expected_commands;
     public static int expected_index = 0;
 
     public static int return_code = Posix.EXIT_SUCCESS;
 
+    public static void run_commands ()
+    {
+        while (true)
+        {
+            var command = expected_commands.nth_data (expected_index);
+            if (!command.has_prefix ("bake"))
+                return;
+
+            Pid pid = 0;
+            try
+            {
+                string[] argv;
+                int stdin_fd, stdout_fd, stderr_fd;
+                Shell.parse_argv (command, out argv);
+                Process.spawn_async_with_pipes (temp_dir, argv, env, SpawnFlags.SEARCH_PATH | SpawnFlags.DO_NOT_REAP_CHILD, null, out pid, out stdin_fd, out stdout_fd, out stderr_fd);
+            }
+            catch (Error e)
+            {
+                stderr.printf ("Failed to run command: %s\n", e.message);
+                Posix.exit (Posix.EXIT_FAILURE);
+            }
+            ChildWatch.add (pid, command_done_cb);
+
+            expected_index++;
+        }
+    }
+
     public static void check_command (string command)
     {
         if (command != expected_commands.nth_data (expected_index))
         {
-            stderr.printf ("Got unexpected command %s\n", command);
+            stderr.printf ("Test failed, ran the following commands:\n");
+            for (var i = 0; i < expected_index; i++)
+                stderr.printf ("%s\n", expected_commands.nth_data (i));
+            stderr.printf ("%s\n", command);
+            stderr.printf ("^^^^ expected \"%s\"\n", expected_commands.nth_data (expected_index));
             return_code = Posix.EXIT_FAILURE;
             loop.quit ();
             return;
@@ -23,6 +56,8 @@ public class TestRunner
             loop.quit ();
             return;
         }
+
+        run_commands ();
     }
 
     public static bool read_cb (Socket socket, IOCondition condition)
@@ -90,7 +125,7 @@ public class TestRunner
         // FIXME: Add command timeout
 
         /* Copy project to a temporary directory */
-        var temp_dir = Path.build_filename (Environment.get_tmp_dir (), "bake-test-XXXXXX");
+        temp_dir = Path.build_filename (Environment.get_tmp_dir (), "bake-test-XXXXXX");
         if (DirUtils.mkdtemp (temp_dir) == null)
         {
             stderr.printf ("Error creating temporary directory: %s\n", strerror (errno));
@@ -117,26 +152,13 @@ public class TestRunner
         status_source.attach (null);
 
         /* Only run our special versions of the tools */
-        var env = new string[3];
+        env = new string[3];
         env[0] = "PATH=%s/../src:%s/src".printf (Environment.get_current_dir (), Environment.get_current_dir ());
         env[1] = "BAKE_TEST_STATUS_SOCKET=%s".printf (status_socket_name);
         env[2] = null;
 
-        /* Run Bake */
-        Pid pid;
-        try
-        {
-            string[] argv;
-            int stdin_fd, stdout_fd, stderr_fd;
-            Shell.parse_argv ("bake", out argv);
-            Process.spawn_async_with_pipes (temp_dir, argv, env, SpawnFlags.SEARCH_PATH | SpawnFlags.DO_NOT_REAP_CHILD, null, out pid, out stdin_fd, out stdout_fd, out stderr_fd);
-        }
-        catch (Error e)
-        {
-            stderr.printf ("Failed to run command: %s\n", e.message);
-            return Posix.EXIT_FAILURE;
-        }
-        ChildWatch.add (pid, command_done_cb);
+        /* Run requested commands */
+        run_commands ();
 
         loop.run ();
 
