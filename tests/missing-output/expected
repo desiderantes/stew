@@ -1,0 +1,13 @@
+# Build b which depends on a
+!bake b
+touch a
+cp a b
+(exit 0)
+
+# Remove the output and check it is rebuilt
+!rm b
+rm b
+(exit 0)
+!bake b
+cp a b
+(exit 0)

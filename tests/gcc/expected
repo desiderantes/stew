@@ -1,4 +1,4 @@
-bake
+!bake
 gcc -c test.c -o .built/test.o
 gcc .built/test.o -o test
 (exit 0)

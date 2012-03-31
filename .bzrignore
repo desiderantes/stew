@@ -26,3 +26,4 @@ tests/src/install
 tests/src/rm
 tests/src/test-runner
 tests/src/mkdir
+tests/src/touch

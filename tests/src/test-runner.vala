@@ -6,6 +6,7 @@ public class TestRunner
     public static List<string> expected_commands;
     public static int expected_index = 0;
     public static int stderr_fd;
+    public static uint timeout_id = 0;
 
     public static int return_code = Posix.EXIT_SUCCESS;
 
@@ -14,8 +15,9 @@ public class TestRunner
         while (true)
         {
             var command = expected_commands.nth_data (expected_index);
-            if (!command.has_prefix ("bake"))
+            if (!command.has_prefix ("!"))
                 return;
+            command = command.substring (1);
 
             Pid pid = 0;
             try
@@ -33,31 +35,20 @@ public class TestRunner
             ChildWatch.add (pid, command_done_cb);
 
             expected_index++;
+            if (timeout_id != 0)
+                Source.remove (timeout_id);
+            timeout_id = Timeout.add (1000, timeout_cb);
         }
     }
 
     public static void check_command (string command)
     {
+        if (timeout_id != 0)
+            Source.remove (timeout_id);
+
         if (command != expected_commands.nth_data (expected_index))
         {
-            stderr.printf ("Test failed, ran the following commands:\n");
-            for (var i = 0; i < expected_index; i++)
-                stderr.printf ("%s\n", expected_commands.nth_data (i));
-            stderr.printf ("%s\n", command);
-            stderr.printf ("^^^^ expected \"%s\"\n", expected_commands.nth_data (expected_index));
-            stderr.printf ("Output of bake:\n");
-            var buffer = new uint8[1024];
-            while (true)
-            {
-                var n_read = Posix.read (stderr_fd, buffer, buffer.length - 1);
-                if (n_read <= 0)
-                    break;
-                buffer[n_read] = '\0';
-                stderr.printf ("%s", (string) buffer);
-            }
-
-            return_code = Posix.EXIT_FAILURE;
-            loop.quit ();
+            fail (command);
             return;
         }
         
@@ -67,8 +58,40 @@ public class TestRunner
             loop.quit ();
             return;
         }
+        timeout_id = Timeout.add (1000, timeout_cb);
 
         run_commands ();
+    }
+    
+    public static bool timeout_cb ()
+    {
+        fail ();
+        return true;
+    }
+
+    public static void fail (string? command = null)
+    {
+        stderr.printf ("Test failed, ran the following commands:\n");
+        for (var i = 0; i < expected_index; i++)
+            stderr.printf ("%s\n", expected_commands.nth_data (i));
+        if (command != null)
+            stderr.printf ("%s\n", command);
+        else
+            stderr.printf ("(timeout)\n");
+        stderr.printf ("^^^^ expected \"%s\"\n", expected_commands.nth_data (expected_index));
+        stderr.printf ("Output of bake:\n");
+        var buffer = new uint8[1024];
+        while (true)
+        {
+            var n_read = Posix.read (stderr_fd, buffer, buffer.length - 1);
+            if (n_read <= 0)
+                break;
+            buffer[n_read] = '\0';
+            stderr.printf ("%s", (string) buffer);
+        }
+
+        return_code = Posix.EXIT_FAILURE;
+        loop.quit ();
     }
 
     public static bool read_cb (Socket socket, IOCondition condition)
@@ -137,7 +160,7 @@ public class TestRunner
             foreach (var command in ((string) contents).split ("\n"))
             {
                  var c = command.strip ();
-                 if (c == "")
+                 if (c == "" || c.has_prefix ("#"))
                      continue;
                  expected_commands.append (c);
             }
@@ -152,7 +175,6 @@ public class TestRunner
             stderr.printf ("No expected commands\n");
             return Posix.EXIT_FAILURE;        
         }
-        // FIXME: Add command timeout
 
         /* Copy project to a temporary directory */
         temp_dir = Path.build_filename (Environment.get_tmp_dir (), "bake-test-XXXXXX");
@@ -165,7 +187,7 @@ public class TestRunner
         Posix.system ("cp -r %s/* %s".printf (test_directory, temp_dir));
 
         /* Open socket to listen to commands run */
-        var status_socket_name = "/tmp/bake-test-status-socket";
+        var status_socket_name = Path.build_filename (temp_dir, ".status-socket");
         Socket socket;
         try
         {

@@ -1,4 +1,4 @@
-public class Copy
+public class Touch
 {
     public static int main (string[] args)
     {
@@ -29,15 +29,13 @@ public class Copy
             stderr.printf ("Failed to write to status socket: %s\n", e.message);
         }
 
-        try
+        for (var i = 1; args[i] != null; i++)
         {
-            string contents;
-            FileUtils.get_contents (args[1], out contents);
-            FileUtils.set_contents (args[2], contents);
-        }
-        catch (Error e)
-        {
-            return Posix.EXIT_FAILURE;
+            if (args[i].has_prefix ("-"))
+                continue;
+
+            var fd = Posix.open (args[i], Posix.O_WRONLY | Posix.O_CREAT, 0666);
+            Posix.close (fd);
         }
 
         return Posix.EXIT_SUCCESS;
