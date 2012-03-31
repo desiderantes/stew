@@ -1,0 +1,9 @@
+package|name = test
+
+a:
+    touch a
+b:
+    touch b
+
+c: a b
+    cat a b > c" >> Recipe

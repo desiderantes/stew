@@ -1,0 +1,13 @@
+# Build the target
+!bake a
+touch a
+(exit 0)
+!bake clean
+rm -f a
+# FIXME: These should only be run if they exist
+rm -rf .built/
+rm -f test.tar.bz2
+rm -f test.tar.gz
+rm -rf test/
+rm -f test.tar.xz
+(exit 0)

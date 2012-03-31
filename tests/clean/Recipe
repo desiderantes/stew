@@ -1,0 +1,4 @@
+package|name = test
+
+a:
+    touch a

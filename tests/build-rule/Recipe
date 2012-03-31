@@ -1,0 +1,6 @@
+package|name = test
+
+%build: a
+
+a:
+    touch a

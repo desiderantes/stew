@@ -37,7 +37,7 @@ public class TestRunner
             expected_index++;
             if (timeout_id != 0)
                 Source.remove (timeout_id);
-            timeout_id = Timeout.add (1000, timeout_cb);
+            timeout_id = Timeout.add (2000, timeout_cb);
         }
     }
 
@@ -58,7 +58,7 @@ public class TestRunner
             loop.quit ();
             return;
         }
-        timeout_id = Timeout.add (1000, timeout_cb);
+        timeout_id = Timeout.add (2000, timeout_cb);
 
         run_commands ();
     }

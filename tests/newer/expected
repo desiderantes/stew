@@ -1,0 +1,18 @@
+# Build the target
+!bake
+touch a
+cp a b
+(exit 0)
+
+# Wait for one second so the modification time will be older
+!sleep 1
+(exit 0)
+
+# Update the input and check the output is rebuilt
+# FIXME: Broken
+!touch a
+touch a
+(exit 0)
+!bake
+cp a b
+(exit 0)
