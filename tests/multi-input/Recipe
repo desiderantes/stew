@@ -6,4 +6,4 @@ b:
     touch b
 
 c: a b
-    cat a b > c" >> Recipe
+    cat a b > c

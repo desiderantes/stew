@@ -2,5 +2,4 @@
 !bake c
 touch a
 touch b
-# FIXME: Broken, need to override cat
 cat a b

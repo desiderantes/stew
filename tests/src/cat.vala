@@ -1,7 +1,4 @@
-[CCode (cheader_filename = "sys/stat.h")]
-extern int futimens (int fd, [CCode (array_length = false)] Posix.timespec[] times);
-
-public class Touch
+public class Cat
 {
     public static int main (string[] args)
     {
@@ -32,17 +29,18 @@ public class Touch
             stderr.printf ("Failed to write to status socket: %s\n", e.message);
         }
 
-        for (var i = 1; args[i] != null; i++)
+        try
         {
-            if (args[i].has_prefix ("-"))
-                continue;
-
-            var fd = Posix.open (args[i], Posix.O_WRONLY | Posix.O_CREAT, 0666);
-            Posix.timespec times[2];
-            Posix.clock_gettime (Posix.CLOCK_REALTIME, out times[0]);
-            times[1] = times[0];
-            futimens (fd, times);
-            Posix.close (fd);
+            string contents;
+            for (var i = 1; i < args.length; i++)
+            {
+                FileUtils.get_contents (args[i], out contents);
+                stdout.write (contents.data);
+            }
+        }
+        catch (Error e)
+        {
+            return Posix.EXIT_FAILURE;
         }
 
         return Posix.EXIT_SUCCESS;
