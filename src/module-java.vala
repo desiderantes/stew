@@ -12,7 +12,7 @@ public class JavaModule : BuildModule
 
         foreach (var source in sources)
             if (!source.has_suffix (".java"))
-                continue;
+                return false;
 
         var jar_file = "%s.jar".printf (program);
 
