@@ -6,7 +6,7 @@ cp a b
 
 # Wait for one second so the modification time will be older
 # FIXME: Update Bake to understand ns timing
-!sleep 2
+!sleep 1
 (exit 0)
 
 # Update the input and check the output is rebuilt
