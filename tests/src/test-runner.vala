@@ -40,7 +40,6 @@ public class TestRunner
                 fail ();
                 return;
             }
-            stderr.printf ("PID=%d\n", pid);
             ChildWatch.add (pid, command_done_cb);
 
             expected_index++;
