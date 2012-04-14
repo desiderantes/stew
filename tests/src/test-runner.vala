@@ -7,6 +7,7 @@ public class TestRunner
     public static int expected_index = 0;
     public static int stderr_fd;
     public static uint timeout_id = 0;
+    public static Pid pid = 0;
 
     public static int return_code = Posix.EXIT_SUCCESS;
 
@@ -18,8 +19,14 @@ public class TestRunner
             if (!command.has_prefix ("!"))
                 return;
             command = command.substring (1);
+            
+            if (pid != 0)
+            {
+                stderr.printf ("Can't run two commands at once\n");
+                fail ();
+                return;
+            }
 
-            Pid pid = 0;
             try
             {
                 string[] argv;
@@ -30,8 +37,10 @@ public class TestRunner
             catch (Error e)
             {
                 stderr.printf ("Failed to run command: %s\n", e.message);
-                Posix.exit (Posix.EXIT_FAILURE);
+                fail ();
+                return;
             }
+            stderr.printf ("PID=%d\n", pid);
             ChildWatch.add (pid, command_done_cb);
 
             expected_index++;
@@ -115,8 +124,9 @@ public class TestRunner
         return true;
     }
 
-    public static void command_done_cb (Pid pid, int status)
+    public static void command_done_cb (Pid p, int status)
     {
+        pid = 0;
         check_command ("(exit %d)".printf (status));
     }
     
@@ -211,6 +221,10 @@ public class TestRunner
         run_commands ();
 
         loop.run ();
+        
+        /* Stop any commands */
+        if (pid != 0)
+            Posix.kill (pid, Posix.SIGTERM);
 
         /* Remove temporary directory */
         try
