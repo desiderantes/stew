@@ -29,3 +29,7 @@ programs|install|install = false
 programs|gcc|sources = gcc.vala
 programs|gcc|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
 programs|gcc|install = false
+
+programs|valac|sources = valac.vala
+programs|valac|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
+programs|valac|install = false
