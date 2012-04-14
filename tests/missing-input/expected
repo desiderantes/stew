@@ -10,6 +10,5 @@ rm a
 (exit 0)
 !bake b
 touch a
-# FIXME: Doesn't work because the timestamp of b is the same as a (too fast)
 cp a b
 (exit 0)

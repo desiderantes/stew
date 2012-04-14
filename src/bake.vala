@@ -115,18 +115,11 @@ public class Rule
     {
         this.recipe = recipe;
     }
-
-    private TimeVal? get_modification_time (string filename) throws Error
-    {
-        var f = File.new_for_path (filename);
-        var info = f.query_info (FileAttribute.TIME_MODIFIED, FileQueryInfoFlags.NONE);
-        return info.get_modification_time ();
-    }
     
-    private static int timeval_cmp (TimeVal a, TimeVal b)
+    private static int timespec_cmp (Posix.timespec a, Posix.timespec b)
     {
         if (a.tv_sec == b.tv_sec)
-            return (int) (a.tv_usec - b.tv_usec);
+            return (int) (a.tv_nsec - b.tv_nsec);
         else
             return (int) (a.tv_sec - b.tv_sec);
     }
@@ -134,36 +127,36 @@ public class Rule
     public bool needs_build ()
     {
         /* Find the most recently changed input */
-        TimeVal max_input_time = { 0, 0 };
+        Posix.timespec max_input_time = { 0, 0 };
         string? youngest_input = null;
         foreach (var input in inputs)
         {
-            try
+            Stat file_info;
+            var e = stat (input, out file_info);
+            if (e == 0)
             {
-                var modification_time = get_modification_time (input);
-                if (timeval_cmp (modification_time, max_input_time) > 0)
+                if (timespec_cmp (file_info.st_mtim, max_input_time) > 0)
                 {
-                    max_input_time = modification_time;
+                    max_input_time = file_info.st_mtim;
                     youngest_input = input;
                 }
             }
-            catch (Error e)
+            else
             {
-                if (e is IOError.NOT_FOUND)
+                if (errno == Posix.ENOENT)
                 {
                     if (debug_enabled)
                         stderr.printf ("Input %s is missing\n", get_relative_path (original_dir, Path.build_filename (recipe.dirname, input)));
                 }
                 else
-                    warning ("Unable to access input file %s: %s", input, e.message);
-
+                    warning ("Unable to access input file %s: %s", input, strerror (errno));
                 /* Something has gone wrong, run the rule anyway and it should fail */
                 return true;
             }
         }
 
         /* Rebuild if any of the outputs are missing */
-        TimeVal max_output_time = { 0, 0 };
+        Posix.timespec max_output_time = { 0, 0 };
         string? youngest_output = null;
         foreach (var output in outputs)
         {
@@ -171,29 +164,31 @@ public class Rule
             if (output.has_prefix ("%"))
                 return true;
 
-            try
+            Stat file_info;
+            var e = stat (output, out file_info);
+            if (e == 0)
             {
-                var modification_time = get_modification_time (output);
-                if (timeval_cmp (modification_time, max_output_time) > 0)
+                if (timespec_cmp (file_info.st_mtim, max_output_time) > 0)
                 {
-                    max_output_time = modification_time;
+                    max_output_time = file_info.st_mtim;
                     youngest_output = output;
                 }
             }
-            catch (Error e)
+            else
             {
-                if (debug_enabled && e is IOError.NOT_FOUND)
+                if (debug_enabled && errno == Posix.ENOENT)
                     stderr.printf ("Output %s is missing\n", get_relative_path (original_dir, Path.build_filename (recipe.dirname, output)));
+
                 return true;
             }
         }
 
-        if (timeval_cmp (max_input_time, max_output_time) > 0)
+        if (timespec_cmp (max_input_time, max_output_time) > 0)
         {
             if (debug_enabled)
                 stderr.printf ("Rebuilding %s as %s is newer\n",
-                       get_relative_path (original_dir, Path.build_filename (recipe.dirname, youngest_output)),
-                       get_relative_path (original_dir, Path.build_filename (recipe.dirname, youngest_input)));
+                               get_relative_path (original_dir, Path.build_filename (recipe.dirname, youngest_output)),
+                               get_relative_path (original_dir, Path.build_filename (recipe.dirname, youngest_input)));
             return true;
         }
 

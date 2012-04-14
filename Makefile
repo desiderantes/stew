@@ -6,6 +6,7 @@ PACKAGES = --pkg=glib-2.0 \
            --pkg=posix
 SOURCES = src/bake.vala \
           src/config.vapi \
+          src/fixes.vapi \
           src/module-bzip.vala \
           src/module-bzr.vala \
           src/module-data.vala \

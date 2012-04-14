@@ -1,5 +1,6 @@
 programs|bake|sources = bake.vala \
                         config.vapi \
+                        fixes.vapi \
                         module-bzip.vala \
                         module-bzr.vala \
                         module-data.vala \
