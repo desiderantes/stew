@@ -152,12 +152,28 @@ public class TestRunner
     {
         loop = new MainLoop ();
 
-        if (args.length != 2)
+        if (args.length < 2)
         {
-            stderr.printf ("Usage: %s test-directory\n", args[0]);
+            stderr.printf ("Usage: %s [--keep-directory] test-directory\n", args[0]);
             return Posix.EXIT_FAILURE;
         }
-        var test_directory = args[1];
+        var keep_directory = false;
+        var test_directory = "";
+        for (var i = 1; i < args.length; i++)
+        {
+            if (args[i].has_prefix ("-"))
+            {
+                if (args[i] == "--keep-directory")
+                    keep_directory = true;
+                else
+                {
+                    stderr.printf ("Unknown argument %s\n", args[i]);
+                    return Posix.EXIT_FAILURE;
+                }
+            }
+            else
+                test_directory = args[i];
+        }
 
         /* Load expected results */
         var expected_path = "%s/expected".printf (test_directory);
@@ -192,6 +208,8 @@ public class TestRunner
             stderr.printf ("Error creating temporary directory: %s\n", strerror (errno));
             return Posix.EXIT_FAILURE;
         }
+        if (keep_directory)
+            stderr.printf ("Running in %s\n", temp_dir);
         FileUtils.chmod (temp_dir, 0755);
         Posix.system ("cp -r %s/* %s".printf (test_directory, temp_dir));
 
@@ -226,13 +244,16 @@ public class TestRunner
             Posix.kill (pid, Posix.SIGTERM);
 
         /* Remove temporary directory */
-        try
+        if (!keep_directory)
         {
-            unlink_recursive (temp_dir);
-        }
-        catch (Error e)
-        {
-            stderr.printf ("Failed to delete temporary directory %s: %s", temp_dir, e.message);
+            try
+            {
+                unlink_recursive (temp_dir);
+            }
+            catch (Error e)
+            {
+                stderr.printf ("Failed to delete temporary directory %s: %s", temp_dir, e.message);
+            }
         }
 
         /* Remove socket */
