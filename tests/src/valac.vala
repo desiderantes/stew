@@ -47,6 +47,17 @@ public class Valac
                  }
              }
         }
+        else if (args[1].has_prefix ("--fast-vapi="))
+        {
+             var filename = args[1].substring (12);
+             try
+             {
+                 FileUtils.set_contents (filename, "");
+             }
+             catch (FileError e)
+             {
+             }           
+        }
 
         return Posix.EXIT_SUCCESS;
     }

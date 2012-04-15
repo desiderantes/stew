@@ -1,0 +1,3 @@
+package|name = test
+
+programs|test|sources = test1.vala test2.vala test3.vala
