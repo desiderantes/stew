@@ -153,7 +153,7 @@ public class GCCModule : BuildModule
 
         var link_rule = recipe.add_rule ();
         link_rule.outputs.append (binary_name);
-        var link_command = "@%s".printf (compiler);
+        var link_command = "@%s -o %s".printf (compiler, binary_name);
         if (is_library)
             link_command += " -shared";
 
@@ -258,7 +258,6 @@ public class GCCModule : BuildModule
 
         link_rule.add_status_command ("GCC-LINK %s".printf (binary_name));
         link_command += ldflags;
-        link_command += " -o %s".printf (binary_name);
         link_rule.commands.append (link_command);
 
         if (is_library)

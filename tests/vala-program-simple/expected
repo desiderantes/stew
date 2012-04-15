@@ -2,5 +2,5 @@
 valac --ccode test.vala
 touch .built/test.c-stamp
 gcc -Wno-unused -c .built/test.c -o .built/test.o
-gcc .built/test.o -o test
+gcc -o test .built/test.o
 (exit 0)

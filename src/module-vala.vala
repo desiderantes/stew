@@ -137,7 +137,7 @@ public class ValaModule : BuildModule
         var valac_inputs = new List<string> ();
         var link_rule = recipe.add_rule ();
         link_rule.outputs.append (binary_name);
-        var link_command = "@gcc";
+        var link_command = "@gcc -o %s".printf (binary_name);
         if (is_library)
             link_command += " -shared";
 
@@ -348,7 +348,6 @@ public class ValaModule : BuildModule
         recipe.build_rule.inputs.append (binary_name);
         link_rule.add_status_command ("GCC-LINK %s".printf (binary_name));
         link_command += ldflags;
-        link_command += " -o %s".printf (binary_name);
         link_rule.commands.append (link_command);
 
         return true;

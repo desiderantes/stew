@@ -1,4 +1,4 @@
 !bake
 gcc -fPIC -c test.c -o .built/test.o
-gcc -shared .built/test.o -o libtest.so.0
+gcc -o libtest.so.0 -shared .built/test.o
 (exit 0)

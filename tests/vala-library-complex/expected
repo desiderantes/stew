@@ -14,6 +14,6 @@ gcc -Wno-unused -fPIC -c .built/test2.c -o .built/test2.o
 valac --ccode test3.vala --use-fast-vapi=.built/test1.vapi --use-fast-vapi=.built/test2.vapi
 touch .built/test3.c-stamp
 gcc -Wno-unused -fPIC -c .built/test3.c -o .built/test3.o
-gcc -shared .built/test1.o .built/test2.o .built/test3.o -o libtest.so.0
+gcc -o libtest.so.0 -shared .built/test1.o .built/test2.o .built/test3.o
 valac --ccode --header=test.h --vapi=test-0.vapi --library=test --use-fast-vapi=.built/test1.vapi --use-fast-vapi=.built/test2.vapi --use-fast-vapi=.built/test3.vapi
 (exit 0)

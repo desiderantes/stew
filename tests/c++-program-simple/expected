@@ -1,4 +1,4 @@
 !bake
 g++ -c test.cpp -o .built/test.o
-g++ .built/test.o -o test
+g++ -o test .built/test.o
 (exit 0)
