@@ -1,0 +1,9 @@
+!bake
+valac --ccode test.vala
+touch .built/test.c-stamp
+gcc -Wno-unused -fPIC -c .built/test.c -o .built/test.o
+gcc -shared .built/test.o -o libtest.so.0
+valac --fast-vapi=.built/test.vapi test.vala
+touch .built/test.vapi-stamp
+valac --ccode --header=test.h --vapi=test-0.vapi --library=test --use-fast-vapi=.built/test.vapi
+(exit 0)
