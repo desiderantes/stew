@@ -1,0 +1,5 @@
+!bake
+python -m py_compile test1.py
+python -m py_compile test2.py
+python -m py_compile test3.py
+(exit 0)

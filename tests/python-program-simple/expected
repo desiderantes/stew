@@ -1,0 +1,3 @@
+!bake
+python -m py_compile test.py
+(exit 0)
