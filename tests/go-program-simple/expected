@@ -1,0 +1,4 @@
+!bake
+gccgo -c test.go -o .built/test.o
+gccgo .built/test.o -o test
+(exit 0)

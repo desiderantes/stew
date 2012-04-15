@@ -42,6 +42,10 @@ programs|ghc|sources = ghc.vala
 programs|ghc|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
 programs|ghc|install = false
 
+programs|gccgo|sources = gccgo.vala
+programs|gccgo|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
+programs|gccgo|install = false
+
 programs|valac|sources = valac.vala
 programs|valac|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
 programs|valac|install = false

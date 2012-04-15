@@ -1,0 +1,3 @@
+package|name = test
+
+programs|test|sources = test.go
