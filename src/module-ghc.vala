@@ -19,15 +19,15 @@ public class GHCModule : BuildModule
         var link_command = "@ghc -o %s".printf (program);
         foreach (var source in sources)
         {
-            var output = replace_extension (source, "o");
-            var interface_file = replace_extension (source, "hi");
+            var output = recipe.get_build_path (replace_extension (source, "o"));
+            var interface_file = recipe.get_build_path (replace_extension (source, "hi"));
 
             var rule = recipe.add_rule ();
             rule.inputs.append (source);
             rule.outputs.append (output);
             rule.outputs.append (interface_file);
             rule.add_status_command ("HC %s".printf (source));
-            rule.commands.append ("@ghc -c %s".printf (source));
+            rule.commands.append ("@ghc -c %s -ohi %s -o %s".printf (source, interface_file, output));
 
             link_rule.inputs.append (output);
             link_pretty_command += " %s".printf (output);
