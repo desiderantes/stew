@@ -131,21 +131,29 @@ public class GCCModule : BuildModule
         var sources = split_variable (source_list);
 
         var have_cpp = false;
+        string? compiler = null;
         foreach (var source in sources)
         {
-            var compiler = get_compiler (source);
-            if (compiler == null || Environment.find_program_in_path (compiler) == null)
+            if (source.has_suffix (".h"))
+                continue;
+
+            var c = get_compiler (source);
+            if (c == null || Environment.find_program_in_path (c) == null)
                 return false;
-                
-            if (compiler == "g++")
+
+            if (c == "g++")
                 have_cpp = true;
+
+            if (compiler != null && c != compiler)
+                return false;
+            compiler = c;
         }
+        if (compiler == null)
+            return false;
 
         var link_rule = recipe.add_rule ();
         link_rule.outputs.append (binary_name);
-        var link_command = "@gcc";
-        if (have_cpp)
-            link_command = "@g++";
+        var link_command = "@%s".printf (compiler);
         if (is_library)
             link_command += " -shared";
 
@@ -225,7 +233,6 @@ public class GCCModule : BuildModule
         foreach (var source in sources)
         {
             var input = source;
-            var compiler = get_compiler (source);
                 
             var output = recipe.get_build_path (replace_extension (source, "o"));
 
