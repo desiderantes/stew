@@ -1,0 +1,6 @@
+!bake
+g++ -c test1.cpp -o .built/test1.o
+g++ -c test2.cpp -o .built/test2.o
+g++ -c test3.cpp -o .built/test3.o
+g++ .built/test1.o .built/test2.o .built/test3.o -o test
+(exit 0)
