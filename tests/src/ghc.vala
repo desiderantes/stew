@@ -1,4 +1,4 @@
-public class GCC
+public class GHC
 {
     public static int main (string[] args)
     {
@@ -31,7 +31,7 @@ public class GCC
 
         for (var i = 1; i < args.length; i++)
         {
-             if (args[i] == "-o")
+             if (args[i] == "-o" || args[i] == "-ohi")
              {
                  create_file (args[i + 1]);
                  i++;
