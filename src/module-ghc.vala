@@ -10,6 +10,9 @@ public class GHCModule : BuildModule
             if (!source.has_suffix (".hs"))
                 return false;
 
+        if (Environment.find_program_in_path ("ghc") == null)
+            return false;
+
         var link_rule = recipe.add_rule ();
         link_rule.outputs.append (program);
         var link_pretty_command = "LINK";
