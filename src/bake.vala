@@ -135,7 +135,7 @@ public class Rule
             var e = stat (input, out file_info);
             if (e == 0)
             {
-                if (timespec_cmp (file_info.st_mtim, max_input_time) > 0)
+                if (Posix.S_ISREG (file_info.st_mode) && timespec_cmp (file_info.st_mtim, max_input_time) > 0)
                 {
                     max_input_time = file_info.st_mtim;
                     youngest_input = input;
@@ -168,7 +168,7 @@ public class Rule
             var e = stat (output, out file_info);
             if (e == 0)
             {
-                if (timespec_cmp (file_info.st_mtim, max_output_time) > 0)
+                if (Posix.S_ISREG (file_info.st_mode) && timespec_cmp (file_info.st_mtim, max_output_time) > 0)
                 {
                     max_output_time = file_info.st_mtim;
                     youngest_output = output;
