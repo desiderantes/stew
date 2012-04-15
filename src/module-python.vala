@@ -10,7 +10,7 @@ public class PythonModule : BuildModule
             if (!source.has_suffix (".py"))
                 return false;
 
-        if (Environment.find_program_in_path ("pycompile") == null)
+        if (Environment.find_program_in_path ("python") == null)
             return false;
 
         var install_sources = recipe.get_variable ("programs|%s|install-sources".printf (program)) == "true";
@@ -21,7 +21,7 @@ public class PythonModule : BuildModule
             rule.inputs.append (source);
             rule.outputs.append (output);
             rule.add_status_command ("PYC %s".printf (source));		
-            rule.commands.append ("@pycompile %s".printf (source));
+            rule.commands.append ("@python -m py_compile %s".printf (source));
             recipe.build_rule.inputs.append (output);
 
             if (install_sources)
@@ -60,7 +60,7 @@ public class PythonModule : BuildModule
             if (!source.has_suffix (".py"))
                 return false;
 
-        if (Environment.find_program_in_path ("pycompile") == null)
+        if (Environment.find_program_in_path ("python") == null)
             return false;
 
         var install_directory = recipe.get_variable ("libraries|%s|install-directory".printf (library));
@@ -84,7 +84,7 @@ public class PythonModule : BuildModule
             rule.inputs.append (source);
             rule.outputs.append (output);
             rule.add_status_command ("PYC %s".printf (source));		
-            rule.commands.append ("@pycompile %s".printf (source));
+            rule.commands.append ("@python -m py_compile %s".printf (source));
             recipe.build_rule.inputs.append (output);
 
             if (install_sources)
