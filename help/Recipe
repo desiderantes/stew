@@ -5,7 +5,9 @@ data|mallard|bake|pages = building.page \
                           c++.page \
                           data.page \
                           example.page \
+                          go.page \
                           gsettings.page \
+                          haskell.page \
                           index.page \
                           installing.page \
                           libraries.page \

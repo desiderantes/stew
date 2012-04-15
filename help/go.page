@@ -1,0 +1,21 @@
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="go">
+<info>
+    <link type="guide" xref="index#programs-and-libraries"/>
+</info>
+
+<title>Go Language Support</title>
+
+<p>
+Bake supports <link xref="programs">programs</link> and <link xref="libraries">libraries</link> written in the Go language.
+</p>
+<example>
+<p>
+The following shows a recipe for a two file Go program:
+</p>
+<code>
+programs|example-program|sources = main.go module.go
+programs|example-program|name = Example
+programs|example-program|description = An example Go program
+</code>
+</example>
+</page>
