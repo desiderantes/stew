@@ -1,0 +1,6 @@
+!bake
+gcc -fPIC -c test1.c -o .built/test1.o
+gcc -fPIC -c test2.c -o .built/test2.o
+gcc -fPIC -c test3.c -o .built/test3.o
+gcc -shared .built/test1.o .built/test2.o .built/test3.o -o libtest.so.0
+(exit 0)
