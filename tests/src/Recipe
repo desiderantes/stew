@@ -49,3 +49,11 @@ programs|gccgo|install = false
 programs|valac|sources = valac.vala
 programs|valac|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
 programs|valac|install = false
+
+programs|javac|sources = javac.vala
+programs|javac|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
+programs|javac|install = false
+
+programs|jar|sources = jar.vala
+programs|jar|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
+programs|jar|install = false

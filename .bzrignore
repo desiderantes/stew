@@ -15,3 +15,5 @@ tests/src/g++
 tests/src/gccgo
 tests/src/ghc
 tests/src/python
+tests/src/javac
+tests/src/jar

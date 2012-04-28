@@ -1,0 +1,4 @@
+!bake
+javac test.java
+jar cfe test.jar test.class
+(exit 0)
