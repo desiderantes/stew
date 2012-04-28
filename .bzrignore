@@ -10,3 +10,8 @@ tests/src/test-runner
 tests/src/mkdir
 tests/src/touch
 tests/src/cat
+tests/src/valac
+tests/src/g++
+tests/src/gccgo
+tests/src/ghc
+tests/src/python
