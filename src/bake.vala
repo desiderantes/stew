@@ -109,7 +109,12 @@ public class Rule
     public Recipe recipe;
     public List<string> inputs;
     public List<string> outputs;
-    public List<string> commands;
+    private List<string> commands;
+    
+    public bool has_commands
+    {
+        get { return commands != null; }
+    }
 
     public Rule (Recipe recipe)
     {
@@ -209,7 +214,7 @@ public class Rule
             c = recipe.substitute_variables (c);
 
             if (show_output)
-                print ("    %s\n", c);
+                GLib.print ("    %s\n", c);
 
             var exit_status = Posix.system (c);
             if (Process.if_signaled (exit_status))
@@ -225,13 +230,40 @@ public class Rule
         }
     }
 
+    public void add_input (string input)
+    {
+        inputs.append (input);    
+    }
+
+    public void add_output (string output)
+    {
+        outputs.append (output);
+    }
+
+    public void add_command (string command)
+    {
+        commands.append (command);
+    }
+
     public void add_status_command (string status)
     {
         if (!pretty_print)
             return;
 
         // FIXME: Escape if necessary
-        commands.append ("@echo '    %s'".printf (status));
+        add_command ("@echo '    %s'".printf (status));
+    }
+
+    public void print ()
+    {
+        foreach (var output in outputs)
+            stdout.printf ("%s ", output);
+        stdout.printf (":");
+        foreach (var input in inputs)
+            stdout.printf (" %s", input);
+        stdout.printf ("\n");
+        foreach (var c in commands)
+            stdout.printf ("    %s\n", c);
     }
 }
 
@@ -296,36 +328,36 @@ public class Recipe
         parse (filename, contents, allow_rules);
 
         var build_dir_rule = add_rule ();
-        build_dir_rule.outputs.append (".built/");
-        build_dir_rule.commands.append ("@mkdir .built");
+        build_dir_rule.add_output (".built/");
+        build_dir_rule.add_command ("@mkdir .built");
 
         build_rule = find_rule ("%build");
         if (build_rule == null)
         {
             build_rule = add_rule ();
-            build_rule.inputs.prepend (".built/");
-            build_rule.outputs.append ("%build");
+            build_rule.add_input (".built/");
+            build_rule.add_output ("%build");
         }
 
         install_rule = find_rule ("%install");
         if (install_rule == null)
         {
             install_rule = add_rule ();
-            install_rule.outputs.append ("%install");
+            install_rule.add_output ("%install");
         }
 
         clean_rule = find_rule ("%clean");
         if (clean_rule == null)
         {
             clean_rule = add_rule ();
-            clean_rule.outputs.append ("%clean");
+            clean_rule.add_output ("%clean");
         }
 
         test_rule = find_rule ("%test");
         if (test_rule == null)
         {
             test_rule = add_rule ();
-            test_rule.outputs.append ("%test");
+            test_rule.add_output ("%test");
         }
     }
 
@@ -408,7 +440,7 @@ public class Recipe
                 if (indent == rule_indent && statement != "")
                 {
                     var rule = rules.last ().data;
-                    rule.commands.append (statement);
+                    rule.add_command (statement);
                     continue;
                 }
                 in_rule = false;
@@ -437,11 +469,11 @@ public class Recipe
 
                 var input_list = statement.substring (0, index).chomp ();
                 foreach (var output in split_variable (input_list))
-                    rule.outputs.append (output);
+                    rule.add_output (output);
 
                 var output_list = statement.substring (index + 1).strip ();
                 foreach (var input in split_variable (output_list))
-                    rule.inputs.append (input);
+                    rule.add_input (input);
 
                 in_rule = true;
                 continue;
@@ -502,12 +534,12 @@ public class Recipe
 
     public void add_install_rule (string filename, string install_dir, string? target_filename = null)
     {
-        install_rule.inputs.append (filename);
+        install_rule.add_input (filename);
         if (target_filename == null)
             target_filename = filename;
         var install_path = get_install_path (Path.build_filename (install_dir, target_filename));
-        install_rule.commands.append ("@mkdir -p %s".printf (Path.get_dirname (install_path)));
-        install_rule.commands.append ("@install %s %s".printf (filename, install_path));
+        install_rule.add_command ("@mkdir -p %s".printf (Path.get_dirname (install_path)));
+        install_rule.add_command ("@install %s %s".printf (filename, install_path));
     }
 
     public void generate_clean_rule ()
@@ -528,7 +560,7 @@ public class Recipe
                     else
                     {
                         clean_rule.add_status_command ("RM %s".printf (output));
-                        clean_rule.commands.append ("@rm -rf %s".printf (output));
+                        clean_rule.add_command ("@rm -rf %s".printf (output));
                     }
                 }
                 else
@@ -538,7 +570,7 @@ public class Recipe
                     if (!output.has_prefix (build_dir + "/"))
                     {
                         clean_rule.add_status_command ("RM %s".printf (output));
-                        clean_rule.commands.append ("@rm -f %s".printf (output));
+                        clean_rule.add_command ("@rm -f %s".printf (output));
                     }
                 }
             }
@@ -674,7 +706,7 @@ public class Recipe
             return;
 
         /* If we're about to do something then note which directory we are in and what we're building */
-        if (rule.commands != null)
+        if (rule.has_commands)
             log_directory_change ();
 
         /* Run the commands */
@@ -688,14 +720,7 @@ public class Recipe
         foreach (var rule in rules)
         {
             stdout.printf ("\n");
-            foreach (var output in rule.outputs)
-                stdout.printf ("%s ", output);
-            stdout.printf (":");
-            foreach (var input in rule.inputs)
-                stdout.printf (" %s", input);
-            stdout.printf ("\n");
-            foreach (var c in rule.commands)
-                stdout.printf ("    %s\n", c);
+            rule.print ();
         }
     }
 }
@@ -770,10 +795,10 @@ public class Bake
         /* Make rules recurse */
         foreach (var c in f.children)
         {
-            f.build_rule.inputs.append ("%s/%%build".printf (Path.get_basename (c.dirname)));
-            f.install_rule.inputs.append ("%s/%%install".printf (Path.get_basename (c.dirname)));
-            f.clean_rule.inputs.append ("%s/%%clean".printf (Path.get_basename (c.dirname)));
-            f.test_rule.inputs.append ("%s/%%test".printf (Path.get_basename (c.dirname)));
+            f.build_rule.add_input ("%s/%%build".printf (Path.get_basename (c.dirname)));
+            f.install_rule.add_input ("%s/%%install".printf (Path.get_basename (c.dirname)));
+            f.clean_rule.add_input ("%s/%%clean".printf (Path.get_basename (c.dirname)));
+            f.test_rule.add_input ("%s/%%test".printf (Path.get_basename (c.dirname)));
         }
 
         return f;

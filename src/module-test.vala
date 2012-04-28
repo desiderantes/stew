@@ -7,7 +7,7 @@ public class TestModule : BuildModule
         {
             recipe.test_rule.add_status_command ("TEST %s".printf (test));
             var command = "@%s".printf (recipe.get_variable ("tests|%s|command".printf (test)));
-            recipe.test_rule.commands.append (command);
+            recipe.test_rule.add_command (command);
         }
     }
 }

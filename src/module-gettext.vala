@@ -23,18 +23,18 @@ public class GettextModule : BuildModule
                 continue;
 
             var pot_file = Path.build_filename (translation_directory, "%s.pot".printf (recipe.package_name));
-            recipe.build_rule.inputs.append (pot_file);
+            recipe.build_rule.add_input (pot_file);
             var pot_rule = recipe.add_rule ();
-            pot_rule.outputs.append (pot_file);
+            pot_rule.add_output (pot_file);
             pot_rule.add_status_command ("GETTEXT %s".printf (pot_file));
             var gettext_command = "@xgettext --extract-all --from-code=utf-8 --output %s".printf (pot_file);
             foreach (var source in gettext_sources)
             {
                 var s = get_relative_path (original_dir, source);
-                pot_rule.inputs.append (s);
+                pot_rule.add_input (s);
                 gettext_command += " %s".printf (s);
             }
-            pot_rule.commands.append (gettext_command);
+            pot_rule.add_command (gettext_command);
         }
 
         /* Compile and install translations */
@@ -51,11 +51,11 @@ public class GettextModule : BuildModule
                 var mo_file = "%s/%s.mo".printf (translation_directory, language);
 
                 var rule = recipe.add_rule ();
-                rule.inputs.append (po_file);
-                rule.outputs.append (mo_file);
-                rule.commands.append ("@msgfmt %s --output-file=%s".printf (po_file, mo_file));
+                rule.add_input (po_file);
+                rule.add_output (mo_file);
+                rule.add_command ("@msgfmt %s --output-file=%s".printf (po_file, mo_file));
 
-                recipe.build_rule.inputs.append (mo_file);
+                recipe.build_rule.add_input (mo_file);
 
                 var target_dir = recipe.get_install_path (Path.build_filename (recipe.get_variable ("gettext|locale-directory"), language, "LC_MESSAGES"));
                 var target_mo_file = "%s.mo".printf (domain);

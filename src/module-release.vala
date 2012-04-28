@@ -3,7 +3,7 @@ public class ReleaseModule : BuildModule
     public override void generate_toplevel_rules (Recipe recipe)
     {
         var rule = recipe.add_rule ();
-        rule.outputs.append ("%s/".printf (recipe.release_name));
+        rule.add_output ("%s/".printf (recipe.release_name));
     }
 
     private static void add_release_file (Rule release_rule, string temp_dir, string directory, string filename)
@@ -29,10 +29,10 @@ public class ReleaseModule : BuildModule
 
         /* Generate directory if a new one */
         if (!has_dir)
-            release_rule.commands.append ("@mkdir -p %s".printf (Path.get_dirname (output_filename)));
+            release_rule.add_command ("@mkdir -p %s".printf (Path.get_dirname (output_filename)));
 
-        release_rule.inputs.append (input_filename);
-        release_rule.commands.append ("@cp %s %s".printf (input_filename, output_filename));
+        release_rule.add_input (input_filename);
+        release_rule.add_command ("@cp %s %s".printf (input_filename, output_filename));
     }
 
     public override void recipe_complete (Recipe recipe)

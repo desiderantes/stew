@@ -31,11 +31,11 @@ public class ValaModule : BuildModule
         /* Generate a symbolic link to the library and install both the link and the library */
         var rule = recipe.add_rule ();
         var unversioned_binary_name = "lib%s.so".printf (library);
-        recipe.build_rule.inputs.append (unversioned_binary_name);
-        rule.inputs.append (binary_name);
-        rule.outputs.append (unversioned_binary_name);
+        recipe.build_rule.add_input (unversioned_binary_name);
+        rule.add_input (binary_name);
+        rule.add_output (unversioned_binary_name);
         rule.add_status_command ("LINK %s".printf (unversioned_binary_name));
-        rule.commands.append ("@ln -s %s %s".printf (binary_name, unversioned_binary_name));
+        rule.add_command ("@ln -s %s %s".printf (binary_name, unversioned_binary_name));
         recipe.add_install_rule (unversioned_binary_name, recipe.library_directory);
         recipe.add_install_rule (binary_name, recipe.library_directory);
 
@@ -54,25 +54,25 @@ public class ValaModule : BuildModule
         var include_directory = Path.build_filename (recipe.include_directory, "%s-%s".printf (library, major_version));
 
         rule = recipe.add_rule ();
-        recipe.build_rule.inputs.append (filename);
-        rule.outputs.append (filename);
+        recipe.build_rule.add_input (filename);
+        rule.add_output (filename);
         rule.add_status_command ("PKG-CONFIG %s".printf (filename));
-        rule.commands.append ("@echo \"Name: %s\" > %s".printf (name, filename));
-        rule.commands.append ("@echo \"Description: %s\" >> %s".printf (description, filename));
-        rule.commands.append ("@echo \"Version: %s\" >> %s".printf (version, filename));
-        rule.commands.append ("@echo \"Requires: %s\" >> %s".printf (requires, filename));
-        rule.commands.append ("@echo \"Libs: -L%s -l%s\" >> %s".printf (recipe.library_directory, library, filename));
-        rule.commands.append ("@echo \"Cflags: -I%s\" >> %s".printf (include_directory, filename));
+        rule.add_command ("@echo \"Name: %s\" > %s".printf (name, filename));
+        rule.add_command ("@echo \"Description: %s\" >> %s".printf (description, filename));
+        rule.add_command ("@echo \"Version: %s\" >> %s".printf (version, filename));
+        rule.add_command ("@echo \"Requires: %s\" >> %s".printf (requires, filename));
+        rule.add_command ("@echo \"Libs: -L%s -l%s\" >> %s".printf (recipe.library_directory, library, filename));
+        rule.add_command ("@echo \"Cflags: -I%s\" >> %s".printf (include_directory, filename));
 
         recipe.add_install_rule (filename, "libraries", Path.build_filename (recipe.library_directory, "pkgconfig"));
 
         var h_filename = "%s.h".printf (name);
-        recipe.build_rule.inputs.append (h_filename);
+        recipe.build_rule.add_input (h_filename);
         recipe.add_install_rule (h_filename, include_directory);
 
         var vapi_filename = "%s-%s.vapi".printf (name, major_version);
         var deps_filename = "%s.deps".printf (name);
-        recipe.build_rule.inputs.append (vapi_filename);
+        recipe.build_rule.add_input (vapi_filename);
         var vapi_directory = Path.build_filename (recipe.data_directory, "vala", "vapi");
         recipe.add_install_rule (vapi_filename, vapi_directory);
         recipe.add_install_rule (deps_filename, vapi_directory);
@@ -85,13 +85,13 @@ public class ValaModule : BuildModule
             recipe.add_install_rule (gir_filename, gir_directory);
 
             var typelib_filename = "%s-%s.typelib".printf (name, major_version);
-            recipe.build_rule.inputs.append (typelib_filename);
+            recipe.build_rule.add_input (typelib_filename);
             var typelib_rule = recipe.add_rule ();
-            typelib_rule.inputs.append (gir_filename);
-            typelib_rule.inputs.append ("lib%s.so".printf (library));
-            typelib_rule.outputs.append (typelib_filename);
+            typelib_rule.add_input (gir_filename);
+            typelib_rule.add_input ("lib%s.so".printf (library));
+            typelib_rule.add_output (typelib_filename);
             typelib_rule.add_status_command ("G-IR-COMPILER %s".printf (typelib_filename));
-            typelib_rule.commands.append ("@g-ir-compiler --shared-library=%s %s -o %s".printf (name, gir_filename, typelib_filename));
+            typelib_rule.add_command ("@g-ir-compiler --shared-library=%s %s -o %s".printf (name, gir_filename, typelib_filename));
             var typelib_directory = Path.build_filename (recipe.library_directory, "girepository-1.0");
             recipe.add_install_rule (typelib_filename, typelib_directory);
         }
@@ -136,7 +136,7 @@ public class ValaModule : BuildModule
         var valac_command = "@valac";
         var valac_inputs = new List<string> ();
         var link_rule = recipe.add_rule ();
-        link_rule.outputs.append (binary_name);
+        link_rule.add_output (binary_name);
         var link_command = "@gcc -o %s".printf (binary_name);
         if (is_library)
             link_command += " -shared";
@@ -150,16 +150,16 @@ public class ValaModule : BuildModule
             valac_inputs.append (defines_filename);
 
             var rule = recipe.add_rule ();
-            rule.outputs.append (defines_filename);
+            rule.add_output (defines_filename);
             rule.add_status_command ("VALAC %s".printf (defines_filename));
-            rule.commands.append ("@echo \"/* Generated by Bake. Do not edit! */\" > %s".printf (defines_filename));
+            rule.add_command ("@echo \"/* Generated by Bake. Do not edit! */\" > %s".printf (defines_filename));
             foreach (var define in defines)
             {
                 var value = recipe.get_variable ("%s|%s|defines|%s".printf (type_name, name, define));
                 cflags += " -D%s=\\\"%s\\\"".printf (define, value);
 
-                rule.commands.append ("@echo \"[CCode (cname=\\\"%s\\\")]\" >> %s".printf (define, defines_filename));
-                rule.commands.append ("@echo \"public const string %s;\" >> %s".printf (define, defines_filename));
+                rule.add_command ("@echo \"[CCode (cname=\\\"%s\\\")]\" >> %s".printf (define, defines_filename));
+                rule.add_command ("@echo \"public const string %s;\" >> %s".printf (define, defines_filename));
             }
         }
 
@@ -191,7 +191,7 @@ public class ValaModule : BuildModule
                     valac_inputs.append (Path.build_filename (rel_dir, vapi_filename));
                     // FIXME: Actually use the .pc file
                     cflags += " -I%s".printf (rel_dir);
-                    link_rule.inputs.append (Path.build_filename (rel_dir, library_filename));
+                    link_rule.add_input (Path.build_filename (rel_dir, library_filename));
                     // FIXME: Use --libs-only-l
                     ldflags += " -L%s -l%s".printf (rel_dir, package);
                     continue;
@@ -245,9 +245,9 @@ public class ValaModule : BuildModule
 
             interface_rule = recipe.add_rule ();
             foreach (var input in valac_inputs)
-                interface_rule.inputs.append (input);
-            interface_rule.outputs.append (h_filename);
-            interface_rule.outputs.append (vapi_filename);
+                interface_rule.add_input (input);
+            interface_rule.add_output (h_filename);
+            interface_rule.add_output (vapi_filename);
 
             interface_rule.add_status_command ("VALAC %s %s".printf (h_filename, vapi_filename));
             interface_command = valac_command + " --ccode --header=%s --vapi=%s --library=%s".printf (h_filename, vapi_filename, name);
@@ -256,7 +256,7 @@ public class ValaModule : BuildModule
             if (namespace != null)
             {
                 var gir_filename = "%s-%s.gir".printf (namespace, major_version);
-                interface_rule.outputs.append (gir_filename);
+                interface_rule.add_output (gir_filename);
                 interface_command += " --gir=%s".printf (gir_filename);
             }
         }
@@ -272,18 +272,18 @@ public class ValaModule : BuildModule
 
             /* Build a fastvapi file */
             var rule = recipe.add_rule ();
-            rule.inputs.append (source);
-            rule.inputs.append (get_relative_path (recipe.dirname, "%s/".printf (recipe.build_directory)));
-            rule.outputs.append (vapi_filename);
-            rule.outputs.append (vapi_stamp_filename);
+            rule.add_input (source);
+            rule.add_input (get_relative_path (recipe.dirname, "%s/".printf (recipe.build_directory)));
+            rule.add_output (vapi_filename);
+            rule.add_output (vapi_stamp_filename);
             rule.add_status_command ("VALAC %s".printf (vapi_filename));
-            rule.commands.append ("@valac --fast-vapi=%s %s".printf (vapi_filename, source));
-            rule.commands.append ("@touch %s".printf (vapi_stamp_filename));
+            rule.add_command ("@valac --fast-vapi=%s %s".printf (vapi_filename, source));
+            rule.add_command ("@touch %s".printf (vapi_stamp_filename));
 
             /* Combine the vapi files into a header */
             if (is_library)
             {
-                interface_rule.inputs.append (vapi_filename);
+                interface_rule.add_input (vapi_filename);
                 interface_command += " --use-fast-vapi=%s".printf (vapi_filename);
             }
 
@@ -293,11 +293,11 @@ public class ValaModule : BuildModule
 
             /* Build a C file */
             rule = recipe.add_rule ();
-            rule.inputs.append (source);
+            rule.add_input (source);
             foreach (var input in valac_inputs)
-                rule.inputs.append (input);
-            rule.outputs.append (c_filename);
-            rule.outputs.append (c_stamp_filename);
+                rule.add_input (input);
+            rule.add_output (c_filename);
+            rule.add_output (c_stamp_filename);
             var command = valac_command + " --ccode %s".printf (source);
             if (defines_filename != null)
                 command += " %s".printf (defines_filename);
@@ -309,46 +309,46 @@ public class ValaModule : BuildModule
                 if (s.has_suffix (".vapi"))
                 {
                     command += " %s".printf (s);
-                    rule.inputs.append (s);
+                    rule.add_input (s);
                 }
                 else
                 {
                     var other_vapi_filename = recipe.get_build_path ("%s".printf (replace_extension (s, "vapi")));
                     command += " --use-fast-vapi=%s".printf (other_vapi_filename);
-                    rule.inputs.append (other_vapi_filename);
+                    rule.add_input (other_vapi_filename);
                 }
             }
             rule.add_status_command ("VALAC %s".printf (source));
-            rule.commands.append (command);
+            rule.add_command (command);
             /* valac always writes the c files into the same directory, so move them */
-            rule.commands.append ("@mv %s %s".printf (replace_extension (source, "c"), c_filename));
-            rule.commands.append ("@touch %s".printf (c_stamp_filename));
+            rule.add_command ("@mv %s %s".printf (replace_extension (source, "c"), c_filename));
+            rule.add_command ("@touch %s".printf (c_stamp_filename));
 
             /* Compile C code */
             rule = recipe.add_rule ();
-            rule.inputs.append (c_filename);
-            rule.outputs.append (o_filename);
+            rule.add_input (c_filename);
+            rule.add_output (o_filename);
             command = "@gcc -Wno-unused";
             if (is_library)
                 command += " -fPIC";
             command += cflags;
             command += " -c %s -o %s".printf (c_filename, o_filename);
             rule.add_status_command ("GCC %s".printf (c_filename));
-            rule.commands.append (command);
+            rule.add_command (command);
 
-            link_rule.inputs.append (o_filename);
+            link_rule.add_input (o_filename);
             link_command += " %s".printf (o_filename);
         }
 
         /* Generate library interfaces */
         if (is_library)
-            interface_rule.commands.append (interface_command);
+            interface_rule.add_command (interface_command);
 
         /* Link */
-        recipe.build_rule.inputs.append (binary_name);
+        recipe.build_rule.add_input (binary_name);
         link_rule.add_status_command ("GCC-LINK %s".printf (binary_name));
         link_command += ldflags;
-        link_rule.commands.append (link_command);
+        link_rule.add_command (link_command);
 
         return true;
     }

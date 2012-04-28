@@ -27,14 +27,14 @@ public class DpkgModule : BuildModule
         var dsc_file = "%s_%s-%s.dsc".printf (recipe.package_name, recipe.package_version, debian_revision);
         var deb_file = "%s_%s-%s_%s.deb".printf (recipe.package_name, recipe.package_version, debian_revision, build_arch);
         var rule = recipe.add_rule ();
-        rule.outputs.append (orig_file);
-        rule.inputs.append (gzip_file);
-        rule.commands.append ("@cp %s %s".printf (gzip_file, orig_file));
+        rule.add_output (orig_file);
+        rule.add_input (gzip_file);
+        rule.add_command ("@cp %s %s".printf (gzip_file, orig_file));
 
         rule = recipe.add_rule ();
-        rule.outputs.append (debian_file);
-        rule.commands.append ("@rm -rf %s".printf (build_dir));
-        rule.commands.append ("@mkdir -p %s/debian".printf (build_dir));
+        rule.add_output (debian_file);
+        rule.add_command ("@rm -rf %s".printf (build_dir));
+        rule.add_command ("@mkdir -p %s/debian".printf (build_dir));
 
         /* Generate debian/changelog */
         var changelog_file = "%s/debian/changelog".printf (build_dir);
@@ -48,33 +48,33 @@ public class DpkgModule : BuildModule
         var now = Time.local (time_t ());
         var release_date = now.format ("%a, %d %b %Y %H:%M:%S %z");
         rule.add_status_command ("Writing debian/changelog");
-        rule.commands.append ("@echo \"%s (%s-%s) %s; urgency=low\" > %s".printf (recipe.package_name, recipe.package_version, debian_revision, distribution, changelog_file));
-        rule.commands.append ("@echo >> %s".printf (changelog_file));
-        rule.commands.append ("@echo \"  * Initial release.\" >> %s".printf (changelog_file));
-        rule.commands.append ("@echo >> %s".printf (changelog_file));
-        rule.commands.append ("@echo \" -- %s <%s>  %s\" >> %s".printf (name, email, release_date, changelog_file));
+        rule.add_command ("@echo \"%s (%s-%s) %s; urgency=low\" > %s".printf (recipe.package_name, recipe.package_version, debian_revision, distribution, changelog_file));
+        rule.add_command ("@echo >> %s".printf (changelog_file));
+        rule.add_command ("@echo \"  * Initial release.\" >> %s".printf (changelog_file));
+        rule.add_command ("@echo >> %s".printf (changelog_file));
+        rule.add_command ("@echo \" -- %s <%s>  %s\" >> %s".printf (name, email, release_date, changelog_file));
 
         /* Generate debian/rules */
         var rules_file = "%s/debian/rules".printf (build_dir);
         rule.add_status_command ("Writing debian/rules");
-        rule.commands.append ("@echo \"#!/usr/bin/make -f\" > %s".printf (rules_file));
-        rule.commands.append ("@echo >> %s".printf (rules_file));
-        rule.commands.append ("@echo \"%%:\" >> %s".printf (rules_file));
-        rule.commands.append ("@echo '\tdh $@' >> %s".printf (rules_file));
-        rule.commands.append ("@echo >> %s".printf (rules_file));
-        rule.commands.append ("@echo \"override_dh_auto_configure:\" >> %s".printf (rules_file));
-        rule.commands.append ("@echo \"\tbake --configure resource-directory=/usr install-directory=debian/%s\" >> %s".printf (recipe.package_name, rules_file));
-        rule.commands.append ("@echo >> %s".printf (rules_file));
-        rule.commands.append ("@echo \"override_dh_auto_build:\" >> %s".printf (rules_file));
-        rule.commands.append ("@echo \"\tbake\" >> %s".printf (rules_file));
-        rule.commands.append ("@echo >> %s".printf (rules_file));
-        rule.commands.append ("@echo \"override_dh_auto_install:\" >> %s".printf (rules_file));
-        rule.commands.append ("@echo '\tbake install' >> %s".printf (rules_file));
-        rule.commands.append ("@echo >> %s".printf (rules_file));
-        rule.commands.append ("@echo \"override_dh_auto_clean:\" >> %s".printf (rules_file));
-        rule.commands.append ("@echo \"\tbake clean\" >> %s".printf (rules_file));
-        rule.commands.append ("@echo \"\tbake --unconfigure\" >> %s".printf (rules_file));
-        rule.commands.append ("@echo chmod +x %s".printf (rules_file));
+        rule.add_command ("@echo \"#!/usr/bin/make -f\" > %s".printf (rules_file));
+        rule.add_command ("@echo >> %s".printf (rules_file));
+        rule.add_command ("@echo \"%%:\" >> %s".printf (rules_file));
+        rule.add_command ("@echo '\tdh $@' >> %s".printf (rules_file));
+        rule.add_command ("@echo >> %s".printf (rules_file));
+        rule.add_command ("@echo \"override_dh_auto_configure:\" >> %s".printf (rules_file));
+        rule.add_command ("@echo \"\tbake --configure resource-directory=/usr install-directory=debian/%s\" >> %s".printf (recipe.package_name, rules_file));
+        rule.add_command ("@echo >> %s".printf (rules_file));
+        rule.add_command ("@echo \"override_dh_auto_build:\" >> %s".printf (rules_file));
+        rule.add_command ("@echo \"\tbake\" >> %s".printf (rules_file));
+        rule.add_command ("@echo >> %s".printf (rules_file));
+        rule.add_command ("@echo \"override_dh_auto_install:\" >> %s".printf (rules_file));
+        rule.add_command ("@echo '\tbake install' >> %s".printf (rules_file));
+        rule.add_command ("@echo >> %s".printf (rules_file));
+        rule.add_command ("@echo \"override_dh_auto_clean:\" >> %s".printf (rules_file));
+        rule.add_command ("@echo \"\tbake clean\" >> %s".printf (rules_file));
+        rule.add_command ("@echo \"\tbake --unconfigure\" >> %s".printf (rules_file));
+        rule.add_command ("@echo chmod +x %s".printf (rules_file));
 
         /* Generate debian/control */
         var control_file = "%s/debian/control".printf (build_dir);
@@ -82,72 +82,72 @@ public class DpkgModule : BuildModule
         var short_description = "Short description of %s".printf (recipe.package_name);
         var long_description = "Long description of %s".printf (recipe.package_name);
         rule.add_status_command ("Writing debian/control");
-        rule.commands.append ("@echo \"Source: %s\" > %s".printf (recipe.package_name, control_file));
-        rule.commands.append ("@echo \"Maintainer: %s <%s>\" >> %s".printf (name, email, control_file));
-        rule.commands.append ("@echo \"Build-Depends: %s\" >> %s".printf (build_depends, control_file));
-        rule.commands.append ("@echo \"Standards-Version: 3.9.2\" >> %s".printf (control_file));
-        rule.commands.append ("@echo >> %s".printf (control_file));
-        rule.commands.append ("@echo \"Package: %s\" >> %s".printf (recipe.package_name, control_file));
-        rule.commands.append ("@echo \"Architecture: any\" >> %s".printf (control_file));
-        rule.commands.append ("@echo \"Description: %s\" >> %s".printf (short_description, control_file));
+        rule.add_command ("@echo \"Source: %s\" > %s".printf (recipe.package_name, control_file));
+        rule.add_command ("@echo \"Maintainer: %s <%s>\" >> %s".printf (name, email, control_file));
+        rule.add_command ("@echo \"Build-Depends: %s\" >> %s".printf (build_depends, control_file));
+        rule.add_command ("@echo \"Standards-Version: 3.9.2\" >> %s".printf (control_file));
+        rule.add_command ("@echo >> %s".printf (control_file));
+        rule.add_command ("@echo \"Package: %s\" >> %s".printf (recipe.package_name, control_file));
+        rule.add_command ("@echo \"Architecture: any\" >> %s".printf (control_file));
+        rule.add_command ("@echo \"Description: %s\" >> %s".printf (short_description, control_file));
         foreach (var line in long_description.split ("\n"))
-            rule.commands.append ("@echo \" %s\" >> %s".printf (line, control_file));
+            rule.add_command ("@echo \" %s\" >> %s".printf (line, control_file));
 
         /* Generate debian/source/format */
         rule.add_status_command ("Writing debian/compat");
-        rule.commands.append ("@echo \"7\" > %s/debian/compat".printf (build_dir));
+        rule.add_command ("@echo \"7\" > %s/debian/compat".printf (build_dir));
 
         /* Generate debian/source/format */
         rule.add_status_command ("Writing debian/source/format");
-        rule.commands.append ("@mkdir -p %s/debian/source".printf (build_dir));
-        rule.commands.append ("@echo \"3.0 (quilt)\" > %s/debian/source/format".printf (build_dir));
+        rule.add_command ("@mkdir -p %s/debian/source".printf (build_dir));
+        rule.add_command ("@echo \"3.0 (quilt)\" > %s/debian/source/format".printf (build_dir));
 
-        rule.commands.append ("@cd %s && tar --create --gzip --file ../%s debian".printf (build_dir, debian_file));
-        rule.commands.append ("@rm -rf %s".printf (build_dir));
+        rule.add_command ("@cd %s && tar --create --gzip --file ../%s debian".printf (build_dir, debian_file));
+        rule.add_command ("@rm -rf %s".printf (build_dir));
 
         /* Source build */
         rule = recipe.add_rule ();
-        rule.outputs.append (dsc_file);
-        rule.outputs.append (changes_file);
-        rule.inputs.append (orig_file);
-        rule.inputs.append (debian_file);
+        rule.add_output (dsc_file);
+        rule.add_output (changes_file);
+        rule.add_input (orig_file);
+        rule.add_input (debian_file);
         rule.add_status_command ("DPKG");
-        rule.commands.append ("@rm -rf %s".printf (build_dir));
-        rule.commands.append ("@mkdir -p %s".printf (build_dir));
-        rule.commands.append ("@cp %s %s %s".printf (orig_file, debian_file, build_dir));
-        rule.commands.append ("@cd %s && tar --extract --gzip --file ../%s".printf (build_dir, orig_file));
-        rule.commands.append ("@cd %s/%s && tar --extract --gzip --file ../../%s".printf (build_dir, recipe.release_name, debian_file));
-        rule.commands.append ("@cd %s/%s && dpkg-buildpackage -S".printf (build_dir, recipe.release_name));
-        rule.commands.append ("@mv %s/%s %s/%s .".printf (build_dir, dsc_file, build_dir, changes_file));
-        rule.commands.append ("@rm -rf %s".printf (build_dir));
+        rule.add_command ("@rm -rf %s".printf (build_dir));
+        rule.add_command ("@mkdir -p %s".printf (build_dir));
+        rule.add_command ("@cp %s %s %s".printf (orig_file, debian_file, build_dir));
+        rule.add_command ("@cd %s && tar --extract --gzip --file ../%s".printf (build_dir, orig_file));
+        rule.add_command ("@cd %s/%s && tar --extract --gzip --file ../../%s".printf (build_dir, recipe.release_name, debian_file));
+        rule.add_command ("@cd %s/%s && dpkg-buildpackage -S".printf (build_dir, recipe.release_name));
+        rule.add_command ("@mv %s/%s %s/%s .".printf (build_dir, dsc_file, build_dir, changes_file));
+        rule.add_command ("@rm -rf %s".printf (build_dir));
 
         /* Binary build */
         rule = recipe.add_rule ();
-        rule.outputs.append (deb_file);
-        rule.inputs.append (orig_file);
-        rule.inputs.append (debian_file);
+        rule.add_output (deb_file);
+        rule.add_input (orig_file);
+        rule.add_input (debian_file);
         rule.add_status_command ("DPKG");
-        rule.commands.append ("@rm -rf %s".printf (build_dir));
-        rule.commands.append ("@mkdir -p %s".printf (build_dir));
-        rule.commands.append ("@cp %s %s %s".printf (orig_file, debian_file, build_dir));
-        rule.commands.append ("@cd %s && tar --extract --gzip --file ../%s".printf (build_dir, orig_file));
-        rule.commands.append ("@cd %s/%s && tar --extract --gzip --file ../../%s".printf (build_dir, recipe.release_name, debian_file));
-        rule.commands.append ("@cd %s/%s && dpkg-buildpackage -b".printf (build_dir, recipe.release_name));
-        rule.commands.append ("@mv %s/%s .".printf (build_dir, deb_file));
-        rule.commands.append ("@rm -rf %s".printf (build_dir));
+        rule.add_command ("@rm -rf %s".printf (build_dir));
+        rule.add_command ("@mkdir -p %s".printf (build_dir));
+        rule.add_command ("@cp %s %s %s".printf (orig_file, debian_file, build_dir));
+        rule.add_command ("@cd %s && tar --extract --gzip --file ../%s".printf (build_dir, orig_file));
+        rule.add_command ("@cd %s/%s && tar --extract --gzip --file ../../%s".printf (build_dir, recipe.release_name, debian_file));
+        rule.add_command ("@cd %s/%s && dpkg-buildpackage -b".printf (build_dir, recipe.release_name));
+        rule.add_command ("@mv %s/%s .".printf (build_dir, deb_file));
+        rule.add_command ("@rm -rf %s".printf (build_dir));
 
         rule = recipe.add_rule ();
-        rule.inputs.append (deb_file);
-        rule.outputs.append ("%release-deb");
+        rule.add_input (deb_file);
+        rule.add_output ("%release-deb");
 
         // FIXME: Move into module-ppa
         var ppa_name = recipe.get_variable ("package.ppa");
         if (ppa_name != null)
         {
             rule = recipe.add_rule ();
-            rule.outputs.append ("%release-ppa");
-            rule.inputs.append (changes_file);
-            rule.commands.append ("dput ppa:%s %s".printf (ppa_name, changes_file));
+            rule.add_output ("%release-ppa");
+            rule.add_input (changes_file);
+            rule.add_command ("dput ppa:%s %s".printf (ppa_name, changes_file));
         }
     }
 }

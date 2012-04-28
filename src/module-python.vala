@@ -18,11 +18,11 @@ public class PythonModule : BuildModule
         {
             var output = replace_extension (source, "pyc");
             var rule = recipe.add_rule ();
-            rule.inputs.append (source);
-            rule.outputs.append (output);
+            rule.add_input (source);
+            rule.add_output (output);
             rule.add_status_command ("PYC %s".printf (source));		
-            rule.commands.append ("@python -m py_compile %s".printf (source));
-            recipe.build_rule.inputs.append (output);
+            rule.add_command ("@python -m py_compile %s".printf (source));
+            recipe.build_rule.add_input (output);
 
             if (install_sources)
                 recipe.add_install_rule (source, recipe.package_data_directory);
@@ -33,19 +33,19 @@ public class PythonModule : BuildModule
 
         /* Script to run locally */
         var rule = recipe.add_rule ();
-        rule.outputs.append (main_file);	    
-        rule.outputs.append (program);
-        rule.commands.append ("@echo '#!/bin/sh' > %s".printf (program));
-        rule.commands.append ("@echo 'exec python %s' >> %s".printf (main_file, program));
-        rule.commands.append ("@chmod +x %s".printf (program));
-        recipe.build_rule.inputs.append (program);
+        rule.add_output (main_file);	    
+        rule.add_output (program);
+        rule.add_command ("@echo '#!/bin/sh' > %s".printf (program));
+        rule.add_command ("@echo 'exec python %s' >> %s".printf (main_file, program));
+        rule.add_command ("@chmod +x %s".printf (program));
+        recipe.build_rule.add_input (program);
 
         /* Script to run when installed */
         var script = recipe.get_install_path (Path.build_filename (recipe.binary_directory, program));
-        recipe.install_rule.commands.append ("@mkdir -p %s".printf (recipe.get_install_path (recipe.binary_directory)));
-        recipe.install_rule.commands.append ("@echo '#!/bin/sh' > %s".printf (script));
-        recipe.install_rule.commands.append ("@echo 'exec python %s' >> %s".printf (Path.build_filename (recipe.package_data_directory, main_file), script));
-        recipe.install_rule.commands.append ("@chmod +x %s".printf (script));
+        recipe.install_rule.add_command ("@mkdir -p %s".printf (recipe.get_install_path (recipe.binary_directory)));
+        recipe.install_rule.add_command ("@echo '#!/bin/sh' > %s".printf (script));
+        recipe.install_rule.add_command ("@echo 'exec python %s' >> %s".printf (Path.build_filename (recipe.package_data_directory, main_file), script));
+        recipe.install_rule.add_command ("@chmod +x %s".printf (script));
             
         return true;
     }
@@ -81,11 +81,11 @@ public class PythonModule : BuildModule
         {
             var output = replace_extension (source, "pyc");
             var rule = recipe.add_rule ();
-            rule.inputs.append (source);
-            rule.outputs.append (output);
+            rule.add_input (source);
+            rule.add_output (output);
             rule.add_status_command ("PYC %s".printf (source));		
-            rule.commands.append ("@python -m py_compile %s".printf (source));
-            recipe.build_rule.inputs.append (output);
+            rule.add_command ("@python -m py_compile %s".printf (source));
+            recipe.build_rule.add_input (output);
 
             if (install_sources)
                 recipe.add_install_rule (source, install_directory);

@@ -6,13 +6,13 @@ public class XZIPModule : BuildModule
         recipe.set_variable ("xzip.release-filename", filename);
 
         var rule = recipe.add_rule ();
-        rule.inputs.append ("%s/".printf (recipe.release_name));
-        rule.outputs.append (filename);
+        rule.add_input ("%s/".printf (recipe.release_name));
+        rule.add_output (filename);
         rule.add_status_command ("COMPRESS %s".printf (filename));
-        rule.commands.append ("@tar --create --xz --file %s %s".printf (filename, recipe.release_name));
+        rule.add_command ("@tar --create --xz --file %s %s".printf (filename, recipe.release_name));
 
         rule = recipe.add_rule ();
-        rule.outputs.append ("%release-xzip");
-        rule.inputs.append (filename);
+        rule.add_output ("%release-xzip");
+        rule.add_input (filename);
     }
 }

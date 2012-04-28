@@ -5,8 +5,8 @@ public class BZRModule : BuildModule
         if (recipe.package_version != null)
         {
             var rule = recipe.add_rule ();
-            rule.outputs.append ("%tag-bzr");
-            rule.commands.append ("bzr tag %s".printf (recipe.package_version));
+            rule.add_output ("%tag-bzr");
+            rule.add_command ("bzr tag %s".printf (recipe.package_version));
         }
     }
 

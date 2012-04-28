@@ -8,9 +8,9 @@ public class LaunchpadModule : BuildModule
         if (recipe.package_version != null)
         {
             var rule = recipe.add_rule ();
-            rule.outputs.append ("%release-launchpad");
-            rule.inputs.append ("%s.tar.gz".printf (recipe.release_name));
-            rule.commands.append ("lp-project-upload %s %s %s.tar.gz".printf (recipe.package_name, recipe.package_version, recipe.release_name));
+            rule.add_output ("%release-launchpad");
+            rule.add_input ("%s.tar.gz".printf (recipe.release_name));
+            rule.add_command ("lp-project-upload %s %s %s.tar.gz".printf (recipe.package_name, recipe.package_version, recipe.release_name));
         }
     }
 }

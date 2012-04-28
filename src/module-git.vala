@@ -5,8 +5,8 @@ public class GITModule : BuildModule
         if (recipe.package_version != null)
         {
             var rule = recipe.add_rule ();
-            rule.outputs.append ("%tag-git");
-            rule.commands.append ("git tag %s".printf (recipe.package_version));
+            rule.add_output ("%tag-git");
+            rule.add_command ("git tag %s".printf (recipe.package_version));
         }
     }
 

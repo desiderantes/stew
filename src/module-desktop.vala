@@ -22,22 +22,22 @@ public class DesktopModule : BuildModule
             /* Generate a .desktop file */
             var filename = recipe.get_build_path ("%s.desktop".printf (program));
             var rule = recipe.add_rule ();
-            recipe.build_rule.inputs.append (filename);
-            rule.outputs.append (filename);
+            recipe.build_rule.add_input (filename);
+            rule.add_output (filename);
 
             rule.add_status_command ("DESKTOP %s".printf (filename));
-            rule.commands.append ("@echo \"[Desktop Entry]\" > %s".printf (filename));
-            rule.commands.append ("@echo \"Type=Application\" >> %s".printf (filename));
+            rule.add_command ("@echo \"[Desktop Entry]\" > %s".printf (filename));
+            rule.add_command ("@echo \"Type=Application\" >> %s".printf (filename));
             if (categories != null)
-                rule.commands.append ("@echo \"Categories=%s\" >> %s".printf (categories, filename));
-            rule.commands.append ("@echo \"Name=%s\" >> %s".printf (name, filename));
+                rule.add_command ("@echo \"Categories=%s\" >> %s".printf (categories, filename));
+            rule.add_command ("@echo \"Name=%s\" >> %s".printf (name, filename));
             if (generic_name != null)
-                rule.commands.append ("@echo \"GenericName=%s\" >> %s".printf (generic_name, filename));
+                rule.add_command ("@echo \"GenericName=%s\" >> %s".printf (generic_name, filename));
             if (description != null)
-                rule.commands.append ("@echo \"Comment=%s\" >> %s".printf (description, filename));
+                rule.add_command ("@echo \"Comment=%s\" >> %s".printf (description, filename));
             if (icon != null)
-                rule.commands.append ("@echo \"Icon=%s\" >> %s".printf (icon, filename));
-            rule.commands.append ("@echo \"Exec=%s\" >> %s".printf (program, filename));
+                rule.add_command ("@echo \"Icon=%s\" >> %s".printf (icon, filename));
+            rule.add_command ("@echo \"Exec=%s\" >> %s".printf (program, filename));
 
             recipe.add_install_rule (filename, dir, "%s.desktop".printf (program));
         }
