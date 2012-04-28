@@ -109,13 +109,8 @@ public class Rule
     public Recipe recipe;
     public List<string> inputs;
     public List<string> outputs;
-    private List<string> commands;
+    protected List<string> static_commands;
     
-    public bool has_commands
-    {
-        get { return commands != null; }
-    }
-
     public Rule (Recipe recipe)
     {
         this.recipe = recipe;
@@ -202,6 +197,7 @@ public class Rule
 
     public void build () throws BuildError
     {
+        var commands = get_commands ();
         foreach (var c in commands)
         {
             var show_output = true;
@@ -242,16 +238,27 @@ public class Rule
 
     public void add_command (string command)
     {
-        commands.append (command);
+        static_commands.append (command);
     }
 
     public void add_status_command (string status)
     {
-        if (!pretty_print)
-            return;
-
+        if (pretty_print)
+            add_command (make_status_command (status));
+    }
+    
+    protected string make_status_command (string status)
+    {
         // FIXME: Escape if necessary
-        add_command ("@echo '    %s'".printf (status));
+        return "@echo '    %s'".printf (status);
+    }
+
+    public virtual List<string> get_commands ()
+    {
+        var commands = new List<string> ();
+        foreach (var c in static_commands)
+            commands.append (c);
+        return commands;
     }
 
     public void print ()
@@ -262,8 +269,58 @@ public class Rule
         foreach (var input in inputs)
             stdout.printf (" %s", input);
         stdout.printf ("\n");
+        var commands = get_commands ();
         foreach (var c in commands)
             stdout.printf ("    %s\n", c);
+    }
+}
+
+public class CleanRule : Rule
+{
+    protected List<string> clean_files;
+
+    public CleanRule (Recipe recipe)
+    {
+        base (recipe);
+    }
+
+    public void add_clean_file (string file)
+    {
+        clean_files.append (file);
+    }
+
+    public override List<string> get_commands ()
+    {
+        var dynamic_commands = new List<string> ();
+
+        /* Use static commands */
+        foreach (var c in static_commands)
+            dynamic_commands.append (c);
+
+        /* Delete the files that exist */
+        foreach (var input in clean_files)
+        {
+            Stat file_info;        
+            var e = stat (input, out file_info);
+            if (e != 0)
+                continue;
+            if (Posix.S_ISREG (file_info.st_mode))
+            {
+                if (pretty_print)
+                    dynamic_commands.append (make_status_command ("RM %s".printf (input)));
+                dynamic_commands.append ("@rm -f %s".printf (input));
+            }
+            else if (Posix.S_ISDIR (file_info.st_mode))
+            {
+                if (!input.has_suffix ("/"))
+                    input += "/";
+                if (pretty_print)
+                    dynamic_commands.append (make_status_command ("RM %s".printf (input)));
+                dynamic_commands.append ("@rm -rf %s".printf (input));
+            }
+        }
+
+        return dynamic_commands;
     }
 }
 
@@ -276,7 +333,7 @@ public class Recipe
     public List<Rule> rules;
     public Rule build_rule;
     public Rule install_rule;
-    public Rule clean_rule;
+    public CleanRule clean_rule;
     public Rule test_rule;
     
     public string dirname { owned get { return Path.get_dirname (filename); } }
@@ -346,11 +403,17 @@ public class Recipe
             install_rule.add_output ("%install");
         }
 
-        clean_rule = find_rule ("%clean");
-        if (clean_rule == null)
+        clean_rule = new CleanRule (this);
+        rules.append (clean_rule);
+        clean_rule.add_output ("%clean");
+        var manual_clean_rule = find_rule ("%clean");
+        if (manual_clean_rule != null)
         {
-            clean_rule = add_rule ();
-            clean_rule.add_output ("%clean");
+            foreach (var input in manual_clean_rule.inputs)
+                clean_rule.add_input (input);
+            var commands = manual_clean_rule.get_commands ();
+            foreach (var command in commands)
+                clean_rule.add_command (command);
         }
 
         test_rule = find_rule ("%test");
@@ -558,20 +621,14 @@ public class Recipe
                     if (output.has_prefix ("/"))
                         warning ("Not making clean rule for absolute directory %s", output);
                     else
-                    {
-                        clean_rule.add_status_command ("RM %s".printf (output));
-                        clean_rule.add_command ("@rm -rf %s".printf (output));
-                    }
+                        clean_rule.add_clean_file (output);
                 }
                 else
                 {
                     var build_dir = get_relative_path (dirname, build_directory);
 
                     if (!output.has_prefix (build_dir + "/"))
-                    {
-                        clean_rule.add_status_command ("RM %s".printf (output));
-                        clean_rule.add_command ("@rm -f %s".printf (output));
-                    }
+                        clean_rule.add_clean_file (output);
                 }
             }
         }
@@ -706,7 +763,7 @@ public class Recipe
             return;
 
         /* If we're about to do something then note which directory we are in and what we're building */
-        if (rule.has_commands)
+        if (rule.get_commands () != null)
             log_directory_change ();
 
         /* Run the commands */
