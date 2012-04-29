@@ -1,0 +1,3 @@
+!bake
+gmcs -out:test.exe test.cs
+(exit 0)

@@ -3,6 +3,7 @@ data|mallard|bake|pages = building.page \
                           config.page \
                           c.page \
                           c++.page \
+                          csharp.page \
                           data.page \
                           example.page \
                           go.page \
