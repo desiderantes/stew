@@ -28,11 +28,17 @@ public class Javac
         {
             stderr.printf ("Failed to write to status socket: %s\n", e.message);
         }
-        
+
+        var destination_dir = ".";
         for (var i = 1; i < args.length; i++)
         {
+            if (args[i] == "-d")
+            {
+                destination_dir = args[i+1];
+                i++;
+            }
             if (args[i].has_suffix (".java"))
-                create_file (args[i].substring (0, args[i].length - 5) + ".class");
+                create_file (Path.build_filename (destination_dir, args[i].substring (0, args[i].length - 5) + ".class"));
         }
 
         return Posix.EXIT_SUCCESS;

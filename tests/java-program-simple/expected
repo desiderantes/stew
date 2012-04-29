@@ -1,4 +1,4 @@
 !bake
-javac test.java
-jar cfe test.jar test.class
+javac -d .built test.java
+jar cfe test.jar -C .built test.class
 (exit 0)

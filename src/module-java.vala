@@ -17,7 +17,8 @@ public class JavaModule : BuildModule
         var jar_file = "%s.jar".printf (program);
 
         var rule = recipe.add_rule ();
-        var command = "javac";
+        var build_directory = get_relative_path (recipe.dirname, recipe.build_directory);
+        var command = "javac -d %s".printf (build_directory);
 
         var jar_rule = recipe.add_rule ();
         jar_rule.add_output (jar_file);
@@ -28,15 +29,18 @@ public class JavaModule : BuildModule
         if (entrypoint != null)
             jar_command += " %s".printf (entrypoint);
 
+        jar_command += " -C %s".printf (build_directory);
+
         foreach (var source in sources)
         {
             var class_file = replace_extension (source, "class");
+            var class_path = Path.build_filename (build_directory, class_file);
 
-            jar_rule.add_input (class_file);
+            jar_rule.add_input (class_path);
             jar_command += " %s".printf (class_file);
 
             rule.add_input (source);
-            rule.add_output (class_file);
+            rule.add_output (class_path);
             command += " %s".printf (source);
         }
 
