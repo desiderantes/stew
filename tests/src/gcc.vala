@@ -36,6 +36,11 @@ public class GCC
                  create_file (args[i + 1]);
                  i++;
              }
+             if (args[i] == "-MF")
+             {
+                 create_file (args[i + 1]);
+                 i++;
+             }
         }
 
         return Posix.EXIT_SUCCESS;

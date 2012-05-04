@@ -1,19 +1,5 @@
 public class GCCModule : BuildModule
 {
-    private Regex include_regex;
-
-    public GCCModule ()
-    {
-        try
-        {
-            include_regex = new Regex ("#include\\s+\"(.+)\"");
-        }
-        catch (RegexError e)
-        {
-            critical ("Failed to make C include regex: %s", e.message);
-        }
-    }
-
     public override bool generate_program_rules (Recipe recipe, string program)
     {
         var binary_name = program;
@@ -236,19 +222,27 @@ public class GCCModule : BuildModule
         foreach (var source in sources)
         {
             var input = source;
-                
             var output = recipe.get_build_path (replace_extension (source, "o"));
+            var deps_file = recipe.get_build_path (replace_extension (source, "d"));
 
             var rule = recipe.add_rule ();
             rule.add_input (input);
-            var includes = get_includes (Path.build_filename (recipe.dirname, source));
-            foreach (var include in includes)
-                rule.add_input (include);
+            if (compiler == "gcc" || compiler == "g++")
+            {
+                var includes = get_includes (recipe, source);
+                foreach (var include in includes)
+                    rule.add_input (include);
+            }
             rule.add_output (output);
             var command = "@%s".printf (compiler);
             if (is_library)
                 command += " -fPIC";
             command += cflags;
+            if (compiler == "gcc" || compiler == "g++")
+            {
+                command += " -MMD -MF %s".printf (deps_file);
+                rule.add_output (deps_file);
+            }
             command += " -c %s -o %s".printf (input, output);
             rule.add_status_command ("GCC %s".printf (input));
             rule.add_command (command);
@@ -271,26 +265,27 @@ public class GCCModule : BuildModule
         return true;
     }
 
-    // FIXME: Cache this with modification time in .cdepends
-    private List<string> get_includes (string filename)
+    private List<string> get_includes (Recipe recipe, string filename)
     {
         List<string> includes = null;
+
+        /* Get dependencies for this file, it will not exist if the file hasn't built (but then we don't need it) */
+        var deps_file = recipe.get_build_path (replace_extension (filename, "d"));
         string data;
         try
         {
-            FileUtils.get_contents (filename, out data);
+            FileUtils.get_contents (deps_file, out data);
         }
         catch (FileError e)
         {
             return includes;
         }
+        data = data.strip ();
 
-        foreach (var line in data.split ("\n"))
-        {
-            MatchInfo info;
-            if (include_regex.match (line, 0, out info))
-                includes.append (info.fetch (1));
-        }
+        /* Line is in the form "output: input1 input2", skip the first two as we know output and the primary input */
+        var tokens = data.split (" ");
+        for (var i = 2; i < tokens.length; i++)
+             includes.append (tokens[i]);
 
         return includes;
     }

@@ -29,20 +29,31 @@ public class GCC
             stderr.printf ("Failed to write to status socket: %s\n", e.message);
         }
 
-        for (var i = 0; i < args.length; i++)
+        for (var i = 1; i < args.length; i++)
         {
              if (args[i] == "-o")
              {
-                 try
-                 {
-                     FileUtils.set_contents (args[i+1], "");
-                 }
-                 catch (FileError e)
-                 {
-                 }
+                 create_file (args[i + 1]);
+                 i++;
+             }
+             if (args[i] == "-MF")
+             {
+                 create_file (args[i + 1]);
+                 i++;
              }
         }
 
         return Posix.EXIT_SUCCESS;
+    }
+
+    private static void create_file (string filename)
+    {
+         try
+         {
+             FileUtils.set_contents (filename, "");
+         }
+         catch (FileError e)
+         {
+         }
     }
 }

@@ -1,7 +1,7 @@
 !bake
-gcc -c test1.c -o .built/test1.o
-gcc -c test2.c -o .built/test2.o
-gcc -c test3.c -o .built/test3.o
+gcc -MMD -MF .built/test1.d -c test1.c -o .built/test1.o
+gcc -MMD -MF .built/test2.d -c test2.c -o .built/test2.o
+gcc -MMD -MF .built/test3.d -c test3.c -o .built/test3.o
 gcc -o test .built/test1.o .built/test2.o .built/test3.o
 (exit 0)
 !bake install

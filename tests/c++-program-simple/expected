@@ -1,5 +1,5 @@
 !bake
-g++ -c test.cpp -o .built/test.o
+g++ -MMD -MF .built/test.d -c test.cpp -o .built/test.o
 g++ -o test .built/test.o
 (exit 0)
 !bake install
