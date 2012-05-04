@@ -18,3 +18,13 @@ tests/src/python
 tests/src/javac
 tests/src/jar
 tests/src/gmcs
+bake-0.1.0~bzr.tar.bz2
+bake_0.1.0~bzr.orig.tar.gz
+bake_0.1.0~bzr-0.debian.tar.gz
+bake_0.1.0~bzr-0.dsc
+bake_0.1.0~bzr-0_source.changes
+bake_0.1.0~bzr-0_amd64.deb
+bake-0.1.0~bzr.tar.gz
+bake-0.1.0~bzr/
+bake-0.1.0~bzr-1.x86_64.rpm
+bake-0.1.0~bzr.tar.xz

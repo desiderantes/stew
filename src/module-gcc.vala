@@ -44,15 +44,18 @@ public class GCCModule : BuildModule
         rule.add_status_command ("LINK %s".printf (unversioned_binary_name));
         rule.add_command ("@ln -s %s %s".printf (binary_name, unversioned_binary_name));
         recipe.add_install_rule (unversioned_binary_name, recipe.library_directory);
-        recipe.add_install_rule (binary_name, recipe.library_directory);
 
         /* Install headers */
-        var header_list = recipe.get_variable ("libraries|%s|headers".printf (library));
-        var headers = split_variable (header_list);
         var include_directory = Path.build_filename (recipe.include_directory, "%s-%s".printf (library, major_version));
+        var header_list = recipe.get_variable ("libraries|%s|headers".printf (library));
+        var headers = new List<string> ();
         if (header_list != null)
-            foreach (var header in headers)
-                recipe.add_install_rule (header, include_directory);
+        {
+            headers = split_variable (header_list);
+            if (header_list != null)
+                foreach (var header in headers)
+                    recipe.add_install_rule (header, include_directory);
+        }
 
         /* Generate pkg-config file */
         var filename = "%s-%s.pc".printf (library, major_version);
