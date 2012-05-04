@@ -3,6 +3,5 @@ javac -d .built test.java
 jar cfe test.jar -C .built test.class
 (exit 0)
 !bake install
-install test.jar /usr/local/share/test/test.jar
-install .built/test /usr/local/bin/test
+install test.jar /usr/local/share/java/test.jar
 (exit 0)

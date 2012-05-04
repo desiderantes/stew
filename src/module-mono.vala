@@ -50,9 +50,9 @@ public class MonoModule : BuildModule
         return true;
     }
 
-    public override bool generate_library_rules (Recipe recipe, string program)
+    public override bool generate_library_rules (Recipe recipe, string library)
     {
-        var source_list = recipe.get_variable ("libraries|%s|sources".printf (program));
+        var source_list = recipe.get_variable ("libraries|%s|sources".printf (library));
         if (source_list == null)
             return false;
         var sources = split_variable (source_list);
@@ -65,7 +65,7 @@ public class MonoModule : BuildModule
         if (Environment.find_program_in_path ("gmcs") == null)
             return false;        
 
-        var dll_file = "%s.dll".printf (program);
+        var dll_file = "%s.dll".printf (library);
 
         var rule = recipe.add_rule ();
         rule.add_output (dll_file);
