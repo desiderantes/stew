@@ -17,3 +17,10 @@ gcc -Wno-unused -fPIC -c .built/test3.c -o .built/test3.o
 gcc -o libtest.so.0 -shared .built/test1.o .built/test2.o .built/test3.o
 valac --ccode --header=test.h --vapi=test-0.vapi --library=test --use-fast-vapi=.built/test1.vapi --use-fast-vapi=.built/test2.vapi --use-fast-vapi=.built/test3.vapi
 (exit 0)
+!bake install
+install libtest.so /usr/local/lib/libtest.so
+install libtest.so.0 /usr/local/lib/libtest.so.0
+install test-0.pc /usr/local/lib/pkgconfig/test-0.pc
+install test.h /usr/local/include/test-0/test.h
+install test-0.vapi /usr/local/share/vala/vapi/test-0.vapi
+(exit 0)

@@ -64,18 +64,16 @@ public class ValaModule : BuildModule
         rule.add_command ("@echo \"Libs: -L%s -l%s\" >> %s".printf (recipe.library_directory, library, filename));
         rule.add_command ("@echo \"Cflags: -I%s\" >> %s".printf (include_directory, filename));
 
-        recipe.add_install_rule (filename, "libraries", Path.build_filename (recipe.library_directory, "pkgconfig"));
+        recipe.add_install_rule (filename, Path.build_filename (recipe.library_directory, "pkgconfig"));
 
         var h_filename = "%s.h".printf (name);
         recipe.build_rule.add_input (h_filename);
         recipe.add_install_rule (h_filename, include_directory);
 
         var vapi_filename = "%s-%s.vapi".printf (name, major_version);
-        var deps_filename = "%s.deps".printf (name);
         recipe.build_rule.add_input (vapi_filename);
         var vapi_directory = Path.build_filename (recipe.data_directory, "vala", "vapi");
         recipe.add_install_rule (vapi_filename, vapi_directory);
-        recipe.add_install_rule (deps_filename, vapi_directory);
 
         /* Build a typelib */
         if (namespace != null)

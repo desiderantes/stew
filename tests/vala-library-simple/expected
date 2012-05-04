@@ -7,3 +7,10 @@ valac --fast-vapi=.built/test.vapi test.vala
 touch .built/test.vapi-stamp
 valac --ccode --header=test.h --vapi=test-0.vapi --library=test --use-fast-vapi=.built/test.vapi
 (exit 0)
+!bake install
+install libtest.so /usr/local/lib/libtest.so
+install libtest.so.0 /usr/local/lib/libtest.so.0
+install test-0.pc /usr/local/lib/pkgconfig/test-0.pc
+install test.h /usr/local/include/test-0/test.h
+install test-0.vapi /usr/local/share/vala/vapi/test-0.vapi
+(exit 0)

@@ -4,3 +4,6 @@ touch .built/test.c-stamp
 gcc -Wno-unused -c .built/test.c -o .built/test.o
 gcc -o test .built/test.o
 (exit 0)
+!bake install
+install test /usr/local/bin/test
+(exit 0)
