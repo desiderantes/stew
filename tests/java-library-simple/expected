@@ -1,6 +1,6 @@
 !bake
-javac -d .built test.java
-jar cfe test.jar -C .built test.class
+javac -d .built Test.java
+jar cfe test.jar -C .built Test.class
 (exit 0)
 !bake install
 install test.jar /usr/local/share/java/test.jar

@@ -1,3 +1,5 @@
 package|name = test
 
-programs|test|sources = test1.java test2.java test3.java
+programs|test|sources = com/example/Test1.java \
+                        com/example/Test2.java \
+                        com/example/Test3.java

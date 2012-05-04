@@ -38,7 +38,11 @@ public class Javac
                 i++;
             }
             if (args[i].has_suffix (".java"))
-                create_file (Path.build_filename (destination_dir, args[i].substring (0, args[i].length - 5) + ".class"));
+            {
+                var filename = Path.build_filename (destination_dir, args[i].substring (0, args[i].length - 5) + ".class");
+                DirUtils.create_with_parents (Path.get_dirname (filename), 0775);
+                create_file (filename);
+            }
         }
 
         return Posix.EXIT_SUCCESS;
