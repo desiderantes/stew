@@ -1,3 +1,7 @@
 !bake
 gmcs -out:test.exe test.cs
 (exit 0)
+!bake install
+install test.exe /usr/local/share/test/test.exe
+install .built/test /usr/local/bin/test
+(exit 0)
