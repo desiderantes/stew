@@ -1,0 +1,12 @@
+!bake
+g++ -fPIC -c test1.cpp -o .built/test1.o
+g++ -fPIC -c test2.cpp -o .built/test2.o
+g++ -fPIC -c test3.cpp -o .built/test3.o
+g++ -o libtest.so.0 -shared .built/test1.o .built/test2.o .built/test3.o
+(exit 0)
+!bake install
+install libtest.so.0 /usr/local/lib/libtest.so.0
+install libtest.so /usr/local/lib/libtest.so
+install test.h /usr/local/include/test-0/test.h
+install test-0.pc /usr/local/lib/pkgconfig/test-0.pc
+(exit 0)
