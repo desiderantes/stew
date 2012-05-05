@@ -36,3 +36,4 @@ tests|newer|command = ./src/test-runner newer
 tests|rule|command = ./src/test-runner rule
 tests|data-man|command = ./src/test-runner data-man
 tests|data-mallard|command = ./src/test-runner data-mallard
+tests|data-gsettings|command = ./src/test-runner data-gsettings

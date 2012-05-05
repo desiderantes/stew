@@ -8,6 +8,7 @@
 <p>
 Projects that use GSettings for configuration storage need to <link xref="installing">install</link> a schema file into a system location.
 The schemas need to be listed using the <code>data|gsettings|schemas</code> <link xref="variables">variable</link>.
+Override files can be specified with <code>data|gsettings|overrides</code> and GConf to GSettings migrations can be specified with <code>data|gsettings|convert-files</code>.
 </p>
 <example>
 <p>
