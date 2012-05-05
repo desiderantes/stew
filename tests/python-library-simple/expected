@@ -1,0 +1,8 @@
+!bake
+python --version
+python -m py_compile test.py
+(exit 0)
+!bake install
+python --version
+install test.pyc /usr/local/lib/python2.7/site-packages/test/test.pyc
+(exit 0)

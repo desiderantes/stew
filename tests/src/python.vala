@@ -32,7 +32,11 @@ public class Python
         var compile = false;
         for (var i = 1; i < args.length; i++)
         {
-            if (args[i] == "-m")
+            if (args[i] == "--version")
+            {
+                stderr.printf ("Python 2.7.3\n");
+            }
+            else if (args[i] == "-m")
             {
                 if (args[i+1] == "py_compile")
                     compile = true;

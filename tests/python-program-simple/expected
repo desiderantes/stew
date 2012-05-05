@@ -1,3 +1,7 @@
 !bake
 python -m py_compile test.py
 (exit 0)
+!bake install
+install test.pyc /usr/local/share/test/test.pyc
+install .built/test /usr/local/bin/test
+(exit 0)
