@@ -1,0 +1,5 @@
+!bake
+(exit 0)
+!bake install
+install test.1 /usr/local/share/man/man1/test.1
+(exit 0)

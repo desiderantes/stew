@@ -2,7 +2,7 @@ public class ManModule : BuildModule
 {
     public override void generate_rules (Recipe recipe)
     {
-        var man_page_list = recipe.get_variable ("man|pages");
+        var man_page_list = recipe.get_variable ("data|man|pages");
         if (man_page_list == null)
             return;
 
@@ -17,7 +17,7 @@ public class ManModule : BuildModule
                 warning ("Not a valid man page name '%s'", page);
                 continue;
             }
-            var dir = "%s/man/man%d".printf  (recipe.data_directory, number);
+            var dir = Path.build_filename (recipe.data_directory, "man", "man%d".printf (number));
             recipe.add_install_rule (page, dir);
         }
     }
