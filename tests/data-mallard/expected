@@ -1,0 +1,6 @@
+!bake
+(exit 0)
+!bake install
+install index.page /usr/local/share/help/test/index.page
+install test.page /usr/local/share/help/test/test.page
+(exit 0)
