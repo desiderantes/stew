@@ -1,6 +1,8 @@
 !bake
+mkdir .built
 gmcs -target:library -out:test.dll test1.cs test2.cs test3.cs
 (exit 0)
 !bake install
+mkdir -p /usr/local/lib/cli/test
 install test.dll /usr/local/lib/cli/test/test.dll
 (exit 0)

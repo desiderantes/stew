@@ -1,9 +1,12 @@
 !bake
+mkdir .built
 gcc -fPIC -MMD -MF .built/test.d -c test.c -o .built/test.o
 gcc -o libtest.so.0 -shared .built/test.o
 (exit 0)
 !bake install
+mkdir -p /usr/local/lib
 install libtest.so.0 /usr/local/lib/libtest.so.0
 install libtest.so /usr/local/lib/libtest.so
+mkdir -p /usr/local/lib/pkgconfig
 install test-0.pc /usr/local/lib/pkgconfig/test-0.pc
 (exit 0)

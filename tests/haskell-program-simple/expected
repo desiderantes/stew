@@ -1,4 +1,5 @@
 !bake
+mkdir .built
 ghc -c test.hs -ohi .built/test.hi -o .built/test.o
 ghc -o test .built/test.o
 (exit 0)

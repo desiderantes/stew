@@ -1,4 +1,5 @@
 !bake
+mkdir .built
 valac --ccode test.vala
 touch .built/test.c-stamp
 gcc -Wno-unused -fPIC -c .built/test.c -o .built/test.o
@@ -8,9 +9,13 @@ touch .built/test.vapi-stamp
 valac --ccode --header=test.h --vapi=test-0.vapi --library=test --use-fast-vapi=.built/test.vapi
 (exit 0)
 !bake install
+mkdir -p /usr/local/lib
 install libtest.so /usr/local/lib/libtest.so
 install libtest.so.0 /usr/local/lib/libtest.so.0
+mkdir -p /usr/local/lib/pkgconfig
 install test-0.pc /usr/local/lib/pkgconfig/test-0.pc
+mkdir -p /usr/local/include/test-0
 install test.h /usr/local/include/test-0/test.h
+mkdir -p /usr/local/share/vala/vapi
 install test-0.vapi /usr/local/share/vala/vapi/test-0.vapi
 (exit 0)

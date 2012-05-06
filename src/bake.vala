@@ -241,6 +241,14 @@ public class Rule
         static_commands.append (command);
     }
 
+    public bool has_command (string command)
+    {
+        foreach (var c in static_commands)
+            if (c == command)
+                return true;
+        return false;
+    }
+
     public void add_status_command (string status)
     {
         if (pretty_print)
@@ -601,7 +609,13 @@ public class Recipe
         if (target_filename == null)
             target_filename = filename;
         var install_path = get_install_path (Path.build_filename (install_dir, target_filename));
-        install_rule.add_command ("@mkdir -p %s".printf (Path.get_dirname (install_path)));
+
+        /* Create directory if not already in install rule */
+        var install_command = "@mkdir -p %s".printf (Path.get_dirname (install_path));
+        if (!install_rule.has_command (install_command))
+            install_rule.add_command (install_command);
+
+        /* Copy file across */
         install_rule.add_command ("@install %s %s".printf (filename, install_path));
     }
 

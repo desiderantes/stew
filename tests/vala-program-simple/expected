@@ -1,9 +1,11 @@
 !bake
+mkdir .built
 valac --ccode test.vala
 touch .built/test.c-stamp
 gcc -Wno-unused -c .built/test.c -o .built/test.o
 gcc -o test .built/test.o
 (exit 0)
 !bake install
+mkdir -p /usr/local/bin
 install test /usr/local/bin/test
 (exit 0)

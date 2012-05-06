@@ -1,8 +1,11 @@
 !bake
+mkdir .built
 javac -d .built com/example/Test1.java com/example/Test2.java com/example/Test3.java
 jar cfe test.jar -C .built com/example/Test1.class com/example/Test2.class com/example/Test3.class
 (exit 0)
 !bake install
+mkdir -p /usr/local/share/test
 install test.jar /usr/local/share/test/test.jar
+mkdir -p /usr/local/bin
 install .built/test /usr/local/bin/test
 (exit 0)

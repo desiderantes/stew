@@ -1,4 +1,5 @@
 !bake
+mkdir .built
 valac --fast-vapi=.built/test2.vapi test2.vala
 touch .built/test2.vapi-stamp
 valac --fast-vapi=.built/test3.vapi test3.vala
@@ -18,9 +19,13 @@ gcc -o libtest.so.0 -shared .built/test1.o .built/test2.o .built/test3.o
 valac --ccode --header=test.h --vapi=test-0.vapi --library=test --use-fast-vapi=.built/test1.vapi --use-fast-vapi=.built/test2.vapi --use-fast-vapi=.built/test3.vapi
 (exit 0)
 !bake install
+mkdir -p /usr/local/lib
 install libtest.so /usr/local/lib/libtest.so
 install libtest.so.0 /usr/local/lib/libtest.so.0
+mkdir -p /usr/local/lib/pkgconfig
 install test-0.pc /usr/local/lib/pkgconfig/test-0.pc
+mkdir -p /usr/local/include/test-0
 install test.h /usr/local/include/test-0/test.h
+mkdir -p /usr/local/share/vala/vapi
 install test-0.vapi /usr/local/share/vala/vapi/test-0.vapi
 (exit 0)

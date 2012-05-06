@@ -1,11 +1,14 @@
 !bake
+mkdir .built
 python -m py_compile test1.py
 python -m py_compile test2.py
 python -m py_compile test3.py
 (exit 0)
 !bake install
+mkdir -p /usr/local/share/test
 install test1.pyc /usr/local/share/test/test1.pyc
 install test2.pyc /usr/local/share/test/test2.pyc
 install test3.pyc /usr/local/share/test/test3.pyc
+mkdir -p /usr/local/bin
 install .built/test /usr/local/bin/test
 (exit 0)

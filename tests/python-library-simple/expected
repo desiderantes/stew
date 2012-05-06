@@ -1,8 +1,10 @@
 !bake
 python --version
+mkdir .built
 python -m py_compile test.py
 (exit 0)
 !bake install
 python --version
+mkdir -p /usr/local/lib/python2.7/site-packages/test
 install test.pyc /usr/local/lib/python2.7/site-packages/test/test.pyc
 (exit 0)

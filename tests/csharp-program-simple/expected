@@ -1,7 +1,10 @@
 !bake
+mkdir .built
 gmcs -out:test.exe test.cs
 (exit 0)
 !bake install
+mkdir -p /usr/local/share/test
 install test.exe /usr/local/share/test/test.exe
+mkdir -p /usr/local/bin
 install .built/test /usr/local/bin/test
 (exit 0)
