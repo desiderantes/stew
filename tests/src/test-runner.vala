@@ -139,7 +139,7 @@ public class TestRunner
                 break;
             var path = Path.build_filename (dir, name);
 
-            if (FileUtils.test (name, FileTest.IS_DIR))
+            if (FileUtils.test (path, FileTest.IS_DIR))
                 unlink_recursive (path);
             else
                 FileUtils.unlink (path);
