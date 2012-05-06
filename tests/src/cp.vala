@@ -37,6 +37,7 @@ public class Copy
         }
         catch (Error e)
         {
+            stderr.printf ("Failed to copy: %s\n", e.message);
             return Posix.EXIT_FAILURE;
         }
 
