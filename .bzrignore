@@ -20,6 +20,7 @@ tests/src/jar
 tests/src/gmcs
 tests/src/tar
 tests/src/dpkg-architecture
+tests/src/dpkg-buildpackage
 bake-0.1.0~bzr.tar.bz2
 bake_0.1.0~bzr.orig.tar.gz
 bake_0.1.0~bzr-0.debian.tar.gz

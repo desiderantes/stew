@@ -148,15 +148,20 @@ public class TestRunner
         DirUtils.remove (dir);
     }
 
+    private static void usage ()
+    {
+        stderr.printf ("Usage: %s [--keep-directory] test-directory\n", Environment.get_prgname ());
+        Posix.exit (Posix.EXIT_FAILURE);
+    }
+
     public static int main (string[] args)
     {
+        Environment.set_prgname (args[0]);
+
         loop = new MainLoop ();
 
         if (args.length < 2)
-        {
-            stderr.printf ("Usage: %s [--keep-directory] test-directory\n", args[0]);
-            return Posix.EXIT_FAILURE;
-        }
+            usage ();
         var keep_directory = false;
         var test_directory = "";
         for (var i = 1; i < args.length; i++)
@@ -165,6 +170,8 @@ public class TestRunner
             {
                 if (args[i] == "--keep-directory")
                     keep_directory = true;
+                else if (args[i] == "--help")
+                    usage ();
                 else
                 {
                     stderr.printf ("Unknown argument %s\n", args[i]);
