@@ -43,7 +43,7 @@ public class Copy
             for (var i = 0; i < files.length () - 1; i++)
             {
                 var filename = files.nth_data (i);
-                copy_file (filename, Path.build_filename (dir, filename));
+                copy_file (filename, Path.build_filename (dir, Path.get_basename (filename)));
             }
             return Posix.EXIT_SUCCESS;
         }
