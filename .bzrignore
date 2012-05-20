@@ -22,6 +22,7 @@ tests/src/tar
 tests/src/dpkg-architecture
 tests/src/dpkg-buildpackage
 tests/src/rpmbuild
+tests/src/lp-project-upload
 bake-0.1.0~bzr.tar.bz2
 bake_0.1.0~bzr.orig.tar.gz
 bake_0.1.0~bzr-0.debian.tar.gz
