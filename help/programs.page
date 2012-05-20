@@ -47,6 +47,10 @@ The following variables are allowed:
   <td><p>defines</p></td>
   <td><p>Values to provide to ... FIXME</p></td>
 </tr>
+<tr>
+  <td><p>gettext-domain</p></td>
+  <td><p>Translation domain to use for translatable strings</p></td>
+</tr>
 </table>
 <p>
 Bake will attempt to <link xref="building">build</link> your program by checking the filenames in the <code>sources</code> variable and generating the required <link xref="rules">rules</link>.

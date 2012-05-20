@@ -1,3 +1,4 @@
 package|name = test
 
 programs|test|sources = test1.c test2.c test3.c
+programs|test|gettext-domain = test

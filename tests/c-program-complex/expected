@@ -1,5 +1,12 @@
 !bake
 mkdir .built
+xgettext --extract-all --language=C --output=.built/test1.c.po test1.c
+touch .built/test1.c.po
+xgettext --extract-all --language=C --output=.built/test2.c.po test2.c
+touch .built/test2.c.po
+xgettext --extract-all --language=C --output=.built/test3.c.po test3.c
+touch .built/test3.c.po
+msgcat --force-po --output-file=test.pot .built/test1.c.po .built/test2.c.po .built/test3.c.po
 gcc -MMD -MF .built/test1.d -c test1.c -o .built/test1.o
 gcc -MMD -MF .built/test2.d -c test2.c -o .built/test2.o
 gcc -MMD -MF .built/test3.d -c test3.c -o .built/test3.o

@@ -219,11 +219,15 @@ public class GCCModule : BuildModule
         }
 
         /* Compile */
+        var gettext_domain = recipe.get_variable ("%s|%s|gettext-domain".printf (type_name, name));
         foreach (var source in sources)
         {
             var input = source;
             var output = recipe.get_build_path (replace_extension (source, "o"));
             var deps_file = recipe.get_build_path (replace_extension (source, "d"));
+
+            if (gettext_domain != null)
+                GettextModule.add_translatable_file (recipe, gettext_domain, "C", source);
 
             var rule = recipe.add_rule ();
             rule.add_input (input);

@@ -93,3 +93,11 @@ programs|ssh|install = false
 programs|scp|sources = scp.vala
 programs|scp|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
 programs|scp|install = false
+
+programs|xgettext|sources = xgettext.vala
+programs|xgettext|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
+programs|xgettext|install = false
+
+programs|msgcat|sources = msgcat.vala
+programs|msgcat|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
+programs|msgcat|install = false
