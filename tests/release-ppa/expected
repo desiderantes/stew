@@ -1,0 +1,21 @@
+!bake release-ppa
+dpkg-architecture -qDEB_BUILD_ARCH
+rpmbuild --showrc
+mkdir -p test-1.0
+cp Recipe test-1.0/Recipe
+tar --create --gzip --file test-1.0.tar.gz test-1.0
+cp test-1.0.tar.gz test_1.0.orig.tar.gz
+rm -rf .bake-dpkg-builddir
+mkdir -p .bake-dpkg-builddir/debian
+mkdir -p .bake-dpkg-builddir/debian/source
+tar --create --gzip --file ../test_1.0-0.debian.tar.gz debian
+rm -rf .bake-dpkg-builddir
+rm -rf .bake-dpkg-builddir
+mkdir -p .bake-dpkg-builddir
+cp test_1.0.orig.tar.gz test_1.0-0.debian.tar.gz .bake-dpkg-builddir
+tar --extract --gzip --file ../test_1.0.orig.tar.gz
+tar --extract --gzip --file ../../test_1.0-0.debian.tar.gz
+dpkg-buildpackage -S
+rm -rf .bake-dpkg-builddir
+dput ppa:lp:~test/releases test_1.0-0_source.changes
+(exit 0)

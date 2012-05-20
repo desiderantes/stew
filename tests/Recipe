@@ -43,3 +43,4 @@ tests|release-xzip|command = ./src/test-runner release-xzip
 tests|release-deb|command = ./src/test-runner release-deb
 tests|release-rpm|command = ./src/test-runner release-rpm
 tests|release-launchpad|command = ./src/test-runner release-launchpad
+tests|release-ppa|command = ./src/test-runner release-ppa

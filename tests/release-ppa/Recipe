@@ -1,0 +1,3 @@
+package|name = test
+package|version = 1.0
+package|ppa = lp:~test/releases

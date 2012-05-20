@@ -141,7 +141,7 @@ public class DpkgModule : BuildModule
         rule.add_output ("%release-deb");
 
         // FIXME: Move into module-ppa
-        var ppa_name = recipe.get_variable ("package.ppa");
+        var ppa_name = recipe.get_variable ("package|ppa");
         if (ppa_name != null)
         {
             rule = recipe.add_rule ();
