@@ -85,3 +85,11 @@ programs|lp-project-upload|install = false
 programs|dput|sources = dput.vala
 programs|dput|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
 programs|dput|install = false
+
+programs|ssh|sources = ssh.vala
+programs|ssh|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
+programs|ssh|install = false
+
+programs|scp|sources = scp.vala
+programs|scp|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
+programs|scp|install = false

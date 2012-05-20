@@ -1,0 +1,9 @@
+!bake release-gnome
+dpkg-architecture -qDEB_BUILD_ARCH
+rpmbuild --showrc
+mkdir -p test-1.0
+cp Recipe test-1.0/Recipe
+tar --create --xz --file test-1.0.tar.xz test-1.0
+scp test-1.0.tar.xz master.gnome.org:
+ssh master.gnome.org install-module test-1.0.tar.xz
+(exit 0)
