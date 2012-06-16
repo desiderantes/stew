@@ -1,3 +1,4 @@
 package|name = test
 
 programs|test|sources = test1.cpp test2.cpp test3.cpp
+programs|test|gettext-domain = test

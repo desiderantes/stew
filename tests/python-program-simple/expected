@@ -1,6 +1,6 @@
 !bake
-mkdir .built
 python -m py_compile test.py
+mkdir -p .built
 (exit 0)
 !bake install
 mkdir -p /usr/local/share/test

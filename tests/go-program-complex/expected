@@ -1,5 +1,5 @@
 !bake
-mkdir .built
+mkdir -p .built
 gccgo -c test1.go -o .built/test1.o
 gccgo -c test2.go -o .built/test2.o
 gccgo -c test3.go -o .built/test3.o

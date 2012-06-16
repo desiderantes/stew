@@ -1,5 +1,5 @@
 !bake
-mkdir .built
+mkdir -p .built
 ghc -c test1.hs -ohi .built/test1.hi -o .built/test1.o
 ghc -c test2.hs -ohi .built/test2.hi -o .built/test2.o
 ghc -c test3.hs -ohi .built/test3.hi -o .built/test3.o

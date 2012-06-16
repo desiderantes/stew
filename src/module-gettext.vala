@@ -31,6 +31,9 @@ public class GettextModule : BuildModule
         rule.add_status_command ("GETTEXT %s".printf (filename));
         /* NOTE: We should use --force-po but that generates invalid .po files, so we touch the output in case no translations were made */
         var xgettext_command = "@xgettext --extract-all --language=%s --output=%s %s".printf (source_language, translation_file, filename);
+        /* Workaround since Vala is not supported */
+        if (source_language == "Vala")
+            xgettext_command = "@xgettext --extract-all --language=C --keyword=_ --escape --output=%s %s".printf (translation_file, filename);
         rule.add_command (xgettext_command);
         rule.add_command ("@touch %s".printf (translation_file));
 

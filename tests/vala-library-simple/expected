@@ -1,5 +1,5 @@
 !bake
-mkdir .built
+mkdir -p .built
 valac --ccode test.vala
 touch .built/test.c-stamp
 gcc -Wno-unused -fPIC -c .built/test.c -o .built/test.o

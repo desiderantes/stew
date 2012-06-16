@@ -1,5 +1,4 @@
 !bake
-mkdir .built
 (exit 0)
 !bake install
 mkdir -p /usr/local/share/help/test

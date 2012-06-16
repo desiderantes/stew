@@ -1,3 +1,4 @@
 package|name = test
 
 libraries|test|sources = test1.cs test2.cs test3.cs
+libraries|test|gettext-domain = test

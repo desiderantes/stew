@@ -9,6 +9,8 @@ public class ValaModule : BuildModule
 
         recipe.add_install_rule (binary_name, recipe.binary_directory);
 
+        generate_gettext_rules (recipe, "programs", program);
+
         return true;
     }
 
@@ -93,6 +95,8 @@ public class ValaModule : BuildModule
             var typelib_directory = Path.build_filename (recipe.library_directory, "girepository-1.0");
             recipe.add_install_rule (typelib_filename, typelib_directory);
         }
+
+        generate_gettext_rules (recipe, "libraries", library);
 
         return true;
     }
@@ -349,5 +353,22 @@ public class ValaModule : BuildModule
         link_rule.add_command (link_command);
 
         return true;
+    }
+
+    private void generate_gettext_rules (Recipe recipe, string type_name, string name)
+    {
+        var source_list = recipe.get_variable ("%s|%s|sources".printf (type_name, name));
+        if (source_list == null)
+            return;
+        var sources = split_variable (source_list);
+        if (sources == null)
+            return;
+
+        var gettext_domain = recipe.get_variable ("%s|%s|gettext-domain".printf (type_name, name));
+        if (gettext_domain != null)
+        {
+            foreach (var source in sources)
+                GettextModule.add_translatable_file (recipe, gettext_domain, "Vala", source);
+        }
     }
 }

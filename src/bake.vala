@@ -234,6 +234,23 @@ public class Rule
     public void add_output (string output)
     {
         outputs.append (output);
+        var output_dir = Path.get_dirname (output);
+        var rule_name = "%s/".printf (output_dir);
+        if (output_dir != "." && !output.has_suffix ("/"))
+        {
+            if (recipe.find_rule (rule_name) == null)
+            {
+                var rule = recipe.add_rule ();
+                rule.add_output (rule_name);
+                rule.add_command ("@mkdir -p %s".printf (output_dir));
+            }
+            var has_input = false;
+            foreach (var input in inputs)
+                if (input == rule_name)
+                    has_input = true;
+            if (!has_input)
+                add_input (rule_name);
+        }
     }
 
     public void add_command (string command)
@@ -392,15 +409,10 @@ public class Recipe
         FileUtils.get_contents (filename, out contents);
         parse (filename, contents, allow_rules);
 
-        var build_dir_rule = add_rule ();
-        build_dir_rule.add_output (".built/");
-        build_dir_rule.add_command ("@mkdir .built");
-
         build_rule = find_rule ("%build");
         if (build_rule == null)
         {
             build_rule = add_rule ();
-            build_rule.add_input (".built/");
             build_rule.add_output ("%build");
         }
 

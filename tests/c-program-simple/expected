@@ -1,5 +1,5 @@
 !bake
-mkdir .built
+mkdir -p .built
 gcc -MMD -MF .built/test.d -c test.c -o .built/test.o
 gcc -o test .built/test.o
 (exit 0)

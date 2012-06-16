@@ -1,9 +1,16 @@
 !bake
 python --version
-mkdir .built
 python -m py_compile test1.py
 python -m py_compile test2.py
 python -m py_compile test3.py
+mkdir -p .built
+xgettext --extract-all --language=Python --output=.built/test1.py.po test1.py
+touch .built/test1.py.po
+xgettext --extract-all --language=Python --output=.built/test2.py.po test2.py
+touch .built/test2.py.po
+xgettext --extract-all --language=Python --output=.built/test3.py.po test3.py
+touch .built/test3.py.po
+msgcat --force-po --output-file=test.pot .built/test1.py.po .built/test2.py.po .built/test3.py.po
 (exit 0)
 !bake install
 python --version

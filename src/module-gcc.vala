@@ -120,13 +120,13 @@ public class GCCModule : BuildModule
         var sources = split_variable (source_list);
 
         var have_cpp = false;
-        string? compiler = null;
+        string? compiler = null, gettext_language = null;
         foreach (var source in sources)
         {
             if (source.has_suffix (".h"))
                 continue;
 
-            var c = get_compiler (source);
+            var c = get_compiler (source, out gettext_language);
             if (c == null || Environment.find_program_in_path (c) == null)
                 return false;
 
@@ -219,15 +219,11 @@ public class GCCModule : BuildModule
         }
 
         /* Compile */
-        var gettext_domain = recipe.get_variable ("%s|%s|gettext-domain".printf (type_name, name));
         foreach (var source in sources)
         {
             var input = source;
             var output = recipe.get_build_path (replace_extension (source, "o"));
             var deps_file = recipe.get_build_path (replace_extension (source, "d"));
-
-            if (gettext_domain != null)
-                GettextModule.add_translatable_file (recipe, gettext_domain, "C", source);
 
             var rule = recipe.add_rule ();
             rule.add_input (input);
@@ -266,6 +262,13 @@ public class GCCModule : BuildModule
         else
             recipe.add_install_rule (binary_name, recipe.binary_directory);
 
+        var gettext_domain = recipe.get_variable ("%s|%s|gettext-domain".printf (type_name, name));
+        if (gettext_domain != null && gettext_language != null)
+        {
+            foreach (var source in sources)
+                GettextModule.add_translatable_file (recipe, gettext_domain, gettext_language, source);
+        }
+
         return true;
     }
 
@@ -294,11 +297,15 @@ public class GCCModule : BuildModule
         return includes;
     }
 
-    private string? get_compiler (string source)
+    private string? get_compiler (string source, out string? gettext_language)
     {
+        gettext_language = null;
         /* C */
         if (source.has_suffix (".c"))
+        {
+            gettext_language = "C";
             return "gcc";
+        }
         /* C++ */
         else if (source.has_suffix (".cpp") ||
                  source.has_suffix (".C") ||
@@ -307,10 +314,16 @@ public class GCCModule : BuildModule
                  source.has_suffix (".c++") ||
                  source.has_suffix (".cp") ||
                  source.has_suffix (".cxx"))
+        {
+            gettext_language = "C++";
             return "g++";
+        }
         /* Objective C */
         else if (source.has_suffix (".m"))
+        {
+            gettext_language = "ObjectiveC";
             return "gcc";
+        }
         /* Go */
         else if (source.has_suffix (".go"))
             return "gccgo";

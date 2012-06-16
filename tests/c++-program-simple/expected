@@ -1,5 +1,5 @@
 !bake
-mkdir .built
+mkdir -p .built
 g++ -MMD -MF .built/test.d -c test.cpp -o .built/test.o
 g++ -o test .built/test.o
 (exit 0)

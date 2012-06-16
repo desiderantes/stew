@@ -1,3 +1,4 @@
 package|name = test
 
 libraries|test|sources = test1.vala test2.vala test3.vala
+libraries|test|gettext-domain = test

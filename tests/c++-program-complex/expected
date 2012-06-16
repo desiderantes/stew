@@ -1,9 +1,16 @@
 !bake
-mkdir .built
+mkdir -p .built
 g++ -MMD -MF .built/test1.d -c test1.cpp -o .built/test1.o
 g++ -MMD -MF .built/test2.d -c test2.cpp -o .built/test2.o
 g++ -MMD -MF .built/test3.d -c test3.cpp -o .built/test3.o
 g++ -o test .built/test1.o .built/test2.o .built/test3.o
+xgettext --extract-all --language=C++ --output=.built/test1.cpp.po test1.cpp
+touch .built/test1.cpp.po
+xgettext --extract-all --language=C++ --output=.built/test2.cpp.po test2.cpp
+touch .built/test2.cpp.po
+xgettext --extract-all --language=C++ --output=.built/test3.cpp.po test3.cpp
+touch .built/test3.cpp.po
+msgcat --force-po --output-file=test.pot .built/test1.cpp.po .built/test2.cpp.po .built/test3.cpp.po
 (exit 0)
 !bake install
 mkdir -p /usr/local/bin

@@ -1,6 +1,6 @@
 !bake
-mkdir .built
 gmcs -out:test.exe test.cs
+mkdir -p .built
 (exit 0)
 !bake install
 mkdir -p /usr/local/share/test

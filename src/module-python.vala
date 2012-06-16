@@ -29,6 +29,13 @@ public class PythonModule : BuildModule
             recipe.add_install_rule (output, recipe.package_data_directory);
         }
 
+        var gettext_domain = recipe.get_variable ("programs|%s|gettext-domain".printf (program));
+        if (gettext_domain != null)
+        {
+            foreach (var source in sources)
+                GettextModule.add_translatable_file (recipe, gettext_domain, "Python", source);
+        }
+
         var main_file = replace_extension (sources.nth_data (0), "pyc");
 
         /* Script to run locally */
@@ -94,6 +101,13 @@ public class PythonModule : BuildModule
             if (install_sources)
                 recipe.add_install_rule (source, install_directory);
             recipe.add_install_rule (output, install_directory);
+        }
+
+        var gettext_domain = recipe.get_variable ("libraries|%s|gettext-domain".printf (library));
+        if (gettext_domain != null)
+        {
+            foreach (var source in sources)
+                GettextModule.add_translatable_file (recipe, gettext_domain, "Python", source);
         }
 
         return true;

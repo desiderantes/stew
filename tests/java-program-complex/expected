@@ -1,7 +1,14 @@
 !bake
-mkdir .built
+mkdir -p .built/com/example
 javac -d .built com/example/Test1.java com/example/Test2.java com/example/Test3.java
 jar cfe test.jar -C .built com/example/Test1.class com/example/Test2.class com/example/Test3.class
+xgettext --extract-all --language=Java --output=.built/com/example/Test1.java.po com/example/Test1.java
+touch .built/com/example/Test1.java.po
+xgettext --extract-all --language=Java --output=.built/com/example/Test2.java.po com/example/Test2.java
+touch .built/com/example/Test2.java.po
+xgettext --extract-all --language=Java --output=.built/com/example/Test3.java.po com/example/Test3.java
+touch .built/com/example/Test3.java.po
+msgcat --force-po --output-file=test.pot .built/com/example/Test1.java.po .built/com/example/Test2.java.po .built/com/example/Test3.java.po
 (exit 0)
 !bake install
 mkdir -p /usr/local/share/test

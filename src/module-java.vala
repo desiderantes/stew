@@ -43,7 +43,6 @@ public class JavaModule : BuildModule
             rule.add_output (class_path);
             command += " %s".printf (source);
         }
-
         rule.add_command (command);
 
         jar_rule.add_command (jar_command);
@@ -67,6 +66,13 @@ public class JavaModule : BuildModule
         rule.add_command ("@chmod +x %s".printf (script));
         recipe.build_rule.add_input (script);
         recipe.add_install_rule (script, recipe.binary_directory, program);
+
+        var gettext_domain = recipe.get_variable ("programs|%s|gettext-domain".printf (program));
+        if (gettext_domain != null)
+        {
+            foreach (var source in sources)
+                GettextModule.add_translatable_file (recipe, gettext_domain, "Java", source);
+        }
 
         return true;
     }
@@ -109,7 +115,6 @@ public class JavaModule : BuildModule
             rule.add_output (class_path);
             command += " %s".printf (source);
         }
-
         rule.add_command (command);
 
         // FIXME: Version .jar files
@@ -117,6 +122,13 @@ public class JavaModule : BuildModule
         jar_rule.add_command (jar_command);
         recipe.build_rule.add_input (jar_file);
         recipe.add_install_rule (jar_file, Path.build_filename (recipe.data_directory, "java"));
+
+        var gettext_domain = recipe.get_variable ("libraries|%s|gettext-domain".printf (library));
+        if (gettext_domain != null)
+        {
+            foreach (var source in sources)
+                GettextModule.add_translatable_file (recipe, gettext_domain, "Java", source);
+        }
 
         return true;
     }

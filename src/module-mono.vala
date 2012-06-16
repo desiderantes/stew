@@ -29,6 +29,13 @@ public class MonoModule : BuildModule
         recipe.build_rule.add_input (exe_file);
         recipe.add_install_rule (exe_file, recipe.package_data_directory);
 
+        var gettext_domain = recipe.get_variable ("programs|%s|gettext-domain".printf (program));
+        if (gettext_domain != null)
+        {
+            foreach (var source in sources)
+                GettextModule.add_translatable_file (recipe, gettext_domain, "C#", source);
+        }
+
         /* Script to run locally */
         rule = recipe.add_rule ();
         rule.add_output (program);
@@ -78,6 +85,13 @@ public class MonoModule : BuildModule
         rule.add_command (command);
         recipe.build_rule.add_input (dll_file);
         recipe.add_install_rule (dll_file, Path.build_filename (recipe.library_directory, "cli", recipe.package_name));
+
+        var gettext_domain = recipe.get_variable ("libraries|%s|gettext-domain".printf (library));
+        if (gettext_domain != null)
+        {
+            foreach (var source in sources)
+                GettextModule.add_translatable_file (recipe, gettext_domain, "C#", source);
+        }
 
         return true;
     }

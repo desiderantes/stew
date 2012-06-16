@@ -1,5 +1,4 @@
 !bake
-mkdir .built
 gmcs -target:library -out:test.dll test.cs
 (exit 0)
 !bake install
