@@ -16,3 +16,8 @@ msgcat --force-po --output-file=test.pot .built/test1.cpp.po .built/test2.cpp.po
 mkdir -p /usr/local/bin
 install test /usr/local/bin/test
 (exit 0)
+!bake clean
+rm -f test
+rm -rf .built/
+rm -f test.pot
+(exit 0)

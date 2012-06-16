@@ -16,3 +16,10 @@ install test.jar /usr/local/share/test/test.jar
 mkdir -p /usr/local/bin
 install .built/test /usr/local/bin/test
 (exit 0)
+!bake clean
+rm -f test.jar
+rm -rf .built/com/example/
+rm -f test
+rm -rf .built/
+rm -f test.pot
+(exit 0)

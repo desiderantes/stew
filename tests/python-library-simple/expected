@@ -7,3 +7,7 @@ python --version
 mkdir -p /usr/local/lib/python2.7/site-packages/test
 install test.pyc /usr/local/lib/python2.7/site-packages/test/test.pyc
 (exit 0)
+!bake clean
+python --version
+rm -f test.pyc
+(exit 0)

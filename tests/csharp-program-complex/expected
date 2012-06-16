@@ -15,3 +15,9 @@ install test.exe /usr/local/share/test/test.exe
 mkdir -p /usr/local/bin
 install .built/test /usr/local/bin/test
 (exit 0)
+!bake clean
+rm -f test.exe
+rm -rf .built/
+rm -f test.pot
+rm -f test
+(exit 0)

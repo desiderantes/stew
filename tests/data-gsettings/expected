@@ -7,3 +7,5 @@ install test.override /usr/local/share/glib-2.0/schemas/test.override
 mkdir -p /usr/local/share/GConf/gsettings
 install test.convert /usr/local/share/GConf/gsettings/test.convert
 (exit 0)
+!bake clean
+(exit 0)

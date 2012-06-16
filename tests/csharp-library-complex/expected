@@ -13,3 +13,8 @@ msgcat --force-po --output-file=test.pot .built/test1.cs.po .built/test2.cs.po .
 mkdir -p /usr/local/lib/cli/test
 install test.dll /usr/local/lib/cli/test/test.dll
 (exit 0)
+!bake clean
+rm -f test.dll
+rm -rf .built/
+rm -f test.pot
+(exit 0)

@@ -19,3 +19,11 @@ install test1.pyc /usr/local/lib/python2.7/site-packages/test/test1.pyc
 install test2.pyc /usr/local/lib/python2.7/site-packages/test/test2.pyc
 install test3.pyc /usr/local/lib/python2.7/site-packages/test/test3.pyc
 (exit 0)
+!bake clean
+python --version
+rm -f test1.pyc
+rm -f test2.pyc
+rm -f test3.pyc
+rm -rf .built/
+rm -f test.pot
+(exit 0)

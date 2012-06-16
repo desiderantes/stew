@@ -7,3 +7,7 @@ jar cfe test.jar -C .built Test.class
 mkdir -p /usr/local/share/java
 install test.jar /usr/local/share/java/test.jar
 (exit 0)
+!bake clean
+rm -f test.jar
+rm -rf .built/
+(exit 0)

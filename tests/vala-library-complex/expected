@@ -36,3 +36,12 @@ install test.h /usr/local/include/test-0/test.h
 mkdir -p /usr/local/share/vala/vapi
 install test-0.vapi /usr/local/share/vala/vapi/test-0.vapi
 (exit 0)
+!bake clean
+rm -f libtest.so.0
+rm -f test.h
+rm -f test-0.vapi
+rm -rf .built/
+rm -f libtest.so
+rm -f test-0.pc
+rm -f test.pot
+(exit 0)

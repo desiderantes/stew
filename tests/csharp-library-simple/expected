@@ -5,3 +5,6 @@ gmcs -target:library -out:test.dll test.cs
 mkdir -p /usr/local/lib/cli/test
 install test.dll /usr/local/lib/cli/test/test.dll
 (exit 0)
+!bake clean
+rm -f test.dll
+(exit 0)
