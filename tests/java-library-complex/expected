@@ -9,14 +9,14 @@ touch .built/com/example/Test2.java.po
 xgettext --extract-all --language=Java --output=.built/com/example/Test3.java.po com/example/Test3.java
 touch .built/com/example/Test3.java.po
 msgcat --force-po --output-file=test.pot .built/com/example/Test1.java.po .built/com/example/Test2.java.po .built/com/example/Test3.java.po
-(exit 0)
+(exit SUCCESS)
 !bake install
 mkdir -p /usr/local/share/java
 install test.jar /usr/local/share/java/test.jar
-(exit 0)
+(exit SUCCESS)
 !bake clean
 rm -f test.jar
 # FIXME: Not necessary - is within the .built/ dir (should be completely removed)
 rm -rf .built/com/example/
 rm -f test.pot
-(exit 0)
+(exit SUCCESS)

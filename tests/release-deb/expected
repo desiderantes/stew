@@ -17,4 +17,4 @@ tar --extract --gzip --file ../test_1.0.orig.tar.gz
 tar --extract --gzip --file ../../test_1.0-0.debian.tar.gz
 dpkg-buildpackage -b
 rm -rf .bake-dpkg-builddir
-(exit 0)
+(exit SUCCESS)

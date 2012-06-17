@@ -2,12 +2,12 @@
 mkdir -p .built
 javac -d .built Test.java
 jar cfe test.jar -C .built Test.class
-(exit 0)
+(exit SUCCESS)
 !bake install
 mkdir -p /usr/local/share/java
 install test.jar /usr/local/share/java/test.jar
-(exit 0)
+(exit SUCCESS)
 !bake clean
 rm -f test.jar
 rm -rf .built/
-(exit 0)
+(exit SUCCESS)

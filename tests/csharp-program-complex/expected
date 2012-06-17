@@ -8,16 +8,16 @@ touch .built/test2.cs.po
 xgettext --extract-all --language=C# --output=.built/test3.cs.po test3.cs
 touch .built/test3.cs.po
 msgcat --force-po --output-file=test.pot .built/test1.cs.po .built/test2.cs.po .built/test3.cs.po
-(exit 0)
+(exit SUCCESS)
 !bake install
 mkdir -p /usr/local/share/test
 install test.exe /usr/local/share/test/test.exe
 mkdir -p /usr/local/bin
 install .built/test /usr/local/bin/test
-(exit 0)
+(exit SUCCESS)
 !bake clean
 rm -f test.exe
 rm -rf .built/
 rm -f test.pot
 rm -f test
-(exit 0)
+(exit SUCCESS)

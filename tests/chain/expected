@@ -1,4 +1,4 @@
 !bake b
 touch a
 cp a b
-(exit 0)
+(exit SUCCESS)

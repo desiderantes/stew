@@ -2,12 +2,12 @@
 mkdir -p .built
 ghc -c test.hs -ohi .built/test.hi -o .built/test.o
 ghc -o test .built/test.o
-(exit 0)
+(exit SUCCESS)
 !bake install
 mkdir -p /usr/local/bin
 install test /usr/local/bin/test
-(exit 0)
+(exit SUCCESS)
 !bake clean
 rm -f test
 rm -rf .built/
-(exit 0)
+(exit SUCCESS)

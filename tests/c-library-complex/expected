@@ -11,7 +11,7 @@ touch .built/test2.c.po
 xgettext --extract-all --language=C --output=.built/test3.c.po test3.c
 touch .built/test3.c.po
 msgcat --force-po --output-file=test.pot .built/test1.c.po .built/test2.c.po .built/test3.c.po
-(exit 0)
+(exit SUCCESS)
 !bake install
 mkdir -p /usr/local/lib
 install libtest.so.0 /usr/local/lib/libtest.so.0
@@ -20,11 +20,11 @@ mkdir -p /usr/local/include/test-0
 install test.h /usr/local/include/test-0/test.h
 mkdir -p /usr/local/lib/pkgconfig
 install test-0.pc /usr/local/lib/pkgconfig/test-0.pc
-(exit 0)
+(exit SUCCESS)
 !bake clean
 rm -f libtest.so.0
 rm -rf .built/
 rm -f test.pot
 rm -f libtest.so
 rm -f test-0.pc
-(exit 0)
+(exit SUCCESS)

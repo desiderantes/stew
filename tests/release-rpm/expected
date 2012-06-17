@@ -12,4 +12,4 @@ rpmbuild -tb test.rpm.tar.gz
 cp /home/bob/rpmbuild/RPMS/x86_64/test-1.0-1.x86_64.rpm .
 rm -f test.rpm.tar.gz
 rm -rf .bake-rpm-builddir
-(exit 0)
+(exit SUCCESS)

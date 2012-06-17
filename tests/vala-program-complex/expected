@@ -23,13 +23,13 @@ touch .built/test2.vala.po
 xgettext --extract-all --language=C --keyword=_ --escape --output=.built/test3.vala.po test3.vala
 touch .built/test3.vala.po
 msgcat --force-po --output-file=test.pot .built/test1.vala.po .built/test2.vala.po .built/test3.vala.po
-(exit 0)
+(exit SUCCESS)
 !bake install
 mkdir -p /usr/local/bin
 install test /usr/local/bin/test
-(exit 0)
+(exit SUCCESS)
 !bake clean
 rm -f test
 rm -rf .built/
 rm -f test.pot
-(exit 0)
+(exit SUCCESS)

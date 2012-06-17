@@ -2,12 +2,12 @@
 !bake b
 touch a
 cp a b
-(exit 0)
+(exit SUCCESS)
 
 # Remove the output and check it is rebuilt
 !rm b
 rm b
-(exit 0)
+(exit SUCCESS)
 !bake b
 cp a b
-(exit 0)
+(exit SUCCESS)

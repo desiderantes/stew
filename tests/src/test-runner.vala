@@ -126,7 +126,26 @@ public class TestRunner
     public static void command_done_cb (Pid p, int status)
     {
         pid = 0;
-        check_command ("(exit %d)".printf (status));
+        if (Process.if_exited (status))
+        {
+            var return_value = Process.exit_status (status);
+            switch (return_value)
+            {
+            case Posix.EXIT_SUCCESS:
+                check_command ("(exit SUCCESS)");
+                break;
+            case Posix.EXIT_FAILURE:
+                check_command ("(exit FAILURE)");
+                break;
+            default:
+                check_command ("(exit %d)".printf (return_value));
+                break;
+            }
+        }
+        else
+        {
+            check_command ("(signal %d)".printf (Process.term_sig (status)));        
+        }
     }
     
     public static void unlink_recursive (string dir) throws FileError

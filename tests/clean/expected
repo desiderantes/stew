@@ -1,7 +1,7 @@
 # Build the target
 !bake a
 touch a
-(exit 0)
+(exit SUCCESS)
 !bake clean
 rm -f a
-(exit 0)
+(exit SUCCESS)

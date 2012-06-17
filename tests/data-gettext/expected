@@ -3,7 +3,7 @@ mkdir -p .built
 msgfmt de.po --output-file=.built/de.mo
 msgfmt fr.po --output-file=.built/fr.mo
 msgfmt it.po --output-file=.built/it.mo
-(exit 0)
+(exit SUCCESS)
 !bake install
 mkdir -p /usr/local/share/locale/de/LC_MESSAGES
 install .built/de.mo /usr/local/share/locale/de/LC_MESSAGES/test.mo
@@ -11,7 +11,7 @@ mkdir -p /usr/local/share/locale/fr/LC_MESSAGES
 install .built/fr.mo /usr/local/share/locale/fr/LC_MESSAGES/test.mo
 mkdir -p /usr/local/share/locale/it/LC_MESSAGES
 install .built/it.mo /usr/local/share/locale/it/LC_MESSAGES/test.mo
-(exit 0)
+(exit SUCCESS)
 !bake clean
 rm -rf .built/
-(exit 0)
+(exit SUCCESS)

@@ -1,9 +1,9 @@
 !bake
-(exit 0)
+(exit SUCCESS)
 !bake install
 mkdir -p /usr/local/share/help/test
 install index.page /usr/local/share/help/test/index.page
 install test.page /usr/local/share/help/test/test.page
-(exit 0)
+(exit SUCCESS)
 !bake clean
-(exit 0)
+(exit SUCCESS)

@@ -4,4 +4,4 @@ rpmbuild --showrc
 mkdir -p test-1.0
 cp Recipe test-1.0/Recipe
 tar --create --xz --file test-1.0.tar.xz test-1.0
-(exit 0)
+(exit SUCCESS)

@@ -11,13 +11,13 @@ touch .built/test2.c.po
 xgettext --extract-all --language=C --output=.built/test3.c.po test3.c
 touch .built/test3.c.po
 msgcat --force-po --output-file=test.pot .built/test1.c.po .built/test2.c.po .built/test3.c.po
-(exit 0)
+(exit SUCCESS)
 !bake install
 mkdir -p /usr/local/bin
 install test /usr/local/bin/test
-(exit 0)
+(exit SUCCESS)
 !bake clean
 rm -f test
 rm -rf .built/
 rm -f test.pot
-(exit 0)
+(exit SUCCESS)

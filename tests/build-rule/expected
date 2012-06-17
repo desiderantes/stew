@@ -1,4 +1,4 @@
 # Check running with no arguments builds a
 !bake
 touch a
-(exit 0)
+(exit SUCCESS)

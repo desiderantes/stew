@@ -24,7 +24,7 @@ touch .built/test2.vala.po
 xgettext --extract-all --language=C --keyword=_ --escape --output=.built/test3.vala.po test3.vala
 touch .built/test3.vala.po
 msgcat --force-po --output-file=test.pot .built/test1.vala.po .built/test2.vala.po .built/test3.vala.po
-(exit 0)
+(exit SUCCESS)
 !bake install
 mkdir -p /usr/local/lib
 install libtest.so /usr/local/lib/libtest.so
@@ -35,7 +35,7 @@ mkdir -p /usr/local/include/test-0
 install test.h /usr/local/include/test-0/test.h
 mkdir -p /usr/local/share/vala/vapi
 install test-0.vapi /usr/local/share/vala/vapi/test-0.vapi
-(exit 0)
+(exit SUCCESS)
 !bake clean
 rm -f libtest.so.0
 rm -f test.h
@@ -44,4 +44,4 @@ rm -rf .built/
 rm -f libtest.so
 rm -f test-0.pc
 rm -f test.pot
-(exit 0)
+(exit SUCCESS)

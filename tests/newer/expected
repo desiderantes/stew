@@ -2,12 +2,12 @@
 !bake
 touch a
 cp a b
-(exit 0)
+(exit SUCCESS)
 
 # Update the input and check the output is rebuilt
 !touch a
 touch a
-(exit 0)
+(exit SUCCESS)
 !bake
 cp a b
-(exit 0)
+(exit SUCCESS)
