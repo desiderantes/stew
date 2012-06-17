@@ -1,0 +1,6 @@
+!bake
+(exit 256)
+!bake install
+(exit 256)
+!bake clean
+(exit 256)

@@ -1,0 +1,3 @@
+package|name = test
+
+libraries|test|sources = test.unknown
