@@ -45,30 +45,7 @@ public class GettextModule : BuildModule
         {
             pot_rule = new PotRule (recipe.toplevel, pot_file);
             recipe.toplevel.rules.append (pot_rule);
-            recipe.toplevel.build_rule.add_input (pot_file);
-            
-            // FIXME: Compile and install translations
-            var translation_directory = recipe.get_variable ("gettext|%s|translation-directory".printf (gettext_domain));
-            if (translation_directory != null)
-            {
-                var languages = load_languages (Path.build_filename (recipe.dirname, translation_directory));
-                foreach (var language in languages)
-                {
-                    var po_file = "%s/%s.po".printf (translation_directory, language);
-                    var mo_file = "%s/%s.mo".printf (translation_directory, language);
-
-                    var compile_rule = recipe.add_rule ();
-                    compile_rule.add_input (po_file);
-                    compile_rule.add_output (mo_file);
-                    compile_rule.add_command ("@msgfmt %s --output-file=%s".printf (po_file, mo_file));
-
-                    recipe.build_rule.add_input (mo_file);
-
-                    var target_dir = recipe.get_install_path (Path.build_filename (recipe.get_variable ("gettext|locale-directory"), language, "LC_MESSAGES"));
-                    var target_mo_file = "%s.mo".printf (gettext_domain);
-                    recipe.add_install_rule (mo_file, target_dir, target_mo_file);
-                }
-            }
+            recipe.toplevel.build_rule.add_input (pot_file);            
         }
         pot_rule.add_input (get_relative_path (recipe.toplevel.dirname, Path.build_filename (recipe.dirname, translation_file)));
     }
@@ -82,29 +59,33 @@ public class GettextModule : BuildModule
         }
     }
 
-    private static List<string> load_languages (string translation_directory)
+    public override void generate_rules (Recipe recipe)
     {
-        Dir dir;
-        List<string> languages = null;
-        try
+        foreach (var gettext_domain in recipe.get_variable_children ("data|gettext"))
         {
-            dir = Dir.open (translation_directory);
-        }
-        catch (FileError e)
-        {
-            warning ("Failed to open translation directory %s: %s", translation_directory, e.message);
-            return languages;
-        }
+            var translation_list = recipe.get_variable ("data|gettext|%s|translations".printf (gettext_domain));
+            if (translation_list == null)
+                continue;
 
-        var suffix = ".po";
-        while (true)
-        {
-            var filename = dir.read_name ();
-            if (filename == null)
-                return languages;
+            foreach (var po_file in split_variable (translation_list))
+            {
+                if (!po_file.has_suffix (".po"))
+                    continue;
 
-            if (filename.has_suffix (suffix))
-                languages.append (filename.substring (0, filename.length - suffix.length));
+                var mo_file = recipe.get_build_path (replace_extension (po_file, "mo"));
+                var language = po_file.substring (0, po_file.length - 3);
+
+                var compile_rule = recipe.add_rule ();
+                compile_rule.add_input (po_file);
+                compile_rule.add_output (mo_file);
+                compile_rule.add_command ("@msgfmt %s --output-file=%s".printf (po_file, mo_file));
+
+                recipe.build_rule.add_input (mo_file);
+
+                var target_dir = recipe.get_install_path (Path.build_filename (recipe.get_variable ("gettext|locale-directory"), language, "LC_MESSAGES"));
+                var target_mo_file = "%s.mo".printf (gettext_domain);
+                recipe.add_install_rule (mo_file, target_dir, target_mo_file);
+            }
         }
     }
 }
