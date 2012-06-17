@@ -39,3 +39,5 @@ bake-0.1.0~bzr/
 bake-0.1.0~bzr-1.x86_64.rpm
 bake-0.1.0~bzr.tar.xz
 tests/src/msgfmt
+tests/src/true
+tests/src/false
