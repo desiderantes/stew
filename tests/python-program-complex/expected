@@ -1,8 +1,8 @@
 !bake
 # FIXME: Should be in .built
-python -m py_compile test1.py
-python -m py_compile test2.py
-python -m py_compile test3.py
+python3.2 -m py_compile test1.py
+python3.2 -m py_compile test2.py
+python3.2 -m py_compile test3.py
 mkdir -p .built
 xgettext --extract-all --language=Python --output=.built/test1.py.po test1.py
 touch .built/test1.py.po
