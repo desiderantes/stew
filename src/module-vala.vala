@@ -349,7 +349,7 @@ public class ValaModule : BuildModule
         /* Link */
         recipe.build_rule.add_input (binary_name);
         link_rule.add_status_command ("GCC-LINK %s".printf (binary_name));
-        link_command += ldflags;
+        link_command += " " + ldflags;
         link_rule.add_command (link_command);
 
         return true;
