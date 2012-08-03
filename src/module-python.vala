@@ -17,18 +17,31 @@ public class PythonModule : BuildModule
         if (Environment.find_program_in_path (python_bin) == null)
             return false;
 
+        var python_cache_dir = "__pycache__";
         var install_sources = recipe.get_variable ("programs|%s|install-sources".printf (program)) == "true";
+        var main_file = "";
         foreach (var source in sources)
         {
-            var output = replace_extension (source, "pyc");
+            var output = "";
             var rule = recipe.add_rule ();
+            if (python_version >= "3.0")
+            {
+                output = "%s/%scpython-%s.pyc".printf (python_cache_dir, replace_extension (source, ""), string.joinv ("", python_version.split (".")));
+                rule.add_input(python_cache_dir + "/");
+            }
+            else
+                output = replace_extension (source, "pyc");
+
+            if (main_file == "")
+                main_file = output;
+
             rule.add_input (source);
             rule.add_output (output);
             rule.add_status_command ("PYC %s".printf (source));		
             rule.add_command ("@%s -m py_compile %s".printf (python_bin, source));
             recipe.build_rule.add_input (output);
 
-            if (install_sources)
+            if (install_sources || (python_version >= "3.0"))
                 recipe.add_install_rule (source, recipe.package_data_directory);
             recipe.add_install_rule (output, recipe.package_data_directory);
         }
@@ -39,8 +52,6 @@ public class PythonModule : BuildModule
             foreach (var source in sources)
                 GettextModule.add_translatable_file (recipe, gettext_domain, "Python", source);
         }
-
-        var main_file = replace_extension (sources.nth_data (0), "pyc");
 
         /* Script to run locally */
         var rule = recipe.add_rule ();

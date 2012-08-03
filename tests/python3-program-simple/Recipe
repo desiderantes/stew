@@ -1,0 +1,4 @@
+package|name = test
+
+programs|test|sources = test.py
+programs|test|python-version = 3.2
