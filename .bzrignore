@@ -29,3 +29,5 @@ tests/src/ssh
 tests/src/xgettext
 tests/src/msgcat
 tests/src/msgfmt
+tests/src/g-ir-scanner
+tests/src/g-ir-compiler

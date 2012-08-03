@@ -105,3 +105,12 @@ programs|msgcat|install = false
 programs|msgfmt|sources = msgfmt.vala
 programs|msgfmt|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
 programs|msgfmt|install = false
+
+programs|g-ir-scanner|sources = g-ir-scanner.vala
+programs|g-ir-scanner|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
+programs|g-ir-scanner|install = false
+
+programs|g-ir-compiler|sources = g-ir-compiler.vala
+programs|g-ir-compiler|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
+programs|g-ir-compiler|install = false
+
