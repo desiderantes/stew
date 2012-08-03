@@ -11,11 +11,9 @@ public class PythonModule : BuildModule
                 return false;
 
         var python_version = recipe.get_variable ("programs|%s|python-version".printf (program));
-        //stderr.printf ("python_version: %s".printf(python_version));
         var python_bin = "python";
         if (python_version != null)
             python_bin += python_version;
-        //stderr.printf ("python_bin: %s".printf(python_bin));
         if (Environment.find_program_in_path (python_bin) == null)
             return false;
 
