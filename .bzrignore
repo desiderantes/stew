@@ -15,6 +15,7 @@ tests/src/g++
 tests/src/gccgo
 tests/src/ghc
 tests/src/python
+tests/src/python2.7
 tests/src/javac
 tests/src/jar
 tests/src/gmcs

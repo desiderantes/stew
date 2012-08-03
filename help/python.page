@@ -22,6 +22,10 @@ Python programs and libraries can set the following program <link xref="variable
   <td><p>install-sources</p></td>
   <td><p>true if the <file>.py</file> files should be installed (defaults to false)</p></td>
 </tr>
+<tr>
+  <td><p>python-version</p></td>
+  <td><p>python version you want the .pyc to be built with, like 2.7 (default to python --version)</p></td>
+</tr>
 </table>
 <p>
 FIXME: Describe the shell script for programs
