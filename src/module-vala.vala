@@ -16,9 +16,7 @@ public class ValaModule : BuildModule
 
     public override bool generate_library_rules (Recipe recipe, string library)
     {
-        var version = recipe.get_variable ("libraries|%s|version".printf (library));
-        if (version == null)
-            version = "0";
+        var version = recipe.get_variable ("libraries|%s|version".printf (library), "0");
         var major_version = version;
         var index = version.index_of (".");
         if (index > 0)
@@ -43,15 +41,9 @@ public class ValaModule : BuildModule
 
         /* Generate pkg-config file */
         var filename = "%s-%s.pc".printf (library, major_version);
-        var name = recipe.get_variable ("libraries|%s|name".printf (library));
-        if (name == null)
-            name = library;
-        var description = recipe.get_variable ("libraries|%s|description".printf (library));
-        if (description == null)
-            description = "";
-        var requires = recipe.get_variable ("libraries|%s|requires".printf (library));
-        if (requires == null)
-            requires = "";
+        var name = recipe.get_variable ("libraries|%s|name".printf (library), library);
+        var description = recipe.get_variable ("libraries|%s|description".printf (library), "");
+        var requires = recipe.get_variable ("libraries|%s|requires".printf (library), "");
 
         var include_directory = Path.build_filename (recipe.include_directory, "%s-%s".printf (library, major_version));
 
@@ -110,16 +102,10 @@ public class ValaModule : BuildModule
         if (sources == null)
             return false;
 
-        var cflags = recipe.get_variable ("%s|%s|compile-flags".printf (type_name, name));
-        if (cflags == null)
-            cflags = "";
-        else
-            cflags = " " + cflags;
-        var ldflags = recipe.get_variable ("%s|%s|link-flags".printf (type_name, name));
-        if (ldflags == null)
-            ldflags = "";
-        else
-            ldflags = " " + cflags;
+        var cflags = recipe.get_variable ("%s|%s|compile-flags".printf (type_name, name), "");
+        cflags = " " + cflags;
+        var ldflags = recipe.get_variable ("%s|%s|link-flags".printf (type_name, name), "");
+        ldflags = " " + ldflags;
 
         var have_vala = false;
         foreach (var source in sources)
@@ -166,9 +152,7 @@ public class ValaModule : BuildModule
         }
 
         /* Get dependencies */
-        var packages = recipe.get_variable ("%s|%s|packages".printf (type_name, name));
-        if (packages == null)
-            packages = "";
+        var packages = recipe.get_variable ("%s|%s|packages".printf (type_name, name), "");
         var package_list = split_variable (packages);
         if (package_list != null)
         {

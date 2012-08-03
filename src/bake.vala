@@ -444,13 +444,14 @@ public class Recipe
         }
     }
 
-    public string? get_variable (string name)
+    public string? get_variable (string name, string? fallback = null)
     {
         var value = variables.lookup (name);
         if (value == null && parent != null)
-            return parent.get_variable (name);
-        else
+            return parent.get_variable (name, fallback);
+        if (value != null)
            return value;
+        return fallback;
     }
 
     public List<string> get_variable_children (string name)
@@ -589,9 +590,7 @@ public class Recipe
             var variable = new_line.substring (start + 2, end - start - 2);
             var suffix = new_line.substring (end + 1);
 
-            var value = get_variable (variable);
-            if (value == null)
-                value = "";
+            var value = get_variable (variable, "");
             
             new_line = prefix + value + suffix;
         }

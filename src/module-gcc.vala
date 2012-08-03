@@ -8,9 +8,7 @@ public class GCCModule : BuildModule
 
     public override bool generate_library_rules (Recipe recipe, string library)
     {
-        var version = recipe.get_variable ("libraries|%s|version".printf (library));
-        if (version == null)
-            version = "0";
+        var version = recipe.get_variable ("libraries|%s|version".printf (library), "0");
         var major_version = version;
         var index = version.index_of (".");
         if (index > 0)
@@ -45,15 +43,9 @@ public class GCCModule : BuildModule
 
         /* Generate pkg-config file */
         var filename = "%s-%s.pc".printf (library, major_version);
-        var name = recipe.get_variable ("libraries|%s|name".printf (library));
-        if (name == null)
-            name = library;
-        var description = recipe.get_variable ("libraries|%s|description".printf (library));
-        if (description == null)
-            description = "";
-        var requires = recipe.get_variable ("libraries|%s|requires".printf (library));
-        if (requires == null)
-            requires = "";
+        var name = recipe.get_variable ("libraries|%s|name".printf (library), library);
+        var description = recipe.get_variable ("libraries|%s|description".printf (library), "");
+        var requires = recipe.get_variable ("libraries|%s|requires".printf (library), "");
         rule = recipe.add_rule ();
         recipe.build_rule.add_input (filename);
         rule.add_output (filename);
@@ -146,12 +138,8 @@ public class GCCModule : BuildModule
         if (is_library)
             link_command += " -shared";
 
-        var cflags = recipe.get_variable ("%s|%s|compile-flags".printf (type_name, name));
-        if (cflags == null)
-            cflags = "";
-        var ldflags = recipe.get_variable ("%s|%s|link-flags".printf (type_name, name));
-        if (ldflags == null)
-            ldflags = "";
+        var cflags = recipe.get_variable ("%s|%s|compile-flags".printf (type_name, name), "");
+        var ldflags = recipe.get_variable ("%s|%s|link-flags".printf (type_name, name), "");
 
         /* Pass build variables to the program/library */
         var defines = recipe.get_variable_children ("%s|%s|defines".printf (type_name, name));
@@ -162,9 +150,7 @@ public class GCCModule : BuildModule
         }
 
         /* Get dependencies */
-        var packages = recipe.get_variable ("%s|%s|packages".printf (type_name, name));
-        if (packages == null)
-            packages = "";
+        var packages = recipe.get_variable ("%s|%s|packages".printf (type_name, name), "");
         var package_list = split_variable (packages);
         if (package_list != null)
         {
