@@ -10,7 +10,11 @@ public class PythonModule : BuildModule
             if (!source.has_suffix (".py"))
                 return false;
 
-        if (Environment.find_program_in_path ("python") == null)
+        var python_version = recipe.get_variable ("programs|%s|python-version".printf (program));
+        var python_bin = "python";
+        if (python_version != null)
+            python_bin += python_version;
+        if (Environment.find_program_in_path (python_bin) == null)
             return false;
 
         var install_sources = recipe.get_variable ("programs|%s|install-sources".printf (program)) == "true";
@@ -21,7 +25,7 @@ public class PythonModule : BuildModule
             rule.add_input (source);
             rule.add_output (output);
             rule.add_status_command ("PYC %s".printf (source));		
-            rule.add_command ("@python -m py_compile %s".printf (source));
+            rule.add_command ("@%s -m py_compile %s".printf (python_bin, source));
             recipe.build_rule.add_input (output);
 
             if (install_sources)
@@ -43,7 +47,7 @@ public class PythonModule : BuildModule
         rule.add_output (main_file);	    
         rule.add_output (program);
         rule.add_command ("@echo '#!/bin/sh' > %s".printf (program));
-        rule.add_command ("@echo 'exec python %s' >> %s".printf (main_file, program));
+        rule.add_command ("@echo 'exec %s %s' >> %s".printf (python_bin, main_file, program));
         rule.add_command ("@chmod +x %s".printf (program));
         recipe.build_rule.add_input (program);
 
@@ -53,7 +57,7 @@ public class PythonModule : BuildModule
         rule.add_output (main_file);
         rule.add_output (script);
         rule.add_command ("@echo '#!/bin/sh' > %s".printf (script));
-        rule.add_command ("@echo 'exec python %s' >> %s".printf (Path.build_filename (recipe.package_data_directory, main_file), script));
+        rule.add_command ("@echo 'exec %s %s' >> %s".printf (python_bin, Path.build_filename (recipe.package_data_directory, main_file), script));
         rule.add_command ("@chmod +x %s".printf (script));
         recipe.build_rule.add_input (script);
         recipe.add_install_rule (script, recipe.binary_directory, program);
