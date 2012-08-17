@@ -51,10 +51,20 @@ public class TestRunner
 
     public static void check_command (string command)
     {
+        bool match;
+
         if (timeout_id != 0)
             Source.remove (timeout_id);
 
-        if (command != expected_commands.nth_data (expected_index))
+        string expected = expected_commands.nth_data (expected_index);
+        if (expected.has_prefix("^"))
+            /* regular expression */
+            match = Regex.match_simple(expected + "$", command);
+        else
+            /* exact match */
+            match = command == expected;
+
+        if (!match)
         {
             fail (command);
             return;

@@ -12,9 +12,7 @@ public class DesktopModule : BuildModule
                 continue;
 
             var categories = recipe.get_variable ("programs|%s|categories".printf (program));
-            var name = recipe.get_variable ("programs|%s|name".printf (program));
-            if (name == null)
-                name = program;
+            var name = recipe.get_variable ("programs|%s|name".printf (program), program);
             var generic_name = recipe.get_variable ("programs|%s|generic-name".printf (program));
             var description = recipe.get_variable ("programs|%s|description".printf (program));
             var icon = recipe.get_variable ("programs|%s|icon".printf (program));
