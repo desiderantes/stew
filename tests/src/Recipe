@@ -42,6 +42,10 @@ programs|python2.7|sources = python.vala
 programs|python2.7|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
 programs|python2.7|install = false
 
+programs|python3.2|sources = python3.vala
+programs|python3.2|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
+programs|python3.2|install = false
+
 programs|ghc|sources = ghc.vala
 programs|ghc|packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
 programs|ghc|install = false

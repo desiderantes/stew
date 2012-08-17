@@ -20,7 +20,7 @@ Python programs and libraries can set the following program <link xref="variable
 </thead>
 <tr>
   <td><p>install-sources</p></td>
-  <td><p>true if the <file>.py</file> files should be installed (defaults to false)</p></td>
+  <td><p>true if the <file>.py</file> files should be installed (defaults to false). Always installed for technical requirement in python3.</p></td>
 </tr>
 <tr>
   <td><p>python-version</p></td>
