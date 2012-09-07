@@ -36,9 +36,9 @@ Vala programs and libraries can set the following program <link xref="variables"
 The following shows a recipe for a two file Vala program:
 </p>
 <code>
-programs|example-program|sources = main.vala module.vala
-programs|example-program|name = Example
-programs|example-program|description = An example Vala program
+programs.example-program.sources = main.vala module.vala
+programs.example-program.name = Example
+programs.example-program.description = An example Vala program
 </code>
 </example>
 </page>

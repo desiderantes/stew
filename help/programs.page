@@ -9,7 +9,7 @@
 A <em>program</em> is executable code that can be run by a user.
 </p>
 <p>
-To specify a program you need to set <code>programs|<em>name</em>|*</code> <link xref="variables">variables</link> where <em>name</em> is a unique name for the program.
+To specify a program you need to set <code>programs.<em>name</em>.*</code> <link xref="variables">variables</link> where <em>name</em> is a unique name for the program.
 The following variables are allowed:
 </p>
 <table frame="all" shade="rows">
@@ -84,8 +84,8 @@ For desktop files a <file>.desktop</file> file is generated and installed descri
 The following describes a simple <link xref="c">C program</link> that is built from one C file:
 </p>
 <code>
-programs|example-program|sources = example-program.c
-programs|example-program|type = desktop
+programs.example-program.sources = example-program.c
+programs.example-program.type = desktop
 </code>
 <p>
 When building Bake will compile example-program.c and produce the program <em>example-program</em>.

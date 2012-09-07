@@ -8,14 +8,14 @@ public class DesktopModule : BuildModule
         foreach (var program in programs)
         {
             /* Ignore non-desktop applications */
-            if (recipe.get_variable ("programs|%s|type".printf (program)) != "desktop")
+            if (recipe.get_variable ("programs.%s.type".printf (program)) != "desktop")
                 continue;
 
-            var categories = recipe.get_variable ("programs|%s|categories".printf (program));
-            var name = recipe.get_variable ("programs|%s|name".printf (program), program);
-            var generic_name = recipe.get_variable ("programs|%s|generic-name".printf (program));
-            var description = recipe.get_variable ("programs|%s|description".printf (program));
-            var icon = recipe.get_variable ("programs|%s|icon".printf (program));
+            var categories = recipe.get_variable ("programs.%s.categories".printf (program));
+            var name = recipe.get_variable ("programs.%s.name".printf (program), program);
+            var generic_name = recipe.get_variable ("programs.%s.generic-name".printf (program));
+            var description = recipe.get_variable ("programs.%s.description".printf (program));
+            var icon = recipe.get_variable ("programs.%s.icon".printf (program));
 
             /* Generate a .desktop file */
             var filename = recipe.get_build_path ("%s.desktop".printf (program));

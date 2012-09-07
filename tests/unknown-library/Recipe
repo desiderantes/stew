@@ -1,3 +1,3 @@
-package|name = test
+package.name = test
 
-libraries|test|sources = test.unknown
+libraries.test.sources = test.unknown

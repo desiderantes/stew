@@ -2,7 +2,7 @@ public class GSettingsModule : BuildModule
 {
     public override void generate_toplevel_rules (Recipe recipe)
     {
-        var schemas_list = recipe.get_variable ("data|gsettings|schemas");
+        var schemas_list = recipe.get_variable ("data.gsettings.schemas");
         if (schemas_list != null)
         {
             foreach (var schema in split_variable (schemas_list))
@@ -14,7 +14,7 @@ public class GSettingsModule : BuildModule
             }
         }
 
-        var overrides_list = recipe.get_variable ("data|gsettings|overrides");
+        var overrides_list = recipe.get_variable ("data.gsettings.overrides");
         if (overrides_list != null)
         {
             foreach (var override in split_variable (overrides_list))
@@ -26,7 +26,7 @@ public class GSettingsModule : BuildModule
             }
         }
 
-        var converts_list = recipe.get_variable ("data|gsettings|convert-files");
+        var converts_list = recipe.get_variable ("data.gsettings.convert-files");
         if (converts_list != null)
         {
             foreach (var convert in split_variable (converts_list))

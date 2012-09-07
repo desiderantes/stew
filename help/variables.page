@@ -19,7 +19,7 @@ Where <em>name</em> is a continuous set of printable characters and <em>value</e
 The variable statement is normally terminated by a newline, if a '\' is the last printable character on a line the value continues to the next line.
 </p>
 <p>
-Variables are grouped using the '|' character.
+Variables are grouped using the '.' character.
 </p>
 <example>
 <p>
@@ -29,7 +29,7 @@ The following are all valid variables:
 name = value
 multiple-line = Line 1\
                 Line 2
-section|subsection = value                
+section.subsection = value                
 </code>
 </example>
 </page>

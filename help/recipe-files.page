@@ -14,8 +14,8 @@ This text file is called <em>Recipe</em> (case sensitive) and defines the compon
 
 <p>
 There are two variables that are required in the toplevel file.
-<em>project|name</em> defines the name of the project.
-<em>project|version</em> defines the current version of this project.
+<em>project.name</em> defines the name of the project.
+<em>project.version</em> defines the current version of this project.
 </p>
 <example>
 <p>
@@ -23,8 +23,8 @@ For example, the <em>foo</em> project (version 0.0.1) has a file called <em>Reci
 This file contains:
 </p>
 <code>
-project|name = foo
-project|version = 0.0.1
+project.name = foo
+project.version = 0.0.1
 </code>
 </example>
 <p>

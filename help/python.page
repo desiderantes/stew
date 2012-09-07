@@ -35,9 +35,9 @@ FIXME: Describe the shell script for programs
 The following shows a recipe for a two file Python program:
 </p>
 <code>
-programs|example-program|sources = main.py module.py
-programs|example-program|name = Example
-programs|example-program|description = An example Python program
+programs.example-program.sources = main.py module.py
+programs.example-program.name = Example
+programs.example-program.description = An example Python program
 </code>
 </example>
 </page>

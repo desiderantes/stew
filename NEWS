@@ -10,7 +10,6 @@ Overview of changes in bake 0.1.0
     * Install .py files if .install-sources=true
     * Install package data with data.*.files
     * Recipes now inherit variables from their parent
-    * Change variable separator from . to | so can use . for versioning
     * Rename intltool rules to gettext
     * Add an easy way to define variables to be passed to programs/libraries
     * Automatically generate .desktop files for desktop applications

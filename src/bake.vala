@@ -13,7 +13,7 @@ public class BuildModule
     {
     }
     
-    public virtual bool generate_program_rules (Recipe recipe, string program)
+    public virtual bool generate_program_rules (Recipe recipe, string id)
     {
         return false;
     }
@@ -386,8 +386,8 @@ public class Recipe
     public string include_directory { owned get { return get_variable ("include-directory"); } }
     public string package_data_directory { owned get { return get_variable ("package-data-directory"); } }
 
-    public string package_name { owned get { return get_variable ("package|name"); } }
-    public string package_version { owned get { return get_variable ("package|version"); } }
+    public string package_name { owned get { return get_variable ("package.name"); } }
+    public string package_version { owned get { return get_variable ("package.version"); } }
     public string release_name
     {
         owned get
@@ -457,14 +457,14 @@ public class Recipe
     public List<string> get_variable_children (string name)
     {
         var children = new List<string> ();
-        var prefix = name + "|";
+        var prefix = name + ".";
         foreach (var variable_name in variables.get_keys ())
         {
             if (!variable_name.has_prefix (prefix))
                 continue;
 
             var length = 0;
-            while (variable_name[prefix.length + 1 + length] != '|' && variable_name[prefix.length + 1 + length] != '\0')
+            while (variable_name[prefix.length + 1 + length] != '.' && variable_name[prefix.length + 1 + length] != '\0')
                 length++;
             var child_name = variable_name.substring (prefix.length, length + 1);
             if (has_value (children, child_name))
@@ -1166,7 +1166,7 @@ public class Bake
             conf_file.set_variable ("include-directory", "%s/include".printf (resource_directory));
         var data_directory = conf_file.get_variable ("data-directory");
         if (conf_file.get_variable ("package-data-directory") == null)
-            conf_file.set_variable ("package-data-directory", "%s/$(package|name)".printf (data_directory));
+            conf_file.set_variable ("package-data-directory", "%s/$(package.name)".printf (data_directory));
 
         /* Load the recipe tree */
         var filename = Path.build_filename (toplevel_dir, "Recipe");

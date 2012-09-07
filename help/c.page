@@ -37,10 +37,10 @@ C programs and libraries can set the following program <link xref="variables">va
 The following shows a recipe for a two file C program:
 </p>
 <code>
-programs|example-program|sources = main.c module.c
-programs|example-program|name = Example
-programs|example-program|description = An example C program
-programs|example-program|compile-flags = -Wall
+programs.example-program.sources = main.c module.c
+programs.example-program.name = Example
+programs.example-program.description = An example C program
+programs.example-program.compile-flags = -Wall
 </code>
 </example>
 </page>

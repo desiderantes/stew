@@ -1,3 +1,3 @@
-package|name = test
+package.name = test
 
-data|man|pages = test.1
+data.man.pages = test.1

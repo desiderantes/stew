@@ -52,18 +52,18 @@ public class GettextModule : BuildModule
 
     public override void generate_toplevel_rules (Recipe recipe)
     {
-        if (recipe.get_variable ("gettext|locale-directory") == null)
+        if (recipe.get_variable ("gettext.locale-directory") == null)
         {
             var dir = Path.build_filename (recipe.data_directory, "locale");
-            recipe.set_variable ("gettext|locale-directory", dir);
+            recipe.set_variable ("gettext.locale-directory", dir);
         }
     }
 
     public override void generate_rules (Recipe recipe)
     {
-        foreach (var gettext_domain in recipe.get_variable_children ("data|gettext"))
+        foreach (var gettext_domain in recipe.get_variable_children ("data.gettext"))
         {
-            var translation_list = recipe.get_variable ("data|gettext|%s|translations".printf (gettext_domain));
+            var translation_list = recipe.get_variable ("data.gettext.%s.translations".printf (gettext_domain));
             if (translation_list == null)
                 continue;
 
@@ -82,7 +82,7 @@ public class GettextModule : BuildModule
 
                 recipe.build_rule.add_input (mo_file);
 
-                var target_dir = recipe.get_install_path (Path.build_filename (recipe.get_variable ("gettext|locale-directory"), language, "LC_MESSAGES"));
+                var target_dir = recipe.get_install_path (Path.build_filename (recipe.get_variable ("gettext.locale-directory"), language, "LC_MESSAGES"));
                 var target_mo_file = "%s.mo".printf (gettext_domain);
                 recipe.add_install_rule (mo_file, target_dir, target_mo_file);
             }

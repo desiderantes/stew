@@ -1,2 +1,2 @@
-package|name = example
-programs|example|sources = Example.cs
+package.name = example
+programs.example.sources = Example.cs

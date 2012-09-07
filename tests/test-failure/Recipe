@@ -1,5 +1,5 @@
-package|name = test
+package.name = test
 
-tests|first|command = true
-tests|second|command = false
-tests|third|command = true
+tests.first.command = true
+tests.second.command = false
+tests.third.command = true

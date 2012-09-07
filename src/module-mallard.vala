@@ -2,10 +2,10 @@ public class MallardModule : BuildModule
 {
     public override void generate_rules (Recipe recipe)
     {
-        var documents = recipe.get_variable_children ("data|mallard");
+        var documents = recipe.get_variable_children ("data.mallard");
         foreach (var document in documents)
         {
-            var pages_list = recipe.get_variable ("data|mallard|%s|pages".printf (document));
+            var pages_list = recipe.get_variable ("data.mallard.%s.pages".printf (document));
             if (pages_list == null)
                 return;
             var pages = split_variable (pages_list);

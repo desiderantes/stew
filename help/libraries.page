@@ -9,7 +9,7 @@
 A <em>library</em> is a piece of executable code that can be shared between different <link xref="programs">programs</link>.
 </p>
 <p>
-To specify a library you need to set <code>libraries|<em>name</em>|*</code> <link xref="variables">variables</link> where <em>name</em> is a unique name for the library.
+To specify a library you need to set <code>libraries.<em>name</em>.*</code> <link xref="variables">variables</link> where <em>name</em> is a unique name for the library.
 The following variables are allowed:
 </p>
 <table frame="all" shade="rows">
@@ -49,8 +49,8 @@ Depending on what <link xref="index#programs-and-libraries">language</link> your
 The following describes a simple <link xref="c">C library</link> that is built from one C file:
 </p>
 <code>
-libraries|lib1|sources = lib1.c
-libraries|lib1|type = desktop
+libraries.lib1.sources = lib1.c
+libraries.lib1.type = desktop
 </code>
 <p>
 When building Bake will compile lib1.c and produce the library <em>lib1</em>.

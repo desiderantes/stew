@@ -1,4 +1,4 @@
-package|name = test
+package.name = test
 
-libraries|test|sources = test1.py test2.py test3.py
-libraries|test|gettext-domain = test
+libraries.test.sources = test1.py test2.py test3.py
+libraries.test.gettext-domain = test

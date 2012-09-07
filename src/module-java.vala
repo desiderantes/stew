@@ -1,11 +1,14 @@
 public class JavaModule : BuildModule
 {
-    public override bool generate_program_rules (Recipe recipe, string program)
-    {    
+    public override bool generate_program_rules (Recipe recipe, string id)
+    {
+        var name = recipe.get_variable ("programs.%s.name".printf (id), id);
+        var binary_name = name;
+
         if (Environment.find_program_in_path ("javac") == null || Environment.find_program_in_path ("jar") == null)
             return false;
 
-        var source_list = recipe.get_variable ("programs|%s|sources".printf (program));
+        var source_list = recipe.get_variable ("programs.%s.sources".printf (id));
         if (source_list == null)
             return false;
         var sources = split_variable (source_list);
@@ -14,7 +17,7 @@ public class JavaModule : BuildModule
             if (!source.has_suffix (".java"))
                 return false;
 
-        var jar_file = "%s.jar".printf (program);
+        var jar_file = "%s.jar".printf (binary_name);
 
         var rule = recipe.add_rule ();
         var build_directory = get_relative_path (recipe.dirname, recipe.build_directory);
@@ -25,7 +28,7 @@ public class JavaModule : BuildModule
         var jar_command = "jar cfe %s".printf (jar_file);
 
         // FIXME: Would like a better way of determining this automatically
-        var entrypoint = recipe.get_variable ("programs|%s|entrypoint".printf (program));
+        var entrypoint = recipe.get_variable ("programs.%s.entrypoint".printf (id));
         if (entrypoint != null)
             jar_command += " %s".printf (entrypoint);
 
@@ -51,23 +54,23 @@ public class JavaModule : BuildModule
 
         /* Script to run locally */
         rule = recipe.add_rule ();
-        rule.add_output (program);
-        rule.add_command ("@echo '#!/bin/sh' > %s".printf (program));
-        rule.add_command ("@echo 'exec java -jar %s' >> %s".printf (jar_file, program));
-        rule.add_command ("@chmod +x %s".printf (program));
-        recipe.build_rule.add_input (program);
+        rule.add_output (binary_name);
+        rule.add_command ("@echo '#!/bin/sh' > %s".printf (binary_name));
+        rule.add_command ("@echo 'exec java -jar %s' >> %s".printf (jar_file, binary_name));
+        rule.add_command ("@chmod +x %s".printf (binary_name));
+        recipe.build_rule.add_input (binary_name);
 
         /* Script to run when installed */
-        var script = recipe.get_build_path (program);
+        var script = recipe.get_build_path (binary_name);
         rule = recipe.add_rule ();
         rule.add_output (script);
         rule.add_command ("@echo '#!/bin/sh' > %s".printf (script));
         rule.add_command ("@echo 'exec java -jar %s' >> %s".printf (Path.build_filename (recipe.package_data_directory, jar_file), script));
         rule.add_command ("@chmod +x %s".printf (script));
         recipe.build_rule.add_input (script);
-        recipe.add_install_rule (script, recipe.binary_directory, program);
+        recipe.add_install_rule (script, recipe.binary_directory, binary_name);
 
-        var gettext_domain = recipe.get_variable ("programs|%s|gettext-domain".printf (program));
+        var gettext_domain = recipe.get_variable ("programs.%s.gettext-domain".printf (id));
         if (gettext_domain != null)
         {
             foreach (var source in sources)
@@ -82,7 +85,7 @@ public class JavaModule : BuildModule
         if (Environment.find_program_in_path ("javac") == null || Environment.find_program_in_path ("jar") == null)
             return false;
 
-        var source_list = recipe.get_variable ("libraries|%s|sources".printf (library));
+        var source_list = recipe.get_variable ("libraries.%s.sources".printf (library));
         if (source_list == null)
             return false;
         var sources = split_variable (source_list);
@@ -123,7 +126,7 @@ public class JavaModule : BuildModule
         recipe.build_rule.add_input (jar_file);
         recipe.add_install_rule (jar_file, Path.build_filename (recipe.data_directory, "java"));
 
-        var gettext_domain = recipe.get_variable ("libraries|%s|gettext-domain".printf (library));
+        var gettext_domain = recipe.get_variable ("libraries.%s.gettext-domain".printf (library));
         if (gettext_domain != null)
         {
             foreach (var source in sources)

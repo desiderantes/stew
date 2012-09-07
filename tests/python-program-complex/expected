@@ -1,5 +1,4 @@
 !bake
-# FIXME: Should be in .built
 python2.7 -m py_compile test1.py
 python2.7 -m py_compile test2.py
 python2.7 -m py_compile test3.py

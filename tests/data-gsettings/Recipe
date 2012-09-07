@@ -1,5 +1,5 @@
-package|name = test
+package.name = test
 
-data|gsettings|schemas = com.example.Test.gschema.xml
-data|gsettings|overrides = test.override
-data|gsettings|convert-files = test.convert
+data.gsettings.schemas = com.example.Test.gschema.xml
+data.gsettings.overrides = test.override
+data.gsettings.convert-files = test.convert

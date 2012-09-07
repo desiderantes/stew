@@ -11,20 +11,20 @@ Data can include things like configuration, UI definition, images and documentat
 </p>
 <p>
 Data is defined using <code>data</code> <link xref="variables">variables</link>.
-The files that make up the data is set using the <code>data|<em>type</em>|files</code> variable where <em>type</em> is the type of data.
+The files that make up the data is set using the <code>data.<em>type</em>.files</code> variable where <em>type</em> is the type of data.
 Bake generates <link xref="installing">install rules</link> for the files specified and for special data types (FIXME: Link to special data types) and generates additional <link xref="rules">rules</link> for that data type.
 </p>
 <p>
-For unrecognised types, Bake will generate an install rule that installs to <code>data|<em>type</em>|install-directory</code>.
-If an install directory is not set, the files are installed to the predefined variable <code>data|install-directory</code> (<code>/usr/share/<em>project name</em>/</code> on Unix systems).
+For unrecognised types, Bake will generate an install rule that installs to <code>data.<em>type</em>.install-directory</code>.
+If an install directory is not set, the files are installed to the predefined variable <code>data.install-directory</code> (<code>/usr/share/<em>project name</em>/</code> on Unix systems).
 </p>
 <example>
 <p>
 For example, the foo project can specify images that are required to be installed with:
 </p>
 <code>
-data|images|files = image1.png
-data|images|install-directory = $(data|install-directory)/images
+data.images.files = image1.png
+data.images.install-directory = $(data.install-directory)/images
 </code>
 <p>
 When running the install rule Bake will copy these files to <code>/usr/share/foo/images</code>.

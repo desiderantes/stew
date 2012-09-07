@@ -1,8 +1,11 @@
 public class PythonModule : BuildModule
 {
-    public override bool generate_program_rules (Recipe recipe, string program)
+    public override bool generate_program_rules (Recipe recipe, string id)
     {
-        var source_list = recipe.get_variable ("programs|%s|sources".printf (program));
+        var name = recipe.get_variable ("programs.%s.name".printf (id), id);
+        var binary_name = name;
+
+        var source_list = recipe.get_variable ("programs.%s.sources".printf (id));
         if (source_list == null)
             return false;
         var sources = split_variable (source_list);
@@ -10,7 +13,7 @@ public class PythonModule : BuildModule
             if (!source.has_suffix (".py"))
                 return false;
 
-        var python_version = recipe.get_variable ("programs|%s|python-version".printf (program));
+        var python_version = recipe.get_variable ("programs.%s.python-version".printf (id));
         var python_bin = "python";
         if (python_version != null)
             python_bin += python_version;
@@ -18,7 +21,7 @@ public class PythonModule : BuildModule
             return false;
 
         var python_cache_dir = "__pycache__";
-        var install_sources = recipe.get_variable ("programs|%s|install-sources".printf (program)) == "true";
+        var install_sources = recipe.get_variable ("programs.%s.install-sources".printf (id)) == "true";
         var main_file = "";
         foreach (var source in sources)
         {
@@ -46,7 +49,7 @@ public class PythonModule : BuildModule
             recipe.add_install_rule (output, recipe.package_data_directory);
         }
 
-        var gettext_domain = recipe.get_variable ("programs|%s|gettext-domain".printf (program));
+        var gettext_domain = recipe.get_variable ("programs.%s.gettext-domain".printf (id));
         if (gettext_domain != null)
         {
             foreach (var source in sources)
@@ -55,15 +58,15 @@ public class PythonModule : BuildModule
 
         /* Script to run locally */
         var rule = recipe.add_rule ();
-        rule.add_output (main_file);	    
-        rule.add_output (program);
-        rule.add_command ("@echo '#!/bin/sh' > %s".printf (program));
-        rule.add_command ("@echo 'exec %s %s' >> %s".printf (python_bin, main_file, program));
-        rule.add_command ("@chmod +x %s".printf (program));
-        recipe.build_rule.add_input (program);
+        rule.add_output (main_file);
+        rule.add_output (binary_name);
+        rule.add_command ("@echo '#!/bin/sh' > %s".printf (binary_name));
+        rule.add_command ("@echo 'exec %s %s' >> %s".printf (python_bin, main_file, binary_name));
+        rule.add_command ("@chmod +x %s".printf (binary_name));
+        recipe.build_rule.add_input (binary_name);
 
         /* Script to run when installed */
-        var script = recipe.get_build_path (program);
+        var script = recipe.get_build_path (binary_name);
         rule = recipe.add_rule ();
         rule.add_output (main_file);
         rule.add_output (script);
@@ -71,14 +74,14 @@ public class PythonModule : BuildModule
         rule.add_command ("@echo 'exec %s %s' >> %s".printf (python_bin, Path.build_filename (recipe.package_data_directory, main_file), script));
         rule.add_command ("@chmod +x %s".printf (script));
         recipe.build_rule.add_input (script);
-        recipe.add_install_rule (script, recipe.binary_directory, program);
+        recipe.add_install_rule (script, recipe.binary_directory, binary_name);
             
         return true;
     }
 
     public override bool generate_library_rules (Recipe recipe, string library)
     {
-        var source_list = recipe.get_variable ("libraries|%s|sources".printf (library));
+        var source_list = recipe.get_variable ("libraries.%s.sources".printf (library));
         if (source_list == null)
             return false;
         var sources = split_variable (source_list);
@@ -89,8 +92,8 @@ public class PythonModule : BuildModule
         if (Environment.find_program_in_path ("python") == null)
             return false;
 
-        var install_directory = recipe.get_variable ("libraries|%s|install-directory".printf (library));
-        var install_sources = recipe.get_variable ("libraries|%s|install-sources".printf (library)) == "true";
+        var install_directory = recipe.get_variable ("libraries.%s.install-directory".printf (library));
+        var install_sources = recipe.get_variable ("libraries.%s.install-sources".printf (library)) == "true";
         if (install_directory == null)
         {
             var version = get_version ();
@@ -118,7 +121,7 @@ public class PythonModule : BuildModule
             recipe.add_install_rule (output, install_directory);
         }
 
-        var gettext_domain = recipe.get_variable ("libraries|%s|gettext-domain".printf (library));
+        var gettext_domain = recipe.get_variable ("libraries.%s.gettext-domain".printf (library));
         if (gettext_domain != null)
         {
             foreach (var source in sources)

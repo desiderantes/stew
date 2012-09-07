@@ -14,37 +14,37 @@ Here is an example of a <link xref="recipe-files">recipe</link> for a simple pro
 # This is the recipe for the foo project
 
 # Describe this project
-project|name = foo
-project|version = 0.0.1
+project.name = foo
+project.version = 0.0.1
 
 # There is a README file that needs to be distributed with the project
-project|files = README
+project.files = README
 
 # Describe the C program in this project
-programs|example-program|sources = main.c module.c
+programs.example-program.sources = main.c module.c
 
 # Describe an image that is required for this project
-data|images|files = image1.png
-data|images|install-directory = $(data|install-directory)/images
+data.images.files = image1.png
+data.images.install-directory = $(data.install-directory)/images
 </code>
 <p>
 The first line is a comment, and is ignored by Bake.
 </p>
 <p>
-The <em>project|name</em> and <em>project|version</em> <link xref="variables">variables</link> define this recipe as being for the <em>foo</em> project version <em>0.0.1</em>.
+The <em>project.name</em> and <em>project.version</em> <link xref="variables">variables</link> define this recipe as being for the <em>foo</em> project version <em>0.0.1</em>.
 These two variables are required and tell Bake that this is the top level recipe for this project.
 </p>
 <p>
-The <em>project|files</em> variable states that there is a file called README that is part of the project.
+The <em>project.files</em> variable states that there is a file called README that is part of the project.
 This file should be <link xref="releasing">distributed</link> with the project but is not installed or used in compilation.
 </p>
 <p>
-The <em>programs|example-program|sources</em> variable describes a C <link xref="programs">program</link> that this project produces.
+The <em>programs.example-program.sources</em> variable describes a C <link xref="programs">program</link> that this project produces.
 This variable means that when <link xref="building">building</link> Bake will compile a C program called <em>example-program</em> using the source file <em>example-program.c</em>.
 The produced executable will be <link xref="installing">installed</link> into an appropriate location and the source file will be distributed with the project.
 </p>
 <p>
-The <em>data|images|files</em> variables defines some data files that are part of this project.
-They will be installed into a subdirectory of the project data directory <em>$(data|install-directory)</em>.
+The <em>data.images.files</em> variables defines some data files that are part of this project.
+They will be installed into a subdirectory of the project data directory <em>$(data.install-directory)</em>.
 </p>
 </page>

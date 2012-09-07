@@ -13,9 +13,9 @@ Bake supports <link xref="programs">programs</link> and <link xref="libraries">l
 The following shows a recipe for a two file Go program:
 </p>
 <code>
-programs|example-program|sources = main.go module.go
-programs|example-program|name = Example
-programs|example-program|description = An example Go program
+programs.example-program.sources = main.go module.go
+programs.example-program.name = Example
+programs.example-program.description = An example Go program
 </code>
 </example>
 </page>

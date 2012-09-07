@@ -1,3 +1,3 @@
-package|name = example
-programs|example|sources = example.vala
-programs|example|packages = gobject-2.0 glib-2.0
+package.name = example
+programs.example.sources = example.vala
+programs.example.packages = gobject-2.0 glib-2.0

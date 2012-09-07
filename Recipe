@@ -1,8 +1,8 @@
-package|name = bake
-package|version = 0.1.0~bzr
-package|ppa = lp:~bake-team/releases
+package.name = bake
+package.version = 0.1.0~bzr
+package.ppa = lp:~bake-team/releases
 
-package|files = Makefile \
+package.files = Makefile \
                 bake.doap \
                 NEWS \
                 examples/ada/Recipe \
@@ -37,7 +37,7 @@ package|files = Makefile \
                 examples/vala-library/example.vala \
                 examples/vala-library/Recipe
 
-data|man|pages = bake.1                
+data.man.pages = bake.1                
 
 %release: release-tarball release-ppa
 

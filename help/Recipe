@@ -1,4 +1,4 @@
-data|mallard|bake|pages = building.page \
+data.mallard.bake.pages = building.page \
                           cleaning.page \
                           config.page \
                           c.page \
@@ -28,4 +28,4 @@ data|mallard|bake|pages = building.page \
                           translation.page \
                           vala.page \
                           variables.page
-data|mallard|bake|gettext-domain = bake-help
+data.mallard.bake.gettext-domain = bake-help
