@@ -444,14 +444,14 @@ public class Recipe
         }
     }
 
-    public string? get_variable (string name, string? fallback = null)
+    public string? get_variable (string name, string? fallback = null, bool recurse = true)
     {
         var value = variables.lookup (name);
-        if (value == null && parent != null)
+        if (recurse && value == null && parent != null)
             return parent.get_variable (name, fallback);
-        if (value != null)
-           return value;
-        return fallback;
+        if (value == null)
+            value = fallback;
+        return value;
     }
 
     public List<string> get_variable_children (string name)

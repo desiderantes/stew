@@ -57,7 +57,7 @@ public class ReleaseModule : BuildModule
                     continue;
 
                 /* Ignore generated files */
-                if (recipe.find_rule (input) != null)
+                if (recipe.find_rule (input) != null || recipe.find_rule ("%%%s".printf (input)) != null)
                     continue;
 
                 /* Ignore files built in other recipes */
@@ -70,7 +70,7 @@ public class ReleaseModule : BuildModule
         }
 
         /* Release files explicitly listed */
-        var extra_files = recipe.get_variable ("package.files");
+        var extra_files = recipe.get_variable ("package.files", null, false);
         if (extra_files != null)
             foreach (var file in split_variable (extra_files))
                 add_release_file (release_rule, release_dir, relative_dirname, file);
