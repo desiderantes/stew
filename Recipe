@@ -27,7 +27,7 @@ package.files = Makefile \
                 examples/haskell/Recipe \
                 examples/haskell/example.hs \
                 examples/java/Recipe \
-                examples/java/Example.java \
+                examples/java/com/example/Example.java \
                 examples/objective-c/Recipe \
                 examples/objective-c/example.m \
                 examples/python/example.py \
