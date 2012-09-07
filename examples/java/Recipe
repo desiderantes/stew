@@ -1,4 +1,0 @@
-package.name = example
-programs.example.sources = com/example/Example.java
-programs.example.entrypoint = Example
-

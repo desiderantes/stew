@@ -4,38 +4,7 @@ package.ppa = lp:~bake-team/releases
 
 package.files = Makefile \
                 bake.doap \
-                NEWS \
-                examples/ada/Recipe \
-                examples/ada/example.adb \
-                examples/c/Recipe \
-                examples/c/example.h \
-                examples/c/example.c \
-                examples/c-library/Recipe \
-                examples/c-library/example.c \
-                examples/c-library/example.h \
-                examples/c-sharp/Recipe \
-                examples/c-sharp/Example.cs \
-                examples/c++/Recipe \
-                examples/c++/example.cpp \
-                examples/custom/Recipe \
-                examples/custom/example.c.in \
-                examples/custom/example.h \
-                examples/fortran/Recipe \
-                examples/fortran/example.f \
-                examples/go/example.go \
-                examples/go/Recipe \
-                examples/haskell/Recipe \
-                examples/haskell/example.hs \
-                examples/java/Recipe \
-                examples/java/com/example/Example.java \
-                examples/objective-c/Recipe \
-                examples/objective-c/example.m \
-                examples/python/example.py \
-                examples/python/Recipe \
-                examples/vala/example.vala \
-                examples/vala/Recipe \
-                examples/vala-library/example.vala \
-                examples/vala-library/Recipe
+                NEWS
 
 data.man.pages = bake.1                
 

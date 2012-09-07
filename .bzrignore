@@ -33,3 +33,13 @@ tests/src/msgcat
 tests/src/msgfmt
 tests/src/g-ir-scanner
 tests/src/g-ir-compiler
+bake-0.1.0.tar.bz2
+bake_0.1.0.orig.tar.gz
+bake_0.1.0-0.debian.tar.gz
+bake_0.1.0-0.dsc
+bake_0.1.0-0_source.changes
+bake_0.1.0-0_amd64.deb
+bake-0.1.0.tar.gz
+bake-0.1.0/
+bake-0.1.0-1.x86_64.rpm
+bake-0.1.0.tar.xz

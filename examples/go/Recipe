@@ -1,3 +1,0 @@
-package.name = example
-package.version = 0.0.1
-programs.example.sources = example.go

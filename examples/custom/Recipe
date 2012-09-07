@@ -1,6 +1,0 @@
-package.name = example
-package.version = 0.0.1
-programs.example.sources = example.c
-
-example.c: example.c.in
-    cp example.c.in example.c
