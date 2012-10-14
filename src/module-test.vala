@@ -5,9 +5,18 @@ public class TestModule : BuildModule
         var tests = recipe.get_variable_children ("tests");
         foreach (var test in tests)
         {
+            var command = recipe.get_variable ("tests.%s.command".printf (test));
+            if (command == null)
+                continue;
+            var data = recipe.get_variable ("tests.%s.data".printf (test));
+
             recipe.test_rule.add_status_command ("TEST %s".printf (test));
-            var command = "@%s".printf (recipe.get_variable ("tests.%s.command".printf (test)));
-            recipe.test_rule.add_command (command);
+            recipe.test_rule.add_command ("@%s".printf (command));
+            if (data != null)
+            {
+                foreach (var f in split_variable (data))
+                    recipe.test_rule.add_input (f);
+            }
         }
     }
 }
