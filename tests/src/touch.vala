@@ -1,6 +1,9 @@
 [CCode (cheader_filename = "sys/stat.h")]
 extern int futimens (int fd, [CCode (array_length = false)] Posix.timespec[] times);
 
+[CCode (cheader_filename = "sys/stat.h")]
+extern const long UTIME_NOW;
+
 public class Touch
 {
     public static int main (string[] args)
@@ -38,10 +41,22 @@ public class Touch
                 continue;
 
             var fd = Posix.open (args[i], Posix.O_WRONLY | Posix.O_CREAT, 0666);
+            if (fd < 0)
+            {
+                stderr.printf ("Failed to open file %s: %s", args[i], Posix.strerror (Posix.errno));
+                return Posix.EXIT_FAILURE;
+            }
+
             Posix.timespec times[2];
-            Posix.clock_gettime (Posix.CLOCK_REALTIME, out times[0]);
-            times[1] = times[0];
-            futimens (fd, times);
+            times[0].tv_sec = 0;
+            times[0].tv_nsec = UTIME_NOW;
+            times[1].tv_sec = 0;
+            times[1].tv_nsec = UTIME_NOW;
+            if (futimens (fd, times) < 0)
+            {
+                stderr.printf ("Failed to update timestamp for %s: %s", args[i], Posix.strerror (Posix.errno));
+                return Posix.EXIT_FAILURE;
+            }
             Posix.close (fd);
         }
 
