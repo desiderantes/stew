@@ -746,7 +746,7 @@ public class Recipe
         directory_changed = false;
     }
     
-    public void build_target (string target) throws BuildError
+    public bool build_target (string target) throws BuildError
     {
         if (debug_enabled)
             stderr.printf ("Considering target %s\n", get_relative_path (original_dir, Path.build_filename (dirname, target)));
@@ -759,8 +759,7 @@ public class Recipe
                 stderr.printf ("Target %s defined in recipe %s\n",
                                get_relative_path (original_dir, Path.build_filename (dirname, target)),
                                get_relative_path (original_dir, recipe.filename));
-            recipe.build_target (Path.get_basename (target));
-            return;
+            return recipe.build_target (Path.get_basename (target));
         }
 
         /* Find a for this target */
@@ -772,20 +771,24 @@ public class Recipe
             /* If it's already there then don't need to do anything */
             var path = Path.build_filename (dirname, target);
             if (FileUtils.test (path, FileTest.EXISTS))
-                return;
+                return false;
 
             /* If doesn't exist then we can't continue */
             throw new BuildError.NO_RULE ("No rule to build '%s'", get_relative_path (original_dir, target));
         }
 
         /* Check the inputs first */
+        var force_build = false;
         foreach (var input in rule.inputs)
-            build_target (input);
+        {
+            if (build_target (input))
+                force_build = true;
+        }
 
         /* Don't bother if it's already up to date */
         change_directory (dirname);
-        if (!rule.needs_build ())
-            return;
+        if (!force_build && !rule.needs_build ())
+            return false;
 
         /* If we're about to do something then note which directory we are in and what we're building */
         if (rule.get_commands () != null)
@@ -793,6 +796,8 @@ public class Recipe
 
         /* Run the commands */
         rule.build ();
+
+        return true;
     }
 
     public void print ()
