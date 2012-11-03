@@ -1,3 +1,7 @@
+Overview of changes in bake 0.1.2
+
+    * Fix 'newer' test failing on filesystems without sub-second timestamps
+
 Overview of changes in bake 0.1.1
 
     * Distribute test data files
