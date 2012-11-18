@@ -142,14 +142,6 @@ public class GCCModule : BuildModule
         var cflags = recipe.get_variable ("%s.%s.compile-flags".printf (type_name, name), "");
         var ldflags = recipe.get_variable ("%s.%s.link-flags".printf (type_name, name), "");
 
-        /* Pass build variables to the program/library */
-        var defines = recipe.get_variable_children ("%s.%s.defines".printf (type_name, name));
-        foreach (var define in defines)
-        {
-            var value = recipe.get_variable ("%s.%s.defines.%s".printf (type_name, name, define));
-            cflags += " -D%s=\\\"%s\\\"".printf (define, value);
-        }
-
         /* Get dependencies */
         var packages = recipe.get_variable ("%s.%s.packages".printf (type_name, name), "");
         var package_list = split_variable (packages);

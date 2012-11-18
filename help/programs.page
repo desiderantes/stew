@@ -44,10 +44,6 @@ The following variables are allowed:
   <td><p>File to use as the icon for this program</p></td>
 </tr>
 <tr>
-  <td><p>defines</p></td>
-  <td><p>Values to provide to ... FIXME</p></td>
-</tr>
-<tr>
   <td><p>gettext-domain</p></td>
   <td><p>Translation domain to use for translatable strings</p></td>
 </tr>
