@@ -191,34 +191,19 @@ public class ValaModule : BuildModule
 
             if (pkg_config_list != "")
             {
-                int exit_status;
+                var f = new PkgConfigFile.local ("", pkg_config_list);
+                string pkg_config_cflags;
+                string pkg_config_libs;
                 try
                 {
-                    string pkg_config_cflags;
-                    Process.spawn_command_line_sync ("pkg-config --cflags %s".printf (pkg_config_list), out pkg_config_cflags, null, out exit_status);
-                    cflags += " %s".printf (pkg_config_cflags.strip ());
+                    f.generate_flags (out pkg_config_cflags, out pkg_config_libs);
+                    cflags += " %s".printf (pkg_config_cflags);
+                    ldflags += " %s".printf (pkg_config_libs);
                 }
-                catch (SpawnError e)
+                catch (FileError e)
                 {
                     return false;
                 }
-                if (exit_status != 0)
-                {
-                    printerr ("Packages %s not available", pkg_config_list);
-                    return false;
-                }
-                try
-                {
-                    string pkg_config_ldflags;
-                    Process.spawn_command_line_sync ("pkg-config --libs %s".printf (pkg_config_list), out pkg_config_ldflags, null, out exit_status);
-                    ldflags += " %s".printf (pkg_config_ldflags.strip ());
-                }
-                catch (SpawnError e)
-                {
-                    return false;
-                }
-                if (exit_status != 0)
-                    return false;
             }
         }
 

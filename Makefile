@@ -29,7 +29,8 @@ SOURCES = src/bake.vala \
           src/module-rpm.vala \
           src/module-test.vala \
           src/module-vala.vala \
-          src/module-xzip.vala
+          src/module-xzip.vala \
+          src/pkg-config.vala
 
 bake-bootstrap: $(SOURCES)
 	valac -o bake-bootstrap $(PACKAGES) --Xcc='-DGETTEXT_PACKAGE="C"' --Xcc='-DVERSION="0.0.bootstrap"' $(SOURCES)
