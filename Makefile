@@ -1,11 +1,11 @@
 all: bake-bootstrap
-	./bake-bootstrap
+	PATH=`pwd`:$$PATH ./bake-bootstrap
 
 PACKAGES = --pkg=glib-2.0 \
            --pkg=gio-2.0 \
            --pkg=posix
 SOURCES = src/bake.vala \
-          src/config.vapi \
+          src/config-bootstrap.vala \
           src/fixes.vapi \
           src/module-bzip.vala \
           src/module-bzr.vala \
@@ -27,24 +27,28 @@ SOURCES = src/bake.vala \
           src/module-python.vala \
           src/module-release.vala \
           src/module-rpm.vala \
+          src/module-template.vala \
           src/module-test.vala \
           src/module-vala.vala \
           src/module-xzip.vala \
           src/pkg-config.vala
 
-bake-bootstrap: $(SOURCES)
-	valac -o bake-bootstrap $(PACKAGES) --Xcc='-DGETTEXT_PACKAGE="C"' --Xcc='-DVERSION="0.0.bootstrap"' $(SOURCES)
+bake-template: src/bake-template.vala
+	valac -o bake-template --pkg=posix src/bake-template.vala
+
+bake-bootstrap: $(SOURCES) bake-template
+	valac -o bake-bootstrap $(PACKAGES) --Xcc='-DGETTEXT_PACKAGE="C"' $(SOURCES)
 
 install: bake-bootstrap
-	./bake-bootstrap install
+	PATH=`pwd`:$$PATH ./bake-bootstrap install
 
 test: bake-bootstrap
-	./bake-bootstrap test
+	PATH=`pwd`:$$PATH ./bake-bootstrap test
 
 release: bake-bootstrap
-	./bake-bootstrap tag-bzr
-	./bake-bootstrap release-launchpad
+	PATH=`pwd`:$$PATH ./bake-bootstrap tag-bzr
+	PATH=`pwd`:$$PATH ./bake-bootstrap release-launchpad
 
 clean: bake-bootstrap
-	./bake-bootstrap clean
+	PATH=`pwd`:$$PATH ./bake-bootstrap clean
 	rm bake-bootstrap

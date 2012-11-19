@@ -216,7 +216,7 @@ public class Rule
             if (Process.if_signaled (exit_status))
                 throw new BuildError.COMMAND_FAILED ("Build stopped with signal %d", Process.term_sig (exit_status));
             if (Process.if_exited (exit_status) && Process.exit_status (exit_status) != 0)
-                throw new BuildError.COMMAND_FAILED ("Build stopped with return value %d", Process.exit_status (exit_status));               
+                throw new BuildError.COMMAND_FAILED ("Build stopped with return value %d", Process.exit_status (exit_status));
         }
 
         foreach (var output in outputs)
@@ -991,7 +991,7 @@ public class Bake
 
         var context = new OptionContext (/* Arguments and description for --help text */
                                          _("[TARGET] - Build system"));
-        context.add_main_entries (options, Config.GETTEXT_PACKAGE);
+        context.add_main_entries (options, GETTEXT_PACKAGE);
         try
         {
             context.parse (ref args);
@@ -1007,7 +1007,7 @@ public class Bake
         if (show_version)
         {
             /* Note, not translated so can be easily parsed */
-            stderr.printf ("bake %s\n", Config.VERSION);
+            stderr.printf ("bake %s\n", VERSION);
             return Posix.EXIT_SUCCESS;
         }
 
@@ -1033,6 +1033,7 @@ public class Bake
         modules.append (new PythonModule ());
         modules.append (new ReleaseModule ());
         modules.append (new RPMModule ());
+        modules.append (new TemplateModule ());
         modules.append (new TestModule ());
         modules.append (new ValaModule ());
         modules.append (new XZIPModule ());

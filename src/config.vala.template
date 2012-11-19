@@ -1,0 +1,2 @@
+public const string VERSION = "%VERSION%";
+public extern const string GETTEXT_PACKAGE;

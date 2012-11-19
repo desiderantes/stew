@@ -2,6 +2,8 @@
 ./bake-bootstrap
 ./Recipe.conf
 src/bake
+src/bake-template
+src/config.vala
 tests/src/gcc
 tests/src/cp
 tests/src/install
