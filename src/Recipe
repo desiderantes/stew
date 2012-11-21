@@ -1,5 +1,5 @@
 templates.config.files = config.vala
-templates.config.variables = %VERSION%=$(package.version)
+templates.config.variables = %VERSION%=$(package.version) %LIBRARY_DIRECTORY%=$(library-directory)
 
 programs.bake-template.sources = bake-template.vala
 programs.bake-template.packages = posix glib-2.0 gobject-2.0
