@@ -52,6 +52,6 @@ release: bake-bootstrap
 release-gzip: bake-bootstrap
 	PATH=`pwd`:$$PATH ./bake-bootstrap release-gzip
 
-clean: bake-bootstrap
-	PATH=`pwd`:$$PATH ./bake-bootstrap clean
-	rm bake-bootstrap bake-template
+clean:
+	if [ -e bake-bootstrap ] ; then PATH=`pwd`:$$PATH ./bake-bootstrap clean ; rm -f bake-bootstrap bake-template ; fi
+
