@@ -21,7 +21,7 @@ public class PythonModule : BuildModule
             return false;
 
         var python_cache_dir = "__pycache__";
-        var install_sources = recipe.get_variable ("programs.%s.install-sources".printf (id)) == "true";
+        var install_sources = recipe.get_boolean_variable ("programs.%s.install-sources".printf (id));
         var main_file = "";
         foreach (var source in sources)
         {
@@ -93,7 +93,7 @@ public class PythonModule : BuildModule
             return false;
 
         var install_directory = recipe.get_variable ("libraries.%s.install-directory".printf (library));
-        var install_sources = recipe.get_variable ("libraries.%s.install-sources".printf (library)) == "true";
+        var install_sources = recipe.get_boolean_variable ("libraries.%s.install-sources".printf (library));
         if (install_directory == null)
         {
             var version = get_version ();

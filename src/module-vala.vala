@@ -4,11 +4,13 @@ public class ValaModule : BuildModule
     {
         var name = recipe.get_variable ("programs.%s.name".printf (id), id);
         var binary_name = name;
+        var do_install = recipe.get_boolean_variable ("programs.%s.install".printf (id));
 
         if (!generate_compile_rules (recipe, "programs", id, binary_name))
             return false;
 
-        recipe.add_install_rule (binary_name, recipe.binary_directory);
+        if (do_install)
+            recipe.add_install_rule (binary_name, recipe.binary_directory);
 
         generate_gettext_rules (recipe, "programs", id);
 
@@ -23,6 +25,7 @@ public class ValaModule : BuildModule
         if (index > 0)
             major_version = version.substring (0, index);
 
+        var do_install = recipe.get_boolean_variable ("libraries.%s.install".printf (library));
         var namespace = recipe.get_variable ("libraries.%s.namespace".printf (library));
 
         var binary_name = "lib%s.so.%s".printf (library, version);
@@ -37,8 +40,11 @@ public class ValaModule : BuildModule
         rule.add_output (unversioned_binary_name);
         rule.add_status_command ("LINK %s".printf (unversioned_binary_name));
         rule.add_command ("@ln -s %s %s".printf (binary_name, unversioned_binary_name));
-        recipe.add_install_rule (unversioned_binary_name, recipe.library_directory);
-        recipe.add_install_rule (binary_name, recipe.library_directory);
+        if (do_install)
+        {
+            recipe.add_install_rule (unversioned_binary_name, recipe.library_directory);
+            recipe.add_install_rule (binary_name, recipe.library_directory);
+        }
 
         /* Generate pkg-config file */
         var filename = "%s-%s.pc".printf (library, major_version);
@@ -59,23 +65,27 @@ public class ValaModule : BuildModule
         rule.add_command ("@echo \"Libs: -L%s -l%s\" >> %s".printf (recipe.library_directory, library, filename));
         rule.add_command ("@echo \"Cflags: -I%s\" >> %s".printf (include_directory, filename));
 
-        recipe.add_install_rule (filename, Path.build_filename (recipe.library_directory, "pkgconfig"));
+        if (do_install)
+            recipe.add_install_rule (filename, Path.build_filename (recipe.library_directory, "pkgconfig"));
 
         var h_filename = "%s.h".printf (name);
         recipe.build_rule.add_input (h_filename);
-        recipe.add_install_rule (h_filename, include_directory);
+        if (do_install)
+            recipe.add_install_rule (h_filename, include_directory);
 
         var vapi_filename = "%s-%s.vapi".printf (name, major_version);
         recipe.build_rule.add_input (vapi_filename);
         var vapi_directory = Path.build_filename (recipe.data_directory, "vala", "vapi");
-        recipe.add_install_rule (vapi_filename, vapi_directory);
+        if (do_install)
+            recipe.add_install_rule (vapi_filename, vapi_directory);
 
         /* Build a typelib */
         if (namespace != null)
         {
             var gir_filename = "%s-%s.gir".printf (namespace, major_version);
             var gir_directory = Path.build_filename (recipe.data_directory, "gir-1.0");
-            recipe.add_install_rule (gir_filename, gir_directory);
+            if (do_install)
+                recipe.add_install_rule (gir_filename, gir_directory);
 
             var typelib_filename = "%s-%s.typelib".printf (name, major_version);
             recipe.build_rule.add_input (typelib_filename);
@@ -86,7 +96,8 @@ public class ValaModule : BuildModule
             typelib_rule.add_status_command ("G-IR-COMPILER %s".printf (typelib_filename));
             typelib_rule.add_command ("@g-ir-compiler --shared-library=%s %s -o %s".printf (name, gir_filename, typelib_filename));
             var typelib_directory = Path.build_filename (recipe.library_directory, "girepository-1.0");
-            recipe.add_install_rule (typelib_filename, typelib_directory);
+            if (do_install)
+                recipe.add_install_rule (typelib_filename, typelib_directory);
         }
 
         generate_gettext_rules (recipe, "libraries", library);

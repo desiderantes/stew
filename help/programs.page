@@ -24,6 +24,10 @@ The following variables are allowed:
   <td><p>The files that make up this program (required)</p></td>
 </tr>
 <tr>
+  <td><p>install</p></td>
+  <td><p>If this program should be installed into the system (defaults to true)</p></td>
+</tr>
+<tr>
   <td><p>install-directory</p></td>
   <td><p>Directory to install the program to</p></td>
 </tr>

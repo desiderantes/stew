@@ -454,6 +454,11 @@ public class Recipe
         return value;
     }
 
+    public bool get_boolean_variable (string name)
+    {
+        return get_variable (name) == "true";
+    }
+
     public List<string> get_variable_children (string name)
     {
         var children = new List<string> ();

@@ -4,6 +4,7 @@ Overview of changes in bake 0.1.4
     * Fix config-bootstrap not being distributed
     * Don't build bake-bootstrap on make clean
     * Set pkg-config path correctly to use library-directory variable
+    * Add programs.*.install and libraries.*.install boolean value
 
 Overview of changes in bake 0.1.3
 

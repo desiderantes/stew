@@ -4,7 +4,8 @@ public class GCCModule : BuildModule
     {
         var name = recipe.get_variable ("programs.%s.name".printf (id), id);
         var binary_name = name;
-        return generate_compile_rules (recipe, "programs", id, binary_name);
+        var do_install = recipe.get_boolean_variable ("programs.%s.install".printf (id));
+        return generate_compile_rules (recipe, "programs", id, binary_name, null, false, do_install);
     }
 
     public override bool generate_library_rules (Recipe recipe, string library)
@@ -15,9 +16,11 @@ public class GCCModule : BuildModule
         if (index > 0)
             major_version = version.substring (0, index);
 
+        var do_install = recipe.get_boolean_variable ("libraries.%s.install".printf (library));
+
         var binary_name = "lib%s.so.%s".printf (library, version);
         var namespace = recipe.get_variable ("libraries.%s.namespace".printf (library));
-        if (!generate_compile_rules (recipe, "libraries", library, binary_name, namespace, true))
+        if (!generate_compile_rules (recipe, "libraries", library, binary_name, namespace, true, do_install))
             return false;
 
         /* Generate a symbolic link to the library and install both the link and the library */
@@ -105,7 +108,7 @@ public class GCCModule : BuildModule
         return true;        
     }
 
-    private bool generate_compile_rules (Recipe recipe, string type_name, string name, string binary_name, string? namespace = null, bool is_library = false)
+    private bool generate_compile_rules (Recipe recipe, string type_name, string name, string binary_name, string? namespace = null, bool is_library = false, bool do_install = true)
     {
         var source_list = recipe.get_variable ("%s.%s.sources".printf (type_name, name));
         if (source_list == null)
@@ -224,10 +227,13 @@ public class GCCModule : BuildModule
         link_command += " " + ldflags;
         link_rule.add_command (link_command);
 
-        if (is_library)
-            recipe.add_install_rule (binary_name, recipe.library_directory);
-        else
-            recipe.add_install_rule (binary_name, recipe.binary_directory);
+        if (do_install)
+        {
+            if (is_library)
+                recipe.add_install_rule (binary_name, recipe.library_directory);
+            else
+                recipe.add_install_rule (binary_name, recipe.binary_directory);
+        }
 
         var gettext_domain = recipe.get_variable ("%s.%s.gettext-domain".printf (type_name, name));
         if (gettext_domain != null && gettext_language != null)

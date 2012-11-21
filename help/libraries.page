@@ -28,6 +28,10 @@ The following variables are allowed:
   <td><p>The version of the library</p></td>
 </tr>
 <tr>
+  <td><p>install</p></td>
+  <td><p>If this library should be installed into the system (defaults to true)</p></td>
+</tr>
+<tr>
   <td><p>install-directory</p></td>
   <td><p>Directory to install the library to</p></td>
 </tr>
