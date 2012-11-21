@@ -454,9 +454,9 @@ public class Recipe
         return value;
     }
 
-    public bool get_boolean_variable (string name)
+    public bool get_boolean_variable (string name, bool fallback = false)
     {
-        return get_variable (name) == "true";
+        return get_variable (name, fallback ? "true" : "false") == "true";
     }
 
     public List<string> get_variable_children (string name)

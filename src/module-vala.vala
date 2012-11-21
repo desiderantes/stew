@@ -4,7 +4,7 @@ public class ValaModule : BuildModule
     {
         var name = recipe.get_variable ("programs.%s.name".printf (id), id);
         var binary_name = name;
-        var do_install = recipe.get_boolean_variable ("programs.%s.install".printf (id));
+        var do_install = recipe.get_boolean_variable ("programs.%s.install".printf (id), true);
 
         if (!generate_compile_rules (recipe, "programs", id, binary_name))
             return false;
@@ -25,7 +25,7 @@ public class ValaModule : BuildModule
         if (index > 0)
             major_version = version.substring (0, index);
 
-        var do_install = recipe.get_boolean_variable ("libraries.%s.install".printf (library));
+        var do_install = recipe.get_boolean_variable ("libraries.%s.install".printf (library), true);
         var namespace = recipe.get_variable ("libraries.%s.namespace".printf (library));
 
         var binary_name = "lib%s.so.%s".printf (library, version);
