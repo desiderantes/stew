@@ -49,6 +49,9 @@ release: bake-bootstrap
 	PATH=`pwd`:$$PATH ./bake-bootstrap tag-bzr
 	PATH=`pwd`:$$PATH ./bake-bootstrap release-launchpad
 
+release-gzip: bake-bootstrap
+	PATH=`pwd`:$$PATH ./bake-bootstrap release-gzip
+
 clean: bake-bootstrap
 	PATH=`pwd`:$$PATH ./bake-bootstrap clean
-	rm bake-bootstrap
+	rm bake-bootstrap bake-template

@@ -1,3 +1,8 @@
+Overview of changes in bake 0.1.4
+
+    * Fix make clean not removing bake-template
+    * Fix config-bootstrap not being distributed
+
 Overview of changes in bake 0.1.3
 
     * Add a templating system
