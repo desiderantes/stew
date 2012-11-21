@@ -1,2 +1,3 @@
 public const string VERSION = "%VERSION%";
+public const string LIBRARY_DIRECTORY = "%LIBRARY_DIRECTORY%";
 public extern const string GETTEXT_PACKAGE;

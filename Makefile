@@ -37,7 +37,7 @@ bake-template: src/bake-template.vala
 	valac -o bake-template --pkg=posix src/bake-template.vala
 
 bake-bootstrap: $(SOURCES) bake-template
-	valac -o bake-bootstrap $(PACKAGES) --Xcc='-DGETTEXT_PACKAGE="C"' $(SOURCES)
+	valac -o bake-bootstrap $(PACKAGES) --Xcc='-DGETTEXT_PACKAGE="C"' --Xcc='-DLIBRARY_DIRECTORY="$(LIBRARY_DIRECTORY)"' $(SOURCES)
 
 install: bake-bootstrap
 	PATH=`pwd`:$$PATH ./bake-bootstrap install

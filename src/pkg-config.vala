@@ -59,7 +59,7 @@ public class PkgConfigFile
     {
         this (id);
 
-        var dir_list = "/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/share/pkgconfig";
+        var dir_list = "%s/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/share/pkgconfig".printf (LIBRARY_DIRECTORY);
         var custom_dir_list = Environment.get_variable ("PKG_CONFIG_PATH");
         if (custom_dir_list != null)
             dir_list = "%s:%s".printf (custom_dir_list, dir_list);
