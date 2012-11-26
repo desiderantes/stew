@@ -1,0 +1,72 @@
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="templates">
+<info>
+    <link type="guide" xref="index#recipes"/>
+</info>
+
+<title>Templates</title>
+
+<p>
+A <em>template</em> is a file that Bake uses to generate another file by substituting text.
+Templates are useful when you need to make use of build variables in your source code.
+</p>
+<p>
+To specify a template you need to set <code>templates.<em>name</em>.*</code> <link xref="variables">variables</link> where <em>name</em> is a unique name for the template.
+The following variables are allowed:
+</p>
+<table frame="all" shade="rows">
+<thead>
+<tr>
+  <td><p>Name</p></td>
+  <td><p>Description</p></td>
+</tr>
+</thead>
+<tr>
+  <td><p>files</p></td>
+  <td><p>Files to generate. Each file will be generated from a template with the same name and a suffix of <file>.template</file>.</p>
+  </td>
+</tr>
+<tr>
+  <td><p>variables</p></td>
+  <td><p>Values to substitute when generating in the format <code><em>NAME</em>=<em>VALUE</em></code> separated by whitespace.</p></td>
+</tr>
+</table>
+<p>
+Names can contain any non-whitespace characters except <code>=</code> or single or double quotes.
+Values can contain any characters.
+If the value contains whitespace then surround the whole name value pair with quotes, e.g. <code>"numbers=1 2 3"</code>.
+</p>
+<note>
+<p>
+No naming scheme is suggested for variables names as it is highly dependent on the format of the file you are generating.
+Pick something that is unlikely to be used in that file format.
+</p>
+</note>
+<example>
+<p>
+For example a C program might require the location where data files are installed.
+To make this location available as C string a header file can be generated from the file <file>config.h.template</file>:
+</p>
+<code>
+#define DATA_DIRECTORY="%DATA_DIRECTORY%"
+</code>
+<p>
+With the following rules:.
+</p>
+<code>
+templates.example.files = config.h
+templates.example.variables = %DATA_DIRECTORY%=$(data-directory)
+</code>
+<p>
+Bake will generate a <file>config.h</file> like:
+</p>
+<code>
+#define DATA_DIRECTORY="/usr/share/example"
+</code>
+</example>
+<note>
+<p>
+Bake templates are quite simple and don't allow complicated substitutions.
+If this is required consider making a <link xref="rules">custom rule</link> that uses another tool like <code>sed</code> or <code>awk</code>.
+</p>
+</note>
+</page>
