@@ -1,0 +1,11 @@
+!bake
+gmcs -out:test.exe test.cs
+mkdir -p .built
+(exit SUCCESS)
+!bake install
+(exit SUCCESS)
+!bake clean
+rm -f test.exe
+rm -f test
+rm -rf .built/
+(exit SUCCESS)

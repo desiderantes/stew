@@ -1,0 +1,4 @@
+package.name = test
+
+programs.test.sources = Test.java
+programs.test.install = false

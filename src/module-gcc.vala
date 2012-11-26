@@ -31,18 +31,18 @@ public class GCCModule : BuildModule
         rule.add_output (unversioned_binary_name);
         rule.add_status_command ("LINK %s".printf (unversioned_binary_name));
         rule.add_command ("@ln -s %s %s".printf (binary_name, unversioned_binary_name));
-        recipe.add_install_rule (unversioned_binary_name, recipe.library_directory);
+        if (do_install)
+            recipe.add_install_rule (unversioned_binary_name, recipe.library_directory);
 
         /* Install headers */
         var include_directory = Path.build_filename (recipe.include_directory, "%s-%s".printf (library, major_version));
         var header_list = recipe.get_variable ("libraries.%s.headers".printf (library));
         var headers = new List<string> ();
-        if (header_list != null)
+        if (do_install && header_list != null)
         {
             headers = split_variable (header_list);
-            if (header_list != null)
-                foreach (var header in headers)
-                    recipe.add_install_rule (header, include_directory);
+            foreach (var header in headers)
+                recipe.add_install_rule (header, include_directory);
         }
 
         /* Generate pkg-config file */
@@ -60,7 +60,8 @@ public class GCCModule : BuildModule
         rule.add_command ("@echo \"Requires: %s\" >> %s".printf (requires, filename));
         rule.add_command ("@echo \"Libs: -L%s -l%s\" >> %s".printf (recipe.library_directory, library, filename));
         rule.add_command ("@echo \"Cflags: -I%s\" >> %s".printf (include_directory, filename));
-        recipe.add_install_rule (filename, Path.build_filename (recipe.library_directory, "pkgconfig"));
+        if (do_install)
+            recipe.add_install_rule (filename, Path.build_filename (recipe.library_directory, "pkgconfig"));
 
         /* Generate introspection */
         if (namespace != null)
@@ -90,7 +91,8 @@ public class GCCModule : BuildModule
             }
             gir_rule.add_command (scan_command);
             var gir_directory = Path.build_filename (recipe.data_directory, "gir-1.0");
-            recipe.add_install_rule (gir_filename, gir_directory);
+            if (do_install)
+                recipe.add_install_rule (gir_filename, gir_directory);
 
             /* Compile the .gir into a typelib */
             var typelib_filename = "%s-%s.typelib".printf (namespace, major_version);
@@ -102,7 +104,8 @@ public class GCCModule : BuildModule
             typelib_rule.add_status_command ("G-IR-COMPILER %s".printf (typelib_filename));
             typelib_rule.add_command ("@g-ir-compiler --shared-library=%s %s -o %s".printf (library, gir_filename, typelib_filename));
             var typelib_directory = Path.build_filename (recipe.library_directory, "girepository-1.0");
-            recipe.add_install_rule (typelib_filename, typelib_directory);
+            if (do_install)
+                recipe.add_install_rule (typelib_filename, typelib_directory);
         }
 
         return true;        

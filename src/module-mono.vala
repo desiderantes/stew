@@ -4,6 +4,7 @@ public class MonoModule : BuildModule
     {
         var name = recipe.get_variable ("programs.%s.name".printf (id), id);
         var binary_name = name;
+        var do_install = recipe.get_boolean_variable ("programs.%s.install".printf (id), true);
 
         var source_list = recipe.get_variable ("programs.%s.sources".printf (id));
         if (source_list == null)
@@ -30,7 +31,8 @@ public class MonoModule : BuildModule
         }
         rule.add_command (command);
         recipe.build_rule.add_input (exe_file);
-        recipe.add_install_rule (exe_file, recipe.package_data_directory);
+        if (do_install)
+            recipe.add_install_rule (exe_file, recipe.package_data_directory);
 
         var gettext_domain = recipe.get_variable ("programs.%s.gettext-domain".printf (id));
         if (gettext_domain != null)
@@ -55,7 +57,8 @@ public class MonoModule : BuildModule
         rule.add_command ("@echo 'exec mono %s' >> %s".printf (Path.build_filename (recipe.package_data_directory, exe_file), script));
         rule.add_command ("@chmod +x %s".printf (script));
         recipe.build_rule.add_input (script);
-        recipe.add_install_rule (script, recipe.binary_directory, binary_name);
+        if (do_install)
+            recipe.add_install_rule (script, recipe.binary_directory, binary_name);
 
         return true;
     }
@@ -71,6 +74,8 @@ public class MonoModule : BuildModule
         foreach (var source in sources)
             if (!source.has_suffix (".cs"))
                 return false;
+
+        var do_install = recipe.get_boolean_variable ("libraries.%s.install".printf (library), true);
                 
         if (Environment.find_program_in_path ("gmcs") == null)
             return false;        
@@ -87,7 +92,8 @@ public class MonoModule : BuildModule
         }
         rule.add_command (command);
         recipe.build_rule.add_input (dll_file);
-        recipe.add_install_rule (dll_file, Path.build_filename (recipe.library_directory, "cli", recipe.package_name));
+        if (do_install)
+            recipe.add_install_rule (dll_file, Path.build_filename (recipe.library_directory, "cli", recipe.package_name));
 
         var gettext_domain = recipe.get_variable ("libraries.%s.gettext-domain".printf (library));
         if (gettext_domain != null)

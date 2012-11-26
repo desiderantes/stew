@@ -1,0 +1,4 @@
+package.name = test
+
+programs.test.sources = test.cs
+programs.test.install = false

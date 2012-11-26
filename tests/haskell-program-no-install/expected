@@ -1,0 +1,11 @@
+!bake
+mkdir -p .built
+ghc -c test.hs -ohi .built/test.hi -o .built/test.o
+ghc -o test .built/test.o
+(exit SUCCESS)
+!bake install
+(exit SUCCESS)
+!bake clean
+rm -f test
+rm -rf .built/
+(exit SUCCESS)

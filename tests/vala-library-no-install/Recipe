@@ -1,0 +1,4 @@
+package.name = test
+
+libraries.test.sources = test.vala
+libraries.test.install = false

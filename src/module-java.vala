@@ -4,6 +4,7 @@ public class JavaModule : BuildModule
     {
         var name = recipe.get_variable ("programs.%s.name".printf (id), id);
         var binary_name = name;
+        var do_install = recipe.get_boolean_variable ("programs.%s.install".printf (id), true);
 
         if (Environment.find_program_in_path ("javac") == null || Environment.find_program_in_path ("jar") == null)
             return false;
@@ -50,7 +51,8 @@ public class JavaModule : BuildModule
 
         jar_rule.add_command (jar_command);
         recipe.build_rule.add_input (jar_file);
-        recipe.add_install_rule (jar_file, recipe.package_data_directory);
+        if (do_install)
+            recipe.add_install_rule (jar_file, recipe.package_data_directory);
 
         /* Script to run locally */
         rule = recipe.add_rule ();
@@ -68,7 +70,8 @@ public class JavaModule : BuildModule
         rule.add_command ("@echo 'exec java -jar %s' >> %s".printf (Path.build_filename (recipe.package_data_directory, jar_file), script));
         rule.add_command ("@chmod +x %s".printf (script));
         recipe.build_rule.add_input (script);
-        recipe.add_install_rule (script, recipe.binary_directory, binary_name);
+        if (do_install)
+            recipe.add_install_rule (script, recipe.binary_directory, binary_name);
 
         var gettext_domain = recipe.get_variable ("programs.%s.gettext-domain".printf (id));
         if (gettext_domain != null)
@@ -84,6 +87,8 @@ public class JavaModule : BuildModule
     {    
         if (Environment.find_program_in_path ("javac") == null || Environment.find_program_in_path ("jar") == null)
             return false;
+
+        var do_install = recipe.get_boolean_variable ("libraries.%s.install".printf (library), true);
 
         var source_list = recipe.get_variable ("libraries.%s.sources".printf (library));
         if (source_list == null)
@@ -124,7 +129,8 @@ public class JavaModule : BuildModule
 
         jar_rule.add_command (jar_command);
         recipe.build_rule.add_input (jar_file);
-        recipe.add_install_rule (jar_file, Path.build_filename (recipe.data_directory, "java"));
+        if (do_install)
+            recipe.add_install_rule (jar_file, Path.build_filename (recipe.data_directory, "java"));
 
         var gettext_domain = recipe.get_variable ("libraries.%s.gettext-domain".printf (library));
         if (gettext_domain != null)

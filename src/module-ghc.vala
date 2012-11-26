@@ -4,6 +4,7 @@ public class GHCModule : BuildModule
     {
         var name = recipe.get_variable ("programs.%s.name".printf (id), id);
         var binary_name = name;
+        var do_install = recipe.get_boolean_variable ("programs.%s.install".printf (id), true);
 
         var source_list = recipe.get_variable ("programs.%s.sources".printf (id));
         if (source_list == null)
@@ -41,7 +42,8 @@ public class GHCModule : BuildModule
         link_rule.add_status_command (link_pretty_command);
         link_rule.add_command (link_command);
 
-        recipe.add_install_rule (binary_name, recipe.binary_directory);
+        if (do_install)
+            recipe.add_install_rule (binary_name, recipe.binary_directory);
 
         return true;
     }

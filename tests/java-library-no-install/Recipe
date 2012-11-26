@@ -1,0 +1,4 @@
+package.name = test
+
+libraries.test.sources = Test.java
+libraries.test.install = false

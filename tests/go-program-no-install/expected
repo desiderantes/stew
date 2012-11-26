@@ -1,0 +1,11 @@
+!bake
+mkdir -p .built
+gccgo -c test.go -o .built/test.o
+gccgo -o test .built/test.o
+(exit SUCCESS)
+!bake install
+(exit SUCCESS)
+!bake clean
+rm -f test
+rm -rf .built/
+(exit SUCCESS)

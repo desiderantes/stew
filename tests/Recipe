@@ -8,68 +8,114 @@ tests.test-success.command = ./src/test-runner test-success
 tests.test-success.data = test-success/expected test-success/Recipe
 tests.test-failure.command = ./src/test-runner test-failure
 tests.test-failure.data = test-failure/expected test-failure/Recipe
+
 tests.unknown-program.command = ./src/test-runner unknown-program
 tests.unknown-program.data = unknown-program/expected unknown-program/Recipe unknown-program/test.unknown
 tests.unknown-library.command = ./src/test-runner unknown-library
 tests.unknown-library.data = unknown-library/expected unknown-library/Recipe unknown-library/test.unknown
+
+# C tests
 tests.c-program-simple.command = ./src/test-runner c-program-simple
 tests.c-program-simple.data = c-program-simple/expected c-program-simple/Recipe c-program-simple/test.c
+tests.c-program-no-install.command = ./src/test-runner c-program-no-install
+tests.c-program-no-install.data = c-program-no-install/expected c-program-no-install/Recipe c-program-no-install/test.c
 tests.c-program-complex.command = ./src/test-runner c-program-complex
 tests.c-program-complex.data = c-program-complex/expected c-program-complex/Recipe c-program-complex/test1.c c-program-complex/test2.c c-program-complex/test3.c
 tests.c-library-simple.command = ./src/test-runner c-library-simple
 tests.c-library-simple.data = c-library-simple/expected c-library-simple/Recipe c-library-simple/test.c
+tests.c-library-no-install.command = ./src/test-runner c-library-no-install
+tests.c-library-no-install.data = c-library-no-install/expected c-library-no-install/Recipe c-library-no-install/test.c
 tests.c-library-complex.command = ./src/test-runner c-library-complex
 tests.c-library-complex.data = c-library-complex/expected c-library-complex/Recipe c-library-complex/test1.c c-library-complex/test2.c c-library-complex/test3.c c-library-complex/test.h
+
+# C++ tests
 tests.c++-program-simple.command = ./src/test-runner c++-program-simple
 tests.c++-program-simple.data = c++-program-simple/expected c++-program-simple/Recipe c++-program-simple/test.cpp
+tests.c++-program-no-install.command = ./src/test-runner c++-program-no-install
+tests.c++-program-no-install.data = c++-program-no-install/expected c++-program-no-install/Recipe c++-program-no-install/test.cpp
 tests.c++-program-complex.command = ./src/test-runner c++-program-complex
 tests.c++-program-complex.data = c++-program-complex/expected c++-program-complex/Recipe c++-program-complex/test1.cpp c++-program-complex/test2.cpp c++-program-complex/test3.cpp
 tests.c++-library-simple.command = ./src/test-runner c++-library-simple
 tests.c++-library-simple.data = c++-library-simple/expected c++-library-simple/Recipe c++-library-simple/test.cpp
+tests.c++-library-no-install.command = ./src/test-runner c++-library-no-install
+tests.c++-library-no-install.data = c++-library-no-install/expected c++-library-no-install/Recipe c++-library-no-install/test.cpp
 tests.c++-library-complex.command = ./src/test-runner c++-library-complex
 tests.c++-library-complex.data = c++-library-complex/expected c++-library-complex/Recipe c++-library-complex/test.h c++-library-complex/test1.cpp c++-library-complex/test2.cpp c++-library-complex/test3.cpp
+
+# C# tests
 tests.csharp-program-simple.command = ./src/test-runner csharp-program-simple
 tests.csharp-program-simple.data = csharp-program-simple/expected csharp-program-simple/Recipe csharp-program-simple/test.cs
+tests.csharp-program-no-install.command = ./src/test-runner csharp-program-no-install
+tests.csharp-program-no-install.data = csharp-program-no-install/expected csharp-program-no-install/Recipe csharp-program-no-install/test.cs
 tests.csharp-program-complex.command = ./src/test-runner csharp-program-complex
 tests.csharp-program-complex.data = csharp-program-complex/expected csharp-program-complex/Recipe csharp-program-complex/test1.cs csharp-program-complex/test2.cs csharp-program-complex/test3.cs
 tests.csharp-library-simple.command = ./src/test-runner csharp-library-simple
 tests.csharp-library-simple.data = csharp-library-simple/expected csharp-library-simple/Recipe csharp-library-simple/test.cs
+tests.csharp-library-no-install.command = ./src/test-runner csharp-library-no-install
+tests.csharp-library-no-install.data = csharp-library-no-install/expected csharp-library-no-install/Recipe csharp-library-no-install/test.cs
 tests.csharp-library-complex.command = ./src/test-runner csharp-library-complex
 tests.csharp-library-complex.data = csharp-library-complex/expected csharp-library-complex/Recipe csharp-library-complex/test1.cs csharp-library-complex/test2.cs csharp-library-complex/test3.cs
+
+# Vala tests
 tests.vala-program-simple.command = ./src/test-runner vala-program-simple
 tests.vala-program-simple.data = vala-program-simple/expected vala-program-simple/Recipe vala-program-simple/test.vala
+tests.vala-program-no-install.command = ./src/test-runner vala-program-no-install
+tests.vala-program-no-install.data = vala-program-no-install/expected vala-program-no-install/Recipe vala-program-no-install/test.vala
 tests.vala-program-complex.command = ./src/test-runner vala-program-complex
 tests.vala-program-complex.data = vala-program-complex/expected vala-program-complex/Recipe vala-program-complex/test1.vala vala-program-complex/test2.vala vala-program-complex/test3.vala
 tests.vala-library-simple.command = ./src/test-runner vala-library-simple
 tests.vala-library-simple.data = vala-library-simple/expected vala-library-simple/Recipe vala-library-simple/test.vala
+tests.vala-library-no-install.command = ./src/test-runner vala-library-no-install
+tests.vala-library-no-install.data = vala-library-no-install/expected vala-library-no-install/Recipe vala-library-no-install/test.vala
 tests.vala-library-complex.command = ./src/test-runner vala-library-complex
 tests.vala-library-complex.data = vala-library-complex/expected vala-library-complex/Recipe vala-library-complex/test1.vala vala-library-complex/test2.vala vala-library-complex/test3.vala
+
+# Java tests
 tests.java-program-simple.command = ./src/test-runner java-program-simple
 tests.java-program-simple.data = java-program-simple/expected java-program-simple/Recipe java-program-simple/Test.java
+tests.java-program-no-install.command = ./src/test-runner java-program-no-install
+tests.java-program-no-install.data = java-program-no-install/expected java-program-no-install/Recipe java-program-no-install/Test.java
 tests.java-program-complex.command = ./src/test-runner java-program-complex
 tests.java-program-complex.data = java-program-complex/expected java-program-complex/Recipe java-program-complex/com/example/Test1.java java-program-complex/com/example/Test2.java java-program-complex/com/example/Test3.java
 tests.java-library-simple.command = ./src/test-runner java-library-simple
 tests.java-library-simple.data = java-library-simple/expected java-library-simple/Recipe java-library-simple/Test.java
+tests.java-library-no-install.command = ./src/test-runner java-library-no-install
+tests.java-library-no-install.data = java-library-no-install/expected java-library-no-install/Recipe java-library-no-install/Test.java
 tests.java-library-complex.command = ./src/test-runner java-library-complex
 tests.java-library-complex.data = java-library-complex/expected java-library-complex/Recipe java-library-complex/com/example/Test1.java java-library-complex/com/example/Test2.java java-library-complex/com/example/Test3.java
+
+# Python tests
 tests.python-program-simple.command = ./src/test-runner python-program-simple
 tests.python-program-simple.data = python-program-simple/expected python-program-simple/Recipe python-program-simple/test.py
+tests.python-program-no-install.command = ./src/test-runner python-program-no-install
+tests.python-program-no-install.data = python-program-no-install/expected python-program-no-install/Recipe python-program-no-install/test.py
 tests.python-program-complex.command = ./src/test-runner python-program-complex
 tests.python-program-complex.data = python-program-complex/expected python-program-complex/Recipe python-program-complex/test1.py python-program-complex/test2.py python-program-complex/test3.py
 tests.python3-program-simple.command = ./src/test-runner python3-program-simple
 tests.python3-program-simple.data = python3-program-simple/expected python3-program-simple/Recipe python3-program-simple/test.py
 tests.python-library-simple.command = ./src/test-runner python-library-simple
 tests.python-library-simple.data = python-library-simple/expected python-library-simple/Recipe python-library-simple/test.py
+tests.python-library-no-install.command = ./src/test-runner python-library-no-install
+tests.python-library-no-install.data = python-library-no-install/expected python-library-no-install/Recipe python-library-no-install/test.py
 tests.python-library-complex.command = ./src/test-runner python-library-complex
 tests.python-library-complex.data = python-library-complex/expected python-library-complex/Recipe python-library-complex/test1.py python-library-complex/test2.py python-library-complex/test3.py
+
+# Go tests
 tests.go-program-simple.command = ./src/test-runner go-program-simple
 tests.go-program-simple.data = go-program-simple/expected go-program-simple/Recipe go-program-simple/test.go
+tests.go-program-no-install.command = ./src/test-runner go-program-no-install
+tests.go-program-no-install.data = go-program-no-install/expected go-program-no-install/Recipe go-program-no-install/test.go
 tests.go-program-complex.command = ./src/test-runner go-program-complex
 tests.go-program-complex.data = go-program-complex/expected go-program-complex/Recipe go-program-complex/test1.go go-program-complex/test2.go go-program-complex/test3.go
+
+# Haskell tests
 tests.haskell-program-simple.command = ./src/test-runner haskell-program-simple
 tests.haskell-program-simple.data = haskell-program-simple/expected haskell-program-simple/Recipe haskell-program-simple/test.hs
+tests.haskell-program-no-install.command = ./src/test-runner haskell-program-no-install
+tests.haskell-program-no-install.data = haskell-program-no-install/expected haskell-program-no-install/Recipe haskell-program-no-install/test.hs
 tests.haskell-program-complex.command = ./src/test-runner haskell-program-complex
 tests.haskell-program-complex.data = haskell-program-complex/expected haskell-program-complex/Recipe haskell-program-complex/test1.hs haskell-program-complex/test2.hs haskell-program-complex/test3.hs
+
 tests.missing-input.command = ./src/test-runner missing-input
 tests.missing-input.data = missing-input/expected missing-input/Recipe
 tests.missing-output.command = ./src/test-runner missing-output

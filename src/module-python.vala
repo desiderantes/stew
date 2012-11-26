@@ -4,6 +4,7 @@ public class PythonModule : BuildModule
     {
         var name = recipe.get_variable ("programs.%s.name".printf (id), id);
         var binary_name = name;
+        var do_install = recipe.get_boolean_variable ("programs.%s.install".printf (id), true);
 
         var source_list = recipe.get_variable ("programs.%s.sources".printf (id));
         if (source_list == null)
@@ -44,9 +45,12 @@ public class PythonModule : BuildModule
             rule.add_command ("@%s -m py_compile %s".printf (python_bin, source));
             recipe.build_rule.add_input (output);
 
-            if (install_sources || (python_version >= "3.0"))
-                recipe.add_install_rule (source, recipe.package_data_directory);
-            recipe.add_install_rule (output, recipe.package_data_directory);
+            if (do_install)
+            {
+                if (install_sources || (python_version >= "3.0"))
+                    recipe.add_install_rule (source, recipe.package_data_directory);
+                recipe.add_install_rule (output, recipe.package_data_directory);
+            }
         }
 
         var gettext_domain = recipe.get_variable ("programs.%s.gettext-domain".printf (id));
@@ -74,7 +78,8 @@ public class PythonModule : BuildModule
         rule.add_command ("@echo 'exec %s %s' >> %s".printf (python_bin, Path.build_filename (recipe.package_data_directory, main_file), script));
         rule.add_command ("@chmod +x %s".printf (script));
         recipe.build_rule.add_input (script);
-        recipe.add_install_rule (script, recipe.binary_directory, binary_name);
+        if (do_install)
+            recipe.add_install_rule (script, recipe.binary_directory, binary_name);
             
         return true;
     }
@@ -91,6 +96,8 @@ public class PythonModule : BuildModule
 
         if (Environment.find_program_in_path ("python") == null)
             return false;
+
+        var do_install = recipe.get_boolean_variable ("libraries.%s.install".printf (library), true);
 
         var install_directory = recipe.get_variable ("libraries.%s.install-directory".printf (library));
         var install_sources = recipe.get_boolean_variable ("libraries.%s.install-sources".printf (library));
@@ -116,9 +123,12 @@ public class PythonModule : BuildModule
             rule.add_command ("@python -m py_compile %s".printf (source));
             recipe.build_rule.add_input (output);
 
-            if (install_sources)
-                recipe.add_install_rule (source, install_directory);
-            recipe.add_install_rule (output, install_directory);
+            if (do_install)
+            {
+                if (install_sources)
+                    recipe.add_install_rule (source, install_directory);
+                recipe.add_install_rule (output, install_directory);
+            }
         }
 
         var gettext_domain = recipe.get_variable ("libraries.%s.gettext-domain".printf (library));

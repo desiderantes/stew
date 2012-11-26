@@ -1,0 +1,11 @@
+!bake
+python --version
+python -m py_compile test.py
+(exit SUCCESS)
+!bake install
+python --version
+(exit SUCCESS)
+!bake clean
+python --version
+rm -f test.pyc
+(exit SUCCESS)

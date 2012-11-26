@@ -1,0 +1,4 @@
+package.name = test
+
+programs.test.sources = test.c
+programs.test.install = false

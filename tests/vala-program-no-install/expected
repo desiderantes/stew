@@ -1,0 +1,13 @@
+!bake
+mkdir -p .built
+valac --ccode test.vala
+touch .built/test.c-stamp
+gcc -Wno-unused -c .built/test.c -o .built/test.o
+gcc -o test .built/test.o
+(exit SUCCESS)
+!bake install
+(exit SUCCESS)
+!bake clean
+rm -f test
+rm -rf .built/
+(exit SUCCESS)

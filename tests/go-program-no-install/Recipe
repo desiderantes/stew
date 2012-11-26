@@ -1,0 +1,4 @@
+package.name = test
+
+programs.test.sources = test.go
+programs.test.install = false
