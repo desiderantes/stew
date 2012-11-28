@@ -139,6 +139,8 @@ public class GCCModule : BuildModule
         if (compiler == null)
             return false;
 
+        var is_qt = recipe.get_boolean_variable ("%s.%s.qt".printf (type_name, name));
+
         var link_rule = recipe.add_rule ();
         link_rule.add_output (binary_name);
         var link_command = "@%s -o %s".printf (compiler, binary_name);
@@ -200,6 +202,7 @@ public class GCCModule : BuildModule
             var input = source;
             var output = recipe.get_build_path (replace_extension (source, "o"));
             var deps_file = recipe.get_build_path (replace_extension (source, "d"));
+            var moc_file = replace_extension (source, "moc");
 
             var rule = recipe.add_rule ();
             rule.add_input (input);
@@ -208,6 +211,15 @@ public class GCCModule : BuildModule
                 var includes = get_includes (recipe, source);
                 foreach (var include in includes)
                     rule.add_input (include);
+            }
+            if (is_qt && input.has_suffix (".cpp"))
+            {
+                rule.add_input (moc_file);
+                var moc_rule = recipe.add_rule ();
+                moc_rule.add_input (input);
+                moc_rule.add_output (moc_file);
+                moc_rule.add_status_command ("MOC %s".printf (input));
+                moc_rule.add_command ("@moc -o %s %s".printf (moc_file, input));
             }
             rule.add_output (output);
             var command = "@%s".printf (compiler);
