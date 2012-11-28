@@ -170,7 +170,9 @@ public class GCCModule : BuildModule
                 }
 
                 /* Otherwise look for it externally */
-                pkg_config_list += " " + package;
+                if (pkg_config_list != "")
+                    pkg_config_list += " ";
+                pkg_config_list += package;
             }
                 
             if (pkg_config_list != "")
@@ -186,6 +188,7 @@ public class GCCModule : BuildModule
                 }
                 catch (FileError e)
                 {
+                    printerr ("Error loading package info %s: %s\n", pkg_config_list, e.message);
                     return false;
                 }
             }
