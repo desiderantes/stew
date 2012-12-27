@@ -1,0 +1,36 @@
+!bake
+moc -o test1.moc test1.cpp
+mkdir -p .built
+g++ -fPIC -MMD -MF .built/test1.d -c test1.cpp -o .built/test1.o
+moc -o test2.moc test2.cpp
+g++ -fPIC -MMD -MF .built/test2.d -c test2.cpp -o .built/test2.o
+moc -o test3.moc test3.cpp
+g++ -fPIC -MMD -MF .built/test3.d -c test3.cpp -o .built/test3.o
+g++ -o libtest.so.0 -shared .built/test1.o .built/test2.o .built/test3.o
+xgettext --extract-all --language=C++ --output=.built/test1.cpp.po test1.cpp
+touch .built/test1.cpp.po
+xgettext --extract-all --language=C++ --output=.built/test2.cpp.po test2.cpp
+touch .built/test2.cpp.po
+xgettext --extract-all --language=C++ --output=.built/test3.cpp.po test3.cpp
+touch .built/test3.cpp.po
+msgcat --force-po --output-file=test.pot .built/test1.cpp.po .built/test2.cpp.po .built/test3.cpp.po
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/local/lib
+install libtest.so.0 /usr/local/lib/libtest.so.0
+install libtest.so /usr/local/lib/libtest.so
+mkdir -p /usr/local/include/test-0
+install test.h /usr/local/include/test-0/test.h
+mkdir -p /usr/local/lib/pkgconfig
+install test-0.pc /usr/local/lib/pkgconfig/test-0.pc
+(exit SUCCESS)
+!bake clean
+rm -f libtest.so.0
+rm -f test1.moc
+rm -rf .built/
+rm -f test2.moc
+rm -f test3.moc
+rm -f test.pot
+rm -f libtest.so
+rm -f test-0.pc
+(exit SUCCESS)

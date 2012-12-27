@@ -1,0 +1,15 @@
+!bake
+moc -o test.moc test.cpp
+mkdir -p .built
+g++ -MMD -MF .built/test.d -c test.cpp -o .built/test.o
+g++ -o test .built/test.o
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/local/bin
+install test /usr/local/bin/test
+(exit SUCCESS)
+!bake clean
+rm -f test
+rm -f test.moc
+rm -rf .built/
+(exit SUCCESS)

@@ -42,6 +42,16 @@ tests.c++-library-no-install.data = c++-library-no-install/expected c++-library-
 tests.c++-library-complex.command = ./src/test-runner c++-library-complex
 tests.c++-library-complex.data = c++-library-complex/expected c++-library-complex/Recipe c++-library-complex/test.h c++-library-complex/test1.cpp c++-library-complex/test2.cpp c++-library-complex/test3.cpp
 
+# Qt tests
+tests.qt-program-simple.command = ./src/test-runner qt-program-simple
+tests.qt-program-simple.data = qt-program-simple/expected qt-program-simple/Recipe qt-program-simple/test.cpp
+tests.qt-program-complex.command = ./src/test-runner qt-program-complex
+tests.qt-program-complex.data = qt-program-complex/expected qt-program-complex/Recipe qt-program-complex/test1.cpp qt-program-complex/test2.cpp qt-program-complex/test3.cpp
+tests.qt-library-simple.command = ./src/test-runner qt-library-simple
+tests.qt-library-simple.data = qt-library-simple/expected qt-library-simple/Recipe qt-library-simple/test.cpp
+tests.qt-library-complex.command = ./src/test-runner qt-library-complex
+tests.qt-library-complex.data = qt-library-complex/expected qt-library-complex/Recipe qt-library-complex/test.h qt-library-complex/test1.cpp qt-library-complex/test2.cpp qt-library-complex/test3.cpp
+
 # C# tests
 tests.csharp-program-simple.command = ./src/test-runner csharp-program-simple
 tests.csharp-program-simple.data = csharp-program-simple/expected csharp-program-simple/Recipe csharp-program-simple/test.cs

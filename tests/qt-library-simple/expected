@@ -1,0 +1,20 @@
+!bake
+moc -o test.moc test.cpp
+mkdir -p .built
+g++ -fPIC -MMD -MF .built/test.d -c test.cpp -o .built/test.o
+g++ -o libtest.so.0 -shared .built/test.o
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/local/lib
+install libtest.so.0 /usr/local/lib/libtest.so.0
+install libtest.so /usr/local/lib/libtest.so
+mkdir -p /usr/local/lib/pkgconfig
+install test-0.pc /usr/local/lib/pkgconfig/test-0.pc
+(exit SUCCESS)
+!bake clean
+rm -f libtest.so.0
+rm -f test.moc
+rm -rf .built/
+rm -f libtest.so
+rm -f test-0.pc
+(exit SUCCESS)
