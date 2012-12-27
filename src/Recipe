@@ -27,6 +27,7 @@ programs.bake.sources = bake.vala \
                         module-python.vala \
                         module-release.vala \
                         module-rpm.vala \
+                        module-script.vala \
                         module-template.vala \
                         module-test.vala \
                         module-vala.vala \

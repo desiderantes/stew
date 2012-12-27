@@ -1,0 +1,3 @@
+package.name = test
+
+programs.test.install = true

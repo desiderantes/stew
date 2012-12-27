@@ -1,0 +1,20 @@
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="scripts">
+<info>
+    <link type="guide" xref="index#programs-and-libraries"/>
+</info>
+
+<title>Script Support</title>
+
+<p>
+Bake supports scripts (i.e. single file non-compiled) programs.
+Scripts can contain <link xref="programs">general program variables</link> except they have no sources defined.
+</p>
+<example>
+<p>
+The following shows a recipe for a script which is in the file <file>example-script</file>:
+</p>
+<code>
+programs.example-script.description = An example script program
+</code>
+</example>
+</page>

@@ -21,7 +21,7 @@ The following variables are allowed:
 </thead>
 <tr>
   <td><p>sources</p></td>
-  <td><p>The files that make up this program (required)</p></td>
+  <td><p>The files that make up this program</p></td>
 </tr>
 <tr>
   <td><p>install</p></td>

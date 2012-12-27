@@ -27,6 +27,7 @@ SOURCES = src/bake.vala \
           src/module-python.vala \
           src/module-release.vala \
           src/module-rpm.vala \
+          src/module-script.vala \
           src/module-template.vala \
           src/module-test.vala \
           src/module-vala.vala \

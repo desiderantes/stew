@@ -1038,6 +1038,7 @@ public class Bake
         modules.append (new PythonModule ());
         modules.append (new ReleaseModule ());
         modules.append (new RPMModule ());
+        modules.append (new ScriptModule ());
         modules.append (new TemplateModule ());
         modules.append (new TestModule ());
         modules.append (new ValaModule ());

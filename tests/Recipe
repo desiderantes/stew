@@ -14,6 +14,10 @@ tests.unknown-program.data = unknown-program/expected unknown-program/Recipe unk
 tests.unknown-library.command = ./src/test-runner unknown-library
 tests.unknown-library.data = unknown-library/expected unknown-library/Recipe unknown-library/test.unknown
 
+# Script test
+tests.script.command = ./src/test-runner script
+tests.script.data = script/expected script/Recipe script/test
+
 # C tests
 tests.c-program-simple.command = ./src/test-runner c-program-simple
 tests.c-program-simple.data = c-program-simple/expected c-program-simple/Recipe c-program-simple/test.c

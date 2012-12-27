@@ -24,6 +24,7 @@ data.mallard.bake.pages = building.page \
                           release-upload.page \
                           releasing.page \
                           rules.page \
+                          scripts.page \
                           templates.page \
                           testing.page \
                           tests.page \
