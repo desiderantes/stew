@@ -46,12 +46,11 @@ install: bake-bootstrap
 test: bake-bootstrap
 	PATH=`pwd`:$$PATH ./bake-bootstrap test
 
-release: bake-bootstrap
-	PATH=`pwd`:$$PATH ./bake-bootstrap tag-bzr
-	PATH=`pwd`:$$PATH ./bake-bootstrap release-launchpad
+release-test: bake-bootstrap
+	PATH=`pwd`:$$PATH ./bake-bootstrap release-test
 
-release-gzip: bake-bootstrap
-	PATH=`pwd`:$$PATH ./bake-bootstrap release-gzip
+release: bake-bootstrap
+	PATH=`pwd`:$$PATH ./bake-bootstrap release
 
 clean:
 	if [ -e bake-bootstrap ] ; then PATH=`pwd`:$$PATH ./bake-bootstrap clean ; rm -f bake-bootstrap bake-template ; fi

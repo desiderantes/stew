@@ -8,7 +8,6 @@ package.files = Makefile \
 
 data.man.pages = bake.1                
 
-%release: release-tarball release-ppa
+%release-test: test release-gzip
 
-%release-tarball: release-gzip
-    lp-project-upload bake $(package.version) $(gzip.release-filename)
+%release: test tag-bzr release-launchpad
