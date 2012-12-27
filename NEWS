@@ -1,3 +1,10 @@
+Overview of changes in bake 0.1.5
+
+    * Add support for scripts
+    * Add support for Qt
+    * Add *.*.install support for all modules
+    * Document templating system
+
 Overview of changes in bake 0.1.4
 
     * Fix make clean not removing bake-template
