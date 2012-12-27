@@ -17,6 +17,7 @@ data.mallard.bake.pages = building.page \
                           man.page \
                           programs.page \
                           python.page \
+                          qt.page \
                           recipe-files.page \
                           release-archive.page \
                           release-package.page \

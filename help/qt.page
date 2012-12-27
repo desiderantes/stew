@@ -1,0 +1,37 @@
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="qt">
+<info>
+    <link type="guide" xref="index#programs-and-libraries"/>
+</info>
+
+<title>Qt Support</title>
+
+<p>
+Bake supports Qt programs by automatically generating the required Meta Object Compiler (MOC) code.
+</p>
+<p>
+Qt programs and libraries can set the following program <link xref="variables">variables</link> in addition to the standard <link xref="c++">variables</link> to control compiling:
+</p>
+<table frame="all" shade="rows">
+<thead>
+<tr>
+  <td><p>Name</p></td>
+  <td><p>Description</p></td>
+</tr>
+</thead>
+<tr>
+  <td><p>qt</p></td>
+  <td><p>Set to true to enable MOC support</p></td>
+</tr>
+</table>
+<example>
+<p>
+The following shows a recipe for a two file Qt program:
+</p>
+<code>
+programs.example-program.sources = main.cpp module.cpp
+programs.example-program.qt = true
+programs.example-program.name = Example
+programs.example-program.description = An example Qt program
+</code>
+</example>
+</page>
