@@ -12,7 +12,7 @@ public class MallardModule : BuildModule
             foreach (var page in pages)
             {
                 // FIXME: Should validate page in build rule
-                var dir = "%s/help/%s".printf (recipe.data_directory, recipe.package_name);
+                var dir = "%s/help/C/%s".printf (recipe.data_directory, recipe.package_name);
                 recipe.add_install_rule (page, dir);
             }
         }

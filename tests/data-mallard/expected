@@ -1,9 +1,9 @@
 !bake
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/local/share/help/test
-install index.page /usr/local/share/help/test/index.page
-install test.page /usr/local/share/help/test/test.page
+mkdir -p /usr/local/share/help/C/test
+install index.page /usr/local/share/help/C/test/index.page
+install test.page /usr/local/share/help/C/test/test.page
 (exit SUCCESS)
 !bake clean
 (exit SUCCESS)
