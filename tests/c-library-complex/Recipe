@@ -3,4 +3,5 @@ package.name = test
 libraries.test.sources = test1.c test2.c test3.c
 libraries.test.headers = test.h
 libraries.test.gettext-domain = test
-libraries.test.link-flags = -Wl,--as-needed
+libraries.test.compile-flags = -DFOO=1
+libraries.test.link-flags = -lm

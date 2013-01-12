@@ -225,7 +225,8 @@ public class GCCModule : BuildModule
             var command = "@%s".printf (compiler);
             if (is_library)
                 command += " -fPIC";
-            command += cflags;
+            if (cflags != "")
+                command += " " + cflags;
             if (compiler == "gcc" || compiler == "g++")
             {
                 command += " -MMD -MF %s".printf (deps_file);

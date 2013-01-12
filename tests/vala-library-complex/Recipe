@@ -3,3 +3,5 @@ package.name = test
 libraries.test.sources = test1.vala test2.vala test3.vala
 libraries.test.gettext-domain = test
 libraries.test.vala-compile-flags = --target-glib 2.32
+libraries.test.compile-flags = -DFOO=1
+libraries.test.link-flags = -lm

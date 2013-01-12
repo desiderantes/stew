@@ -6,16 +6,16 @@ valac --fast-vapi=.built/test3.vapi test3.vala
 touch .built/test3.vapi-stamp
 valac --target-glib 2.32 --ccode test1.vala --use-fast-vapi=.built/test2.vapi --use-fast-vapi=.built/test3.vapi
 touch .built/test1.c-stamp
-gcc -Wno-unused -c .built/test1.c -o .built/test1.o
+gcc -Wno-unused -DFOO=1 -c .built/test1.c -o .built/test1.o
 valac --fast-vapi=.built/test1.vapi test1.vala
 touch .built/test1.vapi-stamp
 valac --target-glib 2.32 --ccode test2.vala --use-fast-vapi=.built/test1.vapi --use-fast-vapi=.built/test3.vapi
 touch .built/test2.c-stamp
-gcc -Wno-unused -c .built/test2.c -o .built/test2.o
+gcc -Wno-unused -DFOO=1 -c .built/test2.c -o .built/test2.o
 valac --target-glib 2.32 --ccode test3.vala --use-fast-vapi=.built/test1.vapi --use-fast-vapi=.built/test2.vapi
 touch .built/test3.c-stamp
-gcc -Wno-unused -c .built/test3.c -o .built/test3.o
-gcc -o test .built/test1.o .built/test2.o .built/test3.o
+gcc -Wno-unused -DFOO=1 -c .built/test3.c -o .built/test3.o
+gcc -o test .built/test1.o .built/test2.o .built/test3.o -lm
 xgettext --extract-all --language=C --keyword=_ --escape --output=.built/test1.vala.po test1.vala
 touch .built/test1.vala.po
 xgettext --extract-all --language=C --keyword=_ --escape --output=.built/test2.vala.po test2.vala
