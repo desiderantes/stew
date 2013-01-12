@@ -2,3 +2,4 @@ package.name = test
 
 programs.test.sources = test1.vala test2.vala test3.vala
 programs.test.gettext-domain = test
+programs.test.vala-compile-flags = --target-glib 2.32

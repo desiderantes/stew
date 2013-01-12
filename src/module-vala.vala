@@ -134,6 +134,9 @@ public class ValaModule : BuildModule
             return false;
 
         var valac_command = "@valac";
+        var valac_flags = recipe.get_variable ("%s.%s.vala-compile-flags".printf (type_name, name), "");
+        if (valac_flags != null)
+            valac_command += " " + valac_flags;
         var valac_inputs = new List<string> ();
         var link_rule = recipe.add_rule ();
         link_rule.add_output (binary_name);

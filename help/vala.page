@@ -23,12 +23,16 @@ Vala programs and libraries can set the following program <link xref="variables"
   <td><p>FIXME (libraries only)</p></td>
 </tr>
 <tr>
+  <td><p>vala-compile-flags</p></td>
+  <td><p>Additional command line flags passed to Vala compiler</p></td>
+</tr>
+<tr>
   <td><p>compile-flags</p></td>
-  <td><p>Additional command line flags to use when compiling</p></td>
+  <td><p>Additional command line flags passed to C compiler</p></td>
 </tr>
 <tr>
   <td><p>link-flags</p></td>
-  <td><p>Additional command line flags to use when linking</p></td>
+  <td><p>Additional command line flags passed to linker</p></td>
 </tr>
 </table>
 <example>
