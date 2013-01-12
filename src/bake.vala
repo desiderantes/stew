@@ -764,7 +764,7 @@ public class Recipe
                 stderr.printf ("Target %s defined in recipe %s\n",
                                get_relative_path (original_dir, Path.build_filename (dirname, target)),
                                get_relative_path (original_dir, recipe.filename));
-            return recipe.build_target (Path.get_basename (target));
+            return recipe.build_target (get_relative_path (recipe.dirname, Path.build_filename (dirname, target)));
         }
 
         /* Find a for this target */
