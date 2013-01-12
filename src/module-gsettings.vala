@@ -1,6 +1,6 @@
 public class GSettingsModule : BuildModule
 {
-    public override void generate_toplevel_rules (Recipe recipe)
+    public override void generate_rules (Recipe recipe)
     {
         var schemas_list = recipe.get_variable ("data.gsettings.schemas", null, false);
         if (schemas_list != null)
