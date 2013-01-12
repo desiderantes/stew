@@ -61,12 +61,14 @@ public class GettextModule : BuildModule
 
     public override void generate_rules (Recipe recipe)
     {
-        foreach (var gettext_domain in recipe.get_variable_children ("data.gettext"))
+        var data = recipe.get_variable_children ("data");
+        foreach (var data_type in data)
         {
-            var translation_list = recipe.get_variable ("data.gettext.%s.translations".printf (gettext_domain));
+            var translation_list = recipe.get_variable ("data.%s.gettext-translations".printf (data_type));
             if (translation_list == null)
                 continue;
 
+            var gettext_domain = data_type;
             foreach (var po_file in split_variable (translation_list))
             {
                 if (!po_file.has_suffix (".po"))

@@ -1,3 +1,3 @@
 package.name = test
 
-data.gettext.test.translations = de.po fr.po it.po
+data.test.gettext-translations = de.po fr.po it.po
