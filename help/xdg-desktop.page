@@ -1,0 +1,20 @@
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="xdg-desktop">
+<info>
+    <link type="guide" xref="index#data"/>
+</info>
+
+<title>XDG Desktop Files</title>
+
+<p>
+Graphical applications need to install an <em>XDG desktop file</em> that describes the application.
+The desktop file(s) need to be listed with the <code>data.<em>name</em>.xdg-desktop-files</code> <link xref="variables">variable</link>.
+</p>
+<example>
+<p>
+For example, this <link xref="recipe-files">recipe</link> specifies a desktop file to install.
+</p>
+<code>
+data.example.xdg-desktop-files = example.desktop
+</code>
+</example>
+</page>

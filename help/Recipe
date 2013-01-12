@@ -30,5 +30,6 @@ data.mallard.bake.pages = building.page \
                           tests.page \
                           translation.page \
                           vala.page \
-                          variables.page
+                          variables.page \
+                          xdg-desktop.page
 data.mallard.bake.gettext-domain = bake-help
