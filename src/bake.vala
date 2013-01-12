@@ -1021,7 +1021,6 @@ public class Bake
         modules.append (new BZIPModule ());
         modules.append (new BZRModule ());
         modules.append (new DataModule ());
-        modules.append (new DesktopModule ());
         modules.append (new DpkgModule ());
         modules.append (new GCCModule ());
         modules.append (new GettextModule ());
@@ -1042,6 +1041,7 @@ public class Bake
         modules.append (new TemplateModule ());
         modules.append (new TestModule ());
         modules.append (new ValaModule ());
+        modules.append (new XdgModule ());
         modules.append (new XZIPModule ());
 
         /* Find the toplevel */

@@ -1,0 +1,3 @@
+package.name = test
+
+data.xdg.desktop-files = test.desktop

@@ -10,7 +10,6 @@ SOURCES = src/bake.vala \
           src/module-bzip.vala \
           src/module-bzr.vala \
           src/module-data.vala \
-          src/module-desktop.vala \
           src/module-dpkg.vala \
           src/module-gcc.vala \
           src/module-gettext.vala \
@@ -31,6 +30,7 @@ SOURCES = src/bake.vala \
           src/module-template.vala \
           src/module-test.vala \
           src/module-vala.vala \
+          src/module-xdg.vala \
           src/module-xzip.vala \
           src/pkg-config.vala
 

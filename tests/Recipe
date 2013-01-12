@@ -153,6 +153,8 @@ tests.data-gettext.command = ./src/test-runner data-gettext
 tests.data-gettext.data = data-gettext/expected data-gettext/Recipe data-gettext/de.po data-gettext/fr.po data-gettext/it.po
 tests.data-gsettings.command = ./src/test-runner data-gsettings
 tests.data-gsettings.data = data-gsettings/expected data-gsettings/Recipe data-gsettings/com.example.Test.gschema.xml data-gsettings/test.convert data-gsettings/test.override
+tests.data-xdg.command = ./src/test-runner data-xdg
+tests.data-xdg.data = data-xdg/expected data-xdg/Recipe data-xdg/test.desktop
 
 # Release tests
 tests.release-gzip.command = ./src/test-runner release-gzip

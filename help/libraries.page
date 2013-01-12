@@ -50,7 +50,6 @@ The following describes a simple <link xref="c">C library</link> that is built f
 </p>
 <code>
 libraries.lib1.sources = lib1.c
-libraries.lib1.type = desktop
 </code>
 <p>
 When building Bake will compile lib1.c and produce the library <em>lib1</em>.

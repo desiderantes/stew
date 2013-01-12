@@ -40,10 +40,6 @@ The following variables are allowed:
   <td><p>A short description of this program</p></td>
 </tr>
 <tr>
-  <td><p>type</p></td>
-  <td><p>The type of this program</p></td>
-</tr>
-<tr>
   <td><p>icon</p></td>
   <td><p>File to use as the icon for this program</p></td>
 </tr>
@@ -56,36 +52,12 @@ The following variables are allowed:
 Bake will attempt to <link xref="building">build</link> your program by checking the filenames in the <code>sources</code> variable and generating the required <link xref="rules">rules</link>.
 Depending on what <link xref="index#programs-and-libraries">language</link> your program uses additional variables may be allowed.
 </p>
-<p>
-The following program types are known by Bake:
-</p>
-<table frame="all" shade="rows">
-<thead>
-<tr>
-  <td><p>Value</p></td>
-  <td><p>Description</p></td>
-</tr>
-</thead>
-<tr>
-  <td><p>terminal</p></td>
-  <td><p>A program intended to be run from a text terminal</p></td>
-</tr>
-<tr>
-  <td><p>desktop</p></td>
-  <td><p>A program run inside a GUI.</p></td>
-</tr>
-</table>
-<p>
-The type variable is optional, but if specified allows Bake to generate any additonal files require by the OS for this program.
-For desktop files a <file>.desktop</file> file is generated and installed describing the program.
-</p>
 <example>
 <p>
 The following describes a simple <link xref="c">C program</link> that is built from one C file:
 </p>
 <code>
 programs.example-program.sources = example-program.c
-programs.example-program.type = desktop
 </code>
 <p>
 When building Bake will compile example-program.c and produce the program <em>example-program</em>.

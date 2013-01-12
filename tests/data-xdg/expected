@@ -1,0 +1,8 @@
+!bake
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/local/share/applications
+install test.desktop /usr/local/share/applications/test.desktop
+(exit SUCCESS)
+!bake clean
+(exit SUCCESS)
