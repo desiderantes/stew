@@ -8,6 +8,6 @@ package.files = Makefile \
 
 data.man.pages = bake.1                
 
-%release-test: test release-gzip
+%release-test: test release-xzip
 
 %release: test tag-bzr release-launchpad
