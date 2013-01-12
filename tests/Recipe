@@ -14,6 +14,18 @@ tests.unknown-program.data = unknown-program/expected unknown-program/Recipe unk
 tests.unknown-library.command = ./src/test-runner unknown-library
 tests.unknown-library.data = unknown-library/expected unknown-library/Recipe unknown-library/test.unknown
 
+# Rule tests
+tests.missing-input.command = ./src/test-runner missing-input
+tests.missing-input.data = missing-input/expected missing-input/Recipe
+tests.missing-output.command = ./src/test-runner missing-output
+tests.missing-output.data = missing-output/expected missing-output/Recipe
+tests.multi-input.command = ./src/test-runner multi-input
+tests.multi-input.data = multi-input/expected multi-input/Recipe
+tests.newer.command = ./src/test-runner newer
+tests.newer.data = newer/expected newer/Recipe
+tests.rule.command = ./src/test-runner rule
+tests.rule.data = rule/expected rule/Recipe
+
 # Script test
 tests.script.command = ./src/test-runner script
 tests.script.data = script/expected script/Recipe script/test
@@ -130,16 +142,9 @@ tests.haskell-program-no-install.data = haskell-program-no-install/expected hask
 tests.haskell-program-complex.command = ./src/test-runner haskell-program-complex
 tests.haskell-program-complex.data = haskell-program-complex/expected haskell-program-complex/Recipe haskell-program-complex/test1.hs haskell-program-complex/test2.hs haskell-program-complex/test3.hs
 
-tests.missing-input.command = ./src/test-runner missing-input
-tests.missing-input.data = missing-input/expected missing-input/Recipe
-tests.missing-output.command = ./src/test-runner missing-output
-tests.missing-output.data = missing-output/expected missing-output/Recipe
-tests.multi-input.command = ./src/test-runner multi-input
-tests.multi-input.data = multi-input/expected multi-input/Recipe
-tests.newer.command = ./src/test-runner newer
-tests.newer.data = newer/expected newer/Recipe
-tests.rule.command = ./src/test-runner rule
-tests.rule.data = rule/expected rule/Recipe
+# Data tests
+tests.data-other.command = ./src/test-runner data-other
+tests.data-other.data = data-other/expected data-other/Recipe data-other/test
 tests.data-man.command = ./src/test-runner data-man
 tests.data-man.data = data-man/expected data-man/Recipe data-man/test.1
 tests.data-mallard.command = ./src/test-runner data-mallard
@@ -148,6 +153,8 @@ tests.data-gettext.command = ./src/test-runner data-gettext
 tests.data-gettext.data = data-gettext/expected data-gettext/Recipe data-gettext/de.po data-gettext/fr.po data-gettext/it.po
 tests.data-gsettings.command = ./src/test-runner data-gsettings
 tests.data-gsettings.data = data-gsettings/expected data-gsettings/Recipe data-gsettings/com.example.Test.gschema.xml data-gsettings/test.convert data-gsettings/test.override
+
+# Release tests
 tests.release-gzip.command = ./src/test-runner release-gzip
 tests.release-gzip.data = release-gzip/expected release-gzip/Recipe
 tests.release-bzip.command = ./src/test-runner release-bzip
