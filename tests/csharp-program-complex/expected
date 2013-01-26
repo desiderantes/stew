@@ -1,12 +1,9 @@
 !bake
 gmcs -out:test.exe test1.cs test2.cs test3.cs
 mkdir -p .built
-xgettext --language=C# --output=.built/test1.cs.po test1.cs
-touch .built/test1.cs.po
-xgettext --language=C# --output=.built/test2.cs.po test2.cs
-touch .built/test2.cs.po
-xgettext --language=C# --output=.built/test3.cs.po test3.cs
-touch .built/test3.cs.po
+bake-gettext --language C# --output .built/test1.cs.po test1.cs
+bake-gettext --language C# --output .built/test2.cs.po test2.cs
+bake-gettext --language C# --output .built/test3.cs.po test3.cs
 msgcat --force-po --output-file=test.pot .built/test1.cs.po .built/test2.cs.po .built/test3.cs.po
 (exit SUCCESS)
 !bake install

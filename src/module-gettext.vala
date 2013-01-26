@@ -29,13 +29,9 @@ public class GettextModule : BuildModule
         rule.add_output (translation_file);
         rule.add_input (filename);
         rule.add_status_command ("GETTEXT %s".printf (filename));
-        /* NOTE: We should use --force-po but that generates invalid .po files, so we touch the output in case no translations were made */
-        var xgettext_command = "@xgettext --language=%s --output=%s %s".printf (source_language, translation_file, filename);
-        /* Workaround since Vala is not supported */
-        if (source_language == "Vala")
-            xgettext_command = "@xgettext --language=C --from-code=UTF-8 --keyword=_ --escape --output=%s %s".printf (translation_file, filename);
-        rule.add_command (xgettext_command);
-        rule.add_command ("@touch %s".printf (translation_file));
+        // FIXME: Replace --language with --mime-type
+        var extract_command = "@bake-gettext --language %s --output %s %s".printf (source_language, translation_file, filename);
+        rule.add_command (extract_command);
 
         /* Combine translations into a pot file */
         // FIXME: Put translations into requested directories

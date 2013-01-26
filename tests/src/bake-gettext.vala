@@ -1,4 +1,4 @@
-public class XGettext
+public class BakeGettext
 {
     public static int main (string[] args)
     {
@@ -31,8 +31,8 @@ public class XGettext
 
         for (var i = 0; i < args.length; i++)
         {
-            if (args[i].has_prefix ("--output="))
-                create_file (args[i].substring (9));
+            if (args[i] == "--output")
+                create_file (args[i+1]);
         }
 
         return Posix.EXIT_SUCCESS;

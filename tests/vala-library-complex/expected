@@ -17,12 +17,9 @@ touch .built/test3.c-stamp
 gcc -Wno-unused -fPIC -DFOO=1 -c .built/test3.c -o .built/test3.o
 gcc -o libtest.so.0 -shared .built/test1.o .built/test2.o .built/test3.o -lm
 valac --target-glib 2.32 --ccode --header=test.h --vapi=test-0.vapi --library=test --use-fast-vapi=.built/test1.vapi --use-fast-vapi=.built/test2.vapi --use-fast-vapi=.built/test3.vapi
-xgettext --language=C --from-code=UTF-8 --keyword=_ --escape --output=.built/test1.vala.po test1.vala
-touch .built/test1.vala.po
-xgettext --language=C --from-code=UTF-8 --keyword=_ --escape --output=.built/test2.vala.po test2.vala
-touch .built/test2.vala.po
-xgettext --language=C --from-code=UTF-8 --keyword=_ --escape --output=.built/test3.vala.po test3.vala
-touch .built/test3.vala.po
+bake-gettext --language Vala --output .built/test1.vala.po test1.vala
+bake-gettext --language Vala --output .built/test2.vala.po test2.vala
+bake-gettext --language Vala --output .built/test3.vala.po test3.vala
 msgcat --force-po --output-file=test.pot .built/test1.vala.po .built/test2.vala.po .built/test3.vala.po
 (exit SUCCESS)
 !bake install
