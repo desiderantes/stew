@@ -4,10 +4,10 @@ python -m py_compile test1.py
 python -m py_compile test2.py
 python -m py_compile test3.py
 mkdir -p .built
-bake-gettext --language Python --output .built/test1.py.po test1.py
-bake-gettext --language Python --output .built/test2.py.po test2.py
-bake-gettext --language Python --output .built/test3.py.po test3.py
-msgcat --force-po --output-file=test.pot .built/test1.py.po .built/test2.py.po .built/test3.py.po
+bake-gettext --language Python --output .built/test1.py.pot test1.py
+bake-gettext --language Python --output .built/test2.py.pot test2.py
+bake-gettext --language Python --output .built/test3.py.pot test3.py
+msgcat --force-po --output-file=test.pot .built/test1.py.pot .built/test2.py.pot .built/test3.py.pot
 (exit SUCCESS)
 !bake install
 python --version

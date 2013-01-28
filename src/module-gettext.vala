@@ -24,7 +24,7 @@ public class GettextModule : BuildModule
     public static void add_translatable_file (Recipe recipe, string gettext_domain, string source_language, string filename)
     {
         /* Extract translations from this file */
-        var translation_file = recipe.get_build_path ("%s.po".printf (filename));
+        var translation_file = recipe.get_build_path ("%s.pot".printf (filename));
         var rule = recipe.add_rule ();
         rule.add_output (translation_file);
         rule.add_input (filename);
