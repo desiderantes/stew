@@ -1,8 +1,8 @@
 public static int main (string[] args)
 {
     var output_filename = "";
-    var language = "";
-    var files_to_translate = new List<string> ();
+    var mime_type = "";
+    string? filename = null;
     var valid_args = true;
     for (var i = 1; i < args.length; i++)
     {
@@ -16,11 +16,11 @@ public static int main (string[] args)
             else
                 valid_args = false;
         }
-        else if (args[i] == "--language")
+        else if (args[i] == "--mime-type")
         {
             if (i < args.length)
             {
-                language = args[i + 1];
+                mime_type = args[i + 1];
                 i++;
             }
             else
@@ -29,98 +29,99 @@ public static int main (string[] args)
         else if (args[i].has_prefix ("-"))
             valid_args = false;
         else
-            files_to_translate.append (args[i]);
+        {
+            if (filename != null)
+                valid_args = false;
+            filename = args[i];
+        }
     }
 
-    if (!valid_args || files_to_translate.length () == 0)
+    if (!valid_args || filename == null)
     {
-        stderr.printf ("Usage: %s [--language language] [--output output-file] files-to-translate...\n", args[0]);
+        stderr.printf ("Usage: %s [--output output-file] --mime-type mime-type file-to-translate\n", args[0]);
         return Posix.EXIT_FAILURE;
     }
 
     var translations = new Translations ();
 
-    foreach (var filename in files_to_translate)
+    string data = "";
+    try
     {
-        string data = "";
-        try
-        {
-            FileUtils.get_contents (filename, out data);
-        }
-        catch (FileError e)
-        {
-            stderr.printf ("Failed to load file to translate: %s\n", e.message);
-            return Posix.EXIT_FAILURE;
-        }
+        FileUtils.get_contents (filename, out data);
+    }
+    catch (FileError e)
+    {
+        stderr.printf ("Failed to load file to translate: %s\n", e.message);
+        return Posix.EXIT_FAILURE;
+    }
 
-        var in_word = false;
-        var word_start = -1;
-        var word_end = -1;
-        var functions = new List<string> ();
-        var string_start = -1;
-        var escape = false;
-        var line = 1;
-        for (var i = 0; i < data.length; i++)
+    var in_word = false;
+    var word_start = -1;
+    var word_end = -1;
+    var functions = new List<string> ();
+    var string_start = -1;
+    var escape = false;
+    var line = 1;
+    for (var i = 0; i < data.length; i++)
+    {
+        var c = data[i];
+
+        if (c == '\n')
+            line++;
+
+        if (string_start < 0)
         {
-            var c = data[i];
-
-            if (c == '\n')
-                line++;
-
-            if (string_start < 0)
+            if (c == '\"')
+                string_start = i;
+            else if (in_word)
             {
-                if (c == '\"')
-                    string_start = i;
-                else if (in_word)
+                if (c.isspace ())
                 {
-                    if (c.isspace ())
-                    {
-                        word_end = i;
-                        in_word = false;
-                    }
-                    else if (c == '(')
-                    {
-                        word_end = i;
-                        var name = data.substring (word_start, word_end - word_start);
-                        functions.prepend (name);
-                        in_word = false;
-                    }
+                    word_end = i;
+                    in_word = false;
                 }
                 else if (c == '(')
                 {
+                    word_end = i;
                     var name = data.substring (word_start, word_end - word_start);
                     functions.prepend (name);
-                }
-                else if (c == ')')
-                {
-                    functions.remove (functions.nth_data (0));
-                }
-                else if (c == '_' || c.isalpha ())
-                {
-                    word_start = i;
-                    in_word = true;
+                    in_word = false;
                 }
             }
+            else if (c == '(')
+            {
+                var name = data.substring (word_start, word_end - word_start);
+                functions.prepend (name);
+            }
+            else if (c == ')')
+            {
+                functions.remove (functions.nth_data (0));
+            }
+            else if (c == '_' || c.isalpha ())
+            {
+                word_start = i;
+                in_word = true;
+            }
+        }
+        else
+        {
+            if (escape)
+                escape = false;
             else
             {
-                if (escape)
-                    escape = false;
-                else
+                if (c == '\\')
+                    escape = true;
+                else if (c == '\"')
                 {
-                    if (c == '\\')
-                        escape = true;
-                    else if (c == '\"')
+                    var function = functions.nth_data (0);
+                    if (function == "_" || function == "N_" || function == "gettext")
                     {
-                        var function = functions.nth_data (0);
-                        if (function == "_" || function == "N_" || function == "gettext")
-                        {
-                            var msgid = data.substring (string_start + 1, i - string_start - 1);
-                            var location = translations.add_location (msgid);
-                            location.filename = filename;
-                            location.line = line;
-                        }
-                        string_start = -1;
+                        var msgid = data.substring (string_start + 1, i - string_start - 1);
+                        var location = translations.add_location (msgid);
+                        location.filename = filename;
+                        location.line = line;
                     }
+                    string_start = -1;
                 }
             }
         }

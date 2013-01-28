@@ -38,7 +38,7 @@ public class MonoModule : BuildModule
         if (gettext_domain != null)
         {
             foreach (var source in sources)
-                GettextModule.add_translatable_file (recipe, gettext_domain, "C#", source);
+                GettextModule.add_translatable_file (recipe, gettext_domain, "text/x-csharp", source);
         }
 
         /* Script to run locally */
@@ -99,7 +99,7 @@ public class MonoModule : BuildModule
         if (gettext_domain != null)
         {
             foreach (var source in sources)
-                GettextModule.add_translatable_file (recipe, gettext_domain, "C#", source);
+                GettextModule.add_translatable_file (recipe, gettext_domain, "text/x-csharp", source);
         }
 
         return true;

@@ -7,9 +7,9 @@ g++ -fPIC -MMD -MF .built/test2.d -c test2.cpp -o .built/test2.o
 moc -o test3.moc test3.cpp
 g++ -fPIC -MMD -MF .built/test3.d -c test3.cpp -o .built/test3.o
 g++ -o libtest.so.0 -shared .built/test1.o .built/test2.o .built/test3.o
-bake-gettext --language C++ --output .built/test1.cpp.pot test1.cpp
-bake-gettext --language C++ --output .built/test2.cpp.pot test2.cpp
-bake-gettext --language C++ --output .built/test3.cpp.pot test3.cpp
+bake-gettext --mime-type text/x-c++src --output .built/test1.cpp.pot test1.cpp
+bake-gettext --mime-type text/x-c++src --output .built/test2.cpp.pot test2.cpp
+bake-gettext --mime-type text/x-c++src --output .built/test3.cpp.pot test3.cpp
 msgcat --force-po --output-file=test.pot .built/test1.cpp.pot .built/test2.cpp.pot .built/test3.cpp.pot
 (exit SUCCESS)
 !bake install

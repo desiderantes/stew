@@ -57,7 +57,7 @@ public class PythonModule : BuildModule
         if (gettext_domain != null)
         {
             foreach (var source in sources)
-                GettextModule.add_translatable_file (recipe, gettext_domain, "Python", source);
+                GettextModule.add_translatable_file (recipe, gettext_domain, "text/x-python", source);
         }
 
         /* Script to run locally */
@@ -135,7 +135,7 @@ public class PythonModule : BuildModule
         if (gettext_domain != null)
         {
             foreach (var source in sources)
-                GettextModule.add_translatable_file (recipe, gettext_domain, "Python", source);
+                GettextModule.add_translatable_file (recipe, gettext_domain, "text/x-python", source);
         }
 
         return true;

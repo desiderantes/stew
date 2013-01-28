@@ -119,13 +119,13 @@ public class GCCModule : BuildModule
         var sources = split_variable (source_list);
 
         var have_cpp = false;
-        string? compiler = null, gettext_language = null;
+        string? compiler = null;
         foreach (var source in sources)
         {
             if (source.has_suffix (".h"))
                 continue;
 
-            var c = get_compiler (source, out gettext_language);
+            var c = get_compiler (source);
             if (c == null || Environment.find_program_in_path (c) == null)
                 return false;
 
@@ -255,10 +255,14 @@ public class GCCModule : BuildModule
         }
 
         var gettext_domain = recipe.get_variable ("%s.%s.gettext-domain".printf (type_name, name));
-        if (gettext_domain != null && gettext_language != null)
+        if (gettext_domain != null)
         {
             foreach (var source in sources)
-                GettextModule.add_translatable_file (recipe, gettext_domain, gettext_language, source);
+            {
+                var mime_type = get_mime_type (source);
+                if (mime_type != null)
+                    GettextModule.add_translatable_file (recipe, gettext_domain, mime_type, source);
+            }
         }
 
         return true;
@@ -289,15 +293,11 @@ public class GCCModule : BuildModule
         return includes;
     }
 
-    private string? get_compiler (string source, out string? gettext_language)
+    private string? get_compiler (string source)
     {
-        gettext_language = null;
         /* C */
         if (source.has_suffix (".c"))
-        {
-            gettext_language = "C";
             return "gcc";
-        }
         /* C++ */
         else if (source.has_suffix (".cpp") ||
                  source.has_suffix (".C") ||
@@ -306,16 +306,10 @@ public class GCCModule : BuildModule
                  source.has_suffix (".c++") ||
                  source.has_suffix (".cp") ||
                  source.has_suffix (".cxx"))
-        {
-            gettext_language = "C++";
             return "g++";
-        }
         /* Objective C */
         else if (source.has_suffix (".m"))
-        {
-            gettext_language = "ObjectiveC";
             return "gcc";
-        }
         /* Go */
         else if (source.has_suffix (".go"))
             return "gccgo";
@@ -330,5 +324,23 @@ public class GCCModule : BuildModule
             return "gfortran";
         else
             return null;   
-    }   
+    }
+
+    private string? get_mime_type (string source)
+    {
+        if (source.has_suffix (".c"))
+            return "text/x-csrc";
+        else if (source.has_suffix (".cpp") ||
+                 source.has_suffix (".C") ||
+                 source.has_suffix (".cc") ||
+                 source.has_suffix (".CPP") ||
+                 source.has_suffix (".c++") ||
+                 source.has_suffix (".cp") ||
+                 source.has_suffix (".cxx"))
+            return "text/x-c++src";
+        else if (source.has_suffix (".h"))
+            return "text/x-chdr"; // FIXME: Also could use text/x-c++hdr?
+        else
+            return null;
+    }
 }

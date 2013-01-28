@@ -4,9 +4,9 @@ python -m py_compile test1.py
 python -m py_compile test2.py
 python -m py_compile test3.py
 mkdir -p .built
-bake-gettext --language Python --output .built/test1.py.pot test1.py
-bake-gettext --language Python --output .built/test2.py.pot test2.py
-bake-gettext --language Python --output .built/test3.py.pot test3.py
+bake-gettext --mime-type text/x-python --output .built/test1.py.pot test1.py
+bake-gettext --mime-type text/x-python --output .built/test2.py.pot test2.py
+bake-gettext --mime-type text/x-python --output .built/test3.py.pot test3.py
 msgcat --force-po --output-file=test.pot .built/test1.py.pot .built/test2.py.pot .built/test3.py.pot
 (exit SUCCESS)
 !bake install

@@ -21,7 +21,7 @@ private class PotRule : Rule
 
 public class GettextModule : BuildModule
 {
-    public static void add_translatable_file (Recipe recipe, string gettext_domain, string source_language, string filename)
+    public static void add_translatable_file (Recipe recipe, string gettext_domain, string mime_type, string filename)
     {
         /* Extract translations from this file */
         var translation_file = recipe.get_build_path ("%s.pot".printf (filename));
@@ -29,8 +29,7 @@ public class GettextModule : BuildModule
         rule.add_output (translation_file);
         rule.add_input (filename);
         rule.add_status_command ("GETTEXT %s".printf (filename));
-        // FIXME: Replace --language with --mime-type
-        var extract_command = "@bake-gettext --language %s --output %s %s".printf (source_language, translation_file, filename);
+        var extract_command = "@bake-gettext --mime-type %s --output %s %s".printf (mime_type, translation_file, filename);
         rule.add_command (extract_command);
 
         /* Combine translations into a pot file */

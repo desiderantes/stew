@@ -77,7 +77,7 @@ public class JavaModule : BuildModule
         if (gettext_domain != null)
         {
             foreach (var source in sources)
-                GettextModule.add_translatable_file (recipe, gettext_domain, "Java", source);
+                GettextModule.add_translatable_file (recipe, gettext_domain, "text/x-java", source);
         }
 
         return true;
@@ -136,7 +136,7 @@ public class JavaModule : BuildModule
         if (gettext_domain != null)
         {
             foreach (var source in sources)
-                GettextModule.add_translatable_file (recipe, gettext_domain, "Java", source);
+                GettextModule.add_translatable_file (recipe, gettext_domain, "text/x-java", source);
         }
 
         return true;

@@ -328,7 +328,7 @@ public class ValaModule : BuildModule
         if (gettext_domain != null)
         {
             foreach (var source in sources)
-                GettextModule.add_translatable_file (recipe, gettext_domain, "Vala", source);
+                GettextModule.add_translatable_file (recipe, gettext_domain, "text/x-vala", source);
         }
     }
 }
