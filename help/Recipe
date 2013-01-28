@@ -1,4 +1,4 @@
-data.help.mallard-pages = building.page \
+data.bake.mallard-pages = building.page \
                           cleaning.page \
                           config.page \
                           c.page \
@@ -32,4 +32,4 @@ data.help.mallard-pages = building.page \
                           vala.page \
                           variables.page \
                           xdg-desktop.page
-data.help.gettext-domain = bake-help
+data.bake.gettext-domain = bake-help
