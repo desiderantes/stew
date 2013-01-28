@@ -4,9 +4,9 @@ mkdir -p .built
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/local/share/test
-install test.exe /usr/local/share/test/test.exe
+cp test.exe /usr/local/share/test/test.exe
 mkdir -p /usr/local/bin
-install .built/test /usr/local/bin/test
+cp .built/test /usr/local/bin/test
 (exit SUCCESS)
 !bake clean
 rm -f test.exe

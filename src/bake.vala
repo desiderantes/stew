@@ -632,7 +632,7 @@ public class Recipe
             install_rule.add_command (install_command);
 
         /* Copy file across */
-        install_rule.add_command ("@install %s %s".printf (filename, install_path));
+        install_rule.add_command ("@cp %s %s".printf (filename, install_path));
     }
 
     public void generate_clean_rule ()

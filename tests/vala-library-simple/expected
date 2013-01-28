@@ -10,14 +10,14 @@ valac --ccode --header=test.h --vapi=test-0.vapi --library=test --use-fast-vapi=
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/local/lib
-install libtest.so /usr/local/lib/libtest.so
-install libtest.so.0 /usr/local/lib/libtest.so.0
+cp libtest.so /usr/local/lib/libtest.so
+cp libtest.so.0 /usr/local/lib/libtest.so.0
 mkdir -p /usr/local/lib/pkgconfig
-install test-0.pc /usr/local/lib/pkgconfig/test-0.pc
+cp test-0.pc /usr/local/lib/pkgconfig/test-0.pc
 mkdir -p /usr/local/include/test-0
-install test.h /usr/local/include/test-0/test.h
+cp test.h /usr/local/include/test-0/test.h
 mkdir -p /usr/local/share/vala/vapi
-install test-0.vapi /usr/local/share/vala/vapi/test-0.vapi
+cp test-0.vapi /usr/local/share/vala/vapi/test-0.vapi
 (exit SUCCESS)
 !bake clean
 rm -f libtest.so.0

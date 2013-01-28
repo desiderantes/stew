@@ -2,7 +2,7 @@
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/local/share/test/test
-install test /usr/local/share/test/test/test
+cp test /usr/local/share/test/test/test
 (exit SUCCESS)
 !bake clean
 (exit SUCCESS)

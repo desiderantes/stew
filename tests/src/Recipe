@@ -22,10 +22,6 @@ programs.rm.sources = rm.vala
 programs.rm.packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
 programs.rm.install = false
 
-programs.install.sources = install.vala
-programs.install.packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
-programs.install.install = false
-
 programs.gcc.sources = gcc.vala
 programs.gcc.packages = gobject-2.0 glib-2.0 posix gio-2.0 gio-unix-2.0
 programs.gcc.install = false

@@ -59,6 +59,10 @@ public class Copy
 
     private static void copy_file (string source, string dest)
     {
+        /* Don't actually copy things into root */
+        if (dest.has_prefix ("/usr"))
+            return;
+
         try
         {
             string contents;

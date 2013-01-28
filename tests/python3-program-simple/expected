@@ -5,11 +5,11 @@ mkdir -p .built
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/local/share/test
-install test.py /usr/local/share/test/test.py
+cp test.py /usr/local/share/test/test.py
 mkdir -p /usr/local/share/test/__pycache__
-install __pycache__/test.cpython-32.pyc /usr/local/share/test/__pycache__/test.cpython-32.pyc
+cp __pycache__/test.cpython-32.pyc /usr/local/share/test/__pycache__/test.cpython-32.pyc
 mkdir -p /usr/local/bin
-install .built/test /usr/local/bin/test
+cp .built/test /usr/local/bin/test
 (exit SUCCESS)
 !bake clean
 rm -f __pycache__/test.cpython-32.pyc

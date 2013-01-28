@@ -5,7 +5,7 @@ python -m py_compile test.py
 !bake install
 python --version
 mkdir -p /usr/local/lib/python2.7/site-packages/test
-install test.pyc /usr/local/lib/python2.7/site-packages/test/test.pyc
+cp test.pyc /usr/local/lib/python2.7/site-packages/test/test.pyc
 (exit SUCCESS)
 !bake clean
 python --version

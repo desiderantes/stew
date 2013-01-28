@@ -11,12 +11,12 @@ msgcat --force-po --output-file=test.pot .built/test1.cpp.po .built/test2.cpp.po
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/local/lib
-install libtest.so.0 /usr/local/lib/libtest.so.0
-install libtest.so /usr/local/lib/libtest.so
+cp libtest.so.0 /usr/local/lib/libtest.so.0
+cp libtest.so /usr/local/lib/libtest.so
 mkdir -p /usr/local/include/test-0
-install test.h /usr/local/include/test-0/test.h
+cp test.h /usr/local/include/test-0/test.h
 mkdir -p /usr/local/lib/pkgconfig
-install test-0.pc /usr/local/lib/pkgconfig/test-0.pc
+cp test-0.pc /usr/local/lib/pkgconfig/test-0.pc
 (exit SUCCESS)
 !bake clean
 rm -f libtest.so.0

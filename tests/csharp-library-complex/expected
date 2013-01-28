@@ -8,7 +8,7 @@ msgcat --force-po --output-file=test.pot .built/test1.cs.po .built/test2.cs.po .
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/local/lib/cli/test
-install test.dll /usr/local/lib/cli/test/test.dll
+cp test.dll /usr/local/lib/cli/test/test.dll
 (exit SUCCESS)
 !bake clean
 rm -f test.dll

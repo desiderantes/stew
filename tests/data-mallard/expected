@@ -2,8 +2,8 @@
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/local/share/help/C/test
-install index.page /usr/local/share/help/C/test/index.page
-install test.page /usr/local/share/help/C/test/test.page
+cp index.page /usr/local/share/help/C/test/index.page
+cp test.page /usr/local/share/help/C/test/test.page
 (exit SUCCESS)
 !bake clean
 (exit SUCCESS)

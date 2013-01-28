@@ -9,7 +9,7 @@ msgcat --force-po --output-file=test.pot .built/com/example/Test1.java.po .built
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/local/share/java
-install test.jar /usr/local/share/java/test.jar
+cp test.jar /usr/local/share/java/test.jar
 (exit SUCCESS)
 !bake clean
 rm -f test.jar

@@ -6,7 +6,7 @@ g++ -o test .built/test.o
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/local/bin
-install test /usr/local/bin/test
+cp test /usr/local/bin/test
 (exit SUCCESS)
 !bake clean
 rm -f test
