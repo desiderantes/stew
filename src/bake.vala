@@ -627,11 +627,16 @@ public class Recipe
         var install_path = get_install_path (Path.build_filename (install_dir, target_filename));
 
         /* Create directory if not already in install rule */
-        var install_command = "@mkdir -p %s".printf (Path.get_dirname (install_path));
+        var dirname = Path.get_dirname (install_path);
+        var install_command = "@mkdir -p %s".printf (dirname);
         if (!install_rule.has_command (install_command))
+        {
+            install_rule.add_status_command ("MKDIR %s".printf (dirname));
             install_rule.add_command (install_command);
+        }
 
         /* Copy file across */
+        install_rule.add_status_command ("CP %s %s".printf (filename, install_path));
         install_rule.add_command ("@cp %s %s".printf (filename, install_path));
     }
 
