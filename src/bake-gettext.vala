@@ -42,8 +42,6 @@ public static int main (string[] args)
         return Posix.EXIT_FAILURE;
     }
 
-    var translations = new Translations ();
-
     string data = "";
     try
     {
@@ -55,6 +53,47 @@ public static int main (string[] args)
         return Posix.EXIT_FAILURE;
     }
 
+    var translations = new Translations ();
+    switch (mime_type)
+    {
+    case "text/x-csrc":
+    case "text/x-c++src":
+    case "text/x-chdr":
+    case "text/x-vala":
+    case "text/x-java":
+        translate_c_source (translations, filename, data);
+        break;
+    default:
+        stderr.printf ("Unknown mime-type %s\n", mime_type);
+        return Posix.EXIT_FAILURE;
+    }
+
+    /* Write translation template */
+    unowned FileStream output_file = stdout;
+    FileStream output_file_handle;
+    if (output_filename != "")
+    {
+        output_file_handle = FileStream.open (output_filename, "w");
+        output_file = output_file_handle;
+    }
+
+    output_file.printf ("msgid \"\"\n");
+    output_file.printf ("msgstr \"\"\n");
+    output_file.printf ("\"Content-Type: text/plain; charset=UTF-8\\n\"\n");
+    foreach (var string in translations.strings)
+    {
+         output_file.printf ("\n");
+         foreach (var location in string.locations)
+             output_file.printf ("#: %s:%d\n", location.filename, location.line);
+         output_file.printf ("msgid \"%s\"\n", string.msgid);
+         output_file.printf ("msgstr \"\"\n");
+    }
+
+    return Posix.EXIT_SUCCESS;
+}
+
+private static void translate_c_source (Translations translations, string filename, string data)
+{
     var in_word = false;
     var word_start = -1;
     var word_end = -1;
@@ -126,28 +165,6 @@ public static int main (string[] args)
             }
         }
     }
-
-    unowned FileStream output_file = stdout;
-    FileStream output_file_handle;
-    if (output_filename != "")
-    {
-        output_file_handle = FileStream.open (output_filename, "w");
-        output_file = output_file_handle;
-    }
-
-    output_file.printf ("msgid \"\"\n");
-    output_file.printf ("msgstr \"\"\n");
-    output_file.printf ("\"Content-Type: text/plain; charset=UTF-8\\n\"\n");
-    foreach (var string in translations.strings)
-    {
-         output_file.printf ("\n");
-         foreach (var location in string.locations)
-             output_file.printf ("#: %s:%d\n", location.filename, location.line);
-         output_file.printf ("msgid \"%s\"\n", string.msgid);
-         output_file.printf ("msgstr \"\"\n");
-    }
-
-    return Posix.EXIT_SUCCESS;
 }
 
 private class Translations
