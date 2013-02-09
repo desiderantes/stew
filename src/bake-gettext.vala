@@ -2,7 +2,7 @@ public static int main (string[] args)
 {
     var output_filename = "";
     var mime_type = "";
-    string? filename = null;
+    var filename = "";
     var valid_args = true;
     for (var i = 1; i < args.length; i++)
     {
@@ -30,13 +30,13 @@ public static int main (string[] args)
             valid_args = false;
         else
         {
-            if (filename != null)
+            if (filename != "")
                 valid_args = false;
             filename = args[i];
         }
     }
 
-    if (!valid_args || filename == null)
+    if (!valid_args || filename == "")
     {
         stderr.printf ("Usage: %s [--output output-file] --mime-type mime-type file-to-translate\n", args[0]);
         return Posix.EXIT_FAILURE;
@@ -62,6 +62,9 @@ public static int main (string[] args)
     case "text/x-vala":
     case "text/x-java":
         translate_c_source (translations, filename, data);
+        break;
+    case "application/x-desktop":
+        translate_xdg_desktop (translations, filename, data);
         break;
     default:
         stderr.printf ("Unknown mime-type %s\n", mime_type);
@@ -164,6 +167,35 @@ private static void translate_c_source (Translations translations, string filena
                 }
             }
         }
+    }
+}
+
+private static void translate_xdg_desktop (Translations translations, string filename, string data)
+{
+    var section = "";
+    var line = 1;
+    foreach (var l in data.split ("\n"))
+    {
+        l = l.strip ();
+        if (l[0] == '[')
+            section = l;
+        else
+        {
+            var i = l.index_of ("=");
+            if (i > 0)
+            {
+                var name = l.substring (0, i);
+                var value = l.substring (i + 1);
+                if (name == "Name" || name == "GenericName" || name == "X-GNOME-FullName" || name == "Comment" || name == "Keywords")
+                {
+                    var location = translations.add_location (value);
+                    location.filename = filename;
+                    location.line = line;
+                }
+            }
+        }
+
+        line++;
     }
 }
 

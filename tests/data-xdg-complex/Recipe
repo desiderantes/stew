@@ -1,0 +1,4 @@
+package.name = test
+
+data.test.xdg-desktop-files = test.desktop
+data.test.gettext-domain = test
