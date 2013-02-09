@@ -1,6 +1,13 @@
 Overview of changes in bake 0.1.7
 
+    * Make data variables match the same format as programs and libraries
+      variables
     * Translate XDG .desktop files
+    * Add programs.*.vala-compile-flags
+    * Pretty print install rules
+    * Use cp instead of install so install rules have correct permissions
+    * Remove program type (too hard to be automagic)
+    * Fix running rules from other recipes when the output is in a subdirectory
 
 Overview of changes in bake 0.1.6
 
