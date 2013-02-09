@@ -1,3 +1,7 @@
+Overview of changes in bake 0.1.8
+
+    * Translate GSettings schema files
+
 Overview of changes in bake 0.1.7
 
     * Make data variables match the same format as programs and libraries

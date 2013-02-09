@@ -5,12 +5,18 @@ public class GSettingsModule : BuildModule
         var data = recipe.get_variable_children ("data");
         foreach (var data_type in data)
         {
+            var gettext_domain = recipe.get_variable ("data.%s.gettext-domain".printf (data_type), null, false);
+
             var schemas_list = recipe.get_variable ("data.%s.gsettings-schemas".printf (data_type), null, false);
             if (schemas_list != null)
             {
                 foreach (var schema in split_variable (schemas_list))
                 {
                     // FIXME: Validate schema in build rule with glib-compile-schemas?
+
+                    // NOTE: Doesn't seem to be a mime type for schemas
+                    if (gettext_domain != null)
+                        GettextModule.add_translatable_file (recipe, gettext_domain, "application/x-gschema+xml", schema);
 
                     var dir = Path.build_filename (recipe.data_directory, "glib-2.0", "schemas");
                     recipe.add_install_rule (schema, dir);

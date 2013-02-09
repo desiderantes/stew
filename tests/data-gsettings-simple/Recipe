@@ -1,0 +1,3 @@
+package.name = test
+
+data.test.gsettings-schemas = com.example.Test.gschema.xml

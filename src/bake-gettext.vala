@@ -66,6 +66,14 @@ public static int main (string[] args)
     case "application/x-desktop":
         translate_xdg_desktop (translations, filename, data);
         break;
+    case "application/x-gschema+xml":
+        var t = new GSchemaTranslator (translations, filename, data);
+        t.parse ();
+        break;
+    case "application/x-glade":
+        var t = new GladeTranslator (translations, filename, data);
+        t.parse ();
+        break;
     default:
         stderr.printf ("Unknown mime-type %s\n", mime_type);
         return Posix.EXIT_FAILURE;
@@ -196,6 +204,115 @@ private static void translate_xdg_desktop (Translations translations, string fil
         }
 
         line++;
+    }
+}
+
+private class GSchemaTranslator
+{
+    private Translations translations;
+    private string filename;
+    private string data;
+    private bool translate_next;
+
+    public GSchemaTranslator (Translations translations, string filename, string data)
+    {
+        this.translations = translations;
+        this.filename = filename;
+        this.data = data;
+    }
+
+    public void parse ()
+    {
+        var parser = MarkupParser ();
+        parser.start_element = start_element_cb;
+        parser.text = text_cb;
+        var context = new MarkupParseContext (parser, 0, this, null);
+        try
+        {
+            context.parse (data, -1);
+        }
+        catch (MarkupError e)
+        {
+            warning ("Failed to parse gschema: %s\n", e.message);
+        }
+    }
+
+    private void start_element_cb (MarkupParseContext context, string element_name, [CCode (array_length = false, array_null_terminated = true)] string[] attribute_names, [CCode (array_length = false, array_null_terminated = true)] string[] attribute_values) throws MarkupError
+    {
+        translate_next = element_name == "summary" || element_name == "description";
+    }
+
+    private void text_cb (MarkupParseContext context, string text, size_t text_len) throws MarkupError
+    {
+        if (!translate_next)
+            return;
+
+        var location = translations.add_location (text);
+        location.filename = filename;
+        int line_number, char_number;
+        context.get_position (out line_number, out char_number);
+        location.line = line_number;
+
+        translate_next = false;
+    }
+}
+
+private class GladeTranslator
+{
+    private Translations translations;
+    private string filename;
+    private string data;
+    private bool translate_next;
+    private string comments;
+
+    public GladeTranslator (Translations translations, string filename, string data)
+    {
+        this.translations = translations;
+        this.filename = filename;
+        this.data = data;
+    }
+
+    public void parse ()
+    {
+        var parser = MarkupParser ();
+        parser.start_element = start_element_cb;
+        parser.text = text_cb;
+        var context = new MarkupParseContext (parser, 0, this, null);
+        try
+        {
+            context.parse (data, -1);
+        }
+        catch (MarkupError e)
+        {
+            warning ("Failed to parse Glade file: %s\n", e.message);
+        }
+    }
+
+    private void start_element_cb (MarkupParseContext context, string element_name, [CCode (array_length = false, array_null_terminated = true)] string[] attribute_names, [CCode (array_length = false, array_null_terminated = true)] string[] attribute_values) throws MarkupError
+    {
+        translate_next = false;        
+        for (var i = 0; attribute_names[i] != null; i++)
+        {
+            if (attribute_names[i] == "translatable" && attribute_values[i] == "yes")
+                translate_next = true;
+            if (attribute_names[i] == "comments")
+                comments = attribute_values[i];
+        }
+    }
+
+    private void text_cb (MarkupParseContext context, string text, size_t text_len) throws MarkupError
+    {
+        if (!translate_next)
+            return;
+
+        var location = translations.add_location (text);
+        location.filename = filename;
+        int line_number, char_number;
+        context.get_position (out line_number, out char_number);
+        location.line = line_number;
+        location.comment = comments;
+
+        translate_next = false;
     }
 }
 
