@@ -1033,6 +1033,7 @@ public class Bake
         modules.append (new GITModule ());
         modules.append (new GNOMEModule ());
         modules.append (new GSettingsModule ());
+        modules.append (new GTKModule ());
         modules.append (new GZIPModule ());
         modules.append (new JavaModule ());
         modules.append (new LaunchpadModule ());

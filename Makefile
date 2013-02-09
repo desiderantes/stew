@@ -17,6 +17,7 @@ SOURCES = src/bake.vala \
           src/module-ghc.vala \
           src/module-git.vala \
           src/module-gsettings.vala \
+          src/module-gtk.vala \
           src/module-gzip.vala \
           src/module-java.vala \
           src/module-launchpad.vala \

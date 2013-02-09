@@ -1,6 +1,7 @@
 Overview of changes in bake 0.1.8
 
     * Translate GSettings schema files
+    * Add support for GTK+ UI files
 
 Overview of changes in bake 0.1.7
 

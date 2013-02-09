@@ -1,0 +1,8 @@
+!bake
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/local/share/test
+cp test.ui /usr/local/share/test/test.ui
+(exit SUCCESS)
+!bake clean
+(exit SUCCESS)

@@ -1,0 +1,5 @@
+package.name = test
+
+data.test.gtk-ui-files = test.ui
+data.test.gettext-domain = test
+data.test.install-directory = $(package-data-directory)/ui

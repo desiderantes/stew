@@ -145,16 +145,26 @@ tests.haskell-program-complex.data = haskell-program-complex/expected haskell-pr
 # Data tests
 tests.data-other.command = ./src/test-runner data-other
 tests.data-other.data = data-other/expected data-other/Recipe data-other/test
+
 tests.data-man.command = ./src/test-runner data-man
 tests.data-man.data = data-man/expected data-man/Recipe data-man/test.1
+
 tests.data-mallard.command = ./src/test-runner data-mallard
 tests.data-mallard.data = data-mallard/expected data-mallard/Recipe data-mallard/index.page data-mallard/test.page
+
 tests.data-gettext.command = ./src/test-runner data-gettext
 tests.data-gettext.data = data-gettext/expected data-gettext/Recipe data-gettext/de.po data-gettext/fr.po data-gettext/it.po
+
 tests.data-gsettings-simple.command = ./src/test-runner data-gsettings-simple
 tests.data-gsettings-simple.data = data-gsettings-simple/expected data-gsettings-simple/Recipe data-gsettings-simple/com.example.Test.gschema.xml
 tests.data-gsettings-complex.command = ./src/test-runner data-gsettings-complex
 tests.data-gsettings-complex.data = data-gsettings-complex/expected data-gsettings-complex/Recipe data-gsettings-complex/com.example.Test.gschema.xml data-gsettings-complex/test.convert data-gsettings-complex/test.override
+
+tests.data-gtk-simple.command = ./src/test-runner data-gtk-simple
+tests.data-gtk-simple.data = data-gtk-simple/expected data-gtk-simple/Recipe data-gtk-simple/test.ui
+tests.data-gtk-complex.command = ./src/test-runner data-gtk-complex
+tests.data-gtk-complex.data = data-gtk-complex/expected data-gtk-complex/Recipe data-gtk-complex/test.ui
+
 tests.data-xdg-simple.command = ./src/test-runner data-xdg-simple
 tests.data-xdg-simple.data = data-xdg-simple/expected data-xdg-simple/Recipe data-xdg-simple/test.desktop
 tests.data-xdg-complex.command = ./src/test-runner data-xdg-complex
