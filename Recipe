@@ -1,5 +1,5 @@
 package.name = bake
-package.version = 0.1.7+bzr
+package.version = 0.1.8
 package.ppa = lp:~bake-team/releases
 
 package.files = Makefile \
