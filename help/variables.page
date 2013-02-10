@@ -32,4 +32,34 @@ multiple-line = Line 1\
 section.subsection = value                
 </code>
 </example>
+<p>
+Variables can also be described in groups using the following syntax:
+</p>
+<code>
+<em>groupname</em> {
+  <em>childname1</em> = <em>value1</em>
+  <em>...</em>
+}
+</code>
+<p>
+Each variable in the group has the name <em>groupname</em>.<em>childname</em>.
+</p>
+<example>
+<p>
+The following variable group:
+</p>
+<code>
+package {
+  name = example
+  version = 0.1
+}
+</code>
+<p>
+is the equivalent of:
+</p>
+<code>
+package.name = example
+package.version = 0.1
+</code>
+</example>
 </page>

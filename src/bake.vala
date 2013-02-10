@@ -501,6 +501,7 @@ public class Recipe
         var in_rule = false;
         string? rule_indent = null;
         var continued_line = "";
+        var variable_stack = new List<string> ();
         foreach (var line in lines)
         {
             line_number++;
@@ -541,12 +542,36 @@ public class Recipe
             if (statement.has_prefix ("#"))
                 continue;
 
+            /* Variable blocks */
+            var index = statement.index_of ("{");
+            if (index >= 0)
+            {
+                var name = statement.substring (0, index).strip ();
+                if (variable_stack == null)
+                    variable_stack.prepend (name);
+                else
+                    variable_stack.prepend ("%s.%s".printf (variable_stack.nth_data (0), name));
+                continue;
+            }
+
+            if (statement == "}")
+            {
+                if (variable_stack == null)
+                    throw new BuildError.INVALID ("Unmatched end variable block in file %s line %d:\n%s", get_relative_path (original_dir, filename), line_number, line);
+                variable_stack.remove_link (variable_stack.nth (0));
+                continue;
+            }
+
             /* Load variables */
-            var index = statement.index_of ("=");
+            index = statement.index_of ("=");
             if (index > 0)
             {
                 var name = statement.substring (0, index).strip ();
-                variables.insert (name, statement.substring (index + 1).strip ());
+                if (variable_stack != null)
+                    name = "%s.%s".printf (variable_stack.nth_data (0), name);
+                var value = statement.substring (index + 1).strip ();
+
+                variables.insert (name, value);
                 continue;
             }
 
@@ -570,6 +595,9 @@ public class Recipe
 
             throw new BuildError.INVALID ("Invalid statement in file %s line %d:\n%s", get_relative_path (original_dir, filename), line_number, line);
         }
+
+        if (variable_stack != null)
+            throw new BuildError.INVALID ("Unmatched end variable block in file %s line %d:\n%s", get_relative_path (original_dir, filename), line_number, "");
     }
     
     public Rule add_rule ()
