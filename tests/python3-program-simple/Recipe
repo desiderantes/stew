@@ -1,4 +1,6 @@
 package.name = test
 
-programs.test.sources = test.py
-programs.test.python-version = 3.2
+programs.test {
+  sources = test.py
+  python-version = 3.2
+}

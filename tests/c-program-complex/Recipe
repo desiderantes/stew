@@ -1,6 +1,8 @@
 package.name = test
 
-programs.test.sources = test1.c test2.c test3.c
-programs.test.gettext-domain = test
-programs.test.compile-flags = -DFOO=1
-programs.test.link-flags = -lm
+programs.test {
+  sources = test1.c test2.c test3.c
+  gettext-domain = test
+  compile-flags = -DFOO=1
+  link-flags = -lm
+}

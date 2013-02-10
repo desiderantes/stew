@@ -1,6 +1,7 @@
 package.name = test
 
-programs.test.sources = test1.py test2.py test3.py
-programs.test.gettext-domain = test
-programs.test.python-version = 2.7
-
+programs.test {
+  sources = test1.py test2.py test3.py
+  gettext-domain = test
+  python-version = 2.7
+}

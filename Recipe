@@ -1,10 +1,12 @@
-package.name = bake
-package.version = 0.1.8+bzr
-package.ppa = lp:~bake-team/releases
+package {
+  name = bake
+  version = 0.1.8+bzr
+  ppa = lp:~bake-team/releases
 
-package.files = Makefile \
-                bake.doap \
-                NEWS
+  files = Makefile \
+          bake.doap \
+          NEWS
+}          
 
 data.man.pages = bake.1                
 

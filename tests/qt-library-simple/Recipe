@@ -1,4 +1,6 @@
 package.name = test
 
-libraries.test.sources = test.cpp
-libraries.test.qt = true
+libraries.test {
+  sources = test.cpp
+  qt = true
+}

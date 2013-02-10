@@ -1,43 +1,53 @@
-templates.config.files = config.vala
-templates.config.variables = %VERSION%=$(package.version) %LIBRARY_DIRECTORY%=$(library-directory)
+templates.config {
+  files = config.vala
+  variables = %VERSION%=$(package.version) %LIBRARY_DIRECTORY%=$(library-directory)
+}
 
-programs.bake-template.sources = bake-template.vala
-programs.bake-template.packages = posix glib-2.0 gobject-2.0
+programs {
+  bake-template {
+    sources = bake-template.vala
+    packages = posix glib-2.0 gobject-2.0
+  }
 
-programs.bake-gettext.sources = bake-gettext.vala
-programs.bake-gettext.packages = posix glib-2.0 gobject-2.0
+  bake-gettext {
+    sources = bake-gettext.vala
+    packages = posix glib-2.0 gobject-2.0
+  }
 
-programs.bake.sources = bake.vala \
-                        config.vala \
-                        fixes.vapi \
-                        module-bzip.vala \
-                        module-bzr.vala \
-                        module-data.vala \
-                        module-dpkg.vala \
-                        module-gcc.vala \
-                        module-gettext.vala \
-                        module-ghc.vala \
-                        module-git.vala \
-                        module-gnome.vala \
-                        module-gsettings.vala \
-                        module-gtk.vala \
-                        module-gzip.vala \
-                        module-java.vala \
-                        module-launchpad.vala \
-                        module-mallard.vala \
-                        module-man.vala \
-                        module-mono.vala \
-                        module-python.vala \
-                        module-release.vala \
-                        module-rpm.vala \
-                        module-script.vala \
-                        module-template.vala \
-                        module-test.vala \
-                        module-vala.vala \
-                        module-xdg.vala \
-                        module-xzip.vala \
-                        pkg-config.vala
-programs.bake.packages = glib-2.0 gio-2.0 posix
-programs.bake.compile-flags = -DGETTEXT_PACKAGE=\"bake\"
+  bake {
+    sources = bake.vala \
+              config.vala \
+              fixes.vapi \
+              module-bzip.vala \
+              module-bzr.vala \
+              module-data.vala \
+              module-dpkg.vala \
+              module-gcc.vala \
+              module-gettext.vala \
+              module-ghc.vala \
+              module-git.vala \
+              module-gnome.vala \
+              module-gsettings.vala \
+              module-gtk.vala \
+              module-gzip.vala \
+              module-java.vala \
+              module-launchpad.vala \
+              module-mallard.vala \
+              module-man.vala \
+              module-mono.vala \
+              module-python.vala \
+              module-release.vala \
+              module-rpm.vala \
+              module-script.vala \
+              module-template.vala \
+              module-test.vala \
+              module-vala.vala \
+              module-xdg.vala \
+              module-xzip.vala \
+              pkg-config.vala
+     packages = glib-2.0 gio-2.0 posix
+     compile-flags = -DGETTEXT_PACKAGE=\"bake\"
+   }
+}
 
 package.files = config-bootstrap.vala

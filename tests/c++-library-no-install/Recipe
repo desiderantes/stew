@@ -1,4 +1,6 @@
 package.name = test
 
-libraries.test.sources = test.cpp
-libraries.test.install = false
+libraries.test {
+  sources = test.cpp
+  install = false
+}

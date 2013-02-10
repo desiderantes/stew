@@ -1,3 +1,5 @@
-package.name = test
-package.version = 1.0
-package.ppa = lp:~test/releases
+package {
+  name = test
+  version = 1.0
+  ppa = lp:~test/releases
+}

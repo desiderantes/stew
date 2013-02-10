@@ -1,4 +1,6 @@
 package.name = test
 
-data.test.files = test
-data.test.install-directory = $(package-data-directory)/test
+data.test {
+  files = test
+  install-directory = $(package-data-directory)/test
+}

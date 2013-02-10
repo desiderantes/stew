@@ -1,6 +1,8 @@
 package.name = test
 
-libraries.test.sources = test1.cpp test2.cpp test3.cpp
-libraries.test.qt = true
-libraries.test.headers = test.h
-libraries.test.gettext-domain = test
+libraries.test {
+  sources = test1.cpp test2.cpp test3.cpp
+  qt = true
+  headers = test.h
+  gettext-domain = test
+}

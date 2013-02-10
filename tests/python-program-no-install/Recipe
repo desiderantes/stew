@@ -1,4 +1,6 @@
 package.name = test
 
-programs.test.sources = test.py
-programs.test.install = false
+programs.test {
+  sources = test.py
+  install = false
+}

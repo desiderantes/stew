@@ -1,6 +1,8 @@
 package.name = test
 
-libraries.test.sources = com/example/Test1.java \
-                         com/example/Test2.java \
-                         com/example/Test3.java
-libraries.test.gettext-domain = test
+libraries.test {
+  sources = com/example/Test1.java \
+            com/example/Test2.java \
+            com/example/Test3.java
+  gettext-domain = test
+}

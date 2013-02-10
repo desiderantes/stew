@@ -1,5 +1,7 @@
 package.name = test
 
-tests.first.command = true
-tests.second.command = true
-tests.third.command = true
+tests {
+  first.command = true
+  second.command = true
+  third.command = true
+}

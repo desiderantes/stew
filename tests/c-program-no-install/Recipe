@@ -1,4 +1,6 @@
 package.name = test
 
-programs.test.sources = test.c
-programs.test.install = false
+programs.test {
+  sources = test.c
+  install = false
+}
