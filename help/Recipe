@@ -8,6 +8,7 @@ data.bake.mallard-pages = building.page \
                           example.page \
                           go.page \
                           gsettings.page \
+                          gtk-ui.page \
                           haskell.page \
                           index.page \
                           installing.page \

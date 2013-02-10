@@ -1,0 +1,22 @@
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="gtk-ui">
+<info>
+    <link type="guide" xref="index#data"/>
+</info>
+
+<title>GTK+ UI Files</title>
+
+<p>
+Projects that use GTK+ UI files can specify them so that they can be translated.
+The files are <link xref="installing">installed</link> to the <link xref="data">standard data location</link>.
+The UI files need to be listed using the <code>data.<em>name</em>.gtk-ui-files</code> <link xref="variables">variable</link>.
+</p>
+<example>
+<p>
+For example, this <link xref="recipe-files">recipe</link> specifies one GTK+ UI file to be translated and installed:
+</p>
+<code>
+data.example.gtk-ui-files = example.ui
+data.example.gettext-domain = example
+</code>
+</example>
+</page>
