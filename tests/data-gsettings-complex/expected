@@ -1,0 +1,16 @@
+!bake
+mkdir -p .built
+bake-gettext --mime-type application/x-gschema+xml --output .built/com.example.Test.gschema.xml.pot com.example.Test.gschema.xml
+msgcat --force-po --output-file=test.pot .built/com.example.Test.gschema.xml.pot
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/local/share/glib-2.0/schemas
+cp com.example.Test.gschema.xml /usr/local/share/glib-2.0/schemas/com.example.Test.gschema.xml
+cp test.override /usr/local/share/glib-2.0/schemas/test.override
+mkdir -p /usr/local/share/GConf/gsettings
+cp test.convert /usr/local/share/GConf/gsettings/test.convert
+(exit SUCCESS)
+!bake clean
+rm -rf .built/
+rm -f test.pot
+(exit SUCCESS)
