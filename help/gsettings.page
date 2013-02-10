@@ -8,6 +8,7 @@
 <p>
 Projects that use GSettings for configuration storage need to <link xref="installing">install</link> a schema file into a system location.
 The schemas need to be listed using the <code>data.<em>name</em>.gsettings-schemas</code> <link xref="variables">variable</link>.
+If present, the schemas are <link xref="translation">translated</link> using the <code>data.<em>name</em>.gettext-domain</code> gettext domain.
 Override files can be specified with <code>data.<em>name</em>.gsettings-overrides</code> and GConf to GSettings migrations can be specified with <code>data.gsettings.convert-files</code>.
 </p>
 <example>
@@ -16,6 +17,7 @@ For example, this <link xref="recipe-files">recipe</link> specifies one schema t
 </p>
 <code>
 data.example.gsettings-schemas = org.example.Example.gschema.xml
+data.example.gettext-domain = example
 </code>
 </example>
 </page>

@@ -6,8 +6,9 @@
 <title>GTK+ UI Files</title>
 
 <p>
-Projects that use GTK+ UI files can specify them so that they can be translated.
+Projects that use GTK+ UI files can specify them so that they can be <link xref="translation">translated</link>.
 The files are <link xref="installing">installed</link> to the <link xref="data">standard data location</link>.
+If present, the UI files are translated using the <code>data.<em>name</em>.gettext-domain</code> gettext domain.
 The UI files need to be listed using the <code>data.<em>name</em>.gtk-ui-files</code> <link xref="variables">variable</link>.
 </p>
 <example>

@@ -8,6 +8,7 @@
 <p>
 Graphical applications need to install an <em>XDG desktop file</em> that describes the application.
 The desktop file(s) need to be listed with the <code>data.<em>name</em>.xdg-desktop-files</code> <link xref="variables">variable</link>.
+If present, the files are <link xref="translation">translated</link> using the <code>data.<em>name</em>.gettext-domain</code> gettext domain.
 </p>
 <example>
 <p>
@@ -15,6 +16,7 @@ For example, this <link xref="recipe-files">recipe</link> specifies a desktop fi
 </p>
 <code>
 data.example.xdg-desktop-files = example.desktop
+data.example.gettext-domain = example
 </code>
 </example>
 </page>

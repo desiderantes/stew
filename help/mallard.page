@@ -8,6 +8,7 @@
 <p>
 Projects that use Mallard for documentation need to <link xref="installing">install</link> these into a system location.
 The documentation files need to be listed with the <code>data.<em>name</em>.mallard-pages</code> <link xref="variables">variable</link>.
+If present, the pages are <link xref="translation">translated</link> using the <code>data.<em>name</em>.gettext-domain</code> gettext domain.
 The data collection (<em>name</em>) is used as the name of the help document.
 </p>
 <example>
@@ -16,6 +17,7 @@ For example, this <link xref="recipe-files">recipe</link> specifies the document
 </p>
 <code>
 data.example.mallard-pages = index.page example.page
+data.example.gettext-domain = example
 </code>
 </example>
 </page>
