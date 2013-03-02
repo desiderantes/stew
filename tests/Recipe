@@ -275,9 +275,13 @@ tests {
     data = data-man/expected data-man/Recipe data-man/test.1
   }
 
-  data-mallard {
-    command = ./src/test-runner data-mallard
-    data = data-mallard/expected data-mallard/Recipe data-mallard/index.page data-mallard/test.page
+  data-mallard-simple {
+    command = ./src/test-runner data-mallard-simple
+    data = data-mallard-simple/expected data-mallard-simple/Recipe data-mallard-simple/index.page data-mallard-simple/test.page
+  }
+  data-mallard-complex {
+    command = ./src/test-runner data-mallard-complex
+    data = data-mallard-complex/expected data-mallard-complex/Recipe data-mallard-complex/index.page data-mallard-complex/test.page data-mallard-complex/fr.po data-mallard-complex/it.po
   }
 
   data-gettext {

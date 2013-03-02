@@ -28,9 +28,18 @@ public class GettextModule : BuildModule
         var rule = recipe.add_rule ();
         rule.add_output (translation_file);
         rule.add_input (filename);
-        rule.add_status_command ("GETTEXT %s".printf (filename));
-        var extract_command = "@bake-gettext --mime-type %s --output %s %s".printf (mime_type, translation_file, filename);
-        rule.add_command (extract_command);
+        if (mime_type == "application/x-mallard+xml")
+        {
+            rule.add_status_command ("ITSTOOL %s".printf (filename));
+            var extract_command = "@itstool --output %s %s".printf (translation_file, filename);
+            rule.add_command (extract_command);
+        }
+        else
+        {
+            rule.add_status_command ("GETTEXT %s".printf (filename));
+            var extract_command = "@bake-gettext --mime-type %s --output %s %s".printf (mime_type, translation_file, filename);
+            rule.add_command (extract_command);
+        }
 
         /* Combine translations into a pot file */
         // FIXME: Put translations into requested directories
@@ -43,6 +52,54 @@ public class GettextModule : BuildModule
             recipe.toplevel.build_rule.add_input (pot_file);            
         }
         pot_rule.add_input (get_relative_path (recipe.toplevel.dirname, Path.build_filename (recipe.dirname, translation_file)));
+    }
+
+    public static List<string> get_languages (Recipe recipe, string gettext_domain, out string template_dir, out string translation_dir)
+    {
+        var languages = new List<string> ();
+
+        string translation_list;
+        var r = find_gettext_recipe (recipe.toplevel, gettext_domain, out translation_list);
+        if (r == null)
+        {
+            template_dir = "";
+            translation_dir = "";
+            return languages;
+        }
+
+        foreach (var po_file in split_variable (translation_list))
+        {
+            if (!po_file.has_suffix (".po"))
+                continue;
+            var language = po_file.substring (0, po_file.length - 3);
+            languages.append (language);
+        }
+
+        template_dir = r.dirname;
+        translation_dir = r.build_directory;
+
+        return languages;
+    }
+
+    private static Recipe? find_gettext_recipe (Recipe recipe, string gettext_domain, out string translation_list)
+    {
+        var data = recipe.get_variable_children ("data");
+        foreach (var data_type in data)
+        {
+            translation_list = recipe.get_variable ("data.%s.gettext-translations".printf (data_type));
+            if (translation_list != null)
+                return recipe;
+        }
+
+        foreach (var child in recipe.children)
+        {
+            var r = find_gettext_recipe (child, gettext_domain, out translation_list);
+            if (r != null)
+                return r;
+        }
+
+        translation_list = "";
+        return null;
     }
 
     public override void generate_toplevel_rules (Recipe recipe)

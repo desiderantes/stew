@@ -1,0 +1,7 @@
+package.name = test
+
+data.test.mallard-pages = index.page test.page
+data.test.gettext-domain = test
+
+data.test.gettext-translations = fr.po it.po
+data.test.install = false

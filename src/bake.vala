@@ -63,20 +63,25 @@ public string get_relative_path (string source_path, string target_path)
     if (target_path == source_path)
         return ".";
 
-    var dir = source_path + "/";
-    if (target_path.has_prefix (dir))
-        return target_path.substring (dir.length);
+    var source_tokens = source_path.split ("/");
+    var target_tokens = target_path.split ("/");
 
-    var path = source_path;
-    var relative_path = Path.get_basename (target_path);
-    while (true)
+    /* Skip common parts */
+    var offset = 0;
+    for (; offset < source_tokens.length && offset < target_tokens.length; offset++)
     {
-        path = Path.get_dirname (path);
-        relative_path = "../" + relative_path;
-
-        if (target_path.has_prefix (path + "/"))
-            return relative_path;
+        if (source_tokens[offset] != target_tokens[offset])
+            break;
     }
+
+    var path = "";
+    for (var i = offset; i < source_tokens.length; i++)
+        path += "../";
+    for (var i = offset; i < target_tokens.length - 1; i++)
+        path += target_tokens[i] + "/";
+    path += target_tokens[target_tokens.length - 1];
+
+    return path;
 }
 
 public string remove_extension (string filename)
@@ -720,7 +725,7 @@ public class Recipe
 
         return null;
     }
-    
+
     public Rule? find_rule_recursive (string output)
     {
         var rule = find_rule (output);
