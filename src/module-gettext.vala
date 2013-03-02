@@ -81,7 +81,7 @@ public class GettextModule : BuildModule
 
                 recipe.build_rule.add_input (mo_file);
 
-                var target_dir = recipe.get_install_path (Path.build_filename (recipe.get_variable ("gettext.locale-directory"), language, "LC_MESSAGES"));
+                var target_dir = Path.build_filename (recipe.get_variable ("gettext.locale-directory"), language, "LC_MESSAGES");
                 var target_mo_file = "%s.mo".printf (gettext_domain);
                 if (do_install)
                     recipe.add_install_rule (mo_file, target_dir, target_mo_file);
