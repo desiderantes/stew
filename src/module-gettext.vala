@@ -63,6 +63,8 @@ public class GettextModule : BuildModule
             if (translation_list == null)
                 continue;
 
+            var do_install = recipe.get_boolean_variable ("data.%s.install".printf (data_type), true);
+
             var gettext_domain = data_type;
             foreach (var po_file in split_variable (translation_list))
             {
@@ -81,7 +83,8 @@ public class GettextModule : BuildModule
 
                 var target_dir = recipe.get_install_path (Path.build_filename (recipe.get_variable ("gettext.locale-directory"), language, "LC_MESSAGES"));
                 var target_mo_file = "%s.mo".printf (gettext_domain);
-                recipe.add_install_rule (mo_file, target_dir, target_mo_file);
+                if (do_install)
+                    recipe.add_install_rule (mo_file, target_dir, target_mo_file);
             }
         }
     }
