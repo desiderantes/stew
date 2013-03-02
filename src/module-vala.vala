@@ -194,6 +194,7 @@ public class ValaModule : BuildModule
                 }
                 catch (FileError e)
                 {
+                    printerr ("Error loading package info %s: %s\n", pkg_config_list, e.message);
                     return false;
                 }
             }
