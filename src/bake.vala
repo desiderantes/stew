@@ -84,6 +84,19 @@ public string get_relative_path (string source_path, string target_path)
     return path;
 }
 
+public string join_relative_dir (string base_dir, string relative_dir)
+{
+    var b = base_dir;
+    var r = relative_dir;
+    while (r.has_prefix ("../") && b != "")
+    {
+        b = Path.get_dirname (b);
+        r = r.substring (3);
+    }
+
+    return Path.build_filename (b, r);
+}
+
 public string remove_extension (string filename)
 {
     var i = filename.last_index_of_char ('.');
@@ -791,8 +804,10 @@ public class Recipe
     
     public bool build_target (string target) throws BuildError
     {
+        var path = join_relative_dir (dirname, target);
+
         if (debug_enabled)
-            stderr.printf ("Considering target %s\n", get_relative_path (original_dir, Path.build_filename (dirname, target)));
+            stderr.printf ("Considering target %s\n", get_relative_path (original_dir, path));
 
         /* If the rule comes from another recipe, use it to build */
         var recipe = get_recipe_with_target (target);
@@ -800,9 +815,10 @@ public class Recipe
         {
             if (debug_enabled)
                 stderr.printf ("Target %s defined in recipe %s\n",
-                               get_relative_path (original_dir, Path.build_filename (dirname, target)),
+                               get_relative_path (original_dir, path),
                                get_relative_path (original_dir, recipe.filename));
-            return recipe.build_target (get_relative_path (recipe.dirname, Path.build_filename (dirname, target)));
+
+            return recipe.build_target (get_relative_path (recipe.dirname, path));
         }
 
         /* Find a for this target */
@@ -812,7 +828,6 @@ public class Recipe
         if (rule == null)
         {
             /* If it's already there then don't need to do anything */
-            var path = Path.build_filename (dirname, target);
             if (FileUtils.test (path, FileTest.EXISTS))
                 return false;
 
