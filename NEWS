@@ -1,3 +1,13 @@
+Overview of changes in bake 0.1.9
+
+    * Translate Mallard documents
+    * Optimise release rules
+    * Put translation templates into translation directory
+    * Fix building relative targets
+    * Print warning when vala module can't find pkg-config file
+    * Fix translation install directory
+    * Make gettext translations uninstallable
+
 Overview of changes in bake 0.1.8
 
     * Translate GSettings schema files
