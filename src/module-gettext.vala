@@ -42,16 +42,20 @@ public class GettextModule : BuildModule
         }
 
         /* Combine translations into a pot file */
-        // FIXME: Put translations into requested directories
+        var translation_list = "";
+        var r = find_gettext_recipe (recipe.toplevel, gettext_domain, out translation_list);
+        if (r == null)
+            r = recipe.toplevel;
+
         var pot_file = "%s.pot".printf (gettext_domain);
-        var pot_rule = recipe.toplevel.find_rule (pot_file);
+        var pot_rule = r.find_rule (pot_file);
         if (pot_rule == null)
         {
-            pot_rule = new PotRule (recipe.toplevel, pot_file);
-            recipe.toplevel.rules.append (pot_rule);
-            recipe.toplevel.build_rule.add_input (pot_file);            
+            pot_rule = new PotRule (r, pot_file);
+            r.rules.append (pot_rule);
+            r.build_rule.add_input (pot_file);            
         }
-        pot_rule.add_input (get_relative_path (recipe.toplevel.dirname, Path.build_filename (recipe.dirname, translation_file)));
+        pot_rule.add_input (get_relative_path (r.dirname, Path.build_filename (recipe.dirname, translation_file)));
     }
 
     public static List<string> get_languages (Recipe recipe, string gettext_domain, out string template_dir, out string translation_dir)
