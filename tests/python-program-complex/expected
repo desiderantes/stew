@@ -22,8 +22,5 @@ rm -f test2.pyc
 rm -f test3.pyc
 rm -rf .built/
 rm -f test.pot
-# FIXME: Duplicate removal
-rm -f test1.pyc
 rm -f test
-rm -f test1.pyc
 (exit SUCCESS)

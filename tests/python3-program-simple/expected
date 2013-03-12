@@ -14,9 +14,6 @@ cp .built/test /usr/local/bin/test
 !bake clean
 rm -f __pycache__/test.cpython-32.pyc
 rm -rf __pycache__/
-# FIXME: Duplicate deletes
-rm -f __pycache__/test.cpython-32.pyc
 rm -f test
-rm -f __pycache__/test.cpython-32.pyc
 rm -rf .built/
 (exit SUCCESS)

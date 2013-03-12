@@ -1,7 +1,7 @@
 private bool pretty_print = true;
 private bool debug_enabled = false;
 private string original_dir;
-private static bool directory_changed;
+private static string last_logged_directory;
 
 public class BuildModule
 {
@@ -378,6 +378,7 @@ public class Recipe
     public Rule install_rule;
     public CleanRule clean_rule;
     public Rule test_rule;
+    public HashTable<string, Rule> targets;
     
     public string dirname { owned get { return Path.get_dirname (filename); } }
 
@@ -714,10 +715,15 @@ public class Recipe
             }
         }
     }
+
+    public bool is_toplevel
+    {
+        get { return parent.parent == null; }
+    }
     
     public Recipe toplevel
     {
-        get { if (parent.parent == null) return this; else return parent.toplevel; }
+        get { if (is_toplevel) return this; else return parent.toplevel; }
     }
 
     public string relative_dirname
@@ -755,80 +761,33 @@ public class Recipe
         return null;
     }
 
-    /* Find the recipe that builds this target or null if no recipe builds it */
-    public Recipe? get_recipe_with_target (string target)
+    /* Find the rule that builds this target or null if no recipe builds it */
+    public Rule? get_rule_with_target (string target)
     {
-        /* See if we have a rule */
-        foreach (var rule in rules)
-        {
-            foreach (var output in rule.outputs)
-                if (output == target)
-                    return this;
-        }
-
-        /* Could be in a parent recipe... */
-        if (target.has_prefix ("../"))
-        {
-            if (parent == null)
-                return null;
-            return parent.get_recipe_with_target (target.substring (3));
-        }
-
-        /* ...or a child recipe */
-        foreach (var child in children)
-        {
-            var child_dir = "%s/".printf (get_relative_path (dirname, child.dirname));
-            if (target.has_prefix (child_dir) && target != child_dir)
-                return child.get_recipe_with_target (target.substring (child_dir.length));
-        }
-
-        /* There's no rule to build this */
-        return null;
+        return toplevel.targets.lookup (target);
     }
 
-    private void change_directory (string dirname)
-    {
-        if (Environment.get_current_dir () == dirname)
-            return;
-
-        directory_changed = true;
-        Environment.set_current_dir (dirname);
-    }
-
-    private void log_directory_change ()
-    {
-        if (directory_changed)
-            GLib.print ("\x1B[1m[Entering directory %s]\x1B[0m\n", get_relative_path (original_dir, Environment.get_current_dir ()));
-        directory_changed = false;
-    }
-    
     public bool build_target (string target) throws BuildError
     {
-        var path = join_relative_dir (dirname, target);
-
         if (debug_enabled)
-            stderr.printf ("Considering target %s\n", get_relative_path (original_dir, path));
+            stderr.printf ("Considering target %s\n", get_relative_path (original_dir, target));
 
-        /* If the rule comes from another recipe, use it to build */
-        var recipe = get_recipe_with_target (target);
-        if (recipe != null && recipe != this)
+        /* Find the rule */
+        var rule = get_rule_with_target (target);
+        if (rule != null && rule.recipe != this)
         {
             if (debug_enabled)
                 stderr.printf ("Target %s defined in recipe %s\n",
-                               get_relative_path (original_dir, path),
-                               get_relative_path (original_dir, recipe.filename));
+                               get_relative_path (original_dir, target),
+                               get_relative_path (original_dir, rule.recipe.filename));
 
-            return recipe.build_target (get_relative_path (recipe.dirname, path));
+            return rule.recipe.build_target (target);
         }
 
-        /* Find a for this target */
-        var rule = find_rule (target);
-        if (rule == null)
-            rule = find_rule ("%" + target);
         if (rule == null)
         {
             /* If it's already there then don't need to do anything */
-            if (FileUtils.test (path, FileTest.EXISTS))
+            if (FileUtils.test (target, FileTest.EXISTS))
                 return false;
 
             /* If doesn't exist then we can't continue */
@@ -839,18 +798,25 @@ public class Recipe
         var force_build = false;
         foreach (var input in rule.inputs)
         {
-            if (build_target (input))
+            if (build_target (join_relative_dir (dirname, input)))
                 force_build = true;
         }
 
         /* Don't bother if it's already up to date */
-        change_directory (dirname);
+        Environment.set_current_dir (dirname);
         if (!force_build && !rule.needs_build ())
             return false;
 
         /* If we're about to do something then note which directory we are in and what we're building */
         if (rule.get_commands () != null)
-            log_directory_change ();
+        {
+            var dir = Environment.get_current_dir ();
+            if (last_logged_directory != dir)
+            {
+                GLib.print ("\x1B[1m[Entering directory %s]\x1B[0m\n", get_relative_path (original_dir, dir));
+                last_logged_directory = dir;
+            }
+        }
 
         /* Run the commands */
         rule.build ();
@@ -956,6 +922,16 @@ public class Bake
 
         foreach (var child in recipe.children)
             recipe_complete (child);
+    }
+
+    private static void optimise (HashTable<string, Rule> targets, Recipe recipe)
+    {
+        foreach (var rule in recipe.rules)
+            foreach (var output in rule.outputs)
+                targets.insert (Path.build_filename (recipe.dirname, output), rule);
+
+        foreach (var r in recipe.children)
+            optimise (targets, r);
     }
 
     private static bool generate_library_rules (Recipe recipe)
@@ -1100,7 +1076,6 @@ public class Bake
 
         /* Find the toplevel */
         var toplevel_dir = Environment.get_current_dir ();
-        var is_toplevel = true;
         Recipe? toplevel = null;
         while (true)
         {
@@ -1118,7 +1093,6 @@ public class Bake
                     printerr ("Unable to build: %s\n", e.message);
                 return Posix.EXIT_FAILURE;
             }
-            is_toplevel = false;
             toplevel_dir = Path.get_dirname (toplevel_dir);
         }
 
@@ -1263,6 +1237,10 @@ public class Bake
         /* Generate clean rule */
         generate_clean_rules (toplevel);
 
+        /* Optimise */
+        toplevel.targets = new HashTable<string, Rule> (str_hash, str_equal);
+        optimise (toplevel.targets, toplevel);
+
         recipe_complete (toplevel);
         foreach (var module in modules)
             module.rules_complete (toplevel);
@@ -1288,15 +1266,20 @@ public class Bake
             return Posix.EXIT_SUCCESS;
         }
 
-        string target = "build";
+        string target = "%build";
         if (args.length >= 2)
             target = args[1];
 
         GLib.print ("\x1B[1m[Building target %s]\x1B[0m\n", target);
 
+        /* Build virtual targets */
+        if (!target.has_prefix ("%") && recipe.get_rule_with_target (Path.build_filename (recipe.dirname, "%" + target)) != null)
+            target = "%" + target;
+
+        last_logged_directory = Environment.get_current_dir ();
         try
         {
-            recipe.build_target (target);
+            recipe.build_target (join_relative_dir (toplevel.dirname, target));
         }
         catch (BuildError e)
         {

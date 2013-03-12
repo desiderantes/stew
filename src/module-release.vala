@@ -1,12 +1,45 @@
+private class ReleaseRule : Rule
+{
+    public HashTable<string, bool> file_table;
+    public HashTable<string, bool> directory_table;
+
+    public ReleaseRule (Recipe recipe)
+    {
+        base (recipe);
+        file_table = new HashTable<string, bool> (str_hash, str_equal);
+        directory_table = new HashTable<string, bool> (str_hash, str_equal);
+    }
+
+    public void add_release_file (string input_filename, string output_filename)
+    {
+        var dirname = Path.get_dirname (output_filename);
+
+        /* Generate directory if a new one */
+        if (!directory_table.contains (dirname))
+        {
+            add_command ("@mkdir -p %s".printf (dirname));
+            directory_table.insert (dirname, true);
+        }
+
+        if (!file_table.contains (input_filename))
+        {
+            add_input (input_filename);
+            add_command ("@cp %s %s".printf (input_filename, output_filename));
+            file_table.insert (input_filename, true);
+        }
+    }
+}
+
 public class ReleaseModule : BuildModule
 {
     public override void generate_toplevel_rules (Recipe recipe)
     {
-        var rule = recipe.add_rule ();
+        var rule = new ReleaseRule (recipe);
+        recipe.rules.append (rule);
         rule.add_output ("%s/".printf (recipe.release_name));
     }
 
-    private static void add_release_file (Rule release_rule, string temp_dir, string directory, string filename)
+    private static void add_release_file (ReleaseRule release_rule, string temp_dir, string directory, string filename)
     {
         var input_filename = Path.build_filename (directory, filename);
         var output_filename = Path.build_filename (temp_dir, directory, filename);
@@ -16,23 +49,7 @@ public class ReleaseModule : BuildModule
             output_filename = Path.build_filename (temp_dir, filename);
         }
 
-        var has_dir = false;
-        foreach (var input in release_rule.inputs)
-        {
-            /* Ignore if already being copied */
-            if (input == input_filename)
-                return;
-
-            if (!has_dir && Path.get_dirname (input) == Path.get_dirname (input_filename))
-                has_dir = true;
-        }
-
-        /* Generate directory if a new one */
-        if (!has_dir)
-            release_rule.add_command ("@mkdir -p %s".printf (Path.get_dirname (output_filename)));
-
-        release_rule.add_input (input_filename);
-        release_rule.add_command ("@cp %s %s".printf (input_filename, output_filename));
+        release_rule.add_release_file (input_filename, output_filename);
     }
 
     public override void recipe_complete (Recipe recipe)
@@ -40,7 +57,7 @@ public class ReleaseModule : BuildModule
         var relative_dirname = recipe.relative_dirname;
         var release_dir = "%s/".printf (recipe.release_name);
 
-        var release_rule = recipe.toplevel.find_rule (release_dir);
+        var release_rule = (ReleaseRule) recipe.toplevel.find_rule (release_dir);
 
         var dirname = Path.build_filename (release_dir, relative_dirname);
         if (relative_dirname == ".")
@@ -53,16 +70,15 @@ public class ReleaseModule : BuildModule
             foreach (var input in rule.inputs)
             {
                 /* Can't depend on ourselves */
-                if (input == release_dir + "/")
+                if (input == release_dir)
                     continue;
 
-                /* Ignore generated files */
-                if (recipe.find_rule (input) != null || recipe.find_rule ("%%%s".printf (input)) != null)
+                /* Ignore virtual rules */
+                if (input.has_prefix ("%"))
                     continue;
 
-                /* Ignore files built in other recipes */
-                var build_recipe = recipe.get_recipe_with_target (input);
-                if (build_recipe != null && build_recipe != recipe)
+                /* Ignore built files */
+                if (recipe.get_rule_with_target (join_relative_dir (recipe.dirname, input)) != null)
                     continue;
 
                 add_release_file (release_rule, release_dir, relative_dirname, input);

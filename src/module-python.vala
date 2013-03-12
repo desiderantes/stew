@@ -62,7 +62,6 @@ public class PythonModule : BuildModule
 
         /* Script to run locally */
         var rule = recipe.add_rule ();
-        rule.add_output (main_file);
         rule.add_output (binary_name);
         rule.add_command ("@echo '#!/bin/sh' > %s".printf (binary_name));
         rule.add_command ("@echo 'exec %s %s' >> %s".printf (python_bin, main_file, binary_name));
@@ -72,7 +71,6 @@ public class PythonModule : BuildModule
         /* Script to run when installed */
         var script = recipe.get_build_path (binary_name);
         rule = recipe.add_rule ();
-        rule.add_output (main_file);
         rule.add_output (script);
         rule.add_command ("@echo '#!/bin/sh' > %s".printf (script));
         rule.add_command ("@echo 'exec %s %s' >> %s".printf (python_bin, Path.build_filename (recipe.package_data_directory, main_file), script));

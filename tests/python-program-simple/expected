@@ -10,9 +10,6 @@ cp .built/test /usr/local/bin/test
 (exit SUCCESS)
 !bake clean
 rm -f test.pyc
-# FIXME: Duplicate deletes
-rm -f test.pyc
 rm -f test
-rm -f test.pyc
 rm -rf .built/
 (exit SUCCESS)
