@@ -13,14 +13,22 @@ public class BuildModule
     {
     }
     
-    public virtual bool generate_program_rules (Recipe recipe, string id)
+    public virtual bool can_generate_program_rules (Recipe recipe, string id)
+    {
+        return false;
+    }
+    
+    public virtual void generate_program_rules (Recipe recipe, string id)
+    {
+    }
+
+    public virtual bool can_generate_library_rules (Recipe recipe, string library)
     {
         return false;
     }
 
-    public virtual bool generate_library_rules (Recipe recipe, string library)
+    public virtual void generate_library_rules (Recipe recipe, string library)
     {
-        return false;
     }
 
     public virtual void recipe_complete (Recipe recipe)
@@ -937,22 +945,24 @@ public class Bake
     private static bool generate_library_rules (Recipe recipe)
     {
         var libraries = recipe.get_variable_children ("libraries");
-        foreach (var library in libraries)
+        foreach (var id in libraries)
         {
-            var matched = false;
+            var buildable_modules = new List<BuildModule> ();
             foreach (var module in modules)
             {
-                if (module.generate_library_rules (recipe, library))
-                {
-                    matched = true;
-                    break;
-                }
+                if (module.can_generate_library_rules (recipe, id))
+                    buildable_modules.append (module);
             }
 
-            if (!matched)
+            if (buildable_modules.length () > 0)
+                buildable_modules.nth_data (0).generate_library_rules (recipe, id);
+            else
             {
-                printerr ("Unable to generate rules for library %s in file %s\n", library, get_relative_path (original_dir, recipe.filename));
-                return false;
+                var rule = recipe.add_rule ();
+                rule.add_output (id);
+                rule.add_command ("@echo 'No compiler found that matches library %s'".printf (id));
+                rule.add_command ("@false");
+                recipe.build_rule.add_input (id);
             }
         }
 
@@ -969,21 +979,24 @@ public class Bake
     private static bool generate_program_rules (Recipe recipe)
     {
         var programs = recipe.get_variable_children ("programs");
-        foreach (var program in programs)
+        foreach (var id in programs)
         {
-            var matched = false;
+            var buildable_modules = new List<BuildModule> ();
             foreach (var module in modules)
             {
-                if (module.generate_program_rules (recipe, program))
-                {
-                    matched = true;
-                    break;
-                }
+                if (module.can_generate_program_rules (recipe, id))
+                    buildable_modules.append (module);
             }
-            if (!matched)
+
+            if (buildable_modules.length () > 0)
+                buildable_modules.nth_data (0).generate_program_rules (recipe, id);
+            else
             {
-                printerr ("Unable to generate rules for program %s in file %s\n", program, get_relative_path (original_dir, recipe.filename));
-                return false;
+                var rule = recipe.add_rule ();
+                rule.add_output (id);
+                rule.add_command ("@echo 'No compiler found that matches program %s'".printf (id));
+                rule.add_command ("@false");
+                recipe.build_rule.add_input (id);
             }
         }
 
@@ -1225,7 +1238,6 @@ public class Bake
             module.generate_toplevel_rules (toplevel);
 
         /* Generate libraries first (as other things may depend on it) then the other rules */
-        /* FIXME: Stop this failing the build, instead print errors in the build rule */
         if (!generate_library_rules (toplevel) ||
             !generate_program_rules (toplevel) ||
             !generate_rules (toplevel))

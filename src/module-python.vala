@@ -1,25 +1,22 @@
 public class PythonModule : BuildModule
 {
-    public override bool generate_program_rules (Recipe recipe, string id)
+    public override bool can_generate_program_rules (Recipe recipe, string id)
+    {
+        return can_generate_rules (recipe, "programs", id);
+    }
+
+    public override void generate_program_rules (Recipe recipe, string id)
     {
         var name = recipe.get_variable ("programs.%s.name".printf (id), id);
         var binary_name = name;
         var do_install = recipe.get_boolean_variable ("programs.%s.install".printf (id), true);
 
-        var source_list = recipe.get_variable ("programs.%s.sources".printf (id));
-        if (source_list == null)
-            return false;
-        var sources = split_variable (source_list);
-        foreach (var source in sources)
-            if (!source.has_suffix (".py"))
-                return false;
+        var sources = split_variable (recipe.get_variable ("programs.%s.sources".printf (id)));
 
         var python_version = recipe.get_variable ("programs.%s.python-version".printf (id));
         var python_bin = "python";
         if (python_version != null)
             python_bin += python_version;
-        if (Environment.find_program_in_path (python_bin) == null)
-            return false;
 
         var python_cache_dir = "__pycache__";
         var install_sources = recipe.get_boolean_variable ("programs.%s.install-sources".printf (id));
@@ -78,37 +75,40 @@ public class PythonModule : BuildModule
         recipe.build_rule.add_input (script);
         if (do_install)
             recipe.add_install_rule (script, recipe.binary_directory, binary_name);
-            
-        return true;
     }
 
-    public override bool generate_library_rules (Recipe recipe, string library)
+    public override bool can_generate_library_rules (Recipe recipe, string id)
     {
-        var source_list = recipe.get_variable ("libraries.%s.sources".printf (library));
-        if (source_list == null)
-            return false;
-        var sources = split_variable (source_list);
-        foreach (var source in sources)
-            if (!source.has_suffix (".py"))
-                return false;
+        return can_generate_rules (recipe, "libraries", id);
+    }
 
-        if (Environment.find_program_in_path ("python") == null)
-            return false;
+    public override void generate_library_rules (Recipe recipe, string id)
+    {
+        var sources = split_variable (recipe.get_variable ("libraries.%s.sources".printf (id)));
 
-        var do_install = recipe.get_boolean_variable ("libraries.%s.install".printf (library), true);
+        var python_version = recipe.get_variable ("programs.%s.python-version".printf (id));
+        var python_bin = "python";
+        if (python_version != null)
+            python_bin += python_version;
 
-        var install_directory = recipe.get_variable ("libraries.%s.install-directory".printf (library));
-        var install_sources = recipe.get_boolean_variable ("libraries.%s.install-sources".printf (library));
+        var do_install = recipe.get_boolean_variable ("libraries.%s.install".printf (id), true);
+
+        var install_directory = recipe.get_variable ("libraries.%s.install-directory".printf (id));
+        var install_sources = recipe.get_boolean_variable ("libraries.%s.install-sources".printf (id));
         if (install_directory == null)
         {
-            var version = get_version ();
-            if (version == null)
-                return false;
-            var tokens = version.split (".");
-            if (tokens.length < 2)
-                return false;
-            /* FIXME: Define this once (python-directory) in the toplevel (need to make recipes inherit variables from parents) */
-            install_directory = Path.build_filename (recipe.library_directory, "python%s.%s".printf (tokens[0], tokens[1]), "site-packages", library);
+            var install_dir = python_bin;
+            if (python_version == null)
+            {
+                var version = get_version (python_bin);
+                if (version != null)
+                {
+                    var tokens = version.split (".");
+                    if (tokens.length > 2)
+                        install_dir = "python%s.%s".printf (tokens[0], tokens[1]);
+                }
+            }
+            install_directory = Path.build_filename (recipe.library_directory, install_dir, "site-packages", id);
         }
 
         foreach (var source in sources)
@@ -118,7 +118,7 @@ public class PythonModule : BuildModule
             rule.add_input (source);
             rule.add_output (output);
             rule.add_status_command ("PYC %s".printf (source));		
-            rule.add_command ("@python -m py_compile %s".printf (source));
+            rule.add_command ("@%s -m py_compile %s".printf (python_bin, source));
             recipe.build_rule.add_input (output);
 
             if (do_install)
@@ -129,23 +129,41 @@ public class PythonModule : BuildModule
             }
         }
 
-        var gettext_domain = recipe.get_variable ("libraries.%s.gettext-domain".printf (library));
+        var gettext_domain = recipe.get_variable ("libraries.%s.gettext-domain".printf (id));
         if (gettext_domain != null)
         {
             foreach (var source in sources)
                 GettextModule.add_translatable_file (recipe, gettext_domain, "text/x-python", source);
         }
+    }
+
+    private bool can_generate_rules (Recipe recipe, string type_name, string id)
+    {
+        var source_list = recipe.get_variable ("%s.%s.sources".printf (type_name, id));
+        if (source_list == null)
+            return false;
+        var sources = split_variable (source_list);
+        foreach (var source in sources)
+            if (!source.has_suffix (".py"))
+                return false;
+
+        var python_version = recipe.get_variable ("%s.%s.python-version".printf (type_name, id));
+        var python_bin = "python";
+        if (python_version != null)
+            python_bin += python_version;
+        if (Environment.find_program_in_path (python_bin) == null)
+            return false;
 
         return true;
     }
 
-    private string? get_version ()
+    private string? get_version (string python_bin)
     {
         int exit_status;
         string version_string;
         try
         {
-            Process.spawn_command_line_sync ("python --version", null, out version_string, out exit_status);
+            Process.spawn_command_line_sync ("%s --version".printf (python_bin), null, out version_string, out exit_status);
         }
         catch (SpawnError e)
         {

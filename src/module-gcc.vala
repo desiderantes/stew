@@ -1,14 +1,24 @@
 public class GCCModule : BuildModule
 {
-    public override bool generate_program_rules (Recipe recipe, string id)
+    public override bool can_generate_program_rules (Recipe recipe, string id)
+    {
+        return can_generate_rules (recipe, "programs", id);
+    }
+
+    public override void generate_program_rules (Recipe recipe, string id)
     {
         var name = recipe.get_variable ("programs.%s.name".printf (id), id);
         var binary_name = name;
         var do_install = recipe.get_boolean_variable ("programs.%s.install".printf (id), true);
-        return generate_compile_rules (recipe, "programs", id, binary_name, null, false, do_install);
+        generate_compile_rules (recipe, "programs", id, binary_name, null, false, do_install);
     }
 
-    public override bool generate_library_rules (Recipe recipe, string library)
+    public override bool can_generate_library_rules (Recipe recipe, string id)
+    {
+        return can_generate_rules (recipe, "libraries", id);
+    }
+
+    public override void generate_library_rules (Recipe recipe, string library)
     {
         var version = recipe.get_variable ("libraries.%s.version".printf (library), "0");
         var major_version = version;
@@ -20,8 +30,7 @@ public class GCCModule : BuildModule
 
         var binary_name = "lib%s.so.%s".printf (library, version);
         var namespace = recipe.get_variable ("libraries.%s.namespace".printf (library));
-        if (!generate_compile_rules (recipe, "libraries", library, binary_name, namespace, true, do_install))
-            return false;
+        generate_compile_rules (recipe, "libraries", library, binary_name, namespace, true, do_install);
 
         /* Generate a symbolic link to the library and install both the link and the library */
         var rule = recipe.add_rule ();
@@ -107,37 +116,46 @@ public class GCCModule : BuildModule
             if (do_install)
                 recipe.add_install_rule (typelib_filename, typelib_directory);
         }
-
-        return true;        
     }
 
-    private bool generate_compile_rules (Recipe recipe, string type_name, string name, string binary_name, string? namespace = null, bool is_library = false, bool do_install = true)
+    private bool can_generate_rules (Recipe recipe, string type_name, string name)
+    {
+        if (get_compiler (recipe, type_name, name) == null)
+            return false;
+
+        return true;
+    }
+
+    private string? get_compiler (Recipe recipe, string type_name, string name)
     {
         var source_list = recipe.get_variable ("%s.%s.sources".printf (type_name, name));
         if (source_list == null)
-            return false;
+            return null;
         var sources = split_variable (source_list);
 
-        var have_cpp = false;
         string? compiler = null;
         foreach (var source in sources)
         {
             if (source.has_suffix (".h"))
                 continue;
 
-            var c = get_compiler (source);
+            var c = get_compiler_for_source_file (source);
             if (c == null || Environment.find_program_in_path (c) == null)
-                return false;
-
-            if (c == "g++")
-                have_cpp = true;
+                return null;
 
             if (compiler != null && c != compiler)
-                return false;
+                return null;
             compiler = c;
         }
-        if (compiler == null)
-            return false;
+
+        return compiler;
+    }
+
+    private void generate_compile_rules (Recipe recipe, string type_name, string name, string binary_name, string? namespace = null, bool is_library = false, bool do_install = true)
+    {
+        var sources = split_variable (recipe.get_variable ("%s.%s.sources".printf (type_name, name)));
+        
+        var compiler = get_compiler (recipe, type_name, name);
 
         var is_qt = recipe.get_boolean_variable ("%s.%s.qt".printf (type_name, name));
 
@@ -153,6 +171,7 @@ public class GCCModule : BuildModule
         /* Get dependencies */
         var packages = recipe.get_variable ("%s.%s.packages".printf (type_name, name), "");
         var package_list = split_variable (packages);
+        var link_error = "";
         if (package_list != null)
         {
             var pkg_config_list = "";
@@ -190,8 +209,7 @@ public class GCCModule : BuildModule
                 }
                 catch (FileError e)
                 {
-                    printerr ("Error loading package info %s: %s\n", pkg_config_list, e.message);
-                    return false;
+                    link_error = "Error loading package info %s: %s".printf (pkg_config_list, e.message);
                 }
             }
         }
@@ -242,9 +260,17 @@ public class GCCModule : BuildModule
 
         recipe.build_rule.add_input (binary_name);
 
-        link_rule.add_status_command ("GCC-LINK %s".printf (binary_name));
-        link_command += " " + ldflags;
-        link_rule.add_command (link_command);
+        if (link_error != "")
+        {
+            link_rule.add_command ("@echo '%s'".printf (link_error));
+            link_rule.add_command ("@false");
+        }
+        else
+        {
+            link_rule.add_status_command ("GCC-LINK %s".printf (binary_name));
+            link_command += " " + ldflags;
+            link_rule.add_command (link_command);
+        }
 
         if (do_install)
         {
@@ -264,8 +290,6 @@ public class GCCModule : BuildModule
                     GettextModule.add_translatable_file (recipe, gettext_domain, mime_type, source);
             }
         }
-
-        return true;
     }
 
     private List<string> get_includes (Recipe recipe, string filename)
@@ -293,7 +317,7 @@ public class GCCModule : BuildModule
         return includes;
     }
 
-    private string? get_compiler (string source)
+    private string? get_compiler_for_source_file (string source)
     {
         /* C */
         if (source.has_suffix (".c"))

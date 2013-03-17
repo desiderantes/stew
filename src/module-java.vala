@@ -1,22 +1,17 @@
 public class JavaModule : BuildModule
 {
-    public override bool generate_program_rules (Recipe recipe, string id)
+    public override bool can_generate_program_rules (Recipe recipe, string id)
+    {
+        return can_generate_rules (recipe, "programs", id);
+    }
+
+    public override void generate_program_rules (Recipe recipe, string id)
     {
         var name = recipe.get_variable ("programs.%s.name".printf (id), id);
         var binary_name = name;
         var do_install = recipe.get_boolean_variable ("programs.%s.install".printf (id), true);
 
-        if (Environment.find_program_in_path ("javac") == null || Environment.find_program_in_path ("jar") == null)
-            return false;
-
-        var source_list = recipe.get_variable ("programs.%s.sources".printf (id));
-        if (source_list == null)
-            return false;
-        var sources = split_variable (source_list);
-
-        foreach (var source in sources)
-            if (!source.has_suffix (".java"))
-                return false;
+        var sources = split_variable (recipe.get_variable ("programs.%s.sources".printf (id)));
 
         var jar_file = "%s.jar".printf (binary_name);
 
@@ -79,27 +74,20 @@ public class JavaModule : BuildModule
             foreach (var source in sources)
                 GettextModule.add_translatable_file (recipe, gettext_domain, "text/x-java", source);
         }
-
-        return true;
     }
 
-    public override bool generate_library_rules (Recipe recipe, string library)
+    public override bool can_generate_library_rules (Recipe recipe, string id)
+    {
+        return can_generate_rules (recipe, "libraries", id);
+    }
+
+    public override void generate_library_rules (Recipe recipe, string id)
     {    
-        if (Environment.find_program_in_path ("javac") == null || Environment.find_program_in_path ("jar") == null)
-            return false;
+        var do_install = recipe.get_boolean_variable ("libraries.%s.install".printf (id), true);
 
-        var do_install = recipe.get_boolean_variable ("libraries.%s.install".printf (library), true);
+        var sources = split_variable (recipe.get_variable ("libraries.%s.sources".printf (id)));
 
-        var source_list = recipe.get_variable ("libraries.%s.sources".printf (library));
-        if (source_list == null)
-            return false;
-        var sources = split_variable (source_list);
-
-        foreach (var source in sources)
-            if (!source.has_suffix (".java"))
-                return false;
-
-        var jar_file = "%s.jar".printf (library);
+        var jar_file = "%s.jar".printf (id);
 
         var rule = recipe.add_rule ();
         var build_directory = get_relative_path (recipe.dirname, recipe.build_directory);
@@ -132,12 +120,27 @@ public class JavaModule : BuildModule
         if (do_install)
             recipe.add_install_rule (jar_file, Path.build_filename (recipe.data_directory, "java"));
 
-        var gettext_domain = recipe.get_variable ("libraries.%s.gettext-domain".printf (library));
+        var gettext_domain = recipe.get_variable ("libraries.%s.gettext-domain".printf (id));
         if (gettext_domain != null)
         {
             foreach (var source in sources)
                 GettextModule.add_translatable_file (recipe, gettext_domain, "text/x-java", source);
         }
+    }
+
+    private bool can_generate_rules (Recipe recipe, string type_name, string id)
+    {
+        if (Environment.find_program_in_path ("javac") == null || Environment.find_program_in_path ("jar") == null)
+            return false;
+
+        var source_list = recipe.get_variable ("%s.%s.sources".printf (type_name, id));
+        if (source_list == null)
+            return false;
+        var sources = split_variable (source_list);
+
+        foreach (var source in sources)
+            if (!source.has_suffix (".java"))
+                return false;
 
         return true;
     }

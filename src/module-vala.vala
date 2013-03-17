@@ -1,40 +1,45 @@
 public class ValaModule : BuildModule
 {
-    public override bool generate_program_rules (Recipe recipe, string id)
+    public override bool can_generate_program_rules (Recipe recipe, string id)
+    {
+        return can_generate_rules (recipe, "programs", id);
+    }
+
+    public override void generate_program_rules (Recipe recipe, string id)
     {
         var name = recipe.get_variable ("programs.%s.name".printf (id), id);
         var binary_name = name;
         var do_install = recipe.get_boolean_variable ("programs.%s.install".printf (id), true);
 
-        if (!generate_compile_rules (recipe, "programs", id, binary_name))
-            return false;
-
+        generate_compile_rules (recipe, "programs", id, binary_name);
         if (do_install)
             recipe.add_install_rule (binary_name, recipe.binary_directory);
 
         generate_gettext_rules (recipe, "programs", id);
-
-        return true;
     }
 
-    public override bool generate_library_rules (Recipe recipe, string library)
+    public override bool can_generate_library_rules (Recipe recipe, string id)
     {
-        var version = recipe.get_variable ("libraries.%s.version".printf (library), "0");
+        return can_generate_rules (recipe, "libraries", id);
+    }
+
+    public override void generate_library_rules (Recipe recipe, string id)
+    {
+        var version = recipe.get_variable ("libraries.%s.version".printf (id), "0");
         var major_version = version;
         var index = version.index_of (".");
         if (index > 0)
             major_version = version.substring (0, index);
 
-        var do_install = recipe.get_boolean_variable ("libraries.%s.install".printf (library), true);
-        var namespace = recipe.get_variable ("libraries.%s.namespace".printf (library));
+        var do_install = recipe.get_boolean_variable ("libraries.%s.install".printf (id), true);
+        var namespace = recipe.get_variable ("libraries.%s.namespace".printf (id));
 
-        var binary_name = "lib%s.so.%s".printf (library, version);
-        if (!generate_compile_rules (recipe, "libraries", library, binary_name, namespace, version, major_version, true))
-            return false;
+        var binary_name = "lib%s.so.%s".printf (id, version);
+        generate_compile_rules (recipe, "libraries", id, binary_name, namespace, version, major_version, true);
            
         /* Generate a symbolic link to the library and install both the link and the library */
         var rule = recipe.add_rule ();
-        var unversioned_binary_name = "lib%s.so".printf (library);
+        var unversioned_binary_name = "lib%s.so".printf (id);
         recipe.build_rule.add_input (unversioned_binary_name);
         rule.add_input (binary_name);
         rule.add_output (unversioned_binary_name);
@@ -47,12 +52,12 @@ public class ValaModule : BuildModule
         }
 
         /* Generate pkg-config file */
-        var filename = "%s-%s.pc".printf (library, major_version);
-        var name = recipe.get_variable ("libraries.%s.name".printf (library), library);
-        var description = recipe.get_variable ("libraries.%s.description".printf (library), "");
-        var requires = recipe.get_variable ("libraries.%s.requires".printf (library), "");
+        var filename = "%s-%s.pc".printf (id, major_version);
+        var name = recipe.get_variable ("libraries.%s.name".printf (id), id);
+        var description = recipe.get_variable ("libraries.%s.description".printf (id), "");
+        var requires = recipe.get_variable ("libraries.%s.requires".printf (id), "");
 
-        var include_directory = Path.build_filename (recipe.include_directory, "%s-%s".printf (library, major_version));
+        var include_directory = Path.build_filename (recipe.include_directory, "%s-%s".printf (id, major_version));
 
         rule = recipe.add_rule ();
         recipe.build_rule.add_input (filename);
@@ -62,7 +67,7 @@ public class ValaModule : BuildModule
         rule.add_command ("@echo \"Description: %s\" >> %s".printf (description, filename));
         rule.add_command ("@echo \"Version: %s\" >> %s".printf (version, filename));
         rule.add_command ("@echo \"Requires: %s\" >> %s".printf (requires, filename));
-        rule.add_command ("@echo \"Libs: -L%s -l%s\" >> %s".printf (recipe.library_directory, library, filename));
+        rule.add_command ("@echo \"Libs: -L%s -l%s\" >> %s".printf (recipe.library_directory, id, filename));
         rule.add_command ("@echo \"Cflags: -I%s\" >> %s".printf (include_directory, filename));
 
         if (do_install)
@@ -91,7 +96,7 @@ public class ValaModule : BuildModule
             recipe.build_rule.add_input (typelib_filename);
             var typelib_rule = recipe.add_rule ();
             typelib_rule.add_input (gir_filename);
-            typelib_rule.add_input ("lib%s.so".printf (library));
+            typelib_rule.add_input ("lib%s.so".printf (id));
             typelib_rule.add_output (typelib_filename);
             typelib_rule.add_status_command ("G-IR-COMPILER %s".printf (typelib_filename));
             typelib_rule.add_command ("@g-ir-compiler --shared-library=%s %s -o %s".printf (name, gir_filename, typelib_filename));
@@ -100,38 +105,17 @@ public class ValaModule : BuildModule
                 recipe.add_install_rule (typelib_filename, typelib_directory);
         }
 
-        generate_gettext_rules (recipe, "libraries", library);
-
-        return true;
+        generate_gettext_rules (recipe, "libraries", id);
     }
 
-    private bool generate_compile_rules (Recipe recipe, string type_name, string name, string binary_name, string? namespace = null, string? version = null, string? major_version = null, bool is_library = false)
+    private void generate_compile_rules (Recipe recipe, string type_name, string name, string binary_name, string? namespace = null, string? version = null, string? major_version = null, bool is_library = false)
     {
-        var source_list = recipe.get_variable ("%s.%s.sources".printf (type_name, name));
-        if (source_list == null)
-            return false;
-        var sources = split_variable (source_list);
-        if (sources == null)
-            return false;
+        var sources = split_variable (recipe.get_variable ("%s.%s.sources".printf (type_name, name)));
 
         var cflags = recipe.get_variable ("%s.%s.compile-flags".printf (type_name, name), "");
         cflags = " " + cflags;
         var ldflags = recipe.get_variable ("%s.%s.link-flags".printf (type_name, name), "");
         ldflags = " " + ldflags;
-
-        var have_vala = false;
-        foreach (var source in sources)
-        {
-            if (source.has_suffix (".vala"))
-                have_vala = true;
-            else if (!source.has_suffix (".vapi"))
-                return false;
-        }
-        if (!have_vala)
-            return false;
-
-        if (Environment.find_program_in_path ("valac") == null || Environment.find_program_in_path ("gcc") == null)
-            return false;
 
         var valac_command = "@valac";
         var valac_flags = recipe.get_variable ("%s.%s.vala-compile-flags".printf (type_name, name), "");
@@ -147,6 +131,7 @@ public class ValaModule : BuildModule
         /* Get dependencies */
         var packages = recipe.get_variable ("%s.%s.packages".printf (type_name, name), "");
         var package_list = split_variable (packages);
+        var link_error = "";
         if (package_list != null)
         {
             var pkg_config_list = "";
@@ -194,8 +179,7 @@ public class ValaModule : BuildModule
                 }
                 catch (FileError e)
                 {
-                    printerr ("Error loading package info %s: %s\n", pkg_config_list, e.message);
-                    return false;
+                    link_error = "Error loading package info %s: %s".printf (pkg_config_list, e.message);
                 }
             }
         }
@@ -309,9 +293,41 @@ public class ValaModule : BuildModule
 
         /* Link */
         recipe.build_rule.add_input (binary_name);
-        link_rule.add_status_command ("GCC-LINK %s".printf (binary_name));
-        link_command += " " + ldflags;
-        link_rule.add_command (link_command);
+
+        if (link_error != "")
+        {
+            link_rule.add_command ("@echo '%s'".printf (link_error));
+            link_rule.add_command ("@false");
+        }
+        else
+        {
+            link_rule.add_status_command ("GCC-LINK %s".printf (binary_name));
+            link_command += " " + ldflags;
+            link_rule.add_command (link_command);
+        }
+    }
+    
+    private bool can_generate_rules (Recipe recipe, string type_name, string name)
+    {
+        var source_list = recipe.get_variable ("%s.%s.sources".printf (type_name, name));
+        if (source_list == null)
+            return false;
+        var sources = split_variable (source_list);
+        if (sources == null)
+            return false;
+
+        var n_sources = 0;
+        foreach (var source in sources)
+        {
+            if (!(source.has_suffix (".vala") || source.has_suffix (".vapi")))
+                return false;
+            n_sources++;
+        }
+        if (n_sources == 0)
+            return false;
+
+        if (Environment.find_program_in_path ("valac") == null || Environment.find_program_in_path ("gcc") == null)
+            return false;
 
         return true;
     }

@@ -1,6 +1,6 @@
 !bake
 (exit FAILURE)
 !bake install
-(exit FAILURE)
+(exit SUCCESS)
 !bake clean
-(exit FAILURE)
+(exit SUCCESS)

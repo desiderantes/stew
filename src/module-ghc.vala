@@ -1,11 +1,7 @@
 public class GHCModule : BuildModule
 {
-    public override bool generate_program_rules (Recipe recipe, string id)
+    public override bool can_generate_program_rules (Recipe recipe, string id)
     {
-        var name = recipe.get_variable ("programs.%s.name".printf (id), id);
-        var binary_name = name;
-        var do_install = recipe.get_boolean_variable ("programs.%s.install".printf (id), true);
-
         var source_list = recipe.get_variable ("programs.%s.sources".printf (id));
         if (source_list == null)
             return false;
@@ -16,6 +12,17 @@ public class GHCModule : BuildModule
 
         if (Environment.find_program_in_path ("ghc") == null)
             return false;
+
+        return true;
+    }
+
+    public override void generate_program_rules (Recipe recipe, string id)
+    {
+        var name = recipe.get_variable ("programs.%s.name".printf (id), id);
+        var binary_name = name;
+        var do_install = recipe.get_boolean_variable ("programs.%s.install".printf (id), true);
+
+        var sources = split_variable (recipe.get_variable ("programs.%s.sources".printf (id)));
 
         var link_rule = recipe.add_rule ();
         link_rule.add_output (binary_name);
@@ -44,7 +51,5 @@ public class GHCModule : BuildModule
 
         if (do_install)
             recipe.add_install_rule (binary_name, recipe.binary_directory);
-
-        return true;
     }
 }
