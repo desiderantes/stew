@@ -103,6 +103,19 @@ public static int main (string[] args)
     return Posix.EXIT_SUCCESS;
 }
 
+/* This is a replacement for string.split since it generates annoying warnings about const pointers.
+ * See https://bugzilla.gnome.org/show_bug.cgi?id=686130 for more information */
+private static string strip (string value)
+{
+    var start = 0;
+    while (value[start].isspace ())
+        start++;
+    var end = value.length;
+    while (end > 0 && value[end - 1].isspace ())
+       end--;
+    return value.slice (start, end);
+}
+
 private static void translate_c_source (Translations translations, string filename, string data)
 {
     var in_word = false;
@@ -184,7 +197,7 @@ private static void translate_xdg_desktop (Translations translations, string fil
     var line = 1;
     foreach (var l in data.split ("\n"))
     {
-        l = l.strip ();
+        l = strip (l);
         if (l[0] == '[')
             section = l;
         else

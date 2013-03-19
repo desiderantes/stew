@@ -12,7 +12,7 @@ public class DpkgModule : BuildModule
         try
         {
             Process.spawn_command_line_sync ("dpkg-architecture -qDEB_BUILD_ARCH", out build_arch, null, out exit_status);
-            build_arch = build_arch.strip ();
+            build_arch = strip (build_arch);
         }
         catch (SpawnError e)
         {

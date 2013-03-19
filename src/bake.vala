@@ -40,6 +40,19 @@ public class BuildModule
     }
 }
 
+/* This is a replacement for string.split since it generates annoying warnings about const pointers.
+ * See https://bugzilla.gnome.org/show_bug.cgi?id=686130 for more information */
+public static string strip (string value)
+{
+    var start = 0;
+    while (value[start].isspace ())
+        start++;
+    var end = value.length;
+    while (end > 0 && value[end - 1].isspace ())
+       end--;
+    return value.slice (start, end);
+}
+
 public List<string> split_variable (string value)
 {
     List<string> values = null;
@@ -533,7 +546,7 @@ public class Recipe
         {
             line_number++;
             
-            line = line.chomp ();
+            line = strip (line);
             if (line.has_suffix ("\\"))
             {
                 continued_line += line.substring (0, line.length - 1) + "\n";
@@ -573,7 +586,7 @@ public class Recipe
             var index = statement.index_of ("{");
             if (index >= 0)
             {
-                var name = statement.substring (0, index).strip ();
+                var name = strip (statement.substring (0, index));
                 if (variable_stack == null)
                     variable_stack.prepend (name);
                 else
@@ -593,10 +606,10 @@ public class Recipe
             index = statement.index_of ("=");
             if (index > 0)
             {
-                var name = statement.substring (0, index).strip ();
+                var name = strip (statement.substring (0, index));
                 if (variable_stack != null)
                     name = "%s.%s".printf (variable_stack.nth_data (0), name);
-                var value = statement.substring (index + 1).strip ();
+                var value = strip (statement.substring (index + 1));
 
                 variables.insert (name, value);
                 continue;
@@ -608,11 +621,11 @@ public class Recipe
             {
                 var rule = add_rule ();
 
-                var input_list = statement.substring (0, index).chomp ();
+                var input_list = strip (statement.substring (0, index));
                 foreach (var output in split_variable (input_list))
                     rule.add_output (output);
 
-                var output_list = statement.substring (index + 1).strip ();
+                var output_list = strip (statement.substring (index + 1));
                 foreach (var input in split_variable (output_list))
                     rule.add_input (input);
 
@@ -1157,8 +1170,8 @@ public class Bake
                     var name = "", value = "";
                     if (index >= 0)
                     {
-                        name = arg.substring (0, index).strip ();
-                        value = arg.substring (index + 1).strip ();
+                        name = strip (arg.substring (0, index));
+                        value = strip (arg.substring (index + 1));
                     }
                     if (name == "" || value == "")
                     {
