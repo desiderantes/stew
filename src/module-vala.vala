@@ -276,7 +276,7 @@ public class ValaModule : BuildModule
             rule = recipe.add_rule ();
             rule.add_input (c_filename);
             rule.add_output (o_filename);
-            command = "@gcc -Wno-unused";
+            command = "@gcc -Wno-unused -Wno-deprecated-declarations";
             if (is_library)
                 command += " -fPIC";
             command += cflags;
