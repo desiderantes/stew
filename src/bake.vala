@@ -960,9 +960,11 @@ public class Bake
             {
                 var rule = recipe.add_rule ();
                 rule.add_output (id);
-                rule.add_command ("@echo 'No compiler found that matches library %s'".printf (id));
+                rule.add_command ("@echo 'Unable to compile library %s:'".printf (id));
+                rule.add_command ("@echo ' - No compiler found that matches source files'");
                 rule.add_command ("@false");
                 recipe.build_rule.add_input (id);
+                recipe.add_install_rule (id, recipe.library_directory);
             }
         }
 
@@ -994,9 +996,11 @@ public class Bake
             {
                 var rule = recipe.add_rule ();
                 rule.add_output (id);
-                rule.add_command ("@echo 'No compiler found that matches program %s'".printf (id));
+                rule.add_command ("@echo 'Unable to compile program %s:'".printf (id));
+                rule.add_command ("@echo ' - No compiler found that matches source files'");
                 rule.add_command ("@false");
                 recipe.build_rule.add_input (id);
+                recipe.add_install_rule (id, recipe.binary_directory);
             }
         }
 
