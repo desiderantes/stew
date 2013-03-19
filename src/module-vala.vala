@@ -108,17 +108,17 @@ public class ValaModule : BuildModule
         generate_gettext_rules (recipe, "libraries", id);
     }
 
-    private void generate_compile_rules (Recipe recipe, string type_name, string name, string binary_name, string? namespace = null, string? version = null, string? major_version = null, bool is_library = false)
+    private void generate_compile_rules (Recipe recipe, string type_name, string id, string binary_name, string? namespace = null, string? version = null, string? major_version = null, bool is_library = false)
     {
-        var sources = split_variable (recipe.get_variable ("%s.%s.sources".printf (type_name, name)));
+        var sources = split_variable (recipe.get_variable ("%s.%s.sources".printf (type_name, id)));
 
-        var cflags = recipe.get_variable ("%s.%s.compile-flags".printf (type_name, name), "");
+        var cflags = recipe.get_variable ("%s.%s.compile-flags".printf (type_name, id), "");
         cflags = " " + cflags;
-        var ldflags = recipe.get_variable ("%s.%s.link-flags".printf (type_name, name), "");
+        var ldflags = recipe.get_variable ("%s.%s.link-flags".printf (type_name, id), "");
         ldflags = " " + ldflags;
 
         var valac_command = "@valac";
-        var valac_flags = recipe.get_variable ("%s.%s.vala-compile-flags".printf (type_name, name), "");
+        var valac_flags = recipe.get_variable ("%s.%s.vala-compile-flags".printf (type_name, id), "");
         if (valac_flags != null)
             valac_command += " " + valac_flags;
         var valac_inputs = new List<string> ();
@@ -129,9 +129,9 @@ public class ValaModule : BuildModule
             link_command += " -shared";
 
         /* Get dependencies */
-        var packages = recipe.get_variable ("%s.%s.packages".printf (type_name, name), "");
+        var packages = recipe.get_variable ("%s.%s.packages".printf (type_name, id), "");
         var package_list = split_variable (packages);
-        var link_error = "";
+        var link_errors = new List<string> ();
         if (package_list != null)
         {
             var pkg_config_list = "";
@@ -171,15 +171,16 @@ public class ValaModule : BuildModule
                 var f = new PkgConfigFile.local ("", pkg_config_list);
                 string pkg_config_cflags;
                 string pkg_config_libs;
-                try
+                var errors = f.generate_flags (out pkg_config_cflags, out pkg_config_libs);
+                if (errors.length () == 0)
                 {
-                    f.generate_flags (out pkg_config_cflags, out pkg_config_libs);
                     cflags += " %s".printf (pkg_config_cflags);
                     ldflags += " %s".printf (pkg_config_libs);
                 }
-                catch (FileError e)
+                else
                 {
-                    link_error = "Error loading package info %s: %s".printf (pkg_config_list, e.message);
+                    foreach (var e in errors)
+                        link_errors.append (e);
                 }
             }
         }
@@ -189,8 +190,8 @@ public class ValaModule : BuildModule
         string interface_command = null;
         if (is_library)
         {
-            var h_filename = "%s.h".printf (name);
-            var vapi_filename = "%s-%s.vapi".printf (name, major_version);
+            var h_filename = "%s.h".printf (id);
+            var vapi_filename = "%s-%s.vapi".printf (id, major_version);
 
             interface_rule = recipe.add_rule ();
             foreach (var input in valac_inputs)
@@ -199,7 +200,7 @@ public class ValaModule : BuildModule
             interface_rule.add_output (vapi_filename);
 
             interface_rule.add_status_command ("VALAC %s %s".printf (h_filename, vapi_filename));
-            interface_command = valac_command + " --ccode --header=%s --vapi=%s --library=%s".printf (h_filename, vapi_filename, name);
+            interface_command = valac_command + " --ccode --header=%s --vapi=%s --library=%s".printf (h_filename, vapi_filename, id);
 
             /* Optionally generate a introspection data */
             if (namespace != null)
@@ -294,9 +295,14 @@ public class ValaModule : BuildModule
         /* Link */
         recipe.build_rule.add_input (binary_name);
 
-        if (link_error != "")
+        if (link_errors.length () != 0)
         {
-            link_rule.add_command ("@echo '%s'".printf (link_error));
+            if (is_library)
+                link_rule.add_command ("@echo 'Unable to compile library %s:'".printf (id));
+            else
+                link_rule.add_command ("@echo 'Unable to compile program %s:'".printf (id));
+            foreach (var e in link_errors)
+                link_rule.add_command ("@echo ' - %s'".printf (e));
             link_rule.add_command ("@false");
         }
         else
