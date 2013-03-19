@@ -1,31 +1,23 @@
 public int pkg_compare_version (string v0, string v1)
 {
-    var i0 = 0;
-    var i1 = 0;
-    while (i0 >= 0 || i1 >= 0)
+    var digits0 = v0.split (".");
+    var digits1 = v1.split (".");
+    
+    for (var i = 0; i < digits0.length || i < digits1.length; i++)
     {
-        var d = next_value (v1, ref i1) - next_value (v0, ref i0);
-        if (d != 0)
-            return d;
+        var d0 = 0;
+        if (i < digits0.length)
+            d0 = int.parse (digits0[i]);
+        var d1 = 0;
+        if (i < digits1.length)
+            d1 = int.parse (digits1[i]);
+
+        var difference = d0 - d1;
+        if (difference != 0)
+            return difference;
     }
 
     return 0;
-}
-
-private int next_value (string version, ref int index)
-{
-    if (index < 0)
-        return 0;
-
-    var next_index = version.index_of_char ('.');
-    string value;
-    if (next_index < 0)
-        value = version.substring (index);
-    else
-        value = version.substring (index, next_index - index);
-
-    index = next_index;
-    return int.parse (value);
 }
 
 public class PkgConfigFile
@@ -254,21 +246,26 @@ public class PkgConfigFile
 
         foreach (var entry in get_requires ())
         {
-            if (resolved_modules.contains (entry.name))
-                continue;
-
+            var child = resolved_modules.lookup (entry.name);
             try
             {
-                var child = new PkgConfigFile.from_id (entry.name);
-                child.resolve_requires (ref resolved_modules, ref errors, ref combined_cflags, ref combined_libs, is_private || entry.is_private);
+                if (child == null)
+                {
+                    child = new PkgConfigFile.from_id (entry.name);
+                    child.resolve_requires (ref resolved_modules, ref errors, ref combined_cflags, ref combined_libs, is_private || entry.is_private);
+                }
             }
             catch (FileError e)
             {
                 if (e is FileError.NOENT)
-                    errors.append ("Package %s not installed".printf (entry.name));
+                    errors.append ("Package %s not installed".printf (entry.name)); // FIXME: Append .pc name if not the toplevel
                 else
                     errors.append ("Package %s not loadable: %s".printf (entry.name, e.message));
+                continue;
             }
+
+            if (!entry.check_version (child.version))
+                errors.append ("Package %s version %s is not %s %s".printf (child.name, child.version, entry.condition, entry.version));
         }
     }
 

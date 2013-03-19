@@ -1,3 +1,8 @@
+Overview of changes in bake 0.1.10
+
+    * Improve error message when unable to compile
+    * Check pkg-config versions of dependencies
+
 Overview of changes in bake 0.1.9
 
     * Translate Mallard documents
