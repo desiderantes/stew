@@ -281,7 +281,7 @@ public class ValaModule : BuildModule
                 command += " -fPIC";
             command += cflags;
             command += " -c %s -o %s".printf (c_filename, o_filename);
-            rule.add_status_command ("GCC %s".printf (c_filename));
+            rule.add_status_command ("GCC %s".printf (source));
             rule.add_command (command);
 
             link_rule.add_input (o_filename);
