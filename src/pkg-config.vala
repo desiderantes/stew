@@ -31,7 +31,8 @@ private int next_value (string version, ref int index)
 public class PkgConfigFile
 {
     public string id;
-    
+    public string? error;
+
     private PkgConfigFile (string id)
     {
         this.id = id;
@@ -231,17 +232,21 @@ public class PkgConfigFile
         }
     }
 
-    public void generate_flags (out string cflags, out string libs) throws FileError
+    public List<string> generate_flags (out string cflags, out string libs)
     {
-        var resolved_modules = new List<string> ();
+        var resolved_modules = new HashTable<string, PkgConfigFile> (str_hash, str_equal);
+        var errors = new List<string> ();
         cflags = "";
         libs = "";
-        resolve_requires (ref resolved_modules, ref cflags, ref libs);
+        resolve_requires (ref resolved_modules, ref errors, ref cflags, ref libs);
+        return errors;
     }
 
-    private void resolve_requires (ref List<string> resolved_modules, ref string combined_cflags, ref string combined_libs, bool is_private = false) throws FileError
+    private void resolve_requires (ref HashTable<string, PkgConfigFile> resolved_modules,
+                                   ref List<string> errors,
+                                   ref string combined_cflags, ref string combined_libs, bool is_private = false)
     {
-        resolved_modules.append (id);
+        resolved_modules.insert (id, this);
 
         combined_cflags = merge_flags (combined_cflags, expand (cflags));
         if (!is_private)
@@ -249,20 +254,22 @@ public class PkgConfigFile
 
         foreach (var entry in get_requires ())
         {
-            if (!already_resolved (resolved_modules, entry.name))
+            if (resolved_modules.contains (entry.name))
+                continue;
+
+            try
             {
                 var child = new PkgConfigFile.from_id (entry.name);
-                child.resolve_requires (ref resolved_modules, ref combined_cflags, ref combined_libs, is_private || entry.is_private);
+                child.resolve_requires (ref resolved_modules, ref errors, ref combined_cflags, ref combined_libs, is_private || entry.is_private);
+            }
+            catch (FileError e)
+            {
+                if (e is FileError.NOENT)
+                    errors.append ("Package %s not installed".printf (entry.name));
+                else
+                    errors.append ("Package %s not loadable: %s".printf (entry.name, e.message));
             }
         }
-    }
-
-    private bool already_resolved (List<string> resolved_modules, string name)
-    {
-        foreach (var n in resolved_modules)
-            if (n == name)
-                return true;
-        return false;
     }
 
     private string merge_flags (string flags0, string flags1)
