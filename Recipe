@@ -1,6 +1,6 @@
 package {
   name = bake
-  version = 0.1.9+bzr
+  version = 0.1.10
   ppa = lp:~bake-team/releases
 
   files = Makefile \
@@ -10,6 +10,6 @@ package {
 
 data.man.pages = bake.1                
 
-%release-test: test release-xzip
+%release-test: %test %release-xzip
 
-%release: test tag-bzr release-launchpad
+%release: %test %tag-bzr %release-launchpad

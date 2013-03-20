@@ -2,6 +2,10 @@ Overview of changes in bake 0.1.10
 
     * Improve error message when unable to compile
     * Check pkg-config versions of dependencies
+    * Show failing command when build stops
+    * Compile Vala C code with -Wno-deprecated-declarations to avoid warnings
+      about g_type_init
+    * Remove unecessary informational messages
 
 Overview of changes in bake 0.1.9
 

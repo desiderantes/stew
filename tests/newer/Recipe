@@ -6,4 +6,3 @@ a:
     touch a
 b: a
     cp a b
-
