@@ -44,13 +44,18 @@ public class BuildModule
  * See https://bugzilla.gnome.org/show_bug.cgi?id=686130 for more information */
 public static string strip (string value)
 {
-    var start = 0;
-    while (value[start].isspace ())
-        start++;
-    var end = value.length;
-    while (end > 0 && value[end - 1].isspace ())
-       end--;
-    return value.slice (start, end);
+    var i = 0;
+    while (value[i].isspace ())
+        i++;
+    var start = i;
+    var last_non_space = i - 1;
+    while (value[i] != '\0')
+    {
+       if (!value[i].isspace ())
+           last_non_space = i;
+       i++;
+    }
+    return value.slice (start, last_non_space + 1);
 }
 
 public List<string> split_variable (string value)

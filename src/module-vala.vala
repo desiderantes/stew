@@ -113,13 +113,11 @@ public class ValaModule : BuildModule
         var sources = split_variable (recipe.get_variable ("%s.%s.sources".printf (type_name, id)));
 
         var cflags = recipe.get_variable ("%s.%s.compile-flags".printf (type_name, id), "");
-        cflags = " " + cflags;
         var ldflags = recipe.get_variable ("%s.%s.link-flags".printf (type_name, id), "");
-        ldflags = " " + ldflags;
 
         var valac_command = "@valac";
         var valac_flags = recipe.get_variable ("%s.%s.vala-compile-flags".printf (type_name, id), "");
-        if (valac_flags != null)
+        if (valac_flags != "")
             valac_command += " " + valac_flags;
         var valac_inputs = new List<string> ();
         var link_rule = recipe.add_rule ();
@@ -127,62 +125,98 @@ public class ValaModule : BuildModule
         var link_command = "@gcc -o %s".printf (binary_name);
         if (is_library)
             link_command += " -shared";
+        recipe.build_rule.add_input (binary_name);
 
         /* Get dependencies */
         var packages = recipe.get_variable ("%s.%s.packages".printf (type_name, id), "");
         var package_list = split_variable (packages);
-        var link_errors = new List<string> ();
-        if (package_list != null)
+
+        /* Add in gobject-2.0 if not specified */
+        var have_gobject = false;
+        foreach (var package in package_list)
         {
-            var pkg_config_list = "";
-            foreach (var package in package_list)
+            if (package == "gobject-2.0")
+            have_gobject = true;
+        }
+        if (!have_gobject)
+            package_list.prepend ("gobject-2.0");
+
+        var link_errors = new List<string> ();
+        var pkg_config_list = "";
+        var in_condition = false;
+        foreach (var package in package_list)
+        {
+            /* Skip conditions */
+            if (in_condition)
             {
-                /* Strip out the posix module used in Vala (has no cflags/libs) */
-                if (package == "posix")
-                {
-                    valac_command += " --pkg=%s".printf (package);
-                    continue;
-                }
-
-                /* Look for locally generated libraries */
-                var vapi_filename = "%s.vapi".printf (package);
-                var library_filename = "lib%s.so".printf (package);
-                var library_rule = recipe.toplevel.find_rule_recursive (vapi_filename);
-                if (library_rule != null)
-                {
-                    var rel_dir = get_relative_path (recipe.dirname, library_rule.recipe.dirname);
-                    valac_command += " --vapidir=%s --pkg=%s".printf (rel_dir, package);
-                    valac_inputs.append (Path.build_filename (rel_dir, vapi_filename));
-                    // FIXME: Actually use the .pc file
-                    cflags += " -I%s".printf (rel_dir);
-                    link_rule.add_input (Path.build_filename (rel_dir, library_filename));
-                    // FIXME: Use --libs-only-l
-                    ldflags += " -L%s -l%s".printf (rel_dir, package);
-                    continue;
-                }
-
-                /* Otherwise look for it externally */
-                valac_command += " --pkg=%s".printf (package);
+                in_condition = false;
                 pkg_config_list += " " + package;
+                continue;
+            }
+            if (package.has_prefix ("=") || package.has_prefix (">") || package.has_prefix ("<"))
+            {
+                in_condition = true;
+                pkg_config_list += " " + package;
+                continue;
             }
 
-            if (pkg_config_list != "")
+            /* Look for locally generated libraries */
+            var vapi_filename = "%s.vapi".printf (package);
+            var library_filename = "lib%s.so".printf (package);
+            var library_rule = recipe.toplevel.find_rule_recursive (vapi_filename);
+            if (library_rule != null)
             {
-                var f = new PkgConfigFile.local ("", pkg_config_list);
-                string pkg_config_cflags;
-                string pkg_config_libs;
-                var errors = f.generate_flags (out pkg_config_cflags, out pkg_config_libs);
-                if (errors.length () == 0)
-                {
-                    cflags += " %s".printf (pkg_config_cflags);
-                    ldflags += " %s".printf (pkg_config_libs);
-                }
-                else
-                {
-                    foreach (var e in errors)
-                        link_errors.append (e);
-                }
+                var rel_dir = get_relative_path (recipe.dirname, library_rule.recipe.dirname);
+                valac_command += " --vapidir=%s --pkg=%s".printf (rel_dir, package);
+                valac_inputs.append (Path.build_filename (rel_dir, vapi_filename));
+                // FIXME: Actually use the .pc file
+                cflags += " -I%s".printf (rel_dir);
+                link_rule.add_input (Path.build_filename (rel_dir, library_filename));
+                // FIXME: Use --libs-only-l
+                ldflags += " -L%s -l%s".printf (rel_dir, package);
+                continue;
             }
+
+            /* Otherwise look for it externally */
+
+            /* gobject-2.0 is implied */
+            if (package != "gobject-2.0")
+                valac_command += " --pkg=%s".printf (package);
+
+            /* posix is not a pkg-config module, so skip that */
+            if (package != "posix")
+                pkg_config_list += " " + package;
+        }
+        pkg_config_list = strip (pkg_config_list);
+
+        if (pkg_config_list != "")
+        {
+            var f = new PkgConfigFile.local ("", pkg_config_list);
+            string pkg_config_cflags;
+            string pkg_config_libs;
+            var errors = f.generate_flags (out pkg_config_cflags, out pkg_config_libs);
+            if (errors.length () == 0)
+            {
+                cflags += " " + pkg_config_cflags;
+                ldflags += " " + pkg_config_libs;
+            }
+            else
+            {
+                foreach (var e in errors)
+                    link_errors.append (e);
+            }
+        }
+
+        if (link_errors.length () != 0)
+        {
+            if (is_library)
+                link_rule.add_command ("@echo 'Unable to compile library %s:'".printf (id));
+            else
+                link_rule.add_command ("@echo 'Unable to compile program %s:'".printf (id));
+            foreach (var e in link_errors)
+                link_rule.add_command ("@echo ' - %s'".printf (e));
+            link_rule.add_command ("@false");
+            return;
         }
 
         /* Generate library interfaces */
@@ -279,7 +313,8 @@ public class ValaModule : BuildModule
             command = "@gcc -Wno-unused -Wno-deprecated-declarations";
             if (is_library)
                 command += " -fPIC";
-            command += cflags;
+            if (cflags != "")
+                command += cflags;
             command += " -c %s -o %s".printf (c_filename, o_filename);
             rule.add_status_command ("GCC %s".printf (source));
             rule.add_command (command);
@@ -293,24 +328,9 @@ public class ValaModule : BuildModule
             interface_rule.add_command (interface_command);
 
         /* Link */
-        recipe.build_rule.add_input (binary_name);
-
-        if (link_errors.length () != 0)
-        {
-            if (is_library)
-                link_rule.add_command ("@echo 'Unable to compile library %s:'".printf (id));
-            else
-                link_rule.add_command ("@echo 'Unable to compile program %s:'".printf (id));
-            foreach (var e in link_errors)
-                link_rule.add_command ("@echo ' - %s'".printf (e));
-            link_rule.add_command ("@false");
-        }
-        else
-        {
-            link_rule.add_status_command ("GCC-LINK %s".printf (binary_name));
-            link_command += " " + ldflags;
-            link_rule.add_command (link_command);
-        }
+        link_rule.add_status_command ("GCC-LINK %s".printf (binary_name));
+        link_command += " " + ldflags;
+        link_rule.add_command (link_command);
     }
     
     private bool can_generate_rules (Recipe recipe, string type_name, string name)
