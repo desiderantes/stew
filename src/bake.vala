@@ -315,6 +315,11 @@ public class Rule
         if (pretty_print)
             add_command (make_status_command (status));
     }
+
+    public void add_error_command (string status)
+    {
+        add_command ("@echo '\x1B[1m\x1B[31m%s\x1B[0m'".printf (status));
+    }
     
     protected string make_status_command (string status)
     {

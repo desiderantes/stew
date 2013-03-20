@@ -227,11 +227,11 @@ public class GCCModule : BuildModule
         if (link_errors.length () != 0)
         {
             if (is_library)
-                link_rule.add_command ("@echo 'Unable to compile library %s:'".printf (id));
+                link_rule.add_error_command ("Unable to compile library %s:".printf (id));
             else
-                link_rule.add_command ("@echo 'Unable to compile program %s:'".printf (id));
+                link_rule.add_error_command ("Unable to compile program %s:".printf (id));
             foreach (var e in link_errors)
-                link_rule.add_command ("@echo ' - %s'".printf (e));
+                link_rule.add_error_command (" - %s".printf (e));
             link_rule.add_command ("@false");
             return;
         }
