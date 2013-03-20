@@ -164,6 +164,15 @@ public class GCCModule : BuildModule
         var link_command = "@%s -o %s".printf (compiler, binary_name);
         if (is_library)
             link_command += " -shared";
+        recipe.build_rule.add_input (binary_name);
+
+        if (do_install)
+        {
+            if (is_library)
+                recipe.add_install_rule (binary_name, recipe.library_directory);
+            else
+                recipe.add_install_rule (binary_name, recipe.binary_directory);
+        }
 
         var cflags = recipe.get_variable ("%s.%s.compile-flags".printf (type_name, id), "");
         var ldflags = recipe.get_variable ("%s.%s.link-flags".printf (type_name, id), "");
@@ -215,6 +224,18 @@ public class GCCModule : BuildModule
             }
         }
 
+        if (link_errors.length () != 0)
+        {
+            if (is_library)
+                link_rule.add_command ("@echo 'Unable to compile library %s:'".printf (id));
+            else
+                link_rule.add_command ("@echo 'Unable to compile program %s:'".printf (id));
+            foreach (var e in link_errors)
+                link_rule.add_command ("@echo ' - %s'".printf (e));
+            link_rule.add_command ("@false");
+            return;
+        }
+
         /* Compile */
         foreach (var source in sources)
         {
@@ -259,32 +280,9 @@ public class GCCModule : BuildModule
             link_command += " %s".printf (output);
         }
 
-        recipe.build_rule.add_input (binary_name);
-
-        if (link_errors.length () != 0)
-        {
-            if (is_library)
-                link_rule.add_command ("@echo 'Unable to compile library %s:'".printf (id));
-            else
-                link_rule.add_command ("@echo 'Unable to compile program %s:'".printf (id));
-            foreach (var e in link_errors)
-                link_rule.add_command ("@echo ' - %s'".printf (e));
-            link_rule.add_command ("@false");
-        }
-        else
-        {
-            link_rule.add_status_command ("GCC-LINK %s".printf (binary_name));
-            link_command += " " + ldflags;
-            link_rule.add_command (link_command);
-        }
-
-        if (do_install)
-        {
-            if (is_library)
-                recipe.add_install_rule (binary_name, recipe.library_directory);
-            else
-                recipe.add_install_rule (binary_name, recipe.binary_directory);
-        }
+        link_rule.add_status_command ("GCC-LINK %s".printf (binary_name));
+        link_command += " " + ldflags;
+        link_rule.add_command (link_command);
 
         var gettext_domain = recipe.get_variable ("%s.%s.gettext-domain".printf (type_name, id));
         if (gettext_domain != null)

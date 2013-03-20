@@ -136,7 +136,7 @@ public class ValaModule : BuildModule
         foreach (var package in package_list)
         {
             if (package == "gobject-2.0")
-            have_gobject = true;
+                have_gobject = true;
         }
         if (!have_gobject)
             package_list.prepend ("gobject-2.0");
