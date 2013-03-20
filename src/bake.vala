@@ -40,7 +40,7 @@ public class BuildModule
     }
 }
 
-/* This is a replacement for string.split since it generates annoying warnings about const pointers.
+/* This is a replacement for string.strip since it generates annoying warnings about const pointers.
  * See https://bugzilla.gnome.org/show_bug.cgi?id=686130 for more information */
 public static string strip (string value)
 {
@@ -56,6 +56,23 @@ public static string strip (string value)
        i++;
     }
     return value.slice (start, last_non_space + 1);
+}
+
+/* This is a replacement for string.chomp since it generates annoying warnings about const pointers.
+ * See https://bugzilla.gnome.org/show_bug.cgi?id=686130 for more information */
+public static string chomp (string value)
+{
+    var i = 0;
+    while (value[i].isspace ())
+        i++;
+    var last_non_space = i - 1;
+    while (value[i] != '\0')
+    {
+       if (!value[i].isspace ())
+           last_non_space = i;
+       i++;
+    }
+    return value.slice (0, last_non_space + 1);
 }
 
 public List<string> split_variable (string value)
@@ -566,8 +583,8 @@ public class Recipe
         foreach (var line in lines)
         {
             line_number++;
-            
-            line = strip (line);
+
+            line = chomp (line);
             if (line.has_suffix ("\\"))
             {
                 continued_line += line.substring (0, line.length - 1) + "\n";
@@ -642,7 +659,7 @@ public class Recipe
             {
                 var rule = add_rule ();
 
-                var input_list = strip (statement.substring (0, index));
+                var input_list = chomp (statement.substring (0, index));
                 foreach (var output in split_variable (input_list))
                     rule.add_output (output);
 
