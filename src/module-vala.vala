@@ -314,7 +314,7 @@ public class ValaModule : BuildModule
             if (is_library)
                 command += " -fPIC";
             if (cflags != "")
-                command += cflags;
+                command += " " + cflags;
             command += " -c %s -o %s".printf (c_filename, o_filename);
             rule.add_status_command ("GCC %s".printf (source));
             rule.add_command (command);
