@@ -254,13 +254,24 @@ public class Rule
             c = recipe.substitute_variables (c);
 
             if (show_output)
-                GLib.print ("    %s\n", c);
+                GLib.print ("%s\n", c);
 
+            /* Run the command */
             var exit_status = Posix.system (c);
+
+            /* On failure, make sure the command is visible and report the error */
             if (Process.if_signaled (exit_status))
-                throw new BuildError.COMMAND_FAILED ("Build stopped with signal %d", Process.term_sig (exit_status));
-            if (Process.if_exited (exit_status) && Process.exit_status (exit_status) != 0)
-                throw new BuildError.COMMAND_FAILED ("Build stopped with return value %d", Process.exit_status (exit_status));
+            {
+                if (!show_output)
+                    GLib.print ("\x1B[1m%s\x1B[0m\n", c);
+                throw new BuildError.COMMAND_FAILED ("Caught signal %d", Process.term_sig (exit_status));
+            }
+            else if (Process.if_exited (exit_status) && Process.exit_status (exit_status) != 0)
+            {
+                if (!show_output)
+                    GLib.print ("\x1B[1m%s\x1B[0m\n", c);
+                throw new BuildError.COMMAND_FAILED ("Command exited with return value %d", Process.exit_status (exit_status));
+            }
         }
 
         foreach (var output in outputs)
@@ -324,7 +335,7 @@ public class Rule
     protected string make_status_command (string status)
     {
         // FIXME: Escape if necessary
-        return "@echo '    %s'".printf (status);
+        return "@echo '%s'".printf (status);
     }
 
     public virtual List<string> get_commands ()
@@ -965,7 +976,7 @@ public class Bake
             optimise (targets, r);
     }
 
-    private static bool generate_library_rules (Recipe recipe)
+    private static void generate_library_rules (Recipe recipe)
     {
         var libraries = recipe.get_variable_children ("libraries");
         foreach (var id in libraries)
@@ -993,15 +1004,10 @@ public class Bake
 
         /* Traverse the recipe tree */
         foreach (var child in recipe.children)
-        {
-            if (!generate_library_rules (child))
-                return false;
-        }
-
-        return true;
+            generate_library_rules (child);
     }
 
-    private static bool generate_program_rules (Recipe recipe)
+    private static void generate_program_rules (Recipe recipe)
     {
         var programs = recipe.get_variable_children ("programs");
         foreach (var id in programs)
@@ -1029,27 +1035,17 @@ public class Bake
 
         /* Traverse the recipe tree */
         foreach (var child in recipe.children)
-        {
-            if (!generate_program_rules (child))
-                return false;
-        }
-
-        return true;
+            generate_program_rules (child);
     }
 
-    private static bool generate_rules (Recipe recipe)
+    private static void generate_rules (Recipe recipe)
     {
         foreach (var module in modules)
             module.generate_rules (recipe);
 
         /* Traverse the recipe tree */
         foreach (var child in recipe.children)
-        {
-            if (!generate_rules (child))
-                return false;
-        }
-
-        return true;
+            generate_rules (child);
     }
 
     private static void generate_clean_rules (Recipe recipe)
@@ -1265,13 +1261,9 @@ public class Bake
             module.generate_toplevel_rules (toplevel);
 
         /* Generate libraries first (as other things may depend on it) then the other rules */
-        if (!generate_library_rules (toplevel) ||
-            !generate_program_rules (toplevel) ||
-            !generate_rules (toplevel))
-        {
-            GLib.print ("\x1B[1m\x1B[31m[Build failed in directory %s]\x1B[0m\n".printf (get_relative_path (original_dir, Environment.get_current_dir ())));
-            return Posix.EXIT_FAILURE;
-        }
+        generate_library_rules (toplevel);
+        generate_program_rules (toplevel);
+        generate_rules (toplevel);
 
         /* Generate clean rule */
         generate_clean_rules (toplevel);
@@ -1309,8 +1301,6 @@ public class Bake
         if (args.length >= 2)
             target = args[1];
 
-        GLib.print ("\x1B[1m[Building target %s]\x1B[0m\n", target);
-
         /* Build virtual targets */
         if (!target.has_prefix ("%") && recipe.get_rule_with_target (Path.build_filename (recipe.dirname, "%" + target)) != null)
             target = "%" + target;
@@ -1322,9 +1312,8 @@ public class Bake
         }
         catch (BuildError e)
         {
-            printerr ("%s\n", e.message);
-            /* FIXME: Say what rule we were trying to build */
-            GLib.print ("\x1B[1m\x1B[31m[Build failed in directory %s]\x1B[0m\n".printf (get_relative_path (original_dir, Environment.get_current_dir ())));
+            printerr ("\x1B[1m\x1B[31m[%s]\x1B[0m\n", e.message);
+            GLib.print ("\x1B[1m\x1B[31m[Build failed]\x1B[0m\n");
             return Posix.EXIT_FAILURE;
         }
 
