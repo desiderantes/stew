@@ -373,5 +373,5 @@ private class TranslatableLocation
     public string filename;
     public int line;
     public string comment;
-    public string function;
+    //public string function;
 }
