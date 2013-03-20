@@ -1,0 +1,5 @@
+Name: GObject
+Description: GObject
+Version: 1.0
+Libs: -lgobject
+Cflags: -Igobject

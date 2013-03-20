@@ -2,8 +2,8 @@
 mkdir -p .built
 valac --ccode test.vala
 touch .built/test.c-stamp
-gcc -Wno-unused -fPIC -c .built/test.c -o .built/test.o
-gcc -o libtest.so.0 -shared .built/test.o
+gcc -Wno-unused -Wno-deprecated-declarations -fPIC -Igobject -c .built/test.c -o .built/test.o
+gcc -o libtest.so.0 -shared .built/test.o -lgobject
 valac --fast-vapi=.built/test.vapi test.vala
 touch .built/test.vapi-stamp
 valac --ccode --header=test.h --vapi=test-0.vapi --library=test --use-fast-vapi=.built/test.vapi
