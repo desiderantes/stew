@@ -260,7 +260,7 @@ public class ValaModule : BuildModule
             rule.add_input (get_relative_path (recipe.dirname, "%s/".printf (recipe.build_directory)));
             rule.add_output (vapi_filename);
             rule.add_output (vapi_stamp_filename);
-            rule.add_status_command ("VALAC %s".printf (vapi_filename));
+            rule.add_status_command ("VALAC-FAST-VAPI %s".printf (source));
             rule.add_command ("@valac --fast-vapi=%s %s".printf (vapi_filename, source));
             rule.add_command ("@touch %s".printf (vapi_stamp_filename));
 
