@@ -24,6 +24,10 @@ C programs and libraries can set the following program <link xref="variables">va
   <td><p>Header files that specify the library interface (libraries only)</p></td>
 </tr>
 <tr>
+  <td><p>packages</p></td>
+  <td><p>Library packages to use</p></td>
+</tr>
+<tr>
   <td><p>compile-flags</p></td>
   <td><p>Additional command line flags to use when compiling</p></td>
 </tr>
@@ -37,10 +41,11 @@ C programs and libraries can set the following program <link xref="variables">va
 The following shows a recipe for a two file C program:
 </p>
 <code>
-programs.example-program.sources = main.c module.c
-programs.example-program.name = Example
-programs.example-program.description = An example C program
-programs.example-program.compile-flags = -Wall
+programs.example-program {
+  sources = main.c module.c
+  packages = glib-2.0
+  compile-flags = -Wall
+}
 </code>
 </example>
 </page>

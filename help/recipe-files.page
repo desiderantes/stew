@@ -23,8 +23,10 @@ For example, the <em>foo</em> project (version 0.0.1) has a file called <em>Reci
 This file contains:
 </p>
 <code>
-project.name = foo
-project.version = 0.0.1
+project {
+  name = foo
+  version = 0.0.1
+}
 </code>
 </example>
 <p>

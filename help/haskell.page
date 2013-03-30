@@ -13,9 +13,9 @@ Bake supports <link xref="programs">programs</link> and <link xref="libraries">l
 The following shows a recipe for a two file Haskell program:
 </p>
 <code>
-programs.example-program.sources = main.hs module.hs
-programs.example-program.name = Example
-programs.example-program.description = An example Haskell program
+programs.example-program {
+  sources = main.hs module.hs
+}
 </code>
 </example>
 </page>

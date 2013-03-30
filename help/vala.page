@@ -27,6 +27,14 @@ Vala programs and libraries can set the following program <link xref="variables"
   <td><p>Additional command line flags passed to Vala compiler</p></td>
 </tr>
 <tr>
+  <td><p>vala-packages</p></td>
+  <td><p>Vala packages to use</p></td>
+</tr>
+<tr>
+  <td><p>packages</p></td>
+  <td><p>Library packages to use in C compile stage</p></td>
+</tr>
+<tr>
   <td><p>compile-flags</p></td>
   <td><p>Additional command line flags passed to C compiler</p></td>
 </tr>
@@ -40,9 +48,11 @@ Vala programs and libraries can set the following program <link xref="variables"
 The following shows a recipe for a two file Vala program:
 </p>
 <code>
-programs.example-program.sources = main.vala module.vala
-programs.example-program.name = Example
-programs.example-program.description = An example Vala program
+programs.example-program {
+  sources = main.vala module.vala
+  vala-packages = gtk+-3.0
+  packages = gtk+-3.0
+}
 </code>
 </example>
 </page>

@@ -28,10 +28,10 @@ Qt programs and libraries can set the following program <link xref="variables">v
 The following shows a recipe for a two file Qt program:
 </p>
 <code>
-programs.example-program.sources = main.cpp module.cpp
-programs.example-program.qt = true
-programs.example-program.name = Example
-programs.example-program.description = An example Qt program
+programs.example-program {
+  sources = main.cpp module.cpp
+  qt = true
+}
 </code>
 </example>
 </page>

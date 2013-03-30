@@ -14,7 +14,9 @@ The manual pages need to be listed with the <code>data.<em>name</em>.man-pages</
 For example, this <link xref="recipe-files">recipe</link> specifies one manual page to be installed:
 </p>
 <code>
-data.example.man-pages = example-program.1
+data.example {
+  man-pages = example-program.1
+}
 </code>
 </example>
 </page>

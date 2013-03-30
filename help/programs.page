@@ -32,14 +32,6 @@ The following variables are allowed:
   <td><p>Directory to install the program to</p></td>
 </tr>
 <tr>
-  <td><p>name</p></td>
-  <td><p>The name of this program suitable for a label for this program</p></td>
-</tr>
-<tr>
-  <td><p>description</p></td>
-  <td><p>A short description of this program</p></td>
-</tr>
-<tr>
   <td><p>icon</p></td>
   <td><p>File to use as the icon for this program</p></td>
 </tr>

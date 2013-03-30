@@ -15,8 +15,10 @@ If present, the files are <link xref="translation">translated</link> using the <
 For example, this <link xref="recipe-files">recipe</link> specifies a desktop file to install.
 </p>
 <code>
-data.example.xdg-desktop-files = example.desktop
-data.example.gettext-domain = example
+data.example {
+  xdg-desktop-files = example.desktop
+  gettext-domain = example
+}
 </code>
 </example>
 </page>

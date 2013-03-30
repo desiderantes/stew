@@ -53,8 +53,10 @@ To make this location available as C string a header file can be generated from 
 With the following rules:.
 </p>
 <code>
-templates.example.files = config.h
-templates.example.variables = %DATA_DIRECTORY%=$(data-directory)
+templates.example {
+  files = config.h
+  variables = %DATA_DIRECTORY%=$(package-data-directory)
+}
 </code>
 <p>
 Bake will generate a <file>config.h</file> like:

@@ -16,8 +16,10 @@ Override files can be specified with <code>data.<em>name</em>.gsettings-override
 For example, this <link xref="recipe-files">recipe</link> specifies one schema to be installed:
 </p>
 <code>
-data.example.gsettings-schemas = org.example.Example.gschema.xml
-data.example.gettext-domain = example
+data.example {
+  gsettings-schemas = org.example.Example.gschema.xml
+  gettext-domain = example
+}
 </code>
 </example>
 </page>

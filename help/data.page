@@ -20,8 +20,10 @@ You need to define multiple collections if files are to be installed into differ
 For example, the foo project can specify images that are required to be installed with:
 </p>
 <code>
-data.images.files = image1.png
-data.images.install-directory = $(package-data-directory)/images
+data.images {
+  files = image1.png
+  install-directory = $(package-data-directory)/images
+}
 </code>
 <p>
 When running the install rule Bake will copy these files to <code>/usr/share/foo/images</code>.

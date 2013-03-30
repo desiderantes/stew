@@ -16,8 +16,10 @@ The data collection (<em>name</em>) is used as the name of the help document.
 For example, this <link xref="recipe-files">recipe</link> specifies the document <em>example</em> that has two pages:
 </p>
 <code>
-data.example.mallard-pages = index.page example.page
-data.example.gettext-domain = example
+data.example {
+  mallard-pages = index.page example.page
+  gettext-domain = example
+}
 </code>
 </example>
 </page>
