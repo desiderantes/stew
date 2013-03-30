@@ -9,12 +9,12 @@ bake-gettext --mime-type text/x-python --output .built/test3.py.pot test3.py
 msgcat --force-po --output-file=test.pot .built/test1.py.pot .built/test2.py.pot .built/test3.py.pot
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/local/share/test
-cp test1.pyc /usr/local/share/test/test1.pyc
-cp test2.pyc /usr/local/share/test/test2.pyc
-cp test3.pyc /usr/local/share/test/test3.pyc
-mkdir -p /usr/local/bin
-cp .built/test /usr/local/bin/test
+mkdir -p /usr/share/test
+cp test1.pyc /usr/share/test/test1.pyc
+cp test2.pyc /usr/share/test/test2.pyc
+cp test3.pyc /usr/share/test/test3.pyc
+mkdir -p /usr/bin
+cp .built/test /usr/bin/test
 (exit SUCCESS)
 !bake clean
 rm -f test1.pyc

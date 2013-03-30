@@ -4,12 +4,12 @@ python3.2 -m py_compile test.py
 mkdir -p .built
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/local/share/test
-cp test.py /usr/local/share/test/test.py
-mkdir -p /usr/local/share/test/__pycache__
-cp __pycache__/test.cpython-32.pyc /usr/local/share/test/__pycache__/test.cpython-32.pyc
-mkdir -p /usr/local/bin
-cp .built/test /usr/local/bin/test
+mkdir -p /usr/share/test
+cp test.py /usr/share/test/test.py
+mkdir -p /usr/share/test/__pycache__
+cp __pycache__/test.cpython-32.pyc /usr/share/test/__pycache__/test.cpython-32.pyc
+mkdir -p /usr/bin
+cp .built/test /usr/bin/test
 (exit SUCCESS)
 !bake clean
 rm -f __pycache__/test.cpython-32.pyc

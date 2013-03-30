@@ -157,27 +157,27 @@ tests {
   # Vala tests
   vala-program-simple {
     command = ./src/test-runner vala-program-simple
-    data = vala-program-simple/expected vala-program-simple/Recipe vala-program-simple/test.vala vala-program-simple/pkg-config/gobject-2.0.pc
+    data = vala-program-simple/expected vala-program-simple/Recipe vala-program-simple/test.vala
   }
   vala-program-no-install {
     command = ./src/test-runner vala-program-no-install
-    data = vala-program-no-install/expected vala-program-no-install/Recipe vala-program-no-install/test.vala vala-program-no-install/pkg-config/gobject-2.0.pc
+    data = vala-program-no-install/expected vala-program-no-install/Recipe vala-program-no-install/test.vala
   }
   vala-program-complex {
     command = ./src/test-runner vala-program-complex
-    data = vala-program-complex/expected vala-program-complex/Recipe vala-program-complex/test1.vala vala-program-complex/test2.vala vala-program-complex/test3.vala vala-program-complex/pkg-config/gobject-2.0.pc
+    data = vala-program-complex/expected vala-program-complex/Recipe vala-program-complex/test1.vala vala-program-complex/test2.vala vala-program-complex/test3.vala
   }
   vala-library-simple {
     command = ./src/test-runner vala-library-simple
-    data = vala-library-simple/expected vala-library-simple/Recipe vala-library-simple/test.vala vala-library-simple/pkg-config/gobject-2.0.pc
+    data = vala-library-simple/expected vala-library-simple/Recipe vala-library-simple/test.vala
   }
   vala-library-no-install {
     command = ./src/test-runner vala-library-no-install
-    data = vala-library-no-install/expected vala-library-no-install/Recipe vala-library-no-install/test.vala vala-library-no-install/pkg-config/gobject-2.0.pc
+    data = vala-library-no-install/expected vala-library-no-install/Recipe vala-library-no-install/test.vala
   }
   vala-library-complex {
     command = ./src/test-runner vala-library-complex
-    data = vala-library-complex/expected vala-library-complex/Recipe vala-library-complex/test1.vala vala-library-complex/test2.vala vala-library-complex/test3.vala vala-library-complex/pkg-config/gobject-2.0.pc
+    data = vala-library-complex/expected vala-library-complex/Recipe vala-library-complex/test1.vala vala-library-complex/test2.vala vala-library-complex/test3.vala
   }
 
   # Java tests

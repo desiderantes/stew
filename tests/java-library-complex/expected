@@ -8,8 +8,8 @@ bake-gettext --mime-type text/x-java --output .built/com/example/Test3.java.pot 
 msgcat --force-po --output-file=test.pot .built/com/example/Test1.java.pot .built/com/example/Test2.java.pot .built/com/example/Test3.java.pot
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/local/share/java
-cp test.jar /usr/local/share/java/test.jar
+mkdir -p /usr/share/java
+cp test.jar /usr/share/java/test.jar
 (exit SUCCESS)
 !bake clean
 rm -f test.jar

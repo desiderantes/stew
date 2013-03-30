@@ -127,39 +127,67 @@ public class ValaModule : BuildModule
             link_command += " -shared";
         recipe.build_rule.add_input (binary_name);
 
+        var link_errors = new List<string> ();
+
         /* Get dependencies */
         var packages = recipe.get_variable ("%s.%s.packages".printf (type_name, id), "");
         var package_list = split_variable (packages);
-
-        /* Add in gobject-2.0 if not specified */
+        var pkg_config_list = "";
         var have_gobject = false;
+        var have_glib = false;
         foreach (var package in package_list)
         {
+            /* Look for locally generated libraries */
+            var library_filename = "lib%s.so".printf (package);
+            var library_rule = recipe.toplevel.find_rule_recursive (library_filename);
+            if (library_rule != null)
+            {
+                var rel_dir = get_relative_path (recipe.dirname, library_rule.recipe.dirname);
+                // FIXME: Actually use the .pc file
+                cflags += " -I%s".printf (rel_dir);
+                link_rule.add_input (Path.build_filename (rel_dir, library_filename));
+                ldflags += " -L%s -l%s".printf (rel_dir, package);
+                continue;
+            }
+
+            /* Otherwise look for it externally */
+            if (pkg_config_list != "")
+                pkg_config_list += " ";
+            pkg_config_list += package;
+
+            /* Make sure we have standard Vala dependencies */
             if (package == "gobject-2.0")
                 have_gobject = true;
+            if (package == "glib-2.0")
+                have_glib = true;
         }
         if (!have_gobject)
-            package_list.prepend ("gobject-2.0");
+            pkg_config_list += " gobject-2.0";
+        if (!have_glib)
+            pkg_config_list += " glib-2.0";
 
-        var link_errors = new List<string> ();
-        var pkg_config_list = "";
-        var in_condition = false;
-        foreach (var package in package_list)
+        if (pkg_config_list != "")
         {
-            /* Skip conditions */
-            if (in_condition)
+            var f = new PkgConfigFile.local ("", pkg_config_list);
+            string pkg_config_cflags;
+            string pkg_config_libs;
+            var errors = f.generate_flags (out pkg_config_cflags, out pkg_config_libs);
+            if (errors.length () == 0)
             {
-                in_condition = false;
-                pkg_config_list += " " + package;
-                continue;
+                cflags += " %s".printf (pkg_config_cflags);
+                ldflags += " %s".printf (pkg_config_libs);
             }
-            if (package.has_prefix ("=") || package.has_prefix (">") || package.has_prefix ("<"))
+            else
             {
-                in_condition = true;
-                pkg_config_list += " " + package;
-                continue;
+                foreach (var e in errors)
+                    link_errors.append (e);
             }
+        }
 
+        var vala_packages = recipe.get_variable ("%s.%s.vala-packages".printf (type_name, id), "");
+        var vala_package_list = split_variable (vala_packages);
+        foreach (var package in vala_package_list)
+        {
             /* Look for locally generated libraries */
             var vapi_filename = "%s.vapi".printf (package);
             var library_filename = "lib%s.so".printf (package);
@@ -178,33 +206,7 @@ public class ValaModule : BuildModule
             }
 
             /* Otherwise look for it externally */
-
-            /* gobject-2.0 is implied */
-            if (package != "gobject-2.0")
-                valac_command += " --pkg=%s".printf (package);
-
-            /* posix is not a pkg-config module, so skip that */
-            if (package != "posix")
-                pkg_config_list += " " + package;
-        }
-        pkg_config_list = strip (pkg_config_list);
-
-        if (pkg_config_list != "")
-        {
-            var f = new PkgConfigFile.local ("", pkg_config_list);
-            string pkg_config_cflags;
-            string pkg_config_libs;
-            var errors = f.generate_flags (out pkg_config_cflags, out pkg_config_libs);
-            if (errors.length () == 0)
-            {
-                cflags += " " + pkg_config_cflags;
-                ldflags += " " + pkg_config_libs;
-            }
-            else
-            {
-                foreach (var e in errors)
-                    link_errors.append (e);
-            }
+            valac_command += " --pkg=%s".printf (package);
         }
 
         if (link_errors.length () != 0)

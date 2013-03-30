@@ -6,8 +6,8 @@ ghc -c test3.hs -ohi .built/test3.hi -o .built/test3.o
 ghc -o test .built/test1.o .built/test2.o .built/test3.o
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/local/bin
-cp test /usr/local/bin/test
+mkdir -p /usr/bin
+cp test /usr/bin/test
 (exit SUCCESS)
 !bake clean
 rm -f test

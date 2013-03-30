@@ -4,11 +4,11 @@ g++ -fPIC -MMD -MF .built/test.d -c test.cpp -o .built/test.o
 g++ -o libtest.so.0 -shared .built/test.o
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/local/lib
-cp libtest.so.0 /usr/local/lib/libtest.so.0
-cp libtest.so /usr/local/lib/libtest.so
-mkdir -p /usr/local/lib/pkgconfig
-cp test-0.pc /usr/local/lib/pkgconfig/test-0.pc
+mkdir -p /usr/lib
+cp libtest.so.0 /usr/lib/libtest.so.0
+cp libtest.so /usr/lib/libtest.so
+mkdir -p /usr/lib/pkgconfig
+cp test-0.pc /usr/lib/pkgconfig/test-0.pc
 (exit SUCCESS)
 !bake clean
 rm -f libtest.so.0

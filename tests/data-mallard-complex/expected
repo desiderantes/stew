@@ -11,15 +11,15 @@ itstool -m .built/fr.mo --output .built/test.page.fr test.page
 itstool -m .built/it.mo --output .built/test.page.it test.page
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/local/share/help/fr/test
-cp .built/index.page.fr /usr/local/share/help/fr/test/index.page
-mkdir -p /usr/local/share/help/it/test
-cp .built/index.page.it /usr/local/share/help/it/test/index.page
-mkdir -p /usr/local/share/help/C/test
-cp index.page /usr/local/share/help/C/test/index.page
-cp .built/test.page.fr /usr/local/share/help/fr/test/test.page
-cp .built/test.page.it /usr/local/share/help/it/test/test.page
-cp test.page /usr/local/share/help/C/test/test.page
+mkdir -p /usr/share/help/fr/test
+cp .built/index.page.fr /usr/share/help/fr/test/index.page
+mkdir -p /usr/share/help/it/test
+cp .built/index.page.it /usr/share/help/it/test/index.page
+mkdir -p /usr/share/help/C/test
+cp index.page /usr/share/help/C/test/index.page
+cp .built/test.page.fr /usr/share/help/fr/test/test.page
+cp .built/test.page.it /usr/share/help/it/test/test.page
+cp test.page /usr/share/help/C/test/test.page
 (exit SUCCESS)
 !bake clean
 rm -rf .built/

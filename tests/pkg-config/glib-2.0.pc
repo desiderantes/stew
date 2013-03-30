@@ -1,0 +1,5 @@
+Name: GLib
+Description: GLib
+Version: 1.0
+Libs: -lglib
+Cflags: -Iglib

@@ -1177,12 +1177,6 @@ public class Bake
         {
             var conf_variables = new HashTable<string, string> (str_hash, str_equal);
 
-            /* Default values */
-            conf_variables.insert ("resource-directory", "/usr/local");
-            conf_variables.insert ("system-config-directory", "/etc");
-            conf_variables.insert ("system-binary-directory", "/sbin");
-            conf_variables.insert ("system-library-directory", "/lib");
-
             /* Load args from the command line */
             if (do_configure)
             {
@@ -1244,18 +1238,35 @@ public class Bake
         }
 
         /* Derived values */
+        var root_directory = conf_file.get_variable ("root-directory");
+        if (root_directory == null)
+        {
+            root_directory = "/";
+            conf_file.set_variable ("root-directory", root_directory);
+        }
         var resource_directory = conf_file.get_variable ("resource-directory");
+        if (resource_directory == null)
+        {
+            resource_directory = Path.build_filename (root_directory, "usr");
+            conf_file.set_variable ("resource-directory", resource_directory);
+        }
+        if (conf_file.get_variable ("system-config-directory") == null)
+            conf_file.set_variable ("system-config-directory", Path.build_filename (root_directory, "etc"));
+        if (conf_file.get_variable ("system-binary-directory") == null)
+            conf_file.set_variable ("system-binary-directory", Path.build_filename (root_directory, "sbin"));
+        if (conf_file.get_variable ("system-library-directory") == null)
+            conf_file.set_variable ("system-library-directory", Path.build_filename (root_directory, "lib"));
         if (conf_file.get_variable ("binary-directory") == null)
-            conf_file.set_variable ("binary-directory", "%s/bin".printf (resource_directory));
+            conf_file.set_variable ("binary-directory", Path.build_filename (resource_directory, "bin"));
         if (conf_file.get_variable ("library-directory") == null)
-            conf_file.set_variable ("library-directory", "%s/lib".printf (resource_directory));
+            conf_file.set_variable ("library-directory", Path.build_filename (resource_directory, "lib"));
         if (conf_file.get_variable ("data-directory") == null)
-            conf_file.set_variable ("data-directory", "%s/share".printf (resource_directory));
+            conf_file.set_variable ("data-directory", Path.build_filename (resource_directory, "share"));
         if (conf_file.get_variable ("include-directory") == null)
-            conf_file.set_variable ("include-directory", "%s/include".printf (resource_directory));
+            conf_file.set_variable ("include-directory", Path.build_filename (resource_directory, "include"));
         var data_directory = conf_file.get_variable ("data-directory");
         if (conf_file.get_variable ("package-data-directory") == null)
-            conf_file.set_variable ("package-data-directory", "%s/$(package.name)".printf (data_directory));
+            conf_file.set_variable ("package-data-directory", Path.build_filename (data_directory, "$(package.name)"));
 
         /* Load the recipe tree */
         var filename = Path.build_filename (toplevel_dir, "Recipe");

@@ -4,8 +4,8 @@ gccgo -c test.go -o .built/test.o
 gccgo -o test .built/test.o
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/local/bin
-cp test /usr/local/bin/test
+mkdir -p /usr/bin
+cp test /usr/bin/test
 (exit SUCCESS)
 !bake clean
 rm -f test

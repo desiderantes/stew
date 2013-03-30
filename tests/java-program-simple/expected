@@ -4,10 +4,10 @@ javac -d .built Test.java
 jar cfe test.jar -C .built Test.class
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/local/share/test
-cp test.jar /usr/local/share/test/test.jar
-mkdir -p /usr/local/bin
-cp .built/test /usr/local/bin/test
+mkdir -p /usr/share/test
+cp test.jar /usr/share/test/test.jar
+mkdir -p /usr/bin
+cp .built/test /usr/bin/test
 (exit SUCCESS)
 !bake clean
 rm -f test.jar

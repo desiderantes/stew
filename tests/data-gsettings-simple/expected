@@ -1,8 +1,8 @@
 !bake
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/local/share/glib-2.0/schemas
-cp com.example.Test.gschema.xml /usr/local/share/glib-2.0/schemas/com.example.Test.gschema.xml
+mkdir -p /usr/share/glib-2.0/schemas
+cp com.example.Test.gschema.xml /usr/share/glib-2.0/schemas/com.example.Test.gschema.xml
 (exit SUCCESS)
 !bake clean
 (exit SUCCESS)

@@ -10,13 +10,13 @@ bake-gettext --mime-type text/x-c++src --output .built/test3.cpp.pot test3.cpp
 msgcat --force-po --output-file=test.pot .built/test1.cpp.pot .built/test2.cpp.pot .built/test3.cpp.pot
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/local/lib
-cp libtest.so.0 /usr/local/lib/libtest.so.0
-cp libtest.so /usr/local/lib/libtest.so
-mkdir -p /usr/local/include/test-0
-cp test.h /usr/local/include/test-0/test.h
-mkdir -p /usr/local/lib/pkgconfig
-cp test-0.pc /usr/local/lib/pkgconfig/test-0.pc
+mkdir -p /usr/lib
+cp libtest.so.0 /usr/lib/libtest.so.0
+cp libtest.so /usr/lib/libtest.so
+mkdir -p /usr/include/test-0
+cp test.h /usr/include/test-0/test.h
+mkdir -p /usr/lib/pkgconfig
+cp test-0.pc /usr/lib/pkgconfig/test-0.pc
 (exit SUCCESS)
 !bake clean
 rm -f libtest.so.0

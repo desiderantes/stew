@@ -3,10 +3,10 @@ python -m py_compile test.py
 mkdir -p .built
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/local/share/test
-cp test.pyc /usr/local/share/test/test.pyc
-mkdir -p /usr/local/bin
-cp .built/test /usr/local/bin/test
+mkdir -p /usr/share/test
+cp test.pyc /usr/share/test/test.pyc
+mkdir -p /usr/bin
+cp .built/test /usr/bin/test
 (exit SUCCESS)
 !bake clean
 rm -f test.pyc

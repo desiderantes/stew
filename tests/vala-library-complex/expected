@@ -6,16 +6,16 @@ valac --fast-vapi=.built/test3.vapi test3.vala
 touch .built/test3.vapi-stamp
 valac --target-glib 2.32 --ccode test1.vala --use-fast-vapi=.built/test2.vapi --use-fast-vapi=.built/test3.vapi
 touch .built/test1.c-stamp
-gcc -Wno-unused -Wno-deprecated-declarations -fPIC -DFOO=1 -Igobject -c .built/test1.c -o .built/test1.o
+gcc -Wno-unused -Wno-deprecated-declarations -fPIC -DFOO=1 -Igobject -Iglib -c .built/test1.c -o .built/test1.o
 valac --fast-vapi=.built/test1.vapi test1.vala
 touch .built/test1.vapi-stamp
 valac --target-glib 2.32 --ccode test2.vala --use-fast-vapi=.built/test1.vapi --use-fast-vapi=.built/test3.vapi
 touch .built/test2.c-stamp
-gcc -Wno-unused -Wno-deprecated-declarations -fPIC -DFOO=1 -Igobject -c .built/test2.c -o .built/test2.o
+gcc -Wno-unused -Wno-deprecated-declarations -fPIC -DFOO=1 -Igobject -Iglib -c .built/test2.c -o .built/test2.o
 valac --target-glib 2.32 --ccode test3.vala --use-fast-vapi=.built/test1.vapi --use-fast-vapi=.built/test2.vapi
 touch .built/test3.c-stamp
-gcc -Wno-unused -Wno-deprecated-declarations -fPIC -DFOO=1 -Igobject -c .built/test3.c -o .built/test3.o
-gcc -o libtest.so.0 -shared .built/test1.o .built/test2.o .built/test3.o -lm -lgobject
+gcc -Wno-unused -Wno-deprecated-declarations -fPIC -DFOO=1 -Igobject -Iglib -c .built/test3.c -o .built/test3.o
+gcc -o libtest.so.0 -shared .built/test1.o .built/test2.o .built/test3.o -lm -lgobject -lglib
 valac --target-glib 2.32 --ccode --header=test.h --vapi=test-0.vapi --library=test --use-fast-vapi=.built/test1.vapi --use-fast-vapi=.built/test2.vapi --use-fast-vapi=.built/test3.vapi
 bake-gettext --mime-type text/x-vala --output .built/test1.vala.pot test1.vala
 bake-gettext --mime-type text/x-vala --output .built/test2.vala.pot test2.vala
@@ -23,15 +23,15 @@ bake-gettext --mime-type text/x-vala --output .built/test3.vala.pot test3.vala
 msgcat --force-po --output-file=test.pot .built/test1.vala.pot .built/test2.vala.pot .built/test3.vala.pot
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/local/lib
-cp libtest.so /usr/local/lib/libtest.so
-cp libtest.so.0 /usr/local/lib/libtest.so.0
-mkdir -p /usr/local/lib/pkgconfig
-cp test-0.pc /usr/local/lib/pkgconfig/test-0.pc
-mkdir -p /usr/local/include/test-0
-cp test.h /usr/local/include/test-0/test.h
-mkdir -p /usr/local/share/vala/vapi
-cp test-0.vapi /usr/local/share/vala/vapi/test-0.vapi
+mkdir -p /usr/lib
+cp libtest.so /usr/lib/libtest.so
+cp libtest.so.0 /usr/lib/libtest.so.0
+mkdir -p /usr/lib/pkgconfig
+cp test-0.pc /usr/lib/pkgconfig/test-0.pc
+mkdir -p /usr/include/test-0
+cp test.h /usr/include/test-0/test.h
+mkdir -p /usr/share/vala/vapi
+cp test-0.vapi /usr/share/vala/vapi/test-0.vapi
 (exit SUCCESS)
 !bake clean
 rm -f libtest.so.0

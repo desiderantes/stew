@@ -2,8 +2,8 @@
 mkdir -p .built
 valac --ccode test.vala
 touch .built/test.c-stamp
-gcc -Wno-unused -Wno-deprecated-declarations -Igobject -c .built/test.c -o .built/test.o
-gcc -o test .built/test.o -lgobject
+gcc -Wno-unused -Wno-deprecated-declarations -Igobject -Iglib -c .built/test.c -o .built/test.o
+gcc -o test .built/test.o -lgobject -lglib
 (exit SUCCESS)
 !bake install
 (exit SUCCESS)

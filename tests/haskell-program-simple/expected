@@ -4,8 +4,8 @@ ghc -c test.hs -ohi .built/test.hi -o .built/test.o
 ghc -o test .built/test.o
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/local/bin
-cp test /usr/local/bin/test
+mkdir -p /usr/bin
+cp test /usr/bin/test
 (exit SUCCESS)
 !bake clean
 rm -f test

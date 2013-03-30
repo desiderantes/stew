@@ -1,8 +1,8 @@
 !bake
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/local/share/man/man1
-cp test.1 /usr/local/share/man/man1/test.1
+mkdir -p /usr/share/man/man1
+cp test.1 /usr/share/man/man1/test.1
 (exit SUCCESS)
 !bake clean
 (exit SUCCESS)
