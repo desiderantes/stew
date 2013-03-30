@@ -1,3 +1,7 @@
+Overview of changes in bake 0.1.12
+
+    * Fix man page not being installed
+
 Overview of changes in bake 0.1.11
 
     * Add root-directory variable

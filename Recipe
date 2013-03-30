@@ -11,7 +11,9 @@ data.meta {
   install = false
 }
 
-data.man.pages = bake.1                
+data.man {
+  man-pages = bake.1
+}
 
 %release-test: %test %release-xzip
 
