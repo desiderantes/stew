@@ -1,3 +1,9 @@
+data.pkg-config {
+  files = pkg-config/gobject-2.0.pc \
+          pkg-config/glib-2.0.pc
+  install = false;
+}
+
 tests {
 
   build-rule {

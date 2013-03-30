@@ -1,6 +1,7 @@
 Overview of changes in bake 0.1.12
 
-    * Fix man page not being installed
+    * Fix man page not being installed/distributed
+    * Fix pkg-config parts of tests not being distributed
 
 Overview of changes in bake 0.1.11
 
