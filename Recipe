@@ -2,11 +2,14 @@ package {
   name = bake
   version = 0.1.10
   ppa = lp:~bake-team/releases
+}
 
+data.meta {
   files = Makefile \
           bake.doap \
           NEWS
-}          
+  install = false
+}
 
 data.man.pages = bake.1                
 
