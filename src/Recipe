@@ -6,12 +6,12 @@ templates.config {
 programs {
   bake-template {
     sources = bake-template.vala
-    packages = posix glib-2.0 gobject-2.0
+    packages = posix
   }
 
   bake-gettext {
     sources = bake-gettext.vala
-    packages = posix glib-2.0 gobject-2.0
+    packages = posix
   }
 
   bake {
