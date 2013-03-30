@@ -21,7 +21,7 @@ For example, the foo project can specify images that are required to be installe
 </p>
 <code>
 data.images.files = image1.png
-data.images.install-directory = $(data.install-directory)/images
+data.images.install-directory = $(package-data-directory)/images
 </code>
 <p>
 When running the install rule Bake will copy these files to <code>/usr/share/foo/images</code>.
