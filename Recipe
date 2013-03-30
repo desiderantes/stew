@@ -1,6 +1,6 @@
 package {
   name = bake
-  version = 0.1.11
+  version = 0.1.11+bzr
   ppa = lp:~bake-team/releases
 }
 
