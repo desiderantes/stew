@@ -1,8 +1,12 @@
+Overview of changes in bake 0.1.13
+
+    * Fix test programs not compiling with new syntax
+
 Overview of changes in bake 0.1.12
 
     * Fix man page not being installed/distributed
     * Fix pkg-config parts of tests not being distributed
-    * Fix bake-templace and bake-gettext not compiling
+    * Fix bake-template and bake-gettext not compiling
 
 Overview of changes in bake 0.1.11
 
