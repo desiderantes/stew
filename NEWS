@@ -1,3 +1,13 @@
+Overview of changes in bake 0.1.11
+
+    * Add root-directory variable
+    * Install into /usr instead of /usr/local by default
+    * Automatically link against both gobject and glib for Vala programs
+    * Don't overload programs.*.packages for Vala packages - use
+      programs.*.vala-packages instead
+    * Improve fast vapi status command
+    * Updated documentation
+
 Overview of changes in bake 0.1.10
 
     * Improve error message when unable to compile
