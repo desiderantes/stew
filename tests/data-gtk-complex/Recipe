@@ -3,5 +3,5 @@ project.name = test
 data.test {
   gtk-ui-files = test.ui
   gettext-domain = test
-  install-directory = $(package-data-directory)/ui
+  install-directory = $(project-data-directory)/ui
 }

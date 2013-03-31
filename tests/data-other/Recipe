@@ -2,5 +2,5 @@ project.name = test
 
 data.test {
   files = test
-  install-directory = $(package-data-directory)/test
+  install-directory = $(project-data-directory)/test
 }
