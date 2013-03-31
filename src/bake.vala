@@ -13,21 +13,21 @@ public class BuildModule
     {
     }
     
-    public virtual bool can_generate_program_rules (Recipe recipe, string id)
+    public virtual bool can_generate_program_rules (Recipe recipe, Program program)
     {
         return false;
     }
     
-    public virtual void generate_program_rules (Recipe recipe, string id)
+    public virtual void generate_program_rules (Recipe recipe, Program program)
     {
     }
 
-    public virtual bool can_generate_library_rules (Recipe recipe, string library)
+    public virtual bool can_generate_library_rules (Recipe recipe, Library library)
     {
         return false;
     }
 
-    public virtual void generate_library_rules (Recipe recipe, string library)
+    public virtual void generate_library_rules (Recipe recipe, Library library)
     {
     }
 
@@ -38,6 +38,38 @@ public class BuildModule
     public virtual void rules_complete (Recipe toplevel)
     {
     }
+}
+
+public class Program
+{
+    public Recipe recipe;
+    public string id;
+
+    public Program (Recipe recipe, string id)
+    {
+        this.recipe = recipe;
+        this.id = id;
+    }
+
+    public string gettext_domain { owned get { return recipe.get_variable ("programs.%s.gettext-domain".printf (id)); } }
+
+    public bool install { owned get { return recipe.get_boolean_variable ("programs.%s.install".printf (id), true); } }
+}
+
+public class Library
+{
+    public Recipe recipe;
+    public string id;
+
+    public Library (Recipe recipe, string id)
+    {
+        this.recipe = recipe;
+        this.id = id;
+    }
+
+    public string gettext_domain { owned get { return recipe.get_variable ("libraries.%s.gettext-domain".printf (id)); } }
+
+    public bool install { owned get { return recipe.get_boolean_variable ("libraries.%s.install".printf (id), true); } }
 }
 
 /* This is a replacement for string.strip since it generates annoying warnings about const pointers.
@@ -268,15 +300,17 @@ public class Bake
         var libraries = recipe.get_variable_children ("libraries");
         foreach (var id in libraries)
         {
+            var library = new Library (recipe, id);
+
             var buildable_modules = new List<BuildModule> ();
             foreach (var module in modules)
             {
-                if (module.can_generate_library_rules (recipe, id))
+                if (module.can_generate_library_rules (recipe, library))
                     buildable_modules.append (module);
             }
 
             if (buildable_modules.length () > 0)
-                buildable_modules.nth_data (0).generate_library_rules (recipe, id);
+                buildable_modules.nth_data (0).generate_library_rules (recipe, library);
             else
             {
                 var rule = recipe.add_rule ();
@@ -299,15 +333,17 @@ public class Bake
         var programs = recipe.get_variable_children ("programs");
         foreach (var id in programs)
         {
+            var program = new Program (recipe, id);
+
             var buildable_modules = new List<BuildModule> ();
             foreach (var module in modules)
             {
-                if (module.can_generate_program_rules (recipe, id))
+                if (module.can_generate_program_rules (recipe, program))
                     buildable_modules.append (module);
             }
 
             if (buildable_modules.length () > 0)
-                buildable_modules.nth_data (0).generate_program_rules (recipe, id);
+                buildable_modules.nth_data (0).generate_program_rules (recipe, program);
             else
             {
                 var rule = recipe.add_rule ();

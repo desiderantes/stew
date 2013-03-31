@@ -1,17 +1,16 @@
 public class JavaModule : BuildModule
 {
-    public override bool can_generate_program_rules (Recipe recipe, string id)
+    public override bool can_generate_program_rules (Recipe recipe, Program program)
     {
-        return can_generate_rules (recipe, "programs", id);
+        return can_generate_rules (recipe, "programs", program.id);
     }
 
-    public override void generate_program_rules (Recipe recipe, string id)
+    public override void generate_program_rules (Recipe recipe, Program program)
     {
-        var name = recipe.get_variable ("programs.%s.name".printf (id), id);
+        var name = recipe.get_variable ("programs.%s.name".printf (program.id), program.id);
         var binary_name = name;
-        var do_install = recipe.get_boolean_variable ("programs.%s.install".printf (id), true);
 
-        var sources = split_variable (recipe.get_variable ("programs.%s.sources".printf (id)));
+        var sources = split_variable (recipe.get_variable ("programs.%s.sources".printf (program.id)));
 
         var jar_file = "%s.jar".printf (binary_name);
 
@@ -24,7 +23,7 @@ public class JavaModule : BuildModule
         var jar_command = "jar cfe %s".printf (jar_file);
 
         // FIXME: Would like a better way of determining this automatically
-        var entrypoint = recipe.get_variable ("programs.%s.entrypoint".printf (id));
+        var entrypoint = recipe.get_variable ("programs.%s.entrypoint".printf (program.id));
         if (entrypoint != null)
             jar_command += " %s".printf (entrypoint);
 
@@ -46,7 +45,7 @@ public class JavaModule : BuildModule
 
         jar_rule.add_command (jar_command);
         recipe.build_rule.add_input (jar_file);
-        if (do_install)
+        if (program.install)
             recipe.add_install_rule (jar_file, recipe.package_data_directory);
 
         /* Script to run locally */
@@ -65,29 +64,26 @@ public class JavaModule : BuildModule
         rule.add_command ("@echo 'exec java -jar %s' >> %s".printf (Path.build_filename (recipe.package_data_directory, jar_file), script));
         rule.add_command ("@chmod +x %s".printf (script));
         recipe.build_rule.add_input (script);
-        if (do_install)
+        if (program.install)
             recipe.add_install_rule (script, recipe.binary_directory, binary_name);
 
-        var gettext_domain = recipe.get_variable ("programs.%s.gettext-domain".printf (id));
-        if (gettext_domain != null)
+        if (program.gettext_domain != null)
         {
             foreach (var source in sources)
-                GettextModule.add_translatable_file (recipe, gettext_domain, "text/x-java", source);
+                GettextModule.add_translatable_file (recipe, program.gettext_domain, "text/x-java", source);
         }
     }
 
-    public override bool can_generate_library_rules (Recipe recipe, string id)
+    public override bool can_generate_library_rules (Recipe recipe, Library library)
     {
-        return can_generate_rules (recipe, "libraries", id);
+        return can_generate_rules (recipe, "libraries", library.id);
     }
 
-    public override void generate_library_rules (Recipe recipe, string id)
+    public override void generate_library_rules (Recipe recipe, Library library)
     {    
-        var do_install = recipe.get_boolean_variable ("libraries.%s.install".printf (id), true);
+        var sources = split_variable (recipe.get_variable ("libraries.%s.sources".printf (library.id)));
 
-        var sources = split_variable (recipe.get_variable ("libraries.%s.sources".printf (id)));
-
-        var jar_file = "%s.jar".printf (id);
+        var jar_file = "%s.jar".printf (library.id);
 
         var rule = recipe.add_rule ();
         var build_directory = get_relative_path (recipe.dirname, recipe.build_directory);
@@ -117,14 +113,13 @@ public class JavaModule : BuildModule
 
         jar_rule.add_command (jar_command);
         recipe.build_rule.add_input (jar_file);
-        if (do_install)
+        if (library.install)
             recipe.add_install_rule (jar_file, Path.build_filename (recipe.data_directory, "java"));
 
-        var gettext_domain = recipe.get_variable ("libraries.%s.gettext-domain".printf (id));
-        if (gettext_domain != null)
+        if (library.gettext_domain != null)
         {
             foreach (var source in sources)
-                GettextModule.add_translatable_file (recipe, gettext_domain, "text/x-java", source);
+                GettextModule.add_translatable_file (recipe, library.gettext_domain, "text/x-java", source);
         }
     }
 

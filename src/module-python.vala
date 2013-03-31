@@ -1,25 +1,24 @@
 public class PythonModule : BuildModule
 {
-    public override bool can_generate_program_rules (Recipe recipe, string id)
+    public override bool can_generate_program_rules (Recipe recipe, Program program)
     {
-        return can_generate_rules (recipe, "programs", id);
+        return can_generate_rules (recipe, "programs", program.id);
     }
 
-    public override void generate_program_rules (Recipe recipe, string id)
+    public override void generate_program_rules (Recipe recipe, Program program)
     {
-        var name = recipe.get_variable ("programs.%s.name".printf (id), id);
+        var name = recipe.get_variable ("programs.%s.name".printf (program.id), program.id);
         var binary_name = name;
-        var do_install = recipe.get_boolean_variable ("programs.%s.install".printf (id), true);
 
-        var sources = split_variable (recipe.get_variable ("programs.%s.sources".printf (id)));
+        var sources = split_variable (recipe.get_variable ("programs.%s.sources".printf (program.id)));
 
-        var python_version = recipe.get_variable ("programs.%s.python-version".printf (id));
+        var python_version = recipe.get_variable ("programs.%s.python-version".printf (program.id));
         var python_bin = "python";
         if (python_version != null)
             python_bin += python_version;
 
         var python_cache_dir = "__pycache__";
-        var install_sources = recipe.get_boolean_variable ("programs.%s.install-sources".printf (id));
+        var install_sources = recipe.get_boolean_variable ("programs.%s.install-sources".printf (program.id));
         var main_file = "";
         foreach (var source in sources)
         {
@@ -42,7 +41,7 @@ public class PythonModule : BuildModule
             rule.add_command ("@%s -m py_compile %s".printf (python_bin, source));
             recipe.build_rule.add_input (output);
 
-            if (do_install)
+            if (program.install)
             {
                 if (install_sources || (python_version >= "3.0"))
                     recipe.add_install_rule (source, recipe.package_data_directory);
@@ -50,11 +49,10 @@ public class PythonModule : BuildModule
             }
         }
 
-        var gettext_domain = recipe.get_variable ("programs.%s.gettext-domain".printf (id));
-        if (gettext_domain != null)
+        if (program.gettext_domain != null)
         {
             foreach (var source in sources)
-                GettextModule.add_translatable_file (recipe, gettext_domain, "text/x-python", source);
+                GettextModule.add_translatable_file (recipe, program.gettext_domain, "text/x-python", source);
         }
 
         /* Script to run locally */
@@ -73,28 +71,26 @@ public class PythonModule : BuildModule
         rule.add_command ("@echo 'exec %s %s' >> %s".printf (python_bin, Path.build_filename (recipe.package_data_directory, main_file), script));
         rule.add_command ("@chmod +x %s".printf (script));
         recipe.build_rule.add_input (script);
-        if (do_install)
+        if (program.install)
             recipe.add_install_rule (script, recipe.binary_directory, binary_name);
     }
 
-    public override bool can_generate_library_rules (Recipe recipe, string id)
+    public override bool can_generate_library_rules (Recipe recipe, Library library)
     {
-        return can_generate_rules (recipe, "libraries", id);
+        return can_generate_rules (recipe, "libraries", library.id);
     }
 
-    public override void generate_library_rules (Recipe recipe, string id)
+    public override void generate_library_rules (Recipe recipe, Library library)
     {
-        var sources = split_variable (recipe.get_variable ("libraries.%s.sources".printf (id)));
+        var sources = split_variable (recipe.get_variable ("libraries.%s.sources".printf (library.id)));
 
-        var python_version = recipe.get_variable ("programs.%s.python-version".printf (id));
+        var python_version = recipe.get_variable ("programs.%s.python-version".printf (library.id));
         var python_bin = "python";
         if (python_version != null)
             python_bin += python_version;
 
-        var do_install = recipe.get_boolean_variable ("libraries.%s.install".printf (id), true);
-
-        var install_directory = recipe.get_variable ("libraries.%s.install-directory".printf (id));
-        var install_sources = recipe.get_boolean_variable ("libraries.%s.install-sources".printf (id));
+        var install_directory = recipe.get_variable ("libraries.%s.install-directory".printf (library.id));
+        var install_sources = recipe.get_boolean_variable ("libraries.%s.install-sources".printf (library.id));
         if (install_directory == null)
         {
             var install_dir = python_bin;
@@ -108,7 +104,7 @@ public class PythonModule : BuildModule
                         install_dir = "python%s.%s".printf (tokens[0], tokens[1]);
                 }
             }
-            install_directory = Path.build_filename (recipe.library_directory, install_dir, "site-packages", id);
+            install_directory = Path.build_filename (recipe.library_directory, install_dir, "site-packages", library.id);
         }
 
         foreach (var source in sources)
@@ -121,7 +117,7 @@ public class PythonModule : BuildModule
             rule.add_command ("@%s -m py_compile %s".printf (python_bin, source));
             recipe.build_rule.add_input (output);
 
-            if (do_install)
+            if (library.install)
             {
                 if (install_sources)
                     recipe.add_install_rule (source, install_directory);
@@ -129,11 +125,10 @@ public class PythonModule : BuildModule
             }
         }
 
-        var gettext_domain = recipe.get_variable ("libraries.%s.gettext-domain".printf (id));
-        if (gettext_domain != null)
+        if (library.gettext_domain != null)
         {
             foreach (var source in sources)
-                GettextModule.add_translatable_file (recipe, gettext_domain, "text/x-python", source);
+                GettextModule.add_translatable_file (recipe, library.gettext_domain, "text/x-python", source);
         }
     }
 

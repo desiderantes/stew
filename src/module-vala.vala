@@ -1,63 +1,61 @@
 public class ValaModule : BuildModule
 {
-    public override bool can_generate_program_rules (Recipe recipe, string id)
+    public override bool can_generate_program_rules (Recipe recipe, Program program)
     {
-        return can_generate_rules (recipe, "programs", id);
+        return can_generate_rules (recipe, "programs", program.id);
     }
 
-    public override void generate_program_rules (Recipe recipe, string id)
+    public override void generate_program_rules (Recipe recipe, Program program)
     {
-        var name = recipe.get_variable ("programs.%s.name".printf (id), id);
+        var name = recipe.get_variable ("programs.%s.name".printf (program.id), program.id);
         var binary_name = name;
-        var do_install = recipe.get_boolean_variable ("programs.%s.install".printf (id), true);
 
-        generate_compile_rules (recipe, "programs", id, binary_name);
-        if (do_install)
+        generate_compile_rules (recipe, "programs", program.id, binary_name);
+        if (program.install)
             recipe.add_install_rule (binary_name, recipe.binary_directory);
 
-        generate_gettext_rules (recipe, "programs", id);
+        generate_gettext_rules (recipe, "programs", program.id);
     }
 
-    public override bool can_generate_library_rules (Recipe recipe, string id)
+    public override bool can_generate_library_rules (Recipe recipe, Library library)
     {
-        return can_generate_rules (recipe, "libraries", id);
+        return can_generate_rules (recipe, "libraries", library.id);
     }
 
-    public override void generate_library_rules (Recipe recipe, string id)
+    public override void generate_library_rules (Recipe recipe, Library library)
     {
-        var version = recipe.get_variable ("libraries.%s.version".printf (id), "0");
+        var version = recipe.get_variable ("libraries.%s.version".printf (library.id), "0");
         var major_version = version;
         var index = version.index_of (".");
         if (index > 0)
             major_version = version.substring (0, index);
 
-        var do_install = recipe.get_boolean_variable ("libraries.%s.install".printf (id), true);
-        var namespace = recipe.get_variable ("libraries.%s.namespace".printf (id));
+        var namespace = recipe.get_variable ("libraries.%s.namespace".printf (library.id));
 
-        var binary_name = "lib%s.so.%s".printf (id, version);
-        generate_compile_rules (recipe, "libraries", id, binary_name, namespace, version, major_version, true);
+        var binary_name = "lib%s.so.%s".printf (library.id, version);
+        generate_compile_rules (recipe, "libraries", library.id, binary_name, namespace, version, major_version, true);
            
         /* Generate a symbolic link to the library and install both the link and the library */
         var rule = recipe.add_rule ();
-        var unversioned_binary_name = "lib%s.so".printf (id);
+        var unversioned_binary_name = "lib%s.so".printf (library.id);
         recipe.build_rule.add_input (unversioned_binary_name);
         rule.add_input (binary_name);
         rule.add_output (unversioned_binary_name);
         rule.add_status_command ("LINK %s".printf (unversioned_binary_name));
         rule.add_command ("@ln -s %s %s".printf (binary_name, unversioned_binary_name));
-        if (do_install)
+        if (library.install)
         {
             recipe.add_install_rule (unversioned_binary_name, recipe.library_directory);
             recipe.add_install_rule (binary_name, recipe.library_directory);
         }
 
         /* Generate pkg-config file */
-        var filename = "%s-%s.pc".printf (id, major_version);
-        var name = recipe.get_variable ("libraries.%s.name".printf (id), id);
-        var description = recipe.get_variable ("libraries.%s.description".printf (id), "");
-        var requires = recipe.get_variable ("libraries.%s.requires".printf (id), "");
+        var filename = "%s-%s.pc".printf (library.id, major_version);
+        var name = recipe.get_variable ("libraries.%s.name".printf (library.id), library.id);
+        var description = recipe.get_variable ("libraries.%s.description".printf (library.id), "");
+        var requires = recipe.get_variable ("libraries.%s.requires".printf (library.id), "");
 
-        var include_directory = Path.build_filename (recipe.include_directory, "%s-%s".printf (id, major_version));
+        var include_directory = Path.build_filename (recipe.include_directory, "%s-%s".printf (library.id, major_version));
 
         rule = recipe.add_rule ();
         recipe.build_rule.add_input (filename);
@@ -67,21 +65,21 @@ public class ValaModule : BuildModule
         rule.add_command ("@echo \"Description: %s\" >> %s".printf (description, filename));
         rule.add_command ("@echo \"Version: %s\" >> %s".printf (version, filename));
         rule.add_command ("@echo \"Requires: %s\" >> %s".printf (requires, filename));
-        rule.add_command ("@echo \"Libs: -L%s -l%s\" >> %s".printf (recipe.library_directory, id, filename));
+        rule.add_command ("@echo \"Libs: -L%s -l%s\" >> %s".printf (recipe.library_directory, library.id, filename));
         rule.add_command ("@echo \"Cflags: -I%s\" >> %s".printf (include_directory, filename));
 
-        if (do_install)
+        if (library.install)
             recipe.add_install_rule (filename, Path.build_filename (recipe.library_directory, "pkgconfig"));
 
         var h_filename = "%s.h".printf (name);
         recipe.build_rule.add_input (h_filename);
-        if (do_install)
+        if (library.install)
             recipe.add_install_rule (h_filename, include_directory);
 
         var vapi_filename = "%s-%s.vapi".printf (name, major_version);
         recipe.build_rule.add_input (vapi_filename);
         var vapi_directory = Path.build_filename (recipe.data_directory, "vala", "vapi");
-        if (do_install)
+        if (library.install)
             recipe.add_install_rule (vapi_filename, vapi_directory);
 
         /* Build a typelib */
@@ -89,23 +87,23 @@ public class ValaModule : BuildModule
         {
             var gir_filename = "%s-%s.gir".printf (namespace, major_version);
             var gir_directory = Path.build_filename (recipe.data_directory, "gir-1.0");
-            if (do_install)
+            if (library.install)
                 recipe.add_install_rule (gir_filename, gir_directory);
 
             var typelib_filename = "%s-%s.typelib".printf (name, major_version);
             recipe.build_rule.add_input (typelib_filename);
             var typelib_rule = recipe.add_rule ();
             typelib_rule.add_input (gir_filename);
-            typelib_rule.add_input ("lib%s.so".printf (id));
+            typelib_rule.add_input ("lib%s.so".printf (library.id));
             typelib_rule.add_output (typelib_filename);
             typelib_rule.add_status_command ("G-IR-COMPILER %s".printf (typelib_filename));
             typelib_rule.add_command ("@g-ir-compiler --shared-library=%s %s -o %s".printf (name, gir_filename, typelib_filename));
             var typelib_directory = Path.build_filename (recipe.library_directory, "girepository-1.0");
-            if (do_install)
+            if (library.install)
                 recipe.add_install_rule (typelib_filename, typelib_directory);
         }
 
-        generate_gettext_rules (recipe, "libraries", id);
+        generate_gettext_rules (recipe, "libraries", library.id);
     }
 
     private void generate_compile_rules (Recipe recipe, string type_name, string id, string binary_name, string? namespace = null, string? version = null, string? major_version = null, bool is_library = false)

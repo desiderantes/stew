@@ -1,53 +1,50 @@
 public class GCCModule : BuildModule
 {
-    public override bool can_generate_program_rules (Recipe recipe, string id)
+    public override bool can_generate_program_rules (Recipe recipe, Program program)
     {
-        return can_generate_rules (recipe, "programs", id);
+        return can_generate_rules (recipe, "programs", program.id);
     }
 
-    public override void generate_program_rules (Recipe recipe, string id)
+    public override void generate_program_rules (Recipe recipe, Program program)
     {
-        var name = recipe.get_variable ("programs.%s.name".printf (id), id);
+        var name = recipe.get_variable ("programs.%s.name".printf (program.id), program.id);
         var binary_name = name;
-        var do_install = recipe.get_boolean_variable ("programs.%s.install".printf (id), true);
-        generate_compile_rules (recipe, "programs", id, binary_name, null, false, do_install);
+        generate_compile_rules (recipe, "programs", program.id, binary_name, null, false, program.install);
     }
 
-    public override bool can_generate_library_rules (Recipe recipe, string id)
+    public override bool can_generate_library_rules (Recipe recipe, Library library)
     {
-        return can_generate_rules (recipe, "libraries", id);
+        return can_generate_rules (recipe, "libraries", library.id);
     }
 
-    public override void generate_library_rules (Recipe recipe, string library)
+    public override void generate_library_rules (Recipe recipe, Library library)
     {
-        var version = recipe.get_variable ("libraries.%s.version".printf (library), "0");
+        var version = recipe.get_variable ("libraries.%s.version".printf (library.id), "0");
         var major_version = version;
         var index = version.index_of (".");
         if (index > 0)
             major_version = version.substring (0, index);
 
-        var do_install = recipe.get_boolean_variable ("libraries.%s.install".printf (library), true);
-
-        var binary_name = "lib%s.so.%s".printf (library, version);
-        var namespace = recipe.get_variable ("libraries.%s.namespace".printf (library));
-        generate_compile_rules (recipe, "libraries", library, binary_name, namespace, true, do_install);
+        var binary_name = "lib%s.so.%s".printf (library.id, version);
+        var namespace = recipe.get_variable ("libraries.%s.namespace".printf (library.id));
+        generate_compile_rules (recipe, "libraries", library.id, binary_name, namespace, true, library.install);
 
         /* Generate a symbolic link to the library and install both the link and the library */
         var rule = recipe.add_rule ();
-        var unversioned_binary_name = "lib%s.so".printf (library);
+        var unversioned_binary_name = "lib%s.so".printf (library.id);
         recipe.build_rule.add_input (unversioned_binary_name);
         rule.add_input (binary_name);
         rule.add_output (unversioned_binary_name);
         rule.add_status_command ("LINK %s".printf (unversioned_binary_name));
         rule.add_command ("@ln -s %s %s".printf (binary_name, unversioned_binary_name));
-        if (do_install)
+        if (library.install)
             recipe.add_install_rule (unversioned_binary_name, recipe.library_directory);
 
         /* Install headers */
-        var include_directory = Path.build_filename (recipe.include_directory, "%s-%s".printf (library, major_version));
-        var header_list = recipe.get_variable ("libraries.%s.headers".printf (library));
+        var include_directory = Path.build_filename (recipe.include_directory, "%s-%s".printf (library.id, major_version));
+        var header_list = recipe.get_variable ("libraries.%s.headers".printf (library.id));
         var headers = new List<string> ();
-        if (do_install && header_list != null)
+        if (library.install && header_list != null)
         {
             headers = split_variable (header_list);
             foreach (var header in headers)
@@ -55,10 +52,10 @@ public class GCCModule : BuildModule
         }
 
         /* Generate pkg-config file */
-        var filename = "%s-%s.pc".printf (library, major_version);
-        var name = recipe.get_variable ("libraries.%s.name".printf (library), library);
-        var description = recipe.get_variable ("libraries.%s.description".printf (library), "");
-        var requires = recipe.get_variable ("libraries.%s.requires".printf (library), "");
+        var filename = "%s-%s.pc".printf (library.id, major_version);
+        var name = recipe.get_variable ("libraries.%s.name".printf (library.id), library.id);
+        var description = recipe.get_variable ("libraries.%s.description".printf (library.id), "");
+        var requires = recipe.get_variable ("libraries.%s.requires".printf (library.id), "");
         rule = recipe.add_rule ();
         recipe.build_rule.add_input (filename);
         rule.add_output (filename);
@@ -67,25 +64,25 @@ public class GCCModule : BuildModule
         rule.add_command ("@echo \"Description: %s\" >> %s".printf (description, filename));
         rule.add_command ("@echo \"Version: %s\" >> %s".printf (version, filename));
         rule.add_command ("@echo \"Requires: %s\" >> %s".printf (requires, filename));
-        rule.add_command ("@echo \"Libs: -L%s -l%s\" >> %s".printf (recipe.library_directory, library, filename));
+        rule.add_command ("@echo \"Libs: -L%s -l%s\" >> %s".printf (recipe.library_directory, library.id, filename));
         rule.add_command ("@echo \"Cflags: -I%s\" >> %s".printf (include_directory, filename));
-        if (do_install)
+        if (library.install)
             recipe.add_install_rule (filename, Path.build_filename (recipe.library_directory, "pkgconfig"));
 
         /* Generate introspection */
         if (namespace != null)
         {
-            var source_list = recipe.get_variable ("libraries.%s.sources".printf (library));
+            var source_list = recipe.get_variable ("libraries.%s.sources".printf (library.id));
             var sources = split_variable (source_list);
 
             /* Generate a .gir from the sources */
             var gir_filename = "%s-%s.gir".printf (namespace, major_version);
             recipe.build_rule.add_input (gir_filename);
             var gir_rule = recipe.add_rule ();
-            gir_rule.add_input ("lib%s.so".printf (library));
+            gir_rule.add_input ("lib%s.so".printf (library.id));
             gir_rule.add_output (gir_filename);
             gir_rule.add_status_command ("G-IR-SCANNER %s".printf (gir_filename));
-            var scan_command = "@g-ir-scanner --no-libtool --namespace=%s --nsversion=%s --library=%s --output %s".printf (namespace, major_version, library, gir_filename);
+            var scan_command = "@g-ir-scanner --no-libtool --namespace=%s --nsversion=%s --library=%s --output %s".printf (namespace, major_version, library.id, gir_filename);
             // FIXME: Need to sort out inputs correctly
             scan_command += " --include=GObject-2.0";
             foreach (var source in sources)
@@ -100,7 +97,7 @@ public class GCCModule : BuildModule
             }
             gir_rule.add_command (scan_command);
             var gir_directory = Path.build_filename (recipe.data_directory, "gir-1.0");
-            if (do_install)
+            if (library.install)
                 recipe.add_install_rule (gir_filename, gir_directory);
 
             /* Compile the .gir into a typelib */
@@ -108,12 +105,12 @@ public class GCCModule : BuildModule
             recipe.build_rule.add_input (typelib_filename);
             var typelib_rule = recipe.add_rule ();
             typelib_rule.add_input (gir_filename);
-            typelib_rule.add_input ("lib%s.so".printf (library));
+            typelib_rule.add_input ("lib%s.so".printf (library.id));
             typelib_rule.add_output (typelib_filename);
             typelib_rule.add_status_command ("G-IR-COMPILER %s".printf (typelib_filename));
-            typelib_rule.add_command ("@g-ir-compiler --shared-library=%s %s -o %s".printf (library, gir_filename, typelib_filename));
+            typelib_rule.add_command ("@g-ir-compiler --shared-library=%s %s -o %s".printf (library.id, gir_filename, typelib_filename));
             var typelib_directory = Path.build_filename (recipe.library_directory, "girepository-1.0");
-            if (do_install)
+            if (library.install)
                 recipe.add_install_rule (typelib_filename, typelib_directory);
         }
     }
