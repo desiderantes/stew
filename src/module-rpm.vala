@@ -2,12 +2,12 @@ public class RPMModule : BuildModule
 {
     public override void generate_toplevel_rules (Recipe recipe)
     {
-        if (recipe.package_version == null || Environment.find_program_in_path ("rpmbuild") == null)
+        if (recipe.project_version == null || Environment.find_program_in_path ("rpmbuild") == null)
             return;
 
         var release = "1";
-        var summary = "Summary of %s".printf (recipe.package_name);
-        var description = "Description of %s".printf (recipe.package_name);
+        var summary = "Summary of %s".printf (recipe.project_name);
+        var description = "Description of %s".printf (recipe.project_name);
         var license = "unknown";
 
         string rpmbuild_rc = "";
@@ -37,9 +37,9 @@ public class RPMModule : BuildModule
 
         var build_dir = ".bake-rpm-builddir";
         var gzip_file = "%s.tar.gz".printf (recipe.release_name);
-        var source_file = "%s.rpm.tar.gz".printf (recipe.package_name);
-        var spec_file = "%s/%s/%s.spec".printf (build_dir, recipe.release_name, recipe.package_name);
-        var rpm_file = "%s-%s-%s.%s.rpm".printf (recipe.package_name, recipe.package_version, release, build_arch);
+        var source_file = "%s.rpm.tar.gz".printf (recipe.project_name);
+        var spec_file = "%s/%s/%s.spec".printf (build_dir, recipe.release_name, recipe.project_name);
+        var rpm_file = "%s-%s-%s.%s.rpm".printf (recipe.project_name, recipe.project_version, release, build_arch);
 
         var rule = recipe.add_rule ();
         rule.add_input (gzip_file);
@@ -47,10 +47,10 @@ public class RPMModule : BuildModule
         rule.add_command ("@rm -rf %s".printf (build_dir));
         rule.add_command ("@mkdir %s".printf (build_dir));
         rule.add_command ("@cd %s && tar --extract --gzip --file ../%s".printf (build_dir, gzip_file));
-        rule.add_status_command ("Writing %s.spec".printf (recipe.package_name));
+        rule.add_status_command ("Writing %s.spec".printf (recipe.project_name));
         rule.add_command ("@echo \"Summary: %s\" > %s".printf (summary, spec_file));
-        rule.add_command ("@echo \"Name: %s\" >> %s".printf (recipe.package_name, spec_file));
-        rule.add_command ("@echo \"Version: %s\" >> %s".printf (recipe.package_version, spec_file));
+        rule.add_command ("@echo \"Name: %s\" >> %s".printf (recipe.project_name, spec_file));
+        rule.add_command ("@echo \"Version: %s\" >> %s".printf (recipe.project_version, spec_file));
         rule.add_command ("@echo \"Release: %s\" >> %s".printf (release, spec_file));
         rule.add_command ("@echo \"License: %s\" >> %s".printf (license, spec_file));
         rule.add_command ("@echo \"Source: %s\" >> %s".printf (source_file, spec_file));

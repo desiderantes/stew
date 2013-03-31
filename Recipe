@@ -1,4 +1,4 @@
-package {
+project {
   name = bake
   version = 0.1.13+bzr
   ppa = lp:~bake-team/releases

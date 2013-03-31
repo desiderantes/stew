@@ -1,4 +1,4 @@
-package.name = test
+project.name = test
 
 libraries.test {
   sources = Test.java

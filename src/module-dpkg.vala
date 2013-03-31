@@ -2,7 +2,7 @@ public class DpkgModule : BuildModule
 {
     public override void generate_toplevel_rules (Recipe recipe)
     {
-        if (recipe.package_version == null || Environment.find_program_in_path ("dpkg-buildpackage") == null)
+        if (recipe.project_version == null || Environment.find_program_in_path ("dpkg-buildpackage") == null)
             return;
 
         var debian_revision = "0";
@@ -21,11 +21,11 @@ public class DpkgModule : BuildModule
 
         var build_dir = ".bake-dpkg-builddir";
         var gzip_file = "%s.tar.gz".printf (recipe.release_name);
-        var orig_file = "%s_%s.orig.tar.gz".printf (recipe.package_name, recipe.package_version);
-        var debian_file = "%s_%s-%s.debian.tar.gz".printf (recipe.package_name, recipe.package_version, debian_revision);
-        var changes_file = "%s_%s-%s_source.changes".printf (recipe.package_name, recipe.package_version, debian_revision);
-        var dsc_file = "%s_%s-%s.dsc".printf (recipe.package_name, recipe.package_version, debian_revision);
-        var deb_file = "%s_%s-%s_%s.deb".printf (recipe.package_name, recipe.package_version, debian_revision, build_arch);
+        var orig_file = "%s_%s.orig.tar.gz".printf (recipe.project_name, recipe.project_version);
+        var debian_file = "%s_%s-%s.debian.tar.gz".printf (recipe.project_name, recipe.project_version, debian_revision);
+        var changes_file = "%s_%s-%s_source.changes".printf (recipe.project_name, recipe.project_version, debian_revision);
+        var dsc_file = "%s_%s-%s.dsc".printf (recipe.project_name, recipe.project_version, debian_revision);
+        var deb_file = "%s_%s-%s_%s.deb".printf (recipe.project_name, recipe.project_version, debian_revision, build_arch);
         var rule = recipe.add_rule ();
         rule.add_output (orig_file);
         rule.add_input (gzip_file);
@@ -48,7 +48,7 @@ public class DpkgModule : BuildModule
         var now = Time.local (time_t ());
         var release_date = now.format ("%a, %d %b %Y %H:%M:%S %z");
         rule.add_status_command ("Writing debian/changelog");
-        rule.add_command ("@echo \"%s (%s-%s) %s; urgency=low\" > %s".printf (recipe.package_name, recipe.package_version, debian_revision, distribution, changelog_file));
+        rule.add_command ("@echo \"%s (%s-%s) %s; urgency=low\" > %s".printf (recipe.project_name, recipe.project_version, debian_revision, distribution, changelog_file));
         rule.add_command ("@echo >> %s".printf (changelog_file));
         rule.add_command ("@echo \"  * Initial release.\" >> %s".printf (changelog_file));
         rule.add_command ("@echo >> %s".printf (changelog_file));
@@ -63,7 +63,7 @@ public class DpkgModule : BuildModule
         rule.add_command ("@echo '\tdh $@' >> %s".printf (rules_file));
         rule.add_command ("@echo >> %s".printf (rules_file));
         rule.add_command ("@echo \"override_dh_auto_configure:\" >> %s".printf (rules_file));
-        rule.add_command ("@echo \"\tbake --configure resource-directory=/usr install-directory=debian/%s\" >> %s".printf (recipe.package_name, rules_file));
+        rule.add_command ("@echo \"\tbake --configure resource-directory=/usr install-directory=debian/%s\" >> %s".printf (recipe.project_name, rules_file));
         rule.add_command ("@echo >> %s".printf (rules_file));
         rule.add_command ("@echo \"override_dh_auto_build:\" >> %s".printf (rules_file));
         rule.add_command ("@echo \"\tbake\" >> %s".printf (rules_file));
@@ -79,15 +79,15 @@ public class DpkgModule : BuildModule
         /* Generate debian/control */
         var control_file = "%s/debian/control".printf (build_dir);
         var build_depends = "debhelper"; // "bake"
-        var short_description = "Short description of %s".printf (recipe.package_name);
-        var long_description = "Long description of %s".printf (recipe.package_name);
+        var short_description = "Short description of %s".printf (recipe.project_name);
+        var long_description = "Long description of %s".printf (recipe.project_name);
         rule.add_status_command ("Writing debian/control");
-        rule.add_command ("@echo \"Source: %s\" > %s".printf (recipe.package_name, control_file));
+        rule.add_command ("@echo \"Source: %s\" > %s".printf (recipe.project_name, control_file));
         rule.add_command ("@echo \"Maintainer: %s <%s>\" >> %s".printf (name, email, control_file));
         rule.add_command ("@echo \"Build-Depends: %s\" >> %s".printf (build_depends, control_file));
         rule.add_command ("@echo \"Standards-Version: 3.9.2\" >> %s".printf (control_file));
         rule.add_command ("@echo >> %s".printf (control_file));
-        rule.add_command ("@echo \"Package: %s\" >> %s".printf (recipe.package_name, control_file));
+        rule.add_command ("@echo \"Package: %s\" >> %s".printf (recipe.project_name, control_file));
         rule.add_command ("@echo \"Architecture: any\" >> %s".printf (control_file));
         rule.add_command ("@echo \"Description: %s\" >> %s".printf (short_description, control_file));
         foreach (var line in long_description.split ("\n"))
@@ -141,7 +141,7 @@ public class DpkgModule : BuildModule
         rule.add_output ("%release-deb");
 
         // FIXME: Move into module-ppa
-        var ppa_name = recipe.get_variable ("package.ppa");
+        var ppa_name = recipe.get_variable ("project.ppa");
         if (ppa_name != null)
         {
             rule = recipe.add_rule ();

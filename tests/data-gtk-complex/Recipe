@@ -1,4 +1,4 @@
-package.name = test
+project.name = test
 
 data.test {
   gtk-ui-files = test.ui

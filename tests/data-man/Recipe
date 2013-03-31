@@ -1,3 +1,3 @@
-package.name = test
+project.name = test
 
 data.test.man-pages = test.1

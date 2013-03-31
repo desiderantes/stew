@@ -1,3 +1,3 @@
-package.name = test
+project.name = test
 
 programs.test.sources = test1.go test2.go test3.go

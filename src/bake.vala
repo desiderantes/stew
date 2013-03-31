@@ -462,18 +462,18 @@ public class Recipe
     public string system_library_directory { owned get { return get_variable ("system-library-directory"); } }
     public string data_directory { owned get { return get_variable ("data-directory"); } }
     public string include_directory { owned get { return get_variable ("include-directory"); } }
-    public string package_data_directory { owned get { return get_variable ("package-data-directory"); } }
+    public string package_data_directory { owned get { return get_variable ("project-data-directory"); } }
 
-    public string package_name { owned get { return get_variable ("package.name"); } }
-    public string package_version { owned get { return get_variable ("package.version"); } }
+    public string project_name { owned get { return get_variable ("project.name"); } }
+    public string project_version { owned get { return get_variable ("project.version"); } }
     public string release_name
     {
         owned get
         {
-            if (package_version == null)
-                return package_name;
+            if (project_version == null)
+                return project_name;
             else
-                return "%s-%s".printf (package_name, package_version);
+                return "%s-%s".printf (project_name, project_version);
         }
     }
 
@@ -935,7 +935,7 @@ public class Bake
         var f = new Recipe (filename);
 
         /* Children can't be new toplevel recipes */
-        if (!is_toplevel && f.package_name != null)
+        if (!is_toplevel && f.project_name != null)
         {
             if (debug_enabled)
                 stderr.printf ("Ignoring toplevel recipe %s\n", filename);
@@ -1135,7 +1135,7 @@ public class Bake
             try
             {
                 toplevel = new Recipe (Path.build_filename (toplevel_dir, "Recipe"));
-                if (toplevel.package_name != null)
+                if (toplevel.project_name != null)
                     break;
             }
             catch (Error e)
@@ -1265,8 +1265,8 @@ public class Bake
         if (conf_file.get_variable ("include-directory") == null)
             conf_file.set_variable ("include-directory", Path.build_filename (resource_directory, "include"));
         var data_directory = conf_file.get_variable ("data-directory");
-        if (conf_file.get_variable ("package-data-directory") == null)
-            conf_file.set_variable ("package-data-directory", Path.build_filename (data_directory, "$(package.name)"));
+        if (conf_file.get_variable ("project-data-directory") == null)
+            conf_file.set_variable ("project-data-directory", Path.build_filename (data_directory, "$(project.name)"));
 
         /* Load the recipe tree */
         var filename = Path.build_filename (toplevel_dir, "Recipe");

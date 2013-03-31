@@ -79,7 +79,7 @@ public class MonoModule : BuildModule
         rule.add_command (command);
         recipe.build_rule.add_input (dll_file);
         if (do_install)
-            recipe.add_install_rule (dll_file, Path.build_filename (recipe.library_directory, "cli", recipe.package_name));
+            recipe.add_install_rule (dll_file, Path.build_filename (recipe.library_directory, "cli", recipe.project_name));
 
         var gettext_domain = recipe.get_variable ("libraries.%s.gettext-domain".printf (id));
         if (gettext_domain != null)

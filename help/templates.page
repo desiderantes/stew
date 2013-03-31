@@ -55,7 +55,7 @@ With the following rules:.
 <code>
 templates.example {
   files = config.h
-  variables = %DATA_DIRECTORY%=$(package-data-directory)
+  variables = %DATA_DIRECTORY%=$(project-data-directory)
 }
 </code>
 <p>
