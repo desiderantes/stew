@@ -40,62 +40,71 @@ public class BuildModule
     }
 }
 
-public class Program
+public class Compilable
 {
     public Recipe recipe;
+    private string type_name;
     public string id;
 
-    public Program (Recipe recipe, string id)
+    public Compilable (Recipe recipe, string type_name, string id)
     {
         this.recipe = recipe;
+        this.type_name = type_name;
         this.id = id;
     }
 
-    public string name { owned get { return recipe.get_variable ("programs.%s.name".printf (id), id); } }
+    public string? get_variable (string name, string? fallback = null)
+    {
+        return recipe.get_variable ("%s.%s.%s".printf (type_name, id, name), fallback);
+    }
 
-    public string? gettext_domain { owned get { return recipe.get_variable ("programs.%s.gettext-domain".printf (id)); } }
+    public bool get_boolean_variable (string name, bool? fallback = false)
+    {
+        return recipe.get_boolean_variable ("%s.%s.%s".printf (type_name, id, name), fallback);
+    }
 
-    public bool install { owned get { return recipe.get_boolean_variable ("programs.%s.install".printf (id), true); } }
+    public string name { owned get { return get_variable ("name", id); } }
+
+    public string? gettext_domain { owned get { return get_variable ("gettext-domain"); } }
+
+    public bool install { owned get { return get_boolean_variable ("install", true); } }
 
     public List<string> sources
     {
         owned get
         {
-            var source_list = recipe.get_variable ("programs.%s.sources".printf (id));
+            var source_list = get_variable ("sources");
             if (source_list == null)
                 return new List<string> ();
             return split_variable (source_list);
         }
+    }
+
+    public string? compile_flags { owned get { return get_variable ("compile-flags"); } }
+
+    public string? link_flags { owned get { return get_variable ("link-flags"); } }
+
+    public string? packages { owned get { return get_variable ("packages"); } }
+}
+
+public class Program : Compilable
+{
+    public Program (Recipe recipe, string id)
+    {
+        base (recipe, "programs", id);
     }
 }
 
-public class Library
+public class Library : Compilable
 {
-    public Recipe recipe;
-    public string id;
-
     public Library (Recipe recipe, string id)
     {
-        this.recipe = recipe;
-        this.id = id;
+        base (recipe, "libraries", id);
     }
 
-    public string name { owned get { return recipe.get_variable ("libraries.%s.name".printf (id), id); } }
+    public string version { owned get { return get_variable ("version", "0"); } }
 
-    public string? gettext_domain { owned get { return recipe.get_variable ("libraries.%s.gettext-domain".printf (id)); } }
-
-    public bool install { owned get { return recipe.get_boolean_variable ("libraries.%s.install".printf (id), true); } }
-
-    public List<string> sources
-    {
-        owned get
-        {
-            var source_list = recipe.get_variable ("libraries.%s.sources".printf (id));
-            if (source_list == null)
-                return new List<string> ();
-            return split_variable (source_list);
-        }
-    }
+    public string? namespace { owned get { return get_variable ("namespace"); } }
 }
 
 /* This is a replacement for string.strip since it generates annoying warnings about const pointers.

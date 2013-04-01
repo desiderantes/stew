@@ -2,7 +2,7 @@ public class PythonModule : BuildModule
 {
     public override bool can_generate_program_rules (Recipe recipe, Program program)
     {
-        return can_generate_rules (recipe, program.sources, recipe.get_variable ("programs.%s.python-version".printf (program.id)));
+        return can_generate_rules (recipe, program.sources, program.get_variable ("python-version"));
     }
 
     public override void generate_program_rules (Recipe recipe, Program program)
@@ -11,13 +11,13 @@ public class PythonModule : BuildModule
 
         var sources = program.sources;
 
-        var python_version = recipe.get_variable ("programs.%s.python-version".printf (program.id));
+        var python_version = program.get_variable ("python-version");
         var python_bin = "python";
         if (python_version != null)
             python_bin += python_version;
 
         var python_cache_dir = "__pycache__";
-        var install_sources = recipe.get_boolean_variable ("programs.%s.install-sources".printf (program.id));
+        var install_sources = program.get_boolean_variable ("install-sources");
         var main_file = "";
         foreach (var source in sources)
         {
@@ -76,20 +76,20 @@ public class PythonModule : BuildModule
 
     public override bool can_generate_library_rules (Recipe recipe, Library library)
     {
-        return can_generate_rules (recipe, library.sources, recipe.get_variable ("libraries.%s.python-version".printf (library.id)));
+        return can_generate_rules (recipe, library.sources, library.get_variable ("python-version"));
     }
 
     public override void generate_library_rules (Recipe recipe, Library library)
     {
         var sources = library.sources;
 
-        var python_version = recipe.get_variable ("programs.%s.python-version".printf (library.id));
+        var python_version = library.get_variable ("python-version");
         var python_bin = "python";
         if (python_version != null)
             python_bin += python_version;
 
         var install_directory = recipe.get_variable ("libraries.%s.install-directory".printf (library.id));
-        var install_sources = recipe.get_boolean_variable ("libraries.%s.install-sources".printf (library.id));
+        var install_sources = library.get_boolean_variable ("install-sources");
         if (install_directory == null)
         {
             var install_dir = python_bin;

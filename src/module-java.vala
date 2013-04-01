@@ -22,7 +22,7 @@ public class JavaModule : BuildModule
         var jar_command = "jar cfe %s".printf (jar_file);
 
         // FIXME: Would like a better way of determining this automatically
-        var entrypoint = recipe.get_variable ("programs.%s.entrypoint".printf (program.id));
+        var entrypoint = program.get_variable ("entrypoint");
         if (entrypoint != null)
             jar_command += " %s".printf (entrypoint);
 
