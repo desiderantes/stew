@@ -7,12 +7,9 @@ public class ValaModule : BuildModule
 
     public override void generate_program_rules (Recipe recipe, Program program)
     {
-        var name = recipe.get_variable ("programs.%s.name".printf (program.id), program.id);
-        var binary_name = name;
-
-        generate_compile_rules (recipe, "programs", program.id, program.sources, binary_name);
+        generate_compile_rules (recipe, "programs", program.id, program.sources, program.name);
         if (program.install)
-            recipe.add_install_rule (binary_name, recipe.binary_directory);
+            recipe.add_install_rule (program.name, recipe.binary_directory);
 
         generate_gettext_rules (recipe, program.sources, program.gettext_domain);
     }
@@ -51,7 +48,7 @@ public class ValaModule : BuildModule
 
         /* Generate pkg-config file */
         var filename = "%s-%s.pc".printf (library.id, major_version);
-        var name = recipe.get_variable ("libraries.%s.name".printf (library.id), library.id);
+        var name = library.name;
         var description = recipe.get_variable ("libraries.%s.description".printf (library.id), "");
         var requires = recipe.get_variable ("libraries.%s.requires".printf (library.id), "");
 

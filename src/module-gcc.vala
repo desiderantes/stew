@@ -7,9 +7,7 @@ public class GCCModule : BuildModule
 
     public override void generate_program_rules (Recipe recipe, Program program)
     {
-        var name = recipe.get_variable ("programs.%s.name".printf (program.id), program.id);
-        var binary_name = name;
-        generate_compile_rules (recipe, "programs", program.id, program.sources, binary_name, null, false, program.install);
+        generate_compile_rules (recipe, "programs", program.id, program.sources, program.name, null, false, program.install);
     }
 
     public override bool can_generate_library_rules (Recipe recipe, Library library)
@@ -53,7 +51,7 @@ public class GCCModule : BuildModule
 
         /* Generate pkg-config file */
         var filename = "%s-%s.pc".printf (library.id, major_version);
-        var name = recipe.get_variable ("libraries.%s.name".printf (library.id), library.id);
+        var name = library.name;
         var description = recipe.get_variable ("libraries.%s.description".printf (library.id), "");
         var requires = recipe.get_variable ("libraries.%s.requires".printf (library.id), "");
         rule = recipe.add_rule ();

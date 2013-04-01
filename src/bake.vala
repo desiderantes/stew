@@ -51,6 +51,8 @@ public class Program
         this.id = id;
     }
 
+    public string name { owned get { return recipe.get_variable ("programs.%s.name".printf (id), id); } }
+
     public string? gettext_domain { owned get { return recipe.get_variable ("programs.%s.gettext-domain".printf (id)); } }
 
     public bool install { owned get { return recipe.get_boolean_variable ("programs.%s.install".printf (id), true); } }
@@ -77,6 +79,8 @@ public class Library
         this.recipe = recipe;
         this.id = id;
     }
+
+    public string name { owned get { return recipe.get_variable ("libraries.%s.name".printf (id), id); } }
 
     public string? gettext_domain { owned get { return recipe.get_variable ("libraries.%s.gettext-domain".printf (id)); } }
 

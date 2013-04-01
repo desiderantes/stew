@@ -7,8 +7,7 @@ public class PythonModule : BuildModule
 
     public override void generate_program_rules (Recipe recipe, Program program)
     {
-        var name = recipe.get_variable ("programs.%s.name".printf (program.id), program.id);
-        var binary_name = name;
+        var binary_name = program.name;
 
         var sources = program.sources;
 

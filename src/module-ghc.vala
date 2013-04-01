@@ -20,8 +20,7 @@ public class GHCModule : BuildModule
 
     public override void generate_program_rules (Recipe recipe, Program program)
     {
-        var name = recipe.get_variable ("programs.%s.name".printf (program.id), program.id);
-        var binary_name = name;
+        var binary_name = program.name;
 
         var link_rule = recipe.add_rule ();
         link_rule.add_output (binary_name);
