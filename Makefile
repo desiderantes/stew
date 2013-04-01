@@ -1,5 +1,8 @@
-all: bake-bootstrap
+all: Recipe.conf bake-bootstrap
 	PATH=`pwd`:$$PATH ./bake-bootstrap
+
+Recipe.conf:
+	PATH=`pwd`:$$PATH ./bake-bootstrap --configure library-directory=$(LIBRARY_DIRECTORY)
 
 PACKAGES = --pkg=glib-2.0 \
            --pkg=gio-2.0 \
@@ -33,7 +36,8 @@ SOURCES = src/bake.vala \
           src/module-vala.vala \
           src/module-xdg.vala \
           src/module-xzip.vala \
-          src/pkg-config.vala
+          src/pkg-config.vala \
+          src/recipe.vala
 
 bake-template: src/bake-template.vala
 	valac -o bake-template --pkg=posix src/bake-template.vala
