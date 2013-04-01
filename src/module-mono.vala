@@ -2,7 +2,7 @@ public class MonoModule : BuildModule
 {
     public override bool can_generate_program_rules (Recipe recipe, Program program)
     {
-        return can_generate_rules (recipe, "programs", program.id);
+        return can_generate_rules (recipe, program.sources);
     }
 
     public override void generate_program_rules (Recipe recipe, Program program)
@@ -10,7 +10,7 @@ public class MonoModule : BuildModule
         var name = recipe.get_variable ("programs.%s.name".printf (program.id), program.id);
         var binary_name = name;
 
-        var sources = split_variable (recipe.get_variable ("programs.%s.sources".printf (program.id)));
+        var sources = program.sources;
 
         var exe_file = "%s.exe".printf (binary_name);
 
@@ -55,12 +55,12 @@ public class MonoModule : BuildModule
 
     public override bool can_generate_library_rules (Recipe recipe, Library library)
     {
-        return can_generate_rules (recipe, "libraries", library.id);
+        return can_generate_rules (recipe, library.sources);
     }
 
     public override void generate_library_rules (Recipe recipe, Library library)
     {
-        var sources = split_variable (recipe.get_variable ("libraries.%s.sources".printf (library.id)));
+        var sources = library.sources;
 
         var dll_file = "%s.dll".printf (library.id);
 
@@ -84,17 +84,17 @@ public class MonoModule : BuildModule
         }
     }
 
-    private bool can_generate_rules (Recipe recipe, string type_name, string id)
+    private bool can_generate_rules (Recipe recipe, List<string> sources)
     {
-        var source_list = recipe.get_variable ("%s.%s.sources".printf (type_name, id));
-        if (source_list == null)
-            return false;
-        var sources = split_variable (source_list);
-        if (sources == null)
-            return false;
+        var count = 0;
         foreach (var source in sources)
+        {
             if (!source.has_suffix (".cs"))
                 return false;
+            count++;
+        }
+        if (count == 0)
+            return false;
 
         if (Environment.find_program_in_path ("gmcs") == null)
             return false;

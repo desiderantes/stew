@@ -2,13 +2,15 @@ public class GHCModule : BuildModule
 {
     public override bool can_generate_program_rules (Recipe recipe, Program program)
     {
-        var source_list = recipe.get_variable ("programs.%s.sources".printf (program.id));
-        if (source_list == null)
-            return false;
-        var sources = split_variable (source_list);
-        foreach (var source in sources)
+        var count = 0;
+        foreach (var source in program.sources)
+        {
             if (!source.has_suffix (".hs"))
                 return false;
+            count++;
+        }
+        if (count == 0)
+            return false;
 
         if (Environment.find_program_in_path ("ghc") == null)
             return false;
@@ -21,13 +23,11 @@ public class GHCModule : BuildModule
         var name = recipe.get_variable ("programs.%s.name".printf (program.id), program.id);
         var binary_name = name;
 
-        var sources = split_variable (recipe.get_variable ("programs.%s.sources".printf (program.id)));
-
         var link_rule = recipe.add_rule ();
         link_rule.add_output (binary_name);
         var link_pretty_command = "LINK";
         var link_command = "@ghc -o %s".printf (binary_name);
-        foreach (var source in sources)
+        foreach (var source in program.sources)
         {
             var output = recipe.get_build_path (replace_extension (source, "o"));
             var interface_file = recipe.get_build_path (replace_extension (source, "hi"));

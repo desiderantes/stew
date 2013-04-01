@@ -2,8 +2,7 @@ public class ScriptModule : BuildModule
 {
     public override bool can_generate_program_rules (Recipe recipe, Program program)
     {
-        var sources = recipe.get_variable ("programs.%s.sources".printf (program.id));
-        if (sources != null)
+        if (program.sources != null)
             return false;
 
         return true;

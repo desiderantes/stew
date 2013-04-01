@@ -2,7 +2,7 @@ public class PythonModule : BuildModule
 {
     public override bool can_generate_program_rules (Recipe recipe, Program program)
     {
-        return can_generate_rules (recipe, "programs", program.id);
+        return can_generate_rules (recipe, program.sources, recipe.get_variable ("programs.%s.python-version".printf (program.id)));
     }
 
     public override void generate_program_rules (Recipe recipe, Program program)
@@ -10,7 +10,7 @@ public class PythonModule : BuildModule
         var name = recipe.get_variable ("programs.%s.name".printf (program.id), program.id);
         var binary_name = name;
 
-        var sources = split_variable (recipe.get_variable ("programs.%s.sources".printf (program.id)));
+        var sources = program.sources;
 
         var python_version = recipe.get_variable ("programs.%s.python-version".printf (program.id));
         var python_bin = "python";
@@ -77,12 +77,12 @@ public class PythonModule : BuildModule
 
     public override bool can_generate_library_rules (Recipe recipe, Library library)
     {
-        return can_generate_rules (recipe, "libraries", library.id);
+        return can_generate_rules (recipe, library.sources, recipe.get_variable ("libraries.%s.python-version".printf (library.id)));
     }
 
     public override void generate_library_rules (Recipe recipe, Library library)
     {
-        var sources = split_variable (recipe.get_variable ("libraries.%s.sources".printf (library.id)));
+        var sources = library.sources;
 
         var python_version = recipe.get_variable ("programs.%s.python-version".printf (library.id));
         var python_bin = "python";
@@ -132,17 +132,18 @@ public class PythonModule : BuildModule
         }
     }
 
-    private bool can_generate_rules (Recipe recipe, string type_name, string id)
+    private bool can_generate_rules (Recipe recipe, List<string> sources, string? python_version)
     {
-        var source_list = recipe.get_variable ("%s.%s.sources".printf (type_name, id));
-        if (source_list == null)
-            return false;
-        var sources = split_variable (source_list);
+        var count = 0;
         foreach (var source in sources)
+        {
             if (!source.has_suffix (".py"))
                 return false;
+            count++;
+        }
+        if (count == 0)
+            return false;
 
-        var python_version = recipe.get_variable ("%s.%s.python-version".printf (type_name, id));
         var python_bin = "python";
         if (python_version != null)
             python_bin += python_version;

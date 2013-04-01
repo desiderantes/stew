@@ -51,9 +51,20 @@ public class Program
         this.id = id;
     }
 
-    public string gettext_domain { owned get { return recipe.get_variable ("programs.%s.gettext-domain".printf (id)); } }
+    public string? gettext_domain { owned get { return recipe.get_variable ("programs.%s.gettext-domain".printf (id)); } }
 
     public bool install { owned get { return recipe.get_boolean_variable ("programs.%s.install".printf (id), true); } }
+
+    public List<string> sources
+    {
+        owned get
+        {
+            var source_list = recipe.get_variable ("programs.%s.sources".printf (id));
+            if (source_list == null)
+                return new List<string> ();
+            return split_variable (source_list);
+        }
+    }
 }
 
 public class Library
@@ -67,9 +78,20 @@ public class Library
         this.id = id;
     }
 
-    public string gettext_domain { owned get { return recipe.get_variable ("libraries.%s.gettext-domain".printf (id)); } }
+    public string? gettext_domain { owned get { return recipe.get_variable ("libraries.%s.gettext-domain".printf (id)); } }
 
     public bool install { owned get { return recipe.get_boolean_variable ("libraries.%s.install".printf (id), true); } }
+
+    public List<string> sources
+    {
+        owned get
+        {
+            var source_list = recipe.get_variable ("libraries.%s.sources".printf (id));
+            if (source_list == null)
+                return new List<string> ();
+            return split_variable (source_list);
+        }
+    }
 }
 
 /* This is a replacement for string.strip since it generates annoying warnings about const pointers.

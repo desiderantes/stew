@@ -2,19 +2,19 @@ public class GCCModule : BuildModule
 {
     public override bool can_generate_program_rules (Recipe recipe, Program program)
     {
-        return can_generate_rules (recipe, "programs", program.id);
+        return can_generate_rules (recipe, program.sources);
     }
 
     public override void generate_program_rules (Recipe recipe, Program program)
     {
         var name = recipe.get_variable ("programs.%s.name".printf (program.id), program.id);
         var binary_name = name;
-        generate_compile_rules (recipe, "programs", program.id, binary_name, null, false, program.install);
+        generate_compile_rules (recipe, "programs", program.id, program.sources, binary_name, null, false, program.install);
     }
 
     public override bool can_generate_library_rules (Recipe recipe, Library library)
     {
-        return can_generate_rules (recipe, "libraries", library.id);
+        return can_generate_rules (recipe, library.sources);
     }
 
     public override void generate_library_rules (Recipe recipe, Library library)
@@ -27,7 +27,7 @@ public class GCCModule : BuildModule
 
         var binary_name = "lib%s.so.%s".printf (library.id, version);
         var namespace = recipe.get_variable ("libraries.%s.namespace".printf (library.id));
-        generate_compile_rules (recipe, "libraries", library.id, binary_name, namespace, true, library.install);
+        generate_compile_rules (recipe, "libraries", library.id, library.sources, binary_name, namespace, true, library.install);
 
         /* Generate a symbolic link to the library and install both the link and the library */
         var rule = recipe.add_rule ();
@@ -72,9 +72,6 @@ public class GCCModule : BuildModule
         /* Generate introspection */
         if (namespace != null)
         {
-            var source_list = recipe.get_variable ("libraries.%s.sources".printf (library.id));
-            var sources = split_variable (source_list);
-
             /* Generate a .gir from the sources */
             var gir_filename = "%s-%s.gir".printf (namespace, major_version);
             recipe.build_rule.add_input (gir_filename);
@@ -85,7 +82,7 @@ public class GCCModule : BuildModule
             var scan_command = "@g-ir-scanner --no-libtool --namespace=%s --nsversion=%s --library=%s --output %s".printf (namespace, major_version, library.id, gir_filename);
             // FIXME: Need to sort out inputs correctly
             scan_command += " --include=GObject-2.0";
-            foreach (var source in sources)
+            foreach (var source in library.sources)
             {
                 gir_rule.add_input (source);
                 scan_command += " %s".printf (source);
@@ -115,21 +112,16 @@ public class GCCModule : BuildModule
         }
     }
 
-    private bool can_generate_rules (Recipe recipe, string type_name, string name)
+    private bool can_generate_rules (Recipe recipe, List<string> sources)
     {
-        if (get_compiler (recipe, type_name, name) == null)
+        if (get_compiler (recipe, sources) == null)
             return false;
 
         return true;
     }
 
-    private string? get_compiler (Recipe recipe, string type_name, string name)
+    private string? get_compiler (Recipe recipe, List<string> sources)
     {
-        var source_list = recipe.get_variable ("%s.%s.sources".printf (type_name, name));
-        if (source_list == null)
-            return null;
-        var sources = split_variable (source_list);
-
         string? compiler = null;
         foreach (var source in sources)
         {
@@ -148,11 +140,9 @@ public class GCCModule : BuildModule
         return compiler;
     }
 
-    private void generate_compile_rules (Recipe recipe, string type_name, string id, string binary_name, string? namespace = null, bool is_library = false, bool do_install = true)
+    private void generate_compile_rules (Recipe recipe, string type_name, string id, List<string> sources, string binary_name, string? namespace = null, bool is_library = false, bool do_install = true)
     {
-        var sources = split_variable (recipe.get_variable ("%s.%s.sources".printf (type_name, id)));
-        
-        var compiler = get_compiler (recipe, type_name, id);
+        var compiler = get_compiler (recipe, sources);
 
         var is_qt = recipe.get_boolean_variable ("%s.%s.qt".printf (type_name, id));
 

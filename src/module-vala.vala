@@ -2,7 +2,7 @@ public class ValaModule : BuildModule
 {
     public override bool can_generate_program_rules (Recipe recipe, Program program)
     {
-        return can_generate_rules (recipe, "programs", program.id);
+        return can_generate_rules (recipe, program.sources);
     }
 
     public override void generate_program_rules (Recipe recipe, Program program)
@@ -10,16 +10,16 @@ public class ValaModule : BuildModule
         var name = recipe.get_variable ("programs.%s.name".printf (program.id), program.id);
         var binary_name = name;
 
-        generate_compile_rules (recipe, "programs", program.id, binary_name);
+        generate_compile_rules (recipe, "programs", program.id, program.sources, binary_name);
         if (program.install)
             recipe.add_install_rule (binary_name, recipe.binary_directory);
 
-        generate_gettext_rules (recipe, "programs", program.id);
+        generate_gettext_rules (recipe, program.sources, program.gettext_domain);
     }
 
     public override bool can_generate_library_rules (Recipe recipe, Library library)
     {
-        return can_generate_rules (recipe, "libraries", library.id);
+        return can_generate_rules (recipe, library.sources);
     }
 
     public override void generate_library_rules (Recipe recipe, Library library)
@@ -33,7 +33,7 @@ public class ValaModule : BuildModule
         var namespace = recipe.get_variable ("libraries.%s.namespace".printf (library.id));
 
         var binary_name = "lib%s.so.%s".printf (library.id, version);
-        generate_compile_rules (recipe, "libraries", library.id, binary_name, namespace, version, major_version, true);
+        generate_compile_rules (recipe, "libraries", library.id, library.sources, binary_name, namespace, version, major_version, true);
            
         /* Generate a symbolic link to the library and install both the link and the library */
         var rule = recipe.add_rule ();
@@ -103,13 +103,11 @@ public class ValaModule : BuildModule
                 recipe.add_install_rule (typelib_filename, typelib_directory);
         }
 
-        generate_gettext_rules (recipe, "libraries", library.id);
+        generate_gettext_rules (recipe, library.sources, library.gettext_domain);
     }
 
-    private void generate_compile_rules (Recipe recipe, string type_name, string id, string binary_name, string? namespace = null, string? version = null, string? major_version = null, bool is_library = false)
+    private void generate_compile_rules (Recipe recipe, string type_name, string id, List<string> sources, string binary_name, string? namespace = null, string? version = null, string? major_version = null, bool is_library = false)
     {
-        var sources = split_variable (recipe.get_variable ("%s.%s.sources".printf (type_name, id)));
-
         var cflags = recipe.get_variable ("%s.%s.compile-flags".printf (type_name, id), "");
         var ldflags = recipe.get_variable ("%s.%s.link-flags".printf (type_name, id), "");
 
@@ -333,15 +331,8 @@ public class ValaModule : BuildModule
         link_rule.add_command (link_command);
     }
     
-    private bool can_generate_rules (Recipe recipe, string type_name, string name)
+    private bool can_generate_rules (Recipe recipe, List<string> sources)
     {
-        var source_list = recipe.get_variable ("%s.%s.sources".printf (type_name, name));
-        if (source_list == null)
-            return false;
-        var sources = split_variable (source_list);
-        if (sources == null)
-            return false;
-
         var n_sources = 0;
         foreach (var source in sources)
         {
@@ -358,20 +349,12 @@ public class ValaModule : BuildModule
         return true;
     }
 
-    private void generate_gettext_rules (Recipe recipe, string type_name, string name)
+    private void generate_gettext_rules (Recipe recipe, List<string> sources, string? gettext_domain)
     {
-        var source_list = recipe.get_variable ("%s.%s.sources".printf (type_name, name));
-        if (source_list == null)
-            return;
-        var sources = split_variable (source_list);
-        if (sources == null)
+        if (gettext_domain == null)
             return;
 
-        var gettext_domain = recipe.get_variable ("%s.%s.gettext-domain".printf (type_name, name));
-        if (gettext_domain != null)
-        {
-            foreach (var source in sources)
-                GettextModule.add_translatable_file (recipe, gettext_domain, "text/x-vala", source);
-        }
+        foreach (var source in sources)
+            GettextModule.add_translatable_file (recipe, gettext_domain, "text/x-vala", source);
     }
 }
