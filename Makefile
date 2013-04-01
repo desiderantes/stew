@@ -1,3 +1,7 @@
+ifndef $(LIBRARY_DIRECTORY)
+	LIBRARY_DIRECTORY = /usr/lib
+endif    
+
 all: Recipe.conf bake-bootstrap
 	PATH=`pwd`:$$PATH ./bake-bootstrap
 
