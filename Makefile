@@ -1,7 +1,7 @@
 all: Recipe.conf bake-bootstrap
 	PATH=`pwd`:$$PATH ./bake-bootstrap
 
-Recipe.conf:
+Recipe.conf: bake-bootstrap
 	PATH=`pwd`:$$PATH ./bake-bootstrap --configure library-directory=$(LIBRARY_DIRECTORY)
 
 PACKAGES = --pkg=glib-2.0 \
