@@ -2,10 +2,6 @@ public class MallardModule : BuildModule
 {
     public override void generate_data_rules (Recipe recipe, Data data)
     {
-        var pages_list = data.get_variable ("mallard-pages");
-        if (pages_list == null)
-            return;
-
         var id = data.get_variable ("mallard-id");
         if (id == null)
             id = data.id;
@@ -17,8 +13,7 @@ public class MallardModule : BuildModule
         if (gettext_domain != null)
             languages = GettextModule.get_languages (recipe, gettext_domain, out template_dir, out translation_dir);
 
-        var pages = split_variable (pages_list);
-        foreach (var page in pages)
+        foreach (var page in data.get_file_list ("mallard-pages"))
         {
             // FIXME: Should validate page in build rule with xmllint
 

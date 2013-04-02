@@ -2,11 +2,7 @@ public class ManModule : BuildModule
 {
     public override void generate_data_rules (Recipe recipe, Data data)
     {
-        var man_page_list = data.get_variable ("man-pages");
-        if (man_page_list == null)
-            return;
-
-        foreach (var page in split_variable (man_page_list))
+        foreach (var page in data.get_file_list ("man-pages"))
         {
             var i = page.last_index_of_char ('.');
             var number = 0;
