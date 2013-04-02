@@ -2,6 +2,8 @@ Overview of changes in bake 0.1.14
 
     * Rename package.* variables to project.* and fix documentation
       inconsistency
+    * Fix Makefile not working with LIBRARY_DIRECTORY variable
+    * Remove obsolete package.files
     * Implement programs.*.install-directory and libraries.*.install-directory
     * Support XDG icons
 
