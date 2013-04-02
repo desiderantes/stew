@@ -1,3 +1,7 @@
+Overview of changes in bake 0.1.15
+
+    * Don't install data when data.*.install is false
+
 Overview of changes in bake 0.1.14
 
     * Rename package.* variables to project.* and fix documentation

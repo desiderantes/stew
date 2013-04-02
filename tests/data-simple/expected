@@ -1,0 +1,8 @@
+!bake
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/share/test
+cp test /usr/share/test/test
+(exit SUCCESS)
+!bake clean
+(exit SUCCESS)

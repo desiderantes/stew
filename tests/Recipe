@@ -327,9 +327,17 @@ tests {
   }
 
   # Data tests
-  data-other {
-    command = ./src/test-runner data-other
-    data = data-other/expected data-other/Recipe data-other/test
+  data-simple {
+    command = ./src/test-runner data-simple
+    data = data-simple/expected data-simple/Recipe data-simple/test
+  }
+  data-complex {
+    command = ./src/test-runner data-complex
+    data = data-complex/expected data-complex/Recipe data-complex/test1 data-complex/test2
+  }
+  data-no-install {
+    command = ./src/test-runner data-no-install
+    data = data-no-install/expected data-no-install/Recipe data-no-install/test
   }
 
   data-man {

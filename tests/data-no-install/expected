@@ -1,0 +1,6 @@
+!bake
+(exit SUCCESS)
+!bake install
+(exit SUCCESS)
+!bake clean
+(exit SUCCESS)

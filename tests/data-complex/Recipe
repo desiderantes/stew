@@ -1,6 +1,6 @@
 project.name = test
 
 data.test {
-  files = test
+  files = test1 test2
   install-directory = $(project-data-directory)/test
 }
