@@ -1,0 +1,48 @@
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="xdg-icons">
+<info>
+    <link type="guide" xref="index#data"/>
+</info>
+
+<title>XDG Icons</title>
+
+<p>
+Graphical applications need to install icons.
+The icons need to be listed with the <code>data.<em>name</em>.xdg-icons</code> <link xref="variables">variable</link>.
+The following variables define icon information:
+</p>
+<table frame="all" shade="rows">
+<thead>
+<tr>
+  <td><p>Name</p></td>
+  <td><p>Description</p></td>
+</tr>
+</thead>
+<tr>
+  <td><p>xdg-icons</p></td>
+  <td><p>The icon files to install</p></td>
+</tr>
+<tr>
+  <td><p>xdg-icon-size</p></td>
+  <td><p>Icon size to install e.g. 32x32, 64x64 (defaults to <em>scalable</em>)</p></td>
+</tr>
+<tr>
+  <td><p>xdg-icon-theme</p></td>
+  <td><p>The icon theme to install into (defaults to <em>hicolor</em>)</p></td>
+</tr>
+<tr>
+  <td><p>xdg-icon-category</p></td>
+  <td><p>The category for the icons (defaults to <em>apps</em>)</p></td>
+</tr>
+</table>
+<example>
+<p>
+For example, this <link xref="recipe-files">recipe</link> specifies an 32x32 application icon to install.
+</p>
+<code>
+data.icon32 {
+  xdg-icons = test.png
+  xdg-icon-size = 32x32
+}
+</code>
+</example>
+</page>

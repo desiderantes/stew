@@ -1,0 +1,8 @@
+!bake
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/share/icons/hicolor/scalable/apps
+cp test.png /usr/share/icons/hicolor/scalable/apps/test.png
+(exit SUCCESS)
+!bake clean
+(exit SUCCESS)

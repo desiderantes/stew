@@ -3,6 +3,7 @@ Overview of changes in bake 0.1.14
     * Rename package.* variables to project.* and fix documentation
       inconsistency
     * Implement programs.*.install-directory and libraries.*.install-directory
+    * Support XDG icons
 
 Overview of changes in bake 0.1.13
 

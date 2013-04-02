@@ -1,0 +1,15 @@
+project.name = test
+
+data.icon32 {
+  xdg-icons = 32x32/test.png
+  xdg-icon-size = 32x32
+  xdg-icon-theme = HighContrast
+  xdg-icon-category = actions
+}
+
+data.icon64 {
+  xdg-icons = 64x64/test.png
+  xdg-icon-size = 64x64
+  xdg-icon-theme = HighContrast
+  xdg-icon-category = actions
+}

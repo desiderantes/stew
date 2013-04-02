@@ -66,6 +66,15 @@ public class Block
     {
         return recipe.get_boolean_variable ("%s.%s.%s".printf (type_name, id, name), fallback);
     }
+
+    public List<string> get_file_list (string name)
+    {
+        var list = get_variable (name);
+        if (list == null)
+            return new List<string> ();
+
+        return split_variable (list);
+    }
 }
 
 public class Compilable : Block

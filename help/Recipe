@@ -33,6 +33,7 @@ data.bake {
                   translation.page \
                   vala.page \
                   variables.page \
-                  xdg-desktop.page
+                  xdg-desktop.page \
+                  xdg-icons.page
   gettext-domain = bake-help
 }

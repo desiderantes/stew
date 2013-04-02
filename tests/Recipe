@@ -369,13 +369,21 @@ tests {
     data = data-gtk-complex/expected data-gtk-complex/Recipe data-gtk-complex/test.ui
   }
 
-  data-xdg-simple {
-    command = ./src/test-runner data-xdg-simple
-    data = data-xdg-simple/expected data-xdg-simple/Recipe data-xdg-simple/test.desktop
+  data-xdg-desktop-simple {
+    command = ./src/test-runner data-xdg-desktop-simple
+    data = data-xdg-desktop-simple/expected data-xdg-desktop-simple/Recipe data-xdg-desktop-simple/test.desktop
   }
-  data-xdg-complex {
-    command = ./src/test-runner data-xdg-complex
-    data = data-xdg-complex/expected data-xdg-complex/Recipe data-xdg-complex/test.desktop
+  data-xdg-desktop-complex {
+    command = ./src/test-runner data-xdg-desktop-complex
+    data = data-xdg-desktop-complex/expected data-xdg-desktop-complex/Recipe data-xdg-desktop-complex/test.desktop
+  }
+  data-xdg-icons-simple {
+    command = ./src/test-runner data-xdg-icons-simple
+    data = data-xdg-icons-simple/expected data-xdg-icons-simple/Recipe data-xdg-icons-simple/test.png
+  }
+  data-xdg-icons-complex {
+    command = ./src/test-runner data-xdg-icons-complex
+    data = data-xdg-icons-complex/expected data-xdg-icons-complex/Recipe data-xdg-icons-complex/32x32/test.png data-xdg-icons-complex/64x64/test.png
   }
 
   # Release tests
