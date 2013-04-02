@@ -51,4 +51,7 @@ programs {
    }
 }
 
-package.files = config-bootstrap.vala
+data.bootstrap {
+  files = config-bootstrap.vala
+  install = false
+}
