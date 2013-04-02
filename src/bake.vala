@@ -31,6 +31,10 @@ public class BuildModule
     {
     }
 
+    public virtual void generate_data_rules (Recipe recipe, Data data)
+    {
+    }
+
     public virtual void recipe_complete (Recipe recipe)
     {
     }
@@ -40,13 +44,13 @@ public class BuildModule
     }
 }
 
-public class Compilable
+public class Block
 {
     public Recipe recipe;
     private string type_name;
     public string id;
 
-    public Compilable (Recipe recipe, string type_name, string id)
+    public Block (Recipe recipe, string type_name, string id)
     {
         this.recipe = recipe;
         this.type_name = type_name;
@@ -61,6 +65,14 @@ public class Compilable
     public bool get_boolean_variable (string name, bool? fallback = false)
     {
         return recipe.get_boolean_variable ("%s.%s.%s".printf (type_name, id, name), fallback);
+    }
+}
+
+public class Compilable : Block
+{
+    public Compilable (Recipe recipe, string type_name, string id)
+    {
+        base (recipe, type_name, id);
     }
 
     public string name { owned get { return get_variable ("name", id); } }
@@ -125,6 +137,30 @@ public class Library : Compilable
             var dir = get_variable ("install-directory");
             if (dir == null)
                 dir = recipe.library_directory;
+
+            return dir;
+        }
+    }
+}
+
+public class Data : Block
+{
+    public Data (Recipe recipe, string id)
+    {
+        base (recipe, "data", id);
+    }
+
+    public string? gettext_domain { owned get { return get_variable ("gettext-domain"); } }
+
+    public bool install { owned get { return get_boolean_variable ("install", true); } }
+
+    public string install_directory
+    {
+        owned get
+        {
+            var dir = get_variable ("install-directory");
+            if (dir == null)
+                dir = recipe.project_data_directory;
 
             return dir;
         }
@@ -420,6 +456,21 @@ public class Bake
             generate_program_rules (child);
     }
 
+    private static void generate_data_rules (Recipe recipe)
+    {
+        var data_blocks = recipe.get_variable_children ("data");
+        foreach (var id in data_blocks)
+        {
+            var data = new Data (recipe, id);
+            foreach (var module in modules)
+                module.generate_data_rules (recipe, data);
+        }
+
+        /* Traverse the recipe tree */
+        foreach (var child in recipe.children)
+            generate_data_rules (child);
+    }
+
     private static void generate_rules (Recipe recipe)
     {
         foreach (var module in modules)
@@ -656,6 +707,7 @@ public class Bake
         /* Generate libraries first (as other things may depend on it) then the other rules */
         generate_library_rules (toplevel);
         generate_program_rules (toplevel);
+        generate_data_rules (toplevel);
         generate_rules (toplevel);
 
         /* Generate clean rule */

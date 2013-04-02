@@ -45,7 +45,7 @@ public class JavaModule : BuildModule
         jar_rule.add_command (jar_command);
         recipe.build_rule.add_input (jar_file);
         if (program.install)
-            recipe.add_install_rule (jar_file, recipe.package_data_directory);
+            recipe.add_install_rule (jar_file, recipe.project_data_directory);
 
         /* Script to run locally */
         rule = recipe.add_rule ();
@@ -60,7 +60,7 @@ public class JavaModule : BuildModule
         rule = recipe.add_rule ();
         rule.add_output (script);
         rule.add_command ("@echo '#!/bin/sh' > %s".printf (script));
-        rule.add_command ("@echo 'exec java -jar %s' >> %s".printf (Path.build_filename (recipe.package_data_directory, jar_file), script));
+        rule.add_command ("@echo 'exec java -jar %s' >> %s".printf (Path.build_filename (recipe.project_data_directory, jar_file), script));
         rule.add_command ("@chmod +x %s".printf (script));
         recipe.build_rule.add_input (script);
         if (program.install)

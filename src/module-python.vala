@@ -43,8 +43,8 @@ public class PythonModule : BuildModule
             if (program.install)
             {
                 if (install_sources || (python_version >= "3.0"))
-                    recipe.add_install_rule (source, recipe.package_data_directory);
-                recipe.add_install_rule (output, recipe.package_data_directory);
+                    recipe.add_install_rule (source, recipe.project_data_directory);
+                recipe.add_install_rule (output, recipe.project_data_directory);
             }
         }
 
@@ -67,7 +67,7 @@ public class PythonModule : BuildModule
         rule = recipe.add_rule ();
         rule.add_output (script);
         rule.add_command ("@echo '#!/bin/sh' > %s".printf (script));
-        rule.add_command ("@echo 'exec %s %s' >> %s".printf (python_bin, Path.build_filename (recipe.package_data_directory, main_file), script));
+        rule.add_command ("@echo 'exec %s %s' >> %s".printf (python_bin, Path.build_filename (recipe.project_data_directory, main_file), script));
         rule.add_command ("@chmod +x %s".printf (script));
         recipe.build_rule.add_input (script);
         if (program.install)

@@ -115,38 +115,34 @@ public class GettextModule : BuildModule
         }
     }
 
-    public override void generate_rules (Recipe recipe)
+    public override void generate_data_rules (Recipe recipe, Data data)
     {
-        var data = recipe.get_variable_children ("data");
-        foreach (var data_type in data)
+        var translation_list = data.get_variable ("gettext-translations");
+        if (translation_list == null)
+            return;
+
+        var gettext_domain = data.gettext_domain;
+        if (gettext_domain == null)
+            gettext_domain = data.id;
+        foreach (var po_file in split_variable (translation_list))
         {
-            var translation_list = recipe.get_variable ("data.%s.gettext-translations".printf (data_type));
-            if (translation_list == null)
+            if (!po_file.has_suffix (".po"))
                 continue;
 
-            var do_install = recipe.get_boolean_variable ("data.%s.install".printf (data_type), true);
+            var mo_file = recipe.get_build_path (replace_extension (po_file, "mo"));
+            var language = po_file.substring (0, po_file.length - 3);
 
-            var gettext_domain = data_type;
-            foreach (var po_file in split_variable (translation_list))
-            {
-                if (!po_file.has_suffix (".po"))
-                    continue;
+            var compile_rule = recipe.add_rule ();
+            compile_rule.add_input (po_file);
+            compile_rule.add_output (mo_file);
+            compile_rule.add_command ("@msgfmt %s --output-file=%s".printf (po_file, mo_file));
 
-                var mo_file = recipe.get_build_path (replace_extension (po_file, "mo"));
-                var language = po_file.substring (0, po_file.length - 3);
+            recipe.build_rule.add_input (mo_file);
 
-                var compile_rule = recipe.add_rule ();
-                compile_rule.add_input (po_file);
-                compile_rule.add_output (mo_file);
-                compile_rule.add_command ("@msgfmt %s --output-file=%s".printf (po_file, mo_file));
-
-                recipe.build_rule.add_input (mo_file);
-
-                var target_dir = Path.build_filename (recipe.get_variable ("gettext.locale-directory"), language, "LC_MESSAGES");
-                var target_mo_file = "%s.mo".printf (gettext_domain);
-                if (do_install)
-                    recipe.add_install_rule (mo_file, target_dir, target_mo_file);
-            }
+            var target_dir = Path.build_filename (recipe.get_variable ("gettext.locale-directory"), language, "LC_MESSAGES");
+            var target_mo_file = "%s.mo".printf (gettext_domain);
+            if (data.install)
+                recipe.add_install_rule (mo_file, target_dir, target_mo_file);
         }
     }
 }

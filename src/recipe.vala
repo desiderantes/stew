@@ -34,7 +34,7 @@ public class Recipe
     public string system_library_directory { owned get { return get_variable ("system-library-directory"); } }
     public string data_directory { owned get { return get_variable ("data-directory"); } }
     public string include_directory { owned get { return get_variable ("include-directory"); } }
-    public string package_data_directory { owned get { return get_variable ("project-data-directory"); } }
+    public string project_data_directory { owned get { return get_variable ("project-data-directory"); } }
 
     public string project_name { owned get { return get_variable ("project.name"); } }
     public string project_version { owned get { return get_variable ("project.version"); } }

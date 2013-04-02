@@ -24,7 +24,7 @@ public class MonoModule : BuildModule
         rule.add_command (command);
         recipe.build_rule.add_input (exe_file);
         if (program.install)
-            recipe.add_install_rule (exe_file, recipe.package_data_directory);
+            recipe.add_install_rule (exe_file, recipe.project_data_directory);
 
         if (program.gettext_domain != null)
         {
@@ -45,7 +45,7 @@ public class MonoModule : BuildModule
         rule = recipe.add_rule ();
         rule.add_output (script);
         rule.add_command ("@echo '#!/bin/sh' > %s".printf (script));
-        rule.add_command ("@echo 'exec mono %s' >> %s".printf (Path.build_filename (recipe.package_data_directory, exe_file), script));
+        rule.add_command ("@echo 'exec mono %s' >> %s".printf (Path.build_filename (recipe.project_data_directory, exe_file), script));
         rule.add_command ("@chmod +x %s".printf (script));
         recipe.build_rule.add_input (script);
         if (program.install)
