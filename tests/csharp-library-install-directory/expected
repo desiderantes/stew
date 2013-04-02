@@ -1,0 +1,10 @@
+!bake
+gmcs -target:library -out:test.dll test.cs
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/lib/test/cli/test
+cp test.dll /usr/lib/test/cli/test/test.dll
+(exit SUCCESS)
+!bake clean
+rm -f test.dll
+(exit SUCCESS)

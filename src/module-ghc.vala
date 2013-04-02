@@ -48,6 +48,6 @@ public class GHCModule : BuildModule
         link_rule.add_command (link_command);
 
         if (program.install)
-            recipe.add_install_rule (binary_name, recipe.binary_directory);
+            recipe.add_install_rule (binary_name, program.install_directory);
     }
 }

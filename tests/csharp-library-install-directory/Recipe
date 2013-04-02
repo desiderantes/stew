@@ -1,0 +1,7 @@
+project.name = test
+
+libraries.test {
+  sources = test.cs
+  install-directory = $(library-directory)/test
+}
+

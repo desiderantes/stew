@@ -1,0 +1,6 @@
+project.name = test
+
+programs.test {
+  sources = test.cs
+  install-directory = $(binary-directory)/test
+}

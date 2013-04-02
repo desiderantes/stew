@@ -1,0 +1,8 @@
+project {
+  name = test
+}
+
+libraries.test {
+  sources = test.c
+  install-directory = $(library-directory)/test
+}

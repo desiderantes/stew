@@ -1,0 +1,6 @@
+project.name = test
+
+libraries.test {
+  sources = test.vala
+  install-directory = $(library-directory)/test
+}

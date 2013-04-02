@@ -1,0 +1,7 @@
+project.name = test
+
+programs.test {
+  sources = test.hs
+  install-directory = $(binary-directory)/test
+}
+

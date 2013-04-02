@@ -1,0 +1,7 @@
+project.name = test
+
+programs.test {
+  sources = Test.java
+  install-directory = $(binary-directory)/test
+}
+

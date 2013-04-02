@@ -1,0 +1,7 @@
+project.name = test
+
+libraries.test {
+  sources = test.cpp
+  install-directory = $(library-directory)/test
+}
+

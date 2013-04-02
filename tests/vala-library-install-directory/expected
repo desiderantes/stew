@@ -1,0 +1,29 @@
+!bake
+mkdir -p .built
+valac --ccode test.vala
+touch .built/test.c-stamp
+gcc -Wno-unused -Wno-deprecated-declarations -fPIC -Igobject -Iglib -c .built/test.c -o .built/test.o
+gcc -o libtest.so.0 -shared .built/test.o -lgobject -lglib
+valac --fast-vapi=.built/test.vapi test.vala
+touch .built/test.vapi-stamp
+valac --ccode --header=test.h --vapi=test-0.vapi --library=test --use-fast-vapi=.built/test.vapi
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/lib/test
+cp libtest.so /usr/lib/test/libtest.so
+cp libtest.so.0 /usr/lib/test/libtest.so.0
+mkdir -p /usr/lib/test/pkgconfig
+cp test-0.pc /usr/lib/test/pkgconfig/test-0.pc
+mkdir -p /usr/include/test-0
+cp test.h /usr/include/test-0/test.h
+mkdir -p /usr/share/vala/vapi
+cp test-0.vapi /usr/share/vala/vapi/test-0.vapi
+(exit SUCCESS)
+!bake clean
+rm -f libtest.so.0
+rm -f test.h
+rm -f test-0.vapi
+rm -rf .built/
+rm -f libtest.so
+rm -f test-0.pc
+(exit SUCCESS)

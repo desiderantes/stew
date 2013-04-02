@@ -10,9 +10,7 @@ public class ScriptModule : BuildModule
 
     public override void generate_program_rules (Recipe recipe, Program program)
     {
-        var binary_name = program.id;
-
         if (program.install)
-            recipe.add_install_rule (binary_name, recipe.binary_directory);
+            recipe.add_install_rule (program.name, program.install_directory);
     }
 }

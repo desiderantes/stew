@@ -93,6 +93,18 @@ public class Program : Compilable
     {
         base (recipe, "programs", id);
     }
+
+    public string install_directory
+    {
+        owned get
+        {
+            var dir = get_variable ("install-directory");
+            if (dir == null)
+                dir = recipe.binary_directory;
+
+            return dir;
+        }
+    }
 }
 
 public class Library : Compilable
@@ -105,6 +117,18 @@ public class Library : Compilable
     public string version { owned get { return get_variable ("version", "0"); } }
 
     public string? namespace { owned get { return get_variable ("namespace"); } }
+
+    public string install_directory
+    {
+        owned get
+        {
+            var dir = get_variable ("install-directory");
+            if (dir == null)
+                dir = recipe.library_directory;
+
+            return dir;
+        }
+    }
 }
 
 /* This is a replacement for string.strip since it generates annoying warnings about const pointers.
@@ -349,12 +373,12 @@ public class Bake
             else
             {
                 var rule = recipe.add_rule ();
-                rule.add_output (id);
+                rule.add_output (library.name);
                 rule.add_command ("@echo 'Unable to compile library %s:'".printf (id));
                 rule.add_command ("@echo ' - No compiler found that matches source files'");
                 rule.add_command ("@false");
-                recipe.build_rule.add_input (id);
-                recipe.add_install_rule (id, recipe.library_directory);
+                recipe.build_rule.add_input (library.name);
+                recipe.add_install_rule (id, library.install_directory);
             }
         }
 
@@ -387,7 +411,7 @@ public class Bake
                 rule.add_command ("@echo ' - No compiler found that matches source files'");
                 rule.add_command ("@false");
                 recipe.build_rule.add_input (id);
-                recipe.add_install_rule (id, recipe.binary_directory);
+                recipe.add_install_rule (id, program.install_directory);
             }
         }
 

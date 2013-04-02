@@ -49,7 +49,7 @@ public class MonoModule : BuildModule
         rule.add_command ("@chmod +x %s".printf (script));
         recipe.build_rule.add_input (script);
         if (program.install)
-            recipe.add_install_rule (script, recipe.binary_directory, binary_name);
+            recipe.add_install_rule (script, program.install_directory, binary_name);
     }
 
     public override bool can_generate_library_rules (Recipe recipe, Library library)
@@ -74,7 +74,7 @@ public class MonoModule : BuildModule
         rule.add_command (command);
         recipe.build_rule.add_input (dll_file);
         if (library.install)
-            recipe.add_install_rule (dll_file, Path.build_filename (recipe.library_directory, "cli", recipe.project_name));
+            recipe.add_install_rule (dll_file, Path.build_filename (library.install_directory, "cli", recipe.project_name));
 
         if (library.gettext_domain != null)
         {

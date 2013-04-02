@@ -1,0 +1,18 @@
+!bake
+mkdir -p .built
+gcc -fPIC -MMD -MF .built/test.d -c test.c -o .built/test.o
+gcc -o libtest.so.0 -shared .built/test.o
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/lib/test
+cp libtest.so.0 /usr/lib/test/libtest.so.0
+cp libtest.so /usr/lib/test/libtest.so
+mkdir -p /usr/lib/test/pkgconfig
+cp test-0.pc /usr/lib/test/pkgconfig/test-0.pc
+(exit SUCCESS)
+!bake clean
+rm -f libtest.so.0
+rm -rf .built/
+rm -f libtest.so
+rm -f test-0.pc
+(exit SUCCESS)

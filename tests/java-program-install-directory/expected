@@ -1,0 +1,16 @@
+!bake
+mkdir -p .built
+javac -d .built Test.java
+jar cfe test.jar -C .built Test.class
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/share/test
+cp test.jar /usr/share/test/test.jar
+mkdir -p /usr/bin/test
+cp .built/test /usr/bin/test/test
+(exit SUCCESS)
+!bake clean
+rm -f test.jar
+rm -rf .built/
+rm -f test
+(exit SUCCESS)

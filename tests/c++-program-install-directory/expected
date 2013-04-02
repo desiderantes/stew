@@ -1,0 +1,13 @@
+!bake
+mkdir -p .built
+g++ -MMD -MF .built/test.d -c test.cpp -o .built/test.o
+g++ -o test .built/test.o
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/bin/test
+cp test /usr/bin/test/test
+(exit SUCCESS)
+!bake clean
+rm -f test
+rm -rf .built/
+(exit SUCCESS)

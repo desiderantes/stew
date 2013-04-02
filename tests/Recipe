@@ -73,6 +73,10 @@ tests {
     command = ./src/test-runner c-program-no-install
     data = c-program-no-install/expected c-program-no-install/Recipe c-program-no-install/test.c
   }
+  c-program-install-directory {
+    command = ./src/test-runner c-program-install-directory
+    data = c-program-install-directory/expected c-program-install-directory/Recipe c-program-install-directory/test.c
+  }
   c-program-complex {
     command = ./src/test-runner c-program-complex
     data = c-program-complex/expected c-program-complex/Recipe c-program-complex/test1.c c-program-complex/test2.c c-program-complex/test3.c
@@ -84,6 +88,10 @@ tests {
   c-library-no-install {
     command = ./src/test-runner c-library-no-install
     data = c-library-no-install/expected c-library-no-install/Recipe c-library-no-install/test.c
+  }
+  c-library-install-directory {
+    command = ./src/test-runner c-library-install-directory
+    data = c-library-install-directory/expected c-library-install-directory/Recipe c-library-install-directory/test.c
   }
   c-library-complex {
     command = ./src/test-runner c-library-complex
@@ -99,6 +107,10 @@ tests {
     command = ./src/test-runner c++-program-no-install
     data = c++-program-no-install/expected c++-program-no-install/Recipe c++-program-no-install/test.cpp
   }
+  c++-program-install-directory {
+    command = ./src/test-runner c++-program-install-directory
+    data = c++-program-install-directory/expected c++-program-install-directory/Recipe c++-program-install-directory/test.cpp
+  }
   c++-program-complex {
     command = ./src/test-runner c++-program-complex
     data = c++-program-complex/expected c++-program-complex/Recipe c++-program-complex/test1.cpp c++-program-complex/test2.cpp c++-program-complex/test3.cpp
@@ -110,6 +122,10 @@ tests {
   c++-library-no-install {
     command = ./src/test-runner c++-library-no-install
     data = c++-library-no-install/expected c++-library-no-install/Recipe c++-library-no-install/test.cpp
+  }
+  c++-library-install-directory {
+    command = ./src/test-runner c++-library-install-directory
+    data = c++-library-install-directory/expected c++-library-install-directory/Recipe c++-library-install-directory/test.cpp
   }
   c++-library-complex {
     command = ./src/test-runner c++-library-complex
@@ -143,6 +159,10 @@ tests {
     command = ./src/test-runner csharp-program-no-install
     data = csharp-program-no-install/expected csharp-program-no-install/Recipe csharp-program-no-install/test.cs
   }
+  csharp-program-install-directory {
+    command = ./src/test-runner csharp-program-install-directory
+    data = csharp-program-install-directory/expected csharp-program-install-directory/Recipe csharp-program-install-directory/test.cs
+  }
   csharp-program-complex {
     command = ./src/test-runner csharp-program-complex
     data = csharp-program-complex/expected csharp-program-complex/Recipe csharp-program-complex/test1.cs csharp-program-complex/test2.cs csharp-program-complex/test3.cs
@@ -154,6 +174,10 @@ tests {
   csharp-library-no-install {
     command = ./src/test-runner csharp-library-no-install
     data = csharp-library-no-install/expected csharp-library-no-install/Recipe csharp-library-no-install/test.cs
+  }
+  csharp-library-install-directory {
+    command = ./src/test-runner csharp-library-install-directory
+    data = csharp-library-install-directory/expected csharp-library-install-directory/Recipe csharp-library-install-directory/test.cs
   }
   csharp-library-complex {
     command = ./src/test-runner csharp-library-complex
@@ -169,6 +193,10 @@ tests {
     command = ./src/test-runner vala-program-no-install
     data = vala-program-no-install/expected vala-program-no-install/Recipe vala-program-no-install/test.vala
   }
+  vala-program-install-directory {
+    command = ./src/test-runner vala-program-install-directory
+    data = vala-program-install-directory/expected vala-program-install-directory/Recipe vala-program-install-directory/test.vala
+  }
   vala-program-complex {
     command = ./src/test-runner vala-program-complex
     data = vala-program-complex/expected vala-program-complex/Recipe vala-program-complex/test1.vala vala-program-complex/test2.vala vala-program-complex/test3.vala
@@ -180,6 +208,10 @@ tests {
   vala-library-no-install {
     command = ./src/test-runner vala-library-no-install
     data = vala-library-no-install/expected vala-library-no-install/Recipe vala-library-no-install/test.vala
+  }
+  vala-library-install-directory {
+    command = ./src/test-runner vala-library-install-directory
+    data = vala-library-install-directory/expected vala-library-install-directory/Recipe vala-library-install-directory/test.vala
   }
   vala-library-complex {
     command = ./src/test-runner vala-library-complex
@@ -195,6 +227,10 @@ tests {
     command = ./src/test-runner java-program-no-install
     data = java-program-no-install/expected java-program-no-install/Recipe java-program-no-install/Test.java
   }
+  java-program-install-directory {
+    command = ./src/test-runner java-program-install-directory
+    data = java-program-install-directory/expected java-program-install-directory/Recipe java-program-install-directory/Test.java
+  }
   java-program-complex {
     command = ./src/test-runner java-program-complex
     data = java-program-complex/expected java-program-complex/Recipe java-program-complex/com/example/Test1.java java-program-complex/com/example/Test2.java java-program-complex/com/example/Test3.java
@@ -206,6 +242,10 @@ tests {
   java-library-no-install {
     command = ./src/test-runner java-library-no-install
     data = java-library-no-install/expected java-library-no-install/Recipe java-library-no-install/Test.java
+  }
+  java-library-install-directory {
+    command = ./src/test-runner java-library-install-directory
+    data = java-library-install-directory/expected java-library-install-directory/Recipe java-library-install-directory/Test.java
   }
   java-library-complex {
     command = ./src/test-runner java-library-complex
@@ -220,6 +260,10 @@ tests {
   python-program-no-install {
     command = ./src/test-runner python-program-no-install
     data = python-program-no-install/expected python-program-no-install/Recipe python-program-no-install/test.py
+  }
+  python-program-install-directory {
+    command = ./src/test-runner python-program-install-directory
+    data = python-program-install-directory/expected python-program-install-directory/Recipe python-program-install-directory/test.py
   }
   python-program-complex {
     command = ./src/test-runner python-program-complex
@@ -237,6 +281,10 @@ tests {
     command = ./src/test-runner python-library-no-install
     data = python-library-no-install/expected python-library-no-install/Recipe python-library-no-install/test.py
   }
+  python-library-install-directory {
+    command = ./src/test-runner python-library-install-directory
+    data = python-library-install-directory/expected python-library-install-directory/Recipe python-library-install-directory/test.py
+  }
   python-library-complex {
     command = ./src/test-runner python-library-complex
     data = python-library-complex/expected python-library-complex/Recipe python-library-complex/test1.py python-library-complex/test2.py python-library-complex/test3.py
@@ -251,6 +299,10 @@ tests {
     command = ./src/test-runner go-program-no-install
     data = go-program-no-install/expected go-program-no-install/Recipe go-program-no-install/test.go
   }
+  go-program-install-directory {
+    command = ./src/test-runner go-program-install-directory
+    data = go-program-install-directory/expected go-program-install-directory/Recipe go-program-install-directory/test.go
+  }
   go-program-complex {
     command = ./src/test-runner go-program-complex
     data = go-program-complex/expected go-program-complex/Recipe go-program-complex/test1.go go-program-complex/test2.go go-program-complex/test3.go
@@ -264,6 +316,10 @@ tests {
   haskell-program-no-install {
     command = ./src/test-runner haskell-program-no-install
     data = haskell-program-no-install/expected haskell-program-no-install/Recipe haskell-program-no-install/test.hs
+  }
+  haskell-program-install-directory {
+    command = ./src/test-runner haskell-program-install-directory
+    data = haskell-program-install-directory/expected haskell-program-install-directory/Recipe haskell-program-install-directory/test.hs
   }
   haskell-program-complex {
     command = ./src/test-runner haskell-program-complex

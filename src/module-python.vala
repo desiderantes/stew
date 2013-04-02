@@ -71,7 +71,7 @@ public class PythonModule : BuildModule
         rule.add_command ("@chmod +x %s".printf (script));
         recipe.build_rule.add_input (script);
         if (program.install)
-            recipe.add_install_rule (script, recipe.binary_directory, binary_name);
+            recipe.add_install_rule (script, program.install_directory, binary_name);
     }
 
     public override bool can_generate_library_rules (Recipe recipe, Library library)
@@ -103,7 +103,7 @@ public class PythonModule : BuildModule
                         install_dir = "python%s.%s".printf (tokens[0], tokens[1]);
                 }
             }
-            install_directory = Path.build_filename (recipe.library_directory, install_dir, "site-packages", library.id);
+            install_directory = Path.build_filename (library.install_directory, install_dir, "site-packages", library.id);
         }
 
         foreach (var source in sources)

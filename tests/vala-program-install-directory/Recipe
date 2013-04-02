@@ -1,0 +1,6 @@
+project.name = test
+
+programs.test {
+  sources = test.vala
+  install-directory = $(binary-directory)/test
+}

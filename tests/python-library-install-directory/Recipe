@@ -2,4 +2,6 @@ project.name = test
 
 libraries.test {
   sources = test.py
+  install-directory = $(library-directory)/test
 }
+

@@ -64,7 +64,7 @@ public class JavaModule : BuildModule
         rule.add_command ("@chmod +x %s".printf (script));
         recipe.build_rule.add_input (script);
         if (program.install)
-            recipe.add_install_rule (script, recipe.binary_directory, binary_name);
+            recipe.add_install_rule (script, program.install_directory, binary_name);
 
         if (program.gettext_domain != null)
         {
