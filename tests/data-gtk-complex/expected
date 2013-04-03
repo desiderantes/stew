@@ -7,6 +7,9 @@ msgcat --force-po --output-file=test.pot .built/test.ui.pot
 mkdir -p /usr/share/test/ui
 cp test.ui /usr/share/test/ui/test.ui
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/share/test/ui/test.ui
+(exit SUCCESS)
 !bake clean
 rm -rf .built/
 rm -f test.pot

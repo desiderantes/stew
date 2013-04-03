@@ -5,6 +5,9 @@ gmcs -target:library -out:test.dll test.cs
 mkdir -p /usr/lib/cli/test
 cp test.dll /usr/lib/cli/test/test.dll
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/lib/cli/test/test.dll
+(exit SUCCESS)
 !bake clean
 rm -f test.dll
 (exit SUCCESS)

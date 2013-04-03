@@ -8,6 +8,10 @@ cp test.pyc /usr/share/test/test.pyc
 mkdir -p /usr/bin/test
 cp .built/test /usr/bin/test/test
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/share/test/test.pyc
+rm -f /usr/bin/test/test
+(exit SUCCESS)
 !bake clean
 rm -f test.pyc
 rm -f test

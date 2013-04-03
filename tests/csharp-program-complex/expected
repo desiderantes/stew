@@ -12,6 +12,10 @@ cp test.exe /usr/share/test/test.exe
 mkdir -p /usr/bin
 cp .built/test /usr/bin/test
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/share/test/test.exe
+rm -f /usr/bin/test
+(exit SUCCESS)
 !bake clean
 rm -f test.exe
 rm -rf .built/

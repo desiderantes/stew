@@ -11,6 +11,9 @@ msgcat --force-po --output-file=test.pot .built/com/example/Test1.java.pot .buil
 mkdir -p /usr/share/java
 cp test.jar /usr/share/java/test.jar
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/share/java/test.jar
+(exit SUCCESS)
 !bake clean
 rm -f test.jar
 # FIXME: Not necessary - is within the .built/ dir (should be completely removed)

@@ -1,3 +1,7 @@
+Overview of changes in bake 0.1.16
+
+    * Add an uninstall target
+
 Overview of changes in bake 0.1.15
 
     * Don't install data when data.*.install is false

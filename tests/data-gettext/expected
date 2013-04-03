@@ -12,6 +12,11 @@ cp .built/fr.mo /usr/share/locale/fr/LC_MESSAGES/test.mo
 mkdir -p /usr/share/locale/it/LC_MESSAGES
 cp .built/it.mo /usr/share/locale/it/LC_MESSAGES/test.mo
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/share/locale/de/LC_MESSAGES/test.mo
+rm -f /usr/share/locale/fr/LC_MESSAGES/test.mo
+rm -f /usr/share/locale/it/LC_MESSAGES/test.mo
+(exit SUCCESS)
 !bake clean
 rm -rf .built/
 (exit SUCCESS)

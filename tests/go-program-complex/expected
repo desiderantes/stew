@@ -9,6 +9,9 @@ gccgo -o test .built/test1.o .built/test2.o .built/test3.o
 mkdir -p /usr/bin
 cp test /usr/bin/test
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/bin/test
+(exit SUCCESS)
 !bake clean
 rm -f test
 rm -rf .built/

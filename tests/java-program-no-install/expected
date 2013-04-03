@@ -5,6 +5,8 @@ jar cfe test.jar -C .built Test.class
 (exit SUCCESS)
 !bake install
 (exit SUCCESS)
+!bake uninstall
+(exit SUCCESS)
 !bake clean
 rm -f test.jar
 rm -rf .built/

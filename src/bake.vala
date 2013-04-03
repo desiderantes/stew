@@ -373,6 +373,7 @@ public class Bake
         {
             f.build_rule.add_input ("%s/%%build".printf (Path.get_basename (c.dirname)));
             f.install_rule.add_input ("%s/%%install".printf (Path.get_basename (c.dirname)));
+            f.uninstall_rule.add_input ("%s/%%uninstall".printf (Path.get_basename (c.dirname)));
             f.clean_rule.add_input ("%s/%%clean".printf (Path.get_basename (c.dirname)));
             f.test_rule.add_input ("%s/%%test".printf (Path.get_basename (c.dirname)));
         }

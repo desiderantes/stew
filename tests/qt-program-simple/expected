@@ -8,6 +8,9 @@ g++ -o test .built/test.o
 mkdir -p /usr/bin
 cp test /usr/bin/test
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/bin/test
+(exit SUCCESS)
 !bake clean
 rm -f test
 rm -f test.moc

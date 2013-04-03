@@ -4,5 +4,8 @@
 mkdir -p /usr/share/applications
 cp test.desktop /usr/share/applications/test.desktop
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/share/applications/test.desktop
+(exit SUCCESS)
 !bake clean
 (exit SUCCESS)

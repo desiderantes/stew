@@ -7,6 +7,9 @@ gcc -o test .built/test.o -lbaketestlibrary -lbaketestlibrary2
 mkdir -p /usr/bin
 cp test /usr/bin/test
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/bin/test
+(exit SUCCESS)
 !bake clean
 rm -f test
 rm -rf .built/

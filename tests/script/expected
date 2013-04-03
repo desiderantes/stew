@@ -4,5 +4,8 @@
 mkdir -p /usr/bin
 cp test /usr/bin/test
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/bin/test
+(exit SUCCESS)
 !bake clean
 (exit SUCCESS)

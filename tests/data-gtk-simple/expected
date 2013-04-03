@@ -4,5 +4,8 @@
 mkdir -p /usr/share/test
 cp test.ui /usr/share/test/test.ui
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/share/test/test.ui
+(exit SUCCESS)
 !bake clean
 (exit SUCCESS)

@@ -21,6 +21,14 @@ cp .built/test.page.fr /usr/share/help/fr/test/test.page
 cp .built/test.page.it /usr/share/help/it/test/test.page
 cp test.page /usr/share/help/C/test/test.page
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/share/help/fr/test/index.page
+rm -f /usr/share/help/it/test/index.page
+rm -f /usr/share/help/C/test/index.page
+rm -f /usr/share/help/fr/test/test.page
+rm -f /usr/share/help/it/test/test.page
+rm -f /usr/share/help/C/test/test.page
+(exit SUCCESS)
 !bake clean
 rm -rf .built/
 rm -f test.pot

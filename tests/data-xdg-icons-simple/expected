@@ -4,5 +4,8 @@
 mkdir -p /usr/share/icons/hicolor/scalable/apps
 cp test.png /usr/share/icons/hicolor/scalable/apps/test.png
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/share/icons/hicolor/scalable/apps/test.png
+(exit SUCCESS)
 !bake clean
 (exit SUCCESS)

@@ -33,6 +33,13 @@ cp test.h /usr/include/test-0/test.h
 mkdir -p /usr/share/vala/vapi
 cp test-0.vapi /usr/share/vala/vapi/test-0.vapi
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/lib/libtest.so
+rm -f /usr/lib/libtest.so.0
+rm -f /usr/lib/pkgconfig/test-0.pc
+rm -f /usr/include/test-0/test.h
+rm -f /usr/share/vala/vapi/test-0.vapi
+(exit SUCCESS)
 !bake clean
 rm -f libtest.so.0
 rm -f test.h

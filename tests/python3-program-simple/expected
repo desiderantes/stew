@@ -11,6 +11,11 @@ cp __pycache__/test.cpython-32.pyc /usr/share/test/__pycache__/test.cpython-32.p
 mkdir -p /usr/bin
 cp .built/test /usr/bin/test
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/share/test/test.py
+rm -f /usr/share/test/__pycache__/test.cpython-32.pyc
+rm -f /usr/bin/test
+(exit SUCCESS)
 !bake clean
 rm -f __pycache__/test.cpython-32.pyc
 rm -rf __pycache__/

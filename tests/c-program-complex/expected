@@ -13,6 +13,9 @@ msgcat --force-po --output-file=test.pot .built/test1.c.pot .built/test2.c.pot .
 mkdir -p /usr/bin
 cp test /usr/bin/test
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/bin/test
+(exit SUCCESS)
 !bake clean
 rm -f test
 rm -rf .built/

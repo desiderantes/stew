@@ -4,5 +4,8 @@
 mkdir -p /usr/share/man/man1
 cp test.1 /usr/share/man/man1/test.1
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/share/man/man1/test.1
+(exit SUCCESS)
 !bake clean
 (exit SUCCESS)

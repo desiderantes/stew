@@ -21,6 +21,12 @@ cp test.h /usr/include/test-0/test.h
 mkdir -p /usr/lib/pkgconfig
 cp test-0.pc /usr/lib/pkgconfig/test-0.pc
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/lib/libtest.so.0
+rm -f /usr/lib/libtest.so
+rm -f /usr/include/test-0/test.h
+rm -f /usr/lib/pkgconfig/test-0.pc
+(exit SUCCESS)
 !bake clean
 rm -f libtest.so.0
 rm -f test1.moc

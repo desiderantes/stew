@@ -2,5 +2,8 @@
 (exit FAILURE)
 !bake install
 (exit FAILURE)
+!bake uninstall
+rm -f /usr/lib/test
+(exit SUCCESS)
 !bake clean
 (exit SUCCESS)

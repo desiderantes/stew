@@ -7,6 +7,7 @@ public class Recipe
     public List<Rule> rules;
     public Rule build_rule;
     public Rule install_rule;
+    public Rule uninstall_rule;
     public CleanRule clean_rule;
     public Rule test_rule;
     public HashTable<string, Rule> targets;
@@ -71,6 +72,13 @@ public class Recipe
         {
             install_rule = add_rule ();
             install_rule.add_output ("%install");
+        }
+
+        uninstall_rule = find_rule ("%uninstall");
+        if (uninstall_rule == null)
+        {
+            uninstall_rule = add_rule ();
+            uninstall_rule.add_output ("%uninstall");
         }
 
         clean_rule = new CleanRule (this);
@@ -316,6 +324,10 @@ public class Recipe
         /* Copy file across */
         install_rule.add_status_command ("CP %s %s".printf (filename, install_path));
         install_rule.add_command ("@cp %s %s".printf (filename, install_path));
+
+        /* Delete on uninstall */
+        uninstall_rule.add_status_command ("RM %s".printf (install_path));
+        uninstall_rule.add_command ("@rm -f %s".printf (install_path));
     }
 
     public void generate_clean_rule ()

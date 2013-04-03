@@ -5,6 +5,9 @@ python -m py_compile test.py
 !bake install
 python --version
 (exit SUCCESS)
+!bake uninstall
+python --version
+(exit SUCCESS)
 !bake clean
 python --version
 rm -f test.pyc

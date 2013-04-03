@@ -4,6 +4,8 @@ mkdir -p .built
 (exit SUCCESS)
 !bake install
 (exit SUCCESS)
+!bake uninstall
+(exit SUCCESS)
 !bake clean
 rm -f test.pyc
 rm -f test

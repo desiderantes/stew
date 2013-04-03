@@ -7,8 +7,8 @@
 
 <p>
 Installing is the process of taking your built project and copying the files to their specified locations so they can be used correctly.
-The <link xref="rules"><em>install</em> rule</link> does this for the recipe and its decendants.
-Running this <link xref="rules">rule</link> will automatically <link xref="building">build</link> any files that are needed.
+The <em>install</em> and <em>uninstall</em> <link xref="rules">rules</link> do this for the recipe and its decendants.
+The install rule will automatically <link xref="building">build</link> any files that are needed.
 </p>
 <example>
 <p>
@@ -20,11 +20,17 @@ bake install
 <p>
 will take this program and install it to /usr/bin/foo (on Unix systems)
 </p>
+<code>
+bake uninstall
+</code>
+<p>
+will remove the installed files
+</p>
 </example>
 <note>
 <p>
 You must have sufficient privileges to be able to copy the files to their required locations.
-If you need to install the files into a local directory for testing set the <em>install-directory</em> variable when <link xref="config">configuring your project</link>.
+If you need to install the files into a local directory for testing set the <em>root-directory</em> variable when <link xref="config">configuring your project</link>.
 </p>
 </note>
 </page>

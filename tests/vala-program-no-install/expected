@@ -7,6 +7,8 @@ gcc -o test .built/test.o -lgobject -lglib
 (exit SUCCESS)
 !bake install
 (exit SUCCESS)
+!bake uninstall
+(exit SUCCESS)
 !bake clean
 rm -f test
 rm -rf .built/

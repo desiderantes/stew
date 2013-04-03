@@ -7,6 +7,9 @@ ghc -o test .built/test.o
 mkdir -p /usr/bin/test
 cp test /usr/bin/test/test
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/bin/test/test
+(exit SUCCESS)
 !bake clean
 rm -f test
 rm -rf .built/

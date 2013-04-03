@@ -5,6 +5,8 @@ ghc -o test .built/test.o
 (exit SUCCESS)
 !bake install
 (exit SUCCESS)
+!bake uninstall
+(exit SUCCESS)
 !bake clean
 rm -f test
 rm -rf .built/

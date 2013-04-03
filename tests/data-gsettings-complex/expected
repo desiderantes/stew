@@ -10,6 +10,11 @@ cp test.override /usr/share/glib-2.0/schemas/test.override
 mkdir -p /usr/share/GConf/gsettings
 cp test.convert /usr/share/GConf/gsettings/test.convert
 (exit SUCCESS)
+!bake uninstall
+rm -f /usr/share/glib-2.0/schemas/com.example.Test.gschema.xml
+rm -f /usr/share/glib-2.0/schemas/test.override
+rm -f /usr/share/GConf/gsettings/test.convert
+(exit SUCCESS)
 !bake clean
 rm -rf .built/
 rm -f test.pot
