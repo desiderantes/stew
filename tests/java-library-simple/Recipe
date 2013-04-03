@@ -1,3 +1,7 @@
-project.name = test
+project {
+  name = test
+}
 
-libraries.test.sources = Test.java
+libraries.test {
+  sources = Test.java
+}

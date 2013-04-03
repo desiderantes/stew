@@ -1,3 +1,7 @@
-project.name = test
+project {
+  name = test
+}
 
-data.test.gsettings-schemas = com.example.Test.gschema.xml
+data.test {
+  gsettings-schemas = com.example.Test.gschema.xml
+}

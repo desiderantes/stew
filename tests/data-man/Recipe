@@ -1,3 +1,7 @@
-project.name = test
+project {
+  name = test
+}
 
-data.test.man-pages = test.1
+data.test {
+  man-pages = test.1
+}

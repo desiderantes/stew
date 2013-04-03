@@ -1,4 +1,6 @@
-project.name = test
+project {
+  name = test
+}
 
 tests {
   first.command = true

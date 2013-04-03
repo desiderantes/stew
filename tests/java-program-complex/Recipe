@@ -1,4 +1,6 @@
-project.name = test
+project {
+  name = test
+}
 
 programs.test {
   sources = com/example/Test1.java \

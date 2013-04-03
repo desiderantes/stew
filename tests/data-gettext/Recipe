@@ -1,3 +1,7 @@
-project.name = test
+project {
+  name = test
+}
 
-data.test.gettext-translations = de.po fr.po it.po
+data.test {
+  gettext-translations = de.po fr.po it.po
+}

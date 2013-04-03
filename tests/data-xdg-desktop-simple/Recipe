@@ -1,3 +1,7 @@
-project.name = test
+project {
+  name = test
+}
 
-data.test.xdg-desktop-files = test.desktop
+data.test {
+  xdg-desktop-files = test.desktop
+}

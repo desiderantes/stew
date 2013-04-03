@@ -1,4 +1,6 @@
-project.name = test
+project {
+  name = test
+}
 
 data.icon32 {
   xdg-icons = 32x32/test.png

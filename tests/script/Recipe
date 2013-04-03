@@ -1,3 +1,7 @@
-project.name = test
+project {
+  name = test
+}
 
-programs.test.install = true
+programs.test {
+  install = true  
+}

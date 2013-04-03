@@ -1,3 +1,7 @@
-project.name = test
+project {
+  name = test
+}
 
-data.test.mallard-pages = index.page test.page
+data.test {
+  mallard-pages = index.page test.page
+}

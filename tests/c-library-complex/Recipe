@@ -1,4 +1,6 @@
-project.name = test
+project {
+  name = test
+}
 
 libraries.test {
   sources = test1.c test2.c test3.c

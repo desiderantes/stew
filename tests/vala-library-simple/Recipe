@@ -1,3 +1,7 @@
-project.name = test
+project {
+  name = test
+}
 
-libraries.test.sources = test.vala
+libraries.test {
+  sources = test.vala
+}

@@ -1,7 +1,10 @@
-project.name = test
+project {
+  name = test
+}
 
-data.test.mallard-pages = index.page test.page
-data.test.gettext-domain = test
-
-data.test.gettext-translations = fr.po it.po
-data.test.install = false
+data.test {
+  mallard-pages = index.page test.page
+  gettext-domain = test
+  gettext-translations = fr.po it.po
+  install = false
+}

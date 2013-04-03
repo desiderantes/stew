@@ -1,3 +1,7 @@
-project.name = test
+project {
+  name = test
+}
 
-programs.test.sources = test.py
+programs.test {
+  sources = test.py
+}
