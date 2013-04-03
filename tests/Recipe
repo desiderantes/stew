@@ -81,6 +81,30 @@ tests {
     command = ./src/test-runner c-program-complex
     data = c-program-complex/expected c-program-complex/Recipe c-program-complex/test1.c c-program-complex/test2.c c-program-complex/test3.c
   }
+  c-program-library {
+    command = ./src/test-runner c-program-library
+    data = c-program-library/expected c-program-library/Recipe c-program-library/test.c
+  }
+  c-program-two-libraries {
+    command = ./src/test-runner c-program-two-libraries
+    data = c-program-two-libraries/expected c-program-two-libraries/Recipe c-program-two-libraries/test.c
+  }
+  c-program-library-version {
+    command = ./src/test-runner c-program-library-version
+    data = c-program-library-version/expected c-program-library-version/Recipe c-program-library-version/test.c
+  }
+  c-program-missing-library {
+    command = ./src/test-runner c-program-missing-library
+    data = c-program-missing-library/expected c-program-missing-library/Recipe c-program-missing-library/test.c
+  }
+  c-program-library-old-minor-version {
+    command = ./src/test-runner c-program-library-old-minor-version
+    data = c-program-library-old-minor-version/expected c-program-library-old-minor-version/Recipe c-program-library-old-minor-version/test.c
+  }
+  c-program-library-old-major-version {
+    command = ./src/test-runner c-program-library-old-major-version
+    data = c-program-library-old-major-version/expected c-program-library-old-major-version/Recipe c-program-library-old-major-version/test.c
+  }
   c-library-simple {
     command = ./src/test-runner c-library-simple
     data = c-library-simple/expected c-library-simple/Recipe c-library-simple/test.c

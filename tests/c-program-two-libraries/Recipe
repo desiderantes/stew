@@ -1,0 +1,7 @@
+project.name = test
+
+programs.test {
+  sources = test.c
+  packages = baketestlibrary \
+             baketestlibrary2
+}
