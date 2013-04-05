@@ -1,3 +1,7 @@
+Overview of changes in bake 0.1.17
+
+    * Allow newlines in *.*.vala-compile-flags
+
 Overview of changes in bake 0.1.16
 
     * Add an uninstall target

@@ -119,7 +119,7 @@ public class ValaModule : BuildModule
             binary_name = "lib%s.so.%s".printf (binary_name, (compilable as Library).version);
 
         var valac_command = "@valac";
-        var valac_flags = compilable.get_variable ("vala-compile-flags", "");
+        var valac_flags = compilable.get_flags ("vala-compile-flags", "");
         if (valac_flags != "")
             valac_command += " " + valac_flags;
         var valac_inputs = new List<string> ();
