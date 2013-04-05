@@ -47,7 +47,7 @@ public class BuildModule
 public class Block
 {
     public Recipe recipe;
-    protected string type_name;
+    private string type_name;
     public string id;
 
     public Block (Recipe recipe, string type_name, string id)
@@ -92,7 +92,7 @@ public class Compilable : Block
 
     public string? get_flags (string name, string? fallback = null)
     {
-        return get_variable ("%s.%s.%s".printf (type_name, id, name), fallback).replace("\n", " ");;
+        return get_variable (name, fallback).replace("\n", " ");
     }
 
     public List<string> sources
