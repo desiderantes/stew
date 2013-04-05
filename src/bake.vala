@@ -90,11 +90,6 @@ public class Compilable : Block
 
     public bool install { owned get { return get_boolean_variable ("install", true); } }
 
-    public string? get_flags (string name, string? fallback = null)
-    {
-        return get_variable (name, fallback).replace("\n", " ");
-    }
-
     public List<string> sources
     {
         owned get

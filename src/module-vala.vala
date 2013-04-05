@@ -66,12 +66,18 @@ public class ValaModule : BuildModule
         if (library.install)
             recipe.add_install_rule (filename, Path.build_filename (library.install_directory, "pkgconfig"));
 
-        var h_filename = "%s.h".printf (name);
+        var user_header_name = library.get_variable ("vala-header-name", "");
+        var h_filename    = user_header_name != "" ? 
+                                user_header_name :
+                                "%s.h".printf (name);
         recipe.build_rule.add_input (h_filename);
         if (library.install)
             recipe.add_install_rule (h_filename, include_directory);
 
-        var vapi_filename = "%s-%s.vapi".printf (name, major_version);
+        var user_vapi_name   = library.get_variable ("vala-vapi-name", "");
+        var vapi_filename = user_vapi_name != "" ? 
+                                user_vapi_name :
+                                "%s-%s.vapi".printf (name, major_version);
         recipe.build_rule.add_input (vapi_filename);
         var vapi_directory = Path.build_filename (recipe.data_directory, "vala", "vapi");
         if (library.install)
@@ -116,7 +122,9 @@ public class ValaModule : BuildModule
             binary_name = "lib%s.so.%s".printf (binary_name, (compilable as Library).version);
 
         var valac_command = "@valac";
-        var valac_flags = compilable.get_flags ("vala-compile-flags", "");
+        var user_vapi_name   = compilable.get_variable ("vala-vapi-name", "");
+        var user_header_name = compilable.get_variable ("vala-header-name", "");
+        var valac_flags      = compilable.get_variable ("vala-compile-flags", "");
         if (valac_flags != "")
             valac_command += " " + valac_flags;
         var valac_inputs = new List<string> ();
@@ -233,10 +241,14 @@ public class ValaModule : BuildModule
             var index = version.index_of (".");
             if (index > 0)
                 major_version = version.substring (0, index);
-
-            var h_filename = "%s.h".printf (compilable.id);
-            var vapi_filename = "%s-%s.vapi".printf (compilable.id, major_version);
-
+            
+            var h_filename    = user_header_name != "" ? 
+                                    user_header_name :
+                                    "%s.h".printf (compilable.id);
+            
+            var vapi_filename = user_vapi_name != "" ? 
+                                    user_vapi_name :
+                                    "%s-%s.vapi".printf (compilable.id, major_version);
             interface_rule = recipe.add_rule ();
             foreach (var input in valac_inputs)
                 interface_rule.add_input (input);
@@ -333,7 +345,6 @@ public class ValaModule : BuildModule
             link_rule.add_input (o_filename);
             link_command += " %s".printf (o_filename);
         }
-
         /* Generate library interfaces */
         if (compilable is Library)
             interface_rule.add_command (interface_command);
