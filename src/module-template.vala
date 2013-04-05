@@ -24,6 +24,8 @@ public class TemplateModule : BuildModule
                 if (variables != null)
                     command += " %s".printf (variables);
                 rule.add_command (command);
+
+                recipe.build_rule.add_input (file);
             }
         }
     }

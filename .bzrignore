@@ -50,3 +50,4 @@ bake-0.1.15+bzr.tar.gz
 bake-0.1.15+bzr/
 bake-0.1.15+bzr-1.x86_64.rpm
 bake-0.1.15+bzr.tar.xz
+tests/src/bake-template

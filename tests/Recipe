@@ -58,6 +58,16 @@ tests {
     data = rule/expected rule/Recipe
   }
 
+  # Template tests
+  template-simple {
+    command = ./src/test-runner template-simple
+    data = template-simple/expected template-simple/Recipe template-simple/test.template
+  }
+  template-complex {
+    command = ./src/test-runner template-complex
+    data = template-complex/expected template-complex/Recipe template-complex/test1.template template-complex/test2.template
+  }
+
   # Script test
   script {
     command = ./src/test-runner script

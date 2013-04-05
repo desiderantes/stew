@@ -1,0 +1,8 @@
+project {
+  name = test
+}
+
+templates.test {
+  files = test
+  variables = TEST=test
+}

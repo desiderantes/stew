@@ -1,0 +1,12 @@
+!bake
+bake-template test1.template test1 TEST=test FOO=foo
+bake-template test2.template test2 TEST=test FOO=foo
+(exit SUCCESS)
+!bake install
+(exit SUCCESS)
+!bake uninstall
+(exit SUCCESS)
+!bake clean
+rm -f test1
+rm -f test2
+(exit SUCCESS)

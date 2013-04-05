@@ -182,6 +182,13 @@ programs.bake-gettext {
   install = false
 }
 
+programs.bake-template {
+  sources = bake-template.vala
+  vala-packages = posix gio-2.0 gio-unix-2.0
+  packages = gio-2.0 gio-unix-2.0
+  install = false
+}
+
 programs.msgcat {
   sources = msgcat.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
