@@ -2,6 +2,7 @@ Overview of changes in bake 0.1.16
 
     * Add an uninstall target
     * Always build templates, not just when something depends on them
+    * Build libraries in both static and dynamic form
 
 Overview of changes in bake 0.1.15
 

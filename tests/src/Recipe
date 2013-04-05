@@ -12,6 +12,13 @@ programs.touch {
   install = false
 }
 
+programs.ar {
+  sources = ar.vala
+  vala-packages = posix gio-2.0 gio-unix-2.0
+  packages = gio-2.0 gio-unix-2.0
+  install = false
+}
+
 programs.cat {
   sources = cat.vala
   vala-packages = posix gio-2.0 gio-unix-2.0

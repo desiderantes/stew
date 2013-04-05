@@ -7,6 +7,7 @@ g++ -fPIC -MMD -MF .built/test2.d -c test2.cpp -o .built/test2.o
 moc -o test3.moc test3.cpp
 g++ -fPIC -MMD -MF .built/test3.d -c test3.cpp -o .built/test3.o
 g++ -o libtest.so.0 -shared .built/test1.o .built/test2.o .built/test3.o
+ar -cq libtest.a .built/test1.o .built/test2.o .built/test3.o
 bake-gettext --mime-type text/x-c++src --output .built/test1.cpp.pot test1.cpp
 bake-gettext --mime-type text/x-c++src --output .built/test2.cpp.pot test2.cpp
 bake-gettext --mime-type text/x-c++src --output .built/test3.cpp.pot test3.cpp
@@ -14,21 +15,24 @@ msgcat --force-po --output-file=test.pot .built/test1.cpp.pot .built/test2.cpp.p
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/lib
-cp libtest.so.0 /usr/lib/libtest.so.0
 cp libtest.so /usr/lib/libtest.so
+cp libtest.so.0 /usr/lib/libtest.so.0
+cp libtest.a /usr/lib/libtest.a
 mkdir -p /usr/include/test-0
 cp test.h /usr/include/test-0/test.h
 mkdir -p /usr/lib/pkgconfig
 cp test-0.pc /usr/lib/pkgconfig/test-0.pc
 (exit SUCCESS)
 !bake uninstall
-rm -f /usr/lib/libtest.so.0
 rm -f /usr/lib/libtest.so
+rm -f /usr/lib/libtest.so.0
+rm -f /usr/lib/libtest.a
 rm -f /usr/include/test-0/test.h
 rm -f /usr/lib/pkgconfig/test-0.pc
 (exit SUCCESS)
 !bake clean
 rm -f libtest.so.0
+rm -f libtest.a
 rm -f test1.moc
 rm -rf .built/
 rm -f test2.moc

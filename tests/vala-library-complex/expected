@@ -16,6 +16,7 @@ valac --target-glib 2.32 --ccode test3.vala --use-fast-vapi=.built/test1.vapi --
 touch .built/test3.c-stamp
 gcc -Wno-unused -Wno-deprecated-declarations -fPIC -DFOO=1 -Igobject -Iglib -c .built/test3.c -o .built/test3.o
 gcc -o libtest.so.0 -shared .built/test1.o .built/test2.o .built/test3.o -lm -lgobject -lglib
+ar -cq libtest.a .built/test1.o .built/test2.o .built/test3.o
 valac --target-glib 2.32 --ccode --header=test.h --vapi=test-0.vapi --library=test --use-fast-vapi=.built/test1.vapi --use-fast-vapi=.built/test2.vapi --use-fast-vapi=.built/test3.vapi
 bake-gettext --mime-type text/x-vala --output .built/test1.vala.pot test1.vala
 bake-gettext --mime-type text/x-vala --output .built/test2.vala.pot test2.vala
@@ -26,6 +27,7 @@ msgcat --force-po --output-file=test.pot .built/test1.vala.pot .built/test2.vala
 mkdir -p /usr/lib
 cp libtest.so /usr/lib/libtest.so
 cp libtest.so.0 /usr/lib/libtest.so.0
+cp libtest.a /usr/lib/libtest.a
 mkdir -p /usr/lib/pkgconfig
 cp test-0.pc /usr/lib/pkgconfig/test-0.pc
 mkdir -p /usr/include/test-0
@@ -36,12 +38,14 @@ cp test-0.vapi /usr/share/vala/vapi/test-0.vapi
 !bake uninstall
 rm -f /usr/lib/libtest.so
 rm -f /usr/lib/libtest.so.0
+rm -f /usr/lib/libtest.a
 rm -f /usr/lib/pkgconfig/test-0.pc
 rm -f /usr/include/test-0/test.h
 rm -f /usr/share/vala/vapi/test-0.vapi
 (exit SUCCESS)
 !bake clean
 rm -f libtest.so.0
+rm -f libtest.a
 rm -f test.h
 rm -f test-0.vapi
 rm -rf .built/

@@ -4,6 +4,7 @@ valac --ccode test.vala
 touch .built/test.c-stamp
 gcc -Wno-unused -Wno-deprecated-declarations -fPIC -Igobject -Iglib -c .built/test.c -o .built/test.o
 gcc -o libtest.so.0 -shared .built/test.o -lgobject -lglib
+ar -cq libtest.a .built/test.o
 valac --fast-vapi=.built/test.vapi test.vala
 touch .built/test.vapi-stamp
 valac --ccode --header=test.h --vapi=test-0.vapi --library=test --use-fast-vapi=.built/test.vapi
@@ -14,6 +15,7 @@ valac --ccode --header=test.h --vapi=test-0.vapi --library=test --use-fast-vapi=
 (exit SUCCESS)
 !bake clean
 rm -f libtest.so.0
+rm -f libtest.a
 rm -f test.h
 rm -f test-0.vapi
 rm -rf .built/

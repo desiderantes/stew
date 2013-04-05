@@ -31,26 +31,29 @@ public class ValaModule : BuildModule
            
         /* Generate a symbolic link to the library and install both the link and the library */
         var rule = recipe.add_rule ();
-        var binary_name = "lib%s.so.%s".printf (library.id, version);
-        var unversioned_binary_name = "lib%s.so".printf (library.id);
+        var binary_name = "lib%s.so.%s".printf (library.name, version);
+        var unversioned_binary_name = "lib%s.so".printf (library.name);
+        var archive_name = "lib%s.a".printf (library.name);
         recipe.build_rule.add_input (unversioned_binary_name);
         rule.add_input (binary_name);
         rule.add_output (unversioned_binary_name);
         rule.add_status_command ("LINK %s".printf (unversioned_binary_name));
         rule.add_command ("@ln -s %s %s".printf (binary_name, unversioned_binary_name));
+
         if (library.install)
         {
             recipe.add_install_rule (unversioned_binary_name, library.install_directory);
             recipe.add_install_rule (binary_name, library.install_directory);
+            recipe.add_install_rule (archive_name, library.install_directory);
         }
 
         /* Generate pkg-config file */
-        var filename = "%s-%s.pc".printf (library.id, major_version);
+        var filename = "%s-%s.pc".printf (library.name, major_version);
         var name = library.name;
         var description = library.get_variable ("description", "");
         var requires = library.get_variable ("requires", "");
 
-        var include_directory = Path.build_filename (recipe.include_directory, "%s-%s".printf (library.id, major_version));
+        var include_directory = Path.build_filename (recipe.include_directory, "%s-%s".printf (library.name, major_version));
 
         rule = recipe.add_rule ();
         recipe.build_rule.add_input (filename);
@@ -60,7 +63,7 @@ public class ValaModule : BuildModule
         rule.add_command ("@echo \"Description: %s\" >> %s".printf (description, filename));
         rule.add_command ("@echo \"Version: %s\" >> %s".printf (version, filename));
         rule.add_command ("@echo \"Requires: %s\" >> %s".printf (requires, filename));
-        rule.add_command ("@echo \"Libs: -L%s -l%s\" >> %s".printf (library.install_directory, library.id, filename));
+        rule.add_command ("@echo \"Libs: -L%s -l%s\" >> %s".printf (library.install_directory, library.name, filename));
         rule.add_command ("@echo \"Cflags: -I%s\" >> %s".printf (include_directory, filename));
 
         if (library.install)
@@ -90,7 +93,7 @@ public class ValaModule : BuildModule
             recipe.build_rule.add_input (typelib_filename);
             var typelib_rule = recipe.add_rule ();
             typelib_rule.add_input (gir_filename);
-            typelib_rule.add_input ("lib%s.so".printf (library.id));
+            typelib_rule.add_input ("lib%s.so".printf (library.name));
             typelib_rule.add_output (typelib_filename);
             typelib_rule.add_status_command ("G-IR-COMPILER %s".printf (typelib_filename));
             typelib_rule.add_command ("@g-ir-compiler --shared-library=%s %s -o %s".printf (name, gir_filename, typelib_filename));
@@ -126,6 +129,17 @@ public class ValaModule : BuildModule
         if (compilable is Library)
             link_command += " -shared";
         recipe.build_rule.add_input (binary_name);
+
+        var archive_name = "lib%s.a".printf (compilable.name);
+        Rule? archive_rule = null;
+        var archive_command = "";
+        if (compilable is Library)
+        {
+            archive_rule = recipe.add_rule ();
+            archive_rule.add_output (archive_name);
+            recipe.build_rule.add_input (archive_name);
+            archive_command = "ar -cq %s".printf (archive_name);
+        }
 
         var link_errors = new List<string> ();
 
@@ -214,9 +228,9 @@ public class ValaModule : BuildModule
         if (link_errors.length () != 0)
         {
             if (compilable is Library)
-                link_rule.add_error_command ("Unable to compile library %s:".printf (compilable.id));
+                link_rule.add_error_command ("Unable to compile library %s:".printf (compilable.name));
             else
-                link_rule.add_error_command ("Unable to compile program %s:".printf (compilable.id));
+                link_rule.add_error_command ("Unable to compile program %s:".printf (compilable.name));
             foreach (var e in link_errors)
                 link_rule.add_error_command (" - %s".printf (e));
             link_rule.add_command ("@false");
@@ -234,8 +248,8 @@ public class ValaModule : BuildModule
             if (index > 0)
                 major_version = version.substring (0, index);
 
-            var h_filename = "%s.h".printf (compilable.id);
-            var vapi_filename = "%s-%s.vapi".printf (compilable.id, major_version);
+            var h_filename = "%s.h".printf (compilable.name);
+            var vapi_filename = "%s-%s.vapi".printf (compilable.name, major_version);
 
             interface_rule = recipe.add_rule ();
             foreach (var input in valac_inputs)
@@ -244,7 +258,7 @@ public class ValaModule : BuildModule
             interface_rule.add_output (vapi_filename);
 
             interface_rule.add_status_command ("VALAC %s %s".printf (h_filename, vapi_filename));
-            interface_command = valac_command + " --ccode --header=%s --vapi=%s --library=%s".printf (h_filename, vapi_filename, compilable.id);
+            interface_command = valac_command + " --ccode --header=%s --vapi=%s --library=%s".printf (h_filename, vapi_filename, compilable.name);
 
             /* Optionally generate a introspection data */
             var namespace = compilable.get_variable ("namespace");
@@ -332,6 +346,7 @@ public class ValaModule : BuildModule
 
             link_rule.add_input (o_filename);
             link_command += " %s".printf (o_filename);
+            archive_command += " %s".printf (o_filename);
         }
 
         /* Generate library interfaces */
@@ -343,6 +358,12 @@ public class ValaModule : BuildModule
         if (link_flags != null)
             link_command += " " + link_flags;
         link_rule.add_command (link_command);
+
+        if (compilable is Library)
+        {
+            archive_rule.add_status_command ("AR %s".printf (archive_name));
+            archive_rule.add_command (archive_command);
+        }
     }
     
     private bool can_generate_rules (Recipe recipe, Compilable compilable)

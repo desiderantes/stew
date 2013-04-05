@@ -2,6 +2,7 @@
 mkdir -p .built
 g++ -fPIC -MMD -MF .built/test.d -c test.cpp -o .built/test.o
 g++ -o libtest.so.0 -shared .built/test.o
+ar -cq libtest.a .built/test.o
 (exit SUCCESS)
 !bake install
 (exit SUCCESS)
@@ -9,6 +10,7 @@ g++ -o libtest.so.0 -shared .built/test.o
 (exit SUCCESS)
 !bake clean
 rm -f libtest.so.0
+rm -f libtest.a
 rm -rf .built/
 rm -f libtest.so
 rm -f test-0.pc

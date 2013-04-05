@@ -8,6 +8,8 @@ public class GCCModule : BuildModule
     public override void generate_program_rules (Recipe recipe, Program program)
     {
         generate_compile_rules (recipe, program);
+        if (program.install)
+            recipe.add_install_rule (program.name, program.install_directory);
     }
 
     public override bool can_generate_library_rules (Recipe recipe, Library library)
@@ -27,18 +29,24 @@ public class GCCModule : BuildModule
 
         /* Generate a symbolic link to the library and install both the link and the library */
         var rule = recipe.add_rule ();
-        var binary_name = "lib%s.so.%s".printf (library.id, version);
-        var unversioned_binary_name = "lib%s.so".printf (library.id);
+        var binary_name = "lib%s.so.%s".printf (library.name, version);
+        var unversioned_binary_name = "lib%s.so".printf (library.name);
+        var archive_name = "lib%s.a".printf (library.name);
         recipe.build_rule.add_input (unversioned_binary_name);
         rule.add_input (binary_name);
         rule.add_output (unversioned_binary_name);
         rule.add_status_command ("LINK %s".printf (unversioned_binary_name));
         rule.add_command ("@ln -s %s %s".printf (binary_name, unversioned_binary_name));
+
         if (library.install)
+        {
             recipe.add_install_rule (unversioned_binary_name, library.install_directory);
+            recipe.add_install_rule (binary_name, library.install_directory);
+            recipe.add_install_rule (archive_name, library.install_directory);
+        }
 
         /* Install headers */
-        var include_directory = Path.build_filename (recipe.include_directory, "%s-%s".printf (library.id, major_version));
+        var include_directory = Path.build_filename (recipe.include_directory, "%s-%s".printf (library.name, major_version));
         var header_list = library.get_variable ("headers");
         var headers = new List<string> ();
         if (library.install && header_list != null)
@@ -49,7 +57,7 @@ public class GCCModule : BuildModule
         }
 
         /* Generate pkg-config file */
-        var filename = "%s-%s.pc".printf (library.id, major_version);
+        var filename = "%s-%s.pc".printf (library.name, major_version);
         var name = library.name;
         var description = library.get_variable ("description", "");
         var requires = library.get_variable ("requires", "");
@@ -61,7 +69,7 @@ public class GCCModule : BuildModule
         rule.add_command ("@echo \"Description: %s\" >> %s".printf (description, filename));
         rule.add_command ("@echo \"Version: %s\" >> %s".printf (version, filename));
         rule.add_command ("@echo \"Requires: %s\" >> %s".printf (requires, filename));
-        rule.add_command ("@echo \"Libs: -L%s -l%s\" >> %s".printf (library.install_directory, library.id, filename));
+        rule.add_command ("@echo \"Libs: -L%s -l%s\" >> %s".printf (library.install_directory, library.name, filename));
         rule.add_command ("@echo \"Cflags: -I%s\" >> %s".printf (include_directory, filename));
         if (library.install)
             recipe.add_install_rule (filename, Path.build_filename (library.install_directory, "pkgconfig"));
@@ -74,10 +82,10 @@ public class GCCModule : BuildModule
             var gir_filename = "%s-%s.gir".printf (namespace, major_version);
             recipe.build_rule.add_input (gir_filename);
             var gir_rule = recipe.add_rule ();
-            gir_rule.add_input ("lib%s.so".printf (library.id));
+            gir_rule.add_input ("lib%s.so".printf (library.name));
             gir_rule.add_output (gir_filename);
             gir_rule.add_status_command ("G-IR-SCANNER %s".printf (gir_filename));
-            var scan_command = "@g-ir-scanner --no-libtool --namespace=%s --nsversion=%s --library=%s --output %s".printf (namespace, major_version, library.id, gir_filename);
+            var scan_command = "@g-ir-scanner --no-libtool --namespace=%s --nsversion=%s --library=%s --output %s".printf (namespace, major_version, library.name, gir_filename);
             // FIXME: Need to sort out inputs correctly
             scan_command += " --include=GObject-2.0";
             foreach (var source in library.sources)
@@ -100,10 +108,10 @@ public class GCCModule : BuildModule
             recipe.build_rule.add_input (typelib_filename);
             var typelib_rule = recipe.add_rule ();
             typelib_rule.add_input (gir_filename);
-            typelib_rule.add_input ("lib%s.so".printf (library.id));
+            typelib_rule.add_input ("lib%s.so".printf (library.name));
             typelib_rule.add_output (typelib_filename);
             typelib_rule.add_status_command ("G-IR-COMPILER %s".printf (typelib_filename));
-            typelib_rule.add_command ("@g-ir-compiler --shared-library=%s %s -o %s".printf (library.id, gir_filename, typelib_filename));
+            typelib_rule.add_command ("@g-ir-compiler --shared-library=%s %s -o %s".printf (library.name, gir_filename, typelib_filename));
             var typelib_directory = Path.build_filename (library.install_directory, "girepository-1.0");
             if (library.install)
                 recipe.add_install_rule (typelib_filename, typelib_directory);
@@ -155,12 +163,15 @@ public class GCCModule : BuildModule
             link_command += " -shared";
         recipe.build_rule.add_input (binary_name);
 
-        if (compilable.install)
+        var archive_name = "lib%s.a".printf (compilable.name);
+        Rule? archive_rule = null;
+        var archive_command = "";
+        if (compilable is Library)
         {
-            if (compilable is Library)
-                recipe.add_install_rule (binary_name, (compilable as Library).install_directory);
-            else
-                recipe.add_install_rule (binary_name, (compilable as Program).install_directory);
+            archive_rule = recipe.add_rule ();
+            archive_rule.add_output (archive_name);
+            recipe.build_rule.add_input (archive_name);
+            archive_command = "ar -cq %s".printf (archive_name);
         }
 
         var compile_flags = compilable.compile_flags;
@@ -273,12 +284,19 @@ public class GCCModule : BuildModule
 
             link_rule.add_input (output);
             link_command += " %s".printf (output);
+            archive_command += " %s".printf (output);
         }
 
         link_rule.add_status_command ("GCC-LINK %s".printf (binary_name));
         if (link_flags != null)
             link_command += " " + link_flags;
         link_rule.add_command (link_command);
+
+        if (compilable is Library)
+        {
+            archive_rule.add_status_command ("AR %s".printf (archive_name));
+            archive_rule.add_command (archive_command);
+        }
 
         if (compilable.gettext_domain != null)
         {
