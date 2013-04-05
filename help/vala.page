@@ -42,6 +42,14 @@ Vala programs and libraries can set the following program <link xref="variables"
   <td><p>link-flags</p></td>
   <td><p>Additional command line flags passed to linker</p></td>
 </tr>
+<tr>
+  <td><p>vala-vapi-name</p></td>
+  <td><p>Name to use for .vapi file generated for libraries (optional)</p></td>
+</tr>
+<tr>
+  <td><p>vala-header-name</p></td>
+  <td><p>Name to use for .h file generated for libraries (optional)</p></td>
+</tr>
 </table>
 <example>
 <p>

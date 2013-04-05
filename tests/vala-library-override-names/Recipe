@@ -1,0 +1,9 @@
+project {
+  name = test
+}
+
+libraries.test {
+  sources = test.vala
+  vala-vapi-name = foo.vapi
+  vala-header-name = foo.h
+}

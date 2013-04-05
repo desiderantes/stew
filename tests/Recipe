@@ -247,6 +247,10 @@ tests {
     command = ./src/test-runner vala-library-install-directory
     data = vala-library-install-directory/expected vala-library-install-directory/Recipe vala-library-install-directory/test.vala
   }
+  vala-library-override-names {
+    command = ./src/test-runner vala-library-override-names
+    data = vala-library-override-names/expected vala-library-override-names/Recipe vala-library-override-names/test.vala
+  }
   vala-library-complex {
     command = ./src/test-runner vala-library-complex
     data = vala-library-complex/expected vala-library-complex/Recipe vala-library-complex/test1.vala vala-library-complex/test2.vala vala-library-complex/test3.vala
