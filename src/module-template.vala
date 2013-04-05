@@ -9,7 +9,7 @@ public class TemplateModule : BuildModule
             if (file_list == null)
                 continue;
 
-            var variables = recipe.get_variable ("templates.%s.variables".printf (template_name));
+            var variables = recipe.get_variable ("templates.%s.variables".printf (template_name)).replace("\n", " ");
             /* FIXME: Validate and expand the variables and escape suitable for command line */
 
             var files = split_variable (file_list);

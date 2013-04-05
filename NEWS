@@ -1,6 +1,6 @@
 Overview of changes in bake 0.1.17
 
-    * Allow newlines in *.*.vala-compile-flags
+    * Allow newlines in *.*.vala-compile-flags, templates.*.variables
     * Add libraries.*.vala-header-name and libraries.*.vala-vapi-name overrides
 
 Overview of changes in bake 0.1.16

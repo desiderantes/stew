@@ -6,5 +6,6 @@ foo_variable=foo
 
 templates.test {
   files = test1 test2
-  variables = TEST=test FOO=$(foo_variable)
+  variables = TEST=test \
+              FOO=$(foo_variable)
 }
