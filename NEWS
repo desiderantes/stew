@@ -1,6 +1,7 @@
 Overview of changes in bake 0.1.16
 
     * Add an uninstall target
+    * Always build templates, not just when something depends on them
 
 Overview of changes in bake 0.1.15
 
