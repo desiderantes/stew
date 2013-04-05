@@ -122,9 +122,7 @@ public class ValaModule : BuildModule
             binary_name = "lib%s.so.%s".printf (binary_name, (compilable as Library).version);
 
         var valac_command = "@valac";
-        var user_vapi_name   = compilable.get_variable ("vala-vapi-name", "");
-        var user_header_name = compilable.get_variable ("vala-header-name", "");
-        var valac_flags      = compilable.get_variable ("vala-compile-flags", "");
+        var valac_flags = compilable.get_flags ("vala-compile-flags", "");
         if (valac_flags != "")
             valac_command += " " + valac_flags;
         var valac_inputs = new List<string> ();
@@ -242,10 +240,12 @@ public class ValaModule : BuildModule
             if (index > 0)
                 major_version = version.substring (0, index);
             
+            var user_header_name = compilable.get_variable ("vala-header-name", "");
             var h_filename    = user_header_name != "" ? 
                                     user_header_name :
                                     "%s.h".printf (compilable.id);
             
+            var user_vapi_name   = compilable.get_variable ("vala-vapi-name", "");
             var vapi_filename = user_vapi_name != "" ? 
                                     user_vapi_name :
                                     "%s-%s.vapi".printf (compilable.id, major_version);
