@@ -20,5 +20,4 @@ rm -f test.h
 rm -f test-0.vapi
 rm -rf .built/
 rm -f libtest.so
-rm -f test-0.pc
 (exit SUCCESS)

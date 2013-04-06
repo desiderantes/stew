@@ -14,8 +14,6 @@ mkdir -p /usr/lib
 cp libtest.so /usr/lib/libtest.so
 cp libtest.so.0 /usr/lib/libtest.so.0
 cp libtest.a /usr/lib/libtest.a
-mkdir -p /usr/lib/pkgconfig
-cp test-0.pc /usr/lib/pkgconfig/test-0.pc
 mkdir -p /usr/include/test-0
 cp test.h /usr/include/test-0/test.h
 mkdir -p /usr/share/vala/vapi
@@ -25,7 +23,6 @@ cp test-0.vapi /usr/share/vala/vapi/test-0.vapi
 rm -f /usr/lib/libtest.so
 rm -f /usr/lib/libtest.so.0
 rm -f /usr/lib/libtest.a
-rm -f /usr/lib/pkgconfig/test-0.pc
 rm -f /usr/include/test-0/test.h
 rm -f /usr/share/vala/vapi/test-0.vapi
 (exit SUCCESS)
@@ -36,5 +33,4 @@ rm -f test.h
 rm -f test-0.vapi
 rm -rf .built/
 rm -f libtest.so
-rm -f test-0.pc
 (exit SUCCESS)
