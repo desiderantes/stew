@@ -1,3 +1,7 @@
+Overview of changes in bake 0.1.18
+
+    * Remove pkg-config autogeneration - it is better to let the user do this
+
 Overview of changes in bake 0.1.17
 
     * Allow newlines in *.*.vala-compile-flags, templates.*.variables

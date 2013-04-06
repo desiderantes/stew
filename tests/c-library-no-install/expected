@@ -13,5 +13,4 @@ rm -f libtest.so.0
 rm -f libtest.a
 rm -rf .built/
 rm -f libtest.so
-rm -f test-0.pc
 (exit SUCCESS)

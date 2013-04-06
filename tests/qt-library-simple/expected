@@ -10,14 +10,11 @@ mkdir -p /usr/lib
 cp libtest.so /usr/lib/libtest.so
 cp libtest.so.0 /usr/lib/libtest.so.0
 cp libtest.a /usr/lib/libtest.a
-mkdir -p /usr/lib/pkgconfig
-cp test-0.pc /usr/lib/pkgconfig/test-0.pc
 (exit SUCCESS)
 !bake uninstall
 rm -f /usr/lib/libtest.so
 rm -f /usr/lib/libtest.so.0
 rm -f /usr/lib/libtest.a
-rm -f /usr/lib/pkgconfig/test-0.pc
 (exit SUCCESS)
 !bake clean
 rm -f libtest.so.0
@@ -25,5 +22,4 @@ rm -f libtest.a
 rm -f test.moc
 rm -rf .built/
 rm -f libtest.so
-rm -f test-0.pc
 (exit SUCCESS)
