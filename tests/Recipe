@@ -28,6 +28,14 @@ tests {
     command = ./src/test-runner test-failure
     data = test-failure/expected test-failure/Recipe
   }
+  minimum-version-older {
+    command = ./src/test-runner minimum-version-older
+    data = minimum-version-older/expected minimum-version-older/Recipe
+  }
+  minimum-version-newer {
+    command = ./src/test-runner minimum-version-newer
+    data = minimum-version-newer/expected minimum-version-newer/Recipe
+  }
 
   unknown-program {
     command = ./src/test-runner unknown-program

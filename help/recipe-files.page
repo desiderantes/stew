@@ -30,6 +30,9 @@ project {
 </code>
 </example>
 <p>
+Optionally you can specify the minimum version of Bake required by specifying <em>project.minimum-bake-version</em>.
+</p>
+<p>
 To make your project more managable you can have recipe files in the subdirectories under the toplevel recipe file.
 Each recipe inherits all the variables from the parent so you can define common values in one recipe and use them in any recipes below this one.
 You can run Bake from any directory containing a recipe; it will find the toplevel one itself and load all its decendendants.

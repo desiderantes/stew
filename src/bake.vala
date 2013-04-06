@@ -580,6 +580,13 @@ public class Bake
             toplevel_dir = Path.get_dirname (toplevel_dir);
         }
 
+        var minimum_bake_version = toplevel.get_variable ("project.minimum-bake-version");
+        if (minimum_bake_version != null && pkg_compare_version (VERSION, minimum_bake_version) < 0)
+        {
+            printerr ("Unable to build: Bake version %s is older than project required version %s\n", VERSION, minimum_bake_version);
+            return Posix.EXIT_FAILURE;
+        }
+
         if (do_unconfigure)
         {
             FileUtils.unlink (Path.build_filename (toplevel_dir, "Recipe.conf"));
