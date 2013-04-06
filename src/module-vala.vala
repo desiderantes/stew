@@ -48,26 +48,9 @@ public class ValaModule : BuildModule
         }
 
         /* Generate pkg-config file */
-        var filename = "%s-%s.pc".printf (library.name, major_version);
         var name = library.name;
-        var description = library.get_variable ("description", "");
-        var requires = library.get_variable ("requires", "");
 
         var include_directory = Path.build_filename (recipe.include_directory, "%s-%s".printf (library.name, major_version));
-
-        rule = recipe.add_rule ();
-        recipe.build_rule.add_input (filename);
-        rule.add_output (filename);
-        rule.add_status_command ("PKG-CONFIG %s".printf (filename));
-        rule.add_command ("@echo \"Name: %s\" > %s".printf (name, filename));
-        rule.add_command ("@echo \"Description: %s\" >> %s".printf (description, filename));
-        rule.add_command ("@echo \"Version: %s\" >> %s".printf (version, filename));
-        rule.add_command ("@echo \"Requires: %s\" >> %s".printf (requires, filename));
-        rule.add_command ("@echo \"Libs: -L%s -l%s\" >> %s".printf (library.install_directory, library.name, filename));
-        rule.add_command ("@echo \"Cflags: -I%s\" >> %s".printf (include_directory, filename));
-
-        if (library.install)
-            recipe.add_install_rule (filename, Path.build_filename (library.install_directory, "pkgconfig"));
 
         var h_filename = library.get_variable ("vala-header-name");
         if (h_filename == null)
