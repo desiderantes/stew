@@ -3,6 +3,7 @@ Overview of changes in bake 0.1.18
     * Remove pkg-config autogeneration - it is better to let the user do this
     * Add project.minimum-bake-version so a project can specify what version of
       Bake is required to build
+    * Rework test support - tests are now connected to programs
 
 Overview of changes in bake 0.1.17
 

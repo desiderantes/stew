@@ -1,0 +1,20 @@
+!bake
+(exit SUCCESS)
+!bake test
+mkdir -p .built
+# FIXME: Order is broken
+bake-test run .built/test.test1-pass.test-results ./test
+bake-test run .built/test.test3-pass.test-results ./test
+bake-test run .built/test.test2-pass.test-results ./test
+bake-test check .built/test.test1-pass.test-results .built/test.test3-pass.test-results .built/test.test2-pass.test-results
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/bin
+cp test /usr/bin/test
+(exit SUCCESS)
+!bake uninstall
+rm -f /usr/bin/test
+(exit SUCCESS)
+!bake clean
+rm -rf .built/
+(exit SUCCESS)

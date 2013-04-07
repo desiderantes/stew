@@ -56,4 +56,9 @@ When building Bake will compile example-program.c and produce the program <em>ex
 When <link xref="installing">installing</link> Bake will install <em>example-program</em> into the appropriate directory.
 </p>
 </example>
+<note>
+<p>
+Programs can contain <link xref="tests">tests</link>.
+</p>
+</note>
 </page>

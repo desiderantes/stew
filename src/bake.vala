@@ -453,7 +453,21 @@ public class Bake
             }
 
             if (buildable_modules.length () > 0)
+            {
                 buildable_modules.nth_data (0).generate_program_rules (recipe, program);
+
+                foreach (var test_id in recipe.get_variable_children ("programs.%s.tests".printf (id)))
+                {
+                    var command = "./%s".printf (program.name); // FIXME: Might not be called this for some compilers
+                    var args = recipe.get_variable ("programs.%s.tests.%s.args".printf (id, test_id));
+                    if (args != null)
+                        command += " " + args;
+                    var results_filename = recipe.get_build_path ("%s.%s.test-results".printf (id, test_id));
+                    recipe.test_rule.add_output (results_filename);
+                    recipe.test_rule.add_status_command ("TEST %s.%s".printf (id, test_id));
+                    recipe.test_rule.add_command ("@bake-test run %s %s".printf (results_filename, command));
+                }
+            }
             else
             {
                 var rule = recipe.add_rule ();
@@ -501,6 +515,27 @@ public class Bake
         recipe.generate_clean_rule ();
         foreach (var child in recipe.children)
             generate_clean_rules (child);
+    }
+
+    private static void generate_test_rule (Recipe recipe)
+    {
+        var targets = new List<string> ();
+        get_test_targets (recipe, ref targets);
+
+        var command = "@bake-test check";
+        foreach (var t in targets)
+            command += " " + get_relative_path (recipe.dirname, t);
+
+        recipe.test_rule.add_command (command);
+    }
+
+    private static void get_test_targets (Recipe recipe, ref List<string> targets)
+    {
+        foreach (var input in recipe.test_rule.outputs)
+            if (input != "%test")
+                targets.append (Path.build_filename (recipe.dirname, input));
+        foreach (var child in recipe.children)
+            get_test_targets (child, ref targets);
     }
 
     public static int main (string[] args)
@@ -553,7 +588,6 @@ public class Bake
         modules.append (new RPMModule ());
         modules.append (new ScriptModule ());
         modules.append (new TemplateModule ());
-        modules.append (new TestModule ());
         modules.append (new ValaModule ());
         modules.append (new XdgModule ());
         modules.append (new XZIPModule ());
@@ -722,27 +756,6 @@ public class Bake
         conf_file.children.append (toplevel);
         toplevel.parent = conf_file;
 
-        /* Generate implicit rules */
-        foreach (var module in modules)
-            module.generate_toplevel_rules (toplevel);
-
-        /* Generate libraries first (as other things may depend on it) then the other rules */
-        generate_library_rules (toplevel);
-        generate_program_rules (toplevel);
-        generate_data_rules (toplevel);
-        generate_rules (toplevel);
-
-        /* Generate clean rule */
-        generate_clean_rules (toplevel);
-
-        /* Optimise */
-        toplevel.targets = new HashTable<string, Rule> (str_hash, str_equal);
-        optimise (toplevel.targets, toplevel);
-
-        recipe_complete (toplevel);
-        foreach (var module in modules)
-            module.rules_complete (toplevel);
-
         /* Find the recipe in the current directory */
         var recipe = toplevel;
         while (recipe.dirname != original_dir)
@@ -757,6 +770,30 @@ public class Bake
                 }
             }
         }
+
+        /* Generate implicit rules */
+        foreach (var module in modules)
+            module.generate_toplevel_rules (toplevel);
+
+        /* Generate libraries first (as other things may depend on it) then the other rules */
+        generate_library_rules (toplevel);
+        generate_program_rules (toplevel);
+        generate_data_rules (toplevel);
+        generate_rules (toplevel);
+
+        /* Generate clean rule */
+        generate_clean_rules (toplevel);
+
+        /* Generate test rule */
+        generate_test_rule (recipe);
+
+        /* Optimise */
+        toplevel.targets = new HashTable<string, Rule> (str_hash, str_equal);
+        optimise (toplevel.targets, toplevel);
+
+        recipe_complete (toplevel);
+        foreach (var module in modules)
+            module.rules_complete (toplevel);
 
         if (do_expand)
         {

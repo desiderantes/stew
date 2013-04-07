@@ -1,5 +1,0 @@
-!bake test
-#true
-#false
-#true
-(exit FAILURE)

@@ -36,7 +36,6 @@ SOURCES = src/bake.vala \
           src/module-rpm.vala \
           src/module-script.vala \
           src/module-template.vala \
-          src/module-test.vala \
           src/module-vala.vala \
           src/module-xdg.vala \
           src/module-xzip.vala \
@@ -46,7 +45,10 @@ SOURCES = src/bake.vala \
 bake-template: src/bake-template.vala
 	valac -o bake-template --pkg=posix src/bake-template.vala
 
-bake-bootstrap: $(SOURCES) bake-template
+bake-test: src/bake-test.vala
+	valac -o bake-test --pkg=posix src/bake-test.vala
+
+bake-bootstrap: $(SOURCES) bake-template bake-test
 	valac -o bake-bootstrap $(PACKAGES) --Xcc='-DGETTEXT_PACKAGE="C"' --Xcc='-DLIBRARY_DIRECTORY="$(LIBRARY_DIRECTORY)"' $(SOURCES)
 
 install: bake-bootstrap
@@ -62,5 +64,5 @@ release: bake-bootstrap
 	PATH=`pwd`:$$PATH ./bake-bootstrap release
 
 clean:
-	if [ -e bake-bootstrap ] ; then PATH=`pwd`:$$PATH ./bake-bootstrap clean ; rm -f bake-bootstrap bake-template ; fi
+	if [ -e bake-bootstrap ] ; then PATH=`pwd`:$$PATH ./bake-bootstrap clean ; rm -f bake-bootstrap bake-template bake-test ; fi
 

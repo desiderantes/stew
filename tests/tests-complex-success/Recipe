@@ -1,0 +1,17 @@
+project {
+  name = test
+}
+
+programs.test {
+  tests {
+    test1-pass {
+      name = Test1
+    }
+    test2-pass {
+      name = Test2
+    }
+    test3-pass {
+      name = Test3
+    }
+  }
+}

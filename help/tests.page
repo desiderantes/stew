@@ -6,10 +6,57 @@
 <title>Tests</title>
 
 <p>
-A <em>test</em> is a command that should be run in your project to confirm it is working.
-Tests provide a good method of catching regressions in your project, but frequently running them when you make changes.
+Bake provides a way to run the <link xref="programs">programs</link> in a project to test they are correctly working.
+If the program returns an error code, then Bake considers the test to have failed.
+Tests provide a good method of catching regressions in your project if run after changes are made.
+The <em>test</em> <link xref="rules">rule</link> runs the tests from the current recipe and any child recipes.
 </p>
 <p>
-FIXME
+To specify a test you need to set <code>programs.<em>program-name</em>.tests.<em>test-name</em>.*</code> <link xref="variables">variables</link> where <em>test-name</em> is a unique name for the test.
+The following variables are allowed:
 </p>
+<table frame="all" shade="rows">
+<thead>
+<tr>
+  <td><p>Name</p></td>
+  <td><p>Description</p></td>
+</tr>
+</thead>
+<tr>
+  <td><p>name</p></td>
+  <td><p>The name of the tests (defaults to <em>test-name</em>)</p></td>
+</tr>
+<tr>
+  <td><p>args</p></td>
+  <td><p>Arguments to pass to the program to test it (optional)</p></td>
+</tr>
+</table>
+<example>
+<p>
+The following describes a simple <link xref="c">C program</link> that has one test.
+</p>
+<code>
+programs.example-program {
+  sources = main.c
+  tests {
+    args = --test
+  }
+}
+</code>
+<p>
+When you run the following command:
+</p>
+<code>
+bake test
+</code>
+<p>
+<code>example-program --test</code> will be run and the tests will considered to have failed if the program returns an error code.
+</p>
+</example>
+<note>
+<p>
+To test your programs or libaries you might have to make to make a test program (e.g. a <link xref="scripts">script</link>) to run the tests against.
+Set the <em>install=false</em> variable so this program is not installed.
+</p>
+</note>
 </page>

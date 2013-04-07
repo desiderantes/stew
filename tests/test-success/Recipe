@@ -1,9 +1,0 @@
-project {
-  name = test
-}
-
-tests {
-  first.command = true
-  second.command = true
-  third.command = true
-}

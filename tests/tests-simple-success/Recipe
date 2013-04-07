@@ -1,0 +1,11 @@
+project {
+  name = test
+}
+
+programs.test {
+  tests {
+    test1-pass {
+      name = Test1
+    }
+  }
+}
