@@ -203,6 +203,9 @@ programs.test-runner {
     vala-program-complex {
       args = vala-program-complex
     }
+    vala-program-source-directories {
+      args = vala-program-source-directories
+    }
     vala-library-simple {
       args = vala-library-simple
     }
@@ -568,6 +571,13 @@ data.tests {
           vala-program-complex/test1.vala \
           vala-program-complex/test2.vala \
           vala-program-complex/test3.vala \
+          vala-program-source-directories/expected \
+          vala-program-source-directories/Recipe \
+          vala-program-source-directories/parent.vala \
+          vala-program-source-directories/src/Recipe \
+          vala-program-source-directories/src/test.vala \
+          vala-program-source-directories/src/child/child.vala \
+          vala-program-source-directories/uncle/uncle.vala \
           vala-library-simple/expected \
           vala-library-simple/Recipe \
           vala-library-simple/test.vala \

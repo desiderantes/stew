@@ -1,0 +1,6 @@
+programs.test {
+  sources = test.vala \
+            child/child.vala \
+            ../parent.vala \
+            ../uncle/uncle.vala
+}

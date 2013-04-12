@@ -269,7 +269,9 @@ public class ValaModule : BuildModule
             if (!source.has_suffix (".vala"))
                 continue;
 
-            var vapi_filename = recipe.get_build_path ("%s".printf (replace_extension (source, "vapi")));
+            var source_base = Path.get_basename (source);
+
+            var vapi_filename = recipe.get_build_path ("%s".printf (replace_extension (source_base, "vapi")));
             var vapi_stamp_filename = "%s-stamp".printf (vapi_filename);
 
             /* Build a fastvapi file */
@@ -289,9 +291,15 @@ public class ValaModule : BuildModule
                 interface_command += " --use-fast-vapi=%s".printf (vapi_filename);
             }
 
-            var c_filename = recipe.get_build_path (replace_extension (source, "c"));
-            var o_filename = recipe.get_build_path (replace_extension (source, "o"));
+            var c_filename = recipe.get_build_path (replace_extension (source_base, "c"));
+            var o_filename = recipe.get_build_path (replace_extension (source_base, "o"));
             var c_stamp_filename = "%s-stamp".printf (c_filename);
+
+            /* valac doesn't allow the output file to be configured so we have to work out where it will write to
+             * https://bugzilla.gnome.org/show_bug.cgi?id=638871 */
+            var valac_c_filename = replace_extension (source, "c");
+            if (source.has_prefix (".."))
+                valac_c_filename = replace_extension (Path.get_basename (source), "c");
 
             /* Build a C file */
             rule = recipe.add_rule ();
@@ -313,15 +321,17 @@ public class ValaModule : BuildModule
                 }
                 else
                 {
-                    var other_vapi_filename = recipe.get_build_path ("%s".printf (replace_extension (s, "vapi")));
+                    var s_base = Path.get_basename (s);
+                    var other_vapi_filename = recipe.get_build_path ("%s".printf (replace_extension (s_base, "vapi")));
                     command += " --use-fast-vapi=%s".printf (other_vapi_filename);
                     rule.add_input (other_vapi_filename);
                 }
             }
             rule.add_status_command ("VALAC %s".printf (source));
             rule.add_command (command);
-            /* valac always writes the c files into the same directory, so move them */
-            rule.add_command ("@mv %s %s".printf (replace_extension (source, "c"), c_filename));
+            /* valac doesn't allow the output file to be configured so we have to move them
+             * https://bugzilla.gnome.org/show_bug.cgi?id=638871 */
+            rule.add_command ("@mv %s %s".printf (valac_c_filename, c_filename));
             rule.add_command ("@touch %s".printf (c_stamp_filename));
 
             /* Compile C code */

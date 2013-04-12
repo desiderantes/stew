@@ -1,0 +1,39 @@
+!bake
+# Note we can't really tell which directory this is occurring in, but in this case it should all be in src/
+mkdir -p .built
+valac --fast-vapi=.built/child.vapi child/child.vala
+touch .built/child.vapi-stamp
+valac --fast-vapi=.built/parent.vapi ../parent.vala
+touch .built/parent.vapi-stamp
+valac --fast-vapi=.built/uncle.vapi ../uncle/uncle.vala
+touch .built/uncle.vapi-stamp
+valac --ccode test.vala --use-fast-vapi=.built/child.vapi --use-fast-vapi=.built/parent.vapi --use-fast-vapi=.built/uncle.vapi
+touch .built/test.c-stamp
+gcc -Wno-unused -Wno-deprecated-declarations -Igobject -Iglib -c .built/test.c -o .built/test.o
+valac --fast-vapi=.built/test.vapi test.vala
+touch .built/test.vapi-stamp
+valac --ccode child/child.vala --use-fast-vapi=.built/test.vapi --use-fast-vapi=.built/parent.vapi --use-fast-vapi=.built/uncle.vapi
+touch .built/child.c-stamp
+gcc -Wno-unused -Wno-deprecated-declarations -Igobject -Iglib -c .built/child.c -o .built/child.o
+valac --ccode ../parent.vala --use-fast-vapi=.built/test.vapi --use-fast-vapi=.built/child.vapi --use-fast-vapi=.built/uncle.vapi
+touch .built/parent.c-stamp
+gcc -Wno-unused -Wno-deprecated-declarations -Igobject -Iglib -c .built/parent.c -o .built/parent.o
+valac --ccode ../uncle/uncle.vala --use-fast-vapi=.built/test.vapi --use-fast-vapi=.built/child.vapi --use-fast-vapi=.built/parent.vapi
+touch .built/uncle.c-stamp
+gcc -Wno-unused -Wno-deprecated-declarations -Igobject -Iglib -c .built/uncle.c -o .built/uncle.o
+gcc -o test .built/test.o .built/child.o .built/parent.o .built/uncle.o -lgobject -lglib
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/bin
+cp test /usr/bin/test
+(exit SUCCESS)
+!bake uninstall
+rm -f /usr/bin/test
+(exit SUCCESS)
+!bake uninstall
+rm -f /usr/bin/test
+(exit SUCCESS)
+!bake clean
+rm -f test
+rm -rf .built/
+(exit SUCCESS)

@@ -55,7 +55,12 @@ public class Valac
             else
             {
                 if (generate_ccode && args[i].has_suffix (".vala"))
-                    create_file (args[i].substring (0, args[i].length - 5) + ".c");
+                {
+                    var filename = args[i];
+                    if (filename.has_prefix (".."))
+                        filename = Path.get_basename (filename);
+                    create_file (filename.substring (0, filename.length - 5) + ".c");
+                }
             }
         }
 
