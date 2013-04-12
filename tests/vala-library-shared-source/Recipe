@@ -1,0 +1,11 @@
+project {
+  name = test
+}
+
+libraries.test1 {
+  sources = test1.vala shared.vala
+}
+
+libraries.test2 {
+  sources = test2.vala shared.vala
+}

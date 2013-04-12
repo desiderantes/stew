@@ -1,0 +1,39 @@
+!bake
+mkdir -p .built
+valac --fast-vapi=.built/test1-shared.vapi shared.vala
+touch .built/test1-shared.vapi-stamp
+valac --ccode test1.vala --use-fast-vapi=.built/test1-shared.vapi
+touch .built/test1-test1.c-stamp
+gcc -Wno-unused -Wno-deprecated-declarations -Igobject -Iglib -c .built/test1-test1.c -o .built/test1-test1.o
+valac --fast-vapi=.built/test1-test1.vapi test1.vala
+touch .built/test1-test1.vapi-stamp
+valac --ccode shared.vala --use-fast-vapi=.built/test1-test1.vapi
+touch .built/test1-shared.c-stamp
+gcc -Wno-unused -Wno-deprecated-declarations -Igobject -Iglib -c .built/test1-shared.c -o .built/test1-shared.o
+gcc -o test1 .built/test1-test1.o .built/test1-shared.o -lgobject -lglib
+valac --fast-vapi=.built/test2-shared.vapi shared.vala
+touch .built/test2-shared.vapi-stamp
+valac --ccode test2.vala --use-fast-vapi=.built/test2-shared.vapi
+touch .built/test2-test2.c-stamp
+gcc -Wno-unused -Wno-deprecated-declarations -Igobject -Iglib -c .built/test2-test2.c -o .built/test2-test2.o
+valac --fast-vapi=.built/test2-test2.vapi test2.vala
+touch .built/test2-test2.vapi-stamp
+valac --ccode shared.vala --use-fast-vapi=.built/test2-test2.vapi
+touch .built/test2-shared.c-stamp
+gcc -Wno-unused -Wno-deprecated-declarations -Igobject -Iglib -c .built/test2-shared.c -o .built/test2-shared.o
+gcc -o test2 .built/test2-test2.o .built/test2-shared.o -lgobject -lglib
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/bin
+cp test1 /usr/bin/test1
+cp test2 /usr/bin/test2
+(exit SUCCESS)
+!bake uninstall
+rm -f /usr/bin/test1
+rm -f /usr/bin/test2
+(exit SUCCESS)
+!bake clean
+rm -f test1
+rm -rf .built/
+rm -f test2
+(exit SUCCESS)

@@ -1,0 +1,11 @@
+project {
+  name = test
+}
+
+programs.test1 {
+  sources = test1.vala shared.vala
+}
+
+programs.test2 {
+  sources = test2.vala shared.vala
+}

@@ -271,7 +271,7 @@ public class ValaModule : BuildModule
 
             var source_base = Path.get_basename (source);
 
-            var vapi_filename = recipe.get_build_path ("%s".printf (replace_extension (source_base, "vapi")));
+            var vapi_filename = recipe.get_build_path ("%s-%s".printf (compilable.id, replace_extension (source_base, "vapi")));
             var vapi_stamp_filename = "%s-stamp".printf (vapi_filename);
 
             /* Build a fastvapi file */
@@ -291,8 +291,8 @@ public class ValaModule : BuildModule
                 interface_command += " --use-fast-vapi=%s".printf (vapi_filename);
             }
 
-            var c_filename = recipe.get_build_path (replace_extension (source_base, "c"));
-            var o_filename = recipe.get_build_path (replace_extension (source_base, "o"));
+            var c_filename = recipe.get_build_path (compilable.id + "-" + replace_extension (source_base, "c"));
+            var o_filename = recipe.get_build_path (compilable.id + "-" + replace_extension (source_base, "o"));
             var c_stamp_filename = "%s-stamp".printf (c_filename);
 
             /* valac doesn't allow the output file to be configured so we have to work out where it will write to
@@ -322,7 +322,7 @@ public class ValaModule : BuildModule
                 else
                 {
                     var s_base = Path.get_basename (s);
-                    var other_vapi_filename = recipe.get_build_path ("%s".printf (replace_extension (s_base, "vapi")));
+                    var other_vapi_filename = recipe.get_build_path ("%s-%s".printf (compilable.id, replace_extension (s_base, "vapi")));
                     command += " --use-fast-vapi=%s".printf (other_vapi_filename);
                     rule.add_input (other_vapi_filename);
                 }
