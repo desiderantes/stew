@@ -93,6 +93,9 @@ programs.test-runner {
     c-program-complex {
       args = c-program-complex
     }
+    c-program-source-directories {
+      args = c-program-source-directories
+    }
     c-program-library {
       args = c-program-library
     }
@@ -450,6 +453,13 @@ data.tests {
           c-program-complex/test1.c \
           c-program-complex/test2.c \
           c-program-complex/test3.c \
+          c-program-source-directories/expected \
+          c-program-source-directories/Recipe \
+          c-program-source-directories/parent.c \
+          c-program-source-directories/src/Recipe \
+          c-program-source-directories/src/test.c \
+          c-program-source-directories/src/child/child.c \
+          c-program-source-directories/uncle/uncle.c \
           c-program-library/expected \
           c-program-library/Recipe \
           c-program-library/test.c \

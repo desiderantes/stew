@@ -1,0 +1,6 @@
+programs.test {
+  sources = test.c \
+            child/child.c \
+            ../parent.c \
+            ../uncle/uncle.c
+}

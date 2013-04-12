@@ -227,9 +227,11 @@ public class GCCModule : BuildModule
         /* Compile */
         foreach (var source in compilable.sources)
         {
+            var source_base = Path.get_basename (source);
+
             var input = source;
-            var output = recipe.get_build_path (replace_extension (source, "o"));
-            var deps_file = recipe.get_build_path (replace_extension (source, "d"));
+            var output = recipe.get_build_path (replace_extension (source_base, "o"));
+            var deps_file = recipe.get_build_path (replace_extension (source_base, "d"));
             var moc_file = replace_extension (source, "moc");
 
             var rule = recipe.add_rule ();
@@ -296,7 +298,7 @@ public class GCCModule : BuildModule
         List<string> includes = null;
 
         /* Get dependencies for this file, it will not exist if the file hasn't built (but then we don't need it) */
-        var deps_file = recipe.get_build_path (replace_extension (filename, "d"));
+        var deps_file = recipe.get_build_path (replace_extension (Path.get_basename (filename), "d"));
         string data;
         try
         {
