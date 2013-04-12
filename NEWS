@@ -1,3 +1,7 @@
+Overview of changes in bake 0.1.19
+
+    * Fix relative sources not working for C and Vala programs/libraries
+
 Overview of changes in bake 0.1.18
 
     * Remove pkg-config autogeneration - it is better to let the user do this
