@@ -3,6 +3,7 @@ public class Recipe
     public string filename;
     public Recipe? parent = null;
     public List<Recipe> children;
+    private List<string> variable_names;
     private HashTable<string, string> variables;
     public List<Rule> rules;
     public Rule build_rule;
@@ -54,6 +55,7 @@ public class Recipe
     {
         this.filename = filename;
 
+        variable_names = new List<string> ();
         variables = new HashTable<string, string> (str_hash, str_equal);
 
         string contents;
@@ -121,15 +123,15 @@ public class Recipe
     {
         var children = new List<string> ();
         var prefix = name + ".";
-        foreach (var variable_name in variables.get_keys ())
+        foreach (var n in variable_names)
         {
-            if (!variable_name.has_prefix (prefix))
+            if (!n.has_prefix (prefix))
                 continue;
 
             var length = 0;
-            while (variable_name[prefix.length + 1 + length] != '.' && variable_name[prefix.length + 1 + length] != '\0')
+            while (n[prefix.length + 1 + length] != '.' && n[prefix.length + 1 + length] != '\0')
                 length++;
-            var child_name = variable_name.substring (prefix.length, length + 1);
+            var child_name = n.substring (prefix.length, length + 1);
             if (has_value (children, child_name))
                 continue;
 
@@ -149,6 +151,7 @@ public class Recipe
 
     public void set_variable (string name, string value)
     {
+        variable_names.append (name);
         variables.insert (name, value);
     }
 
@@ -229,7 +232,7 @@ public class Recipe
                     name = "%s.%s".printf (variable_stack.nth_data (0), name);
                 var value = strip (statement.substring (index + 1));
 
-                variables.insert (name, value);
+                set_variable (name, value);
                 continue;
             }
 
@@ -469,7 +472,7 @@ public class Recipe
 
     public void print ()
     {
-        foreach (var name in variables.get_keys ())
+        foreach (var name in variable_names)
             stdout.printf ("%s=%s\n", name, get_variable (name));
         foreach (var rule in rules)
         {
