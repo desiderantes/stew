@@ -1,61 +1,61 @@
 programs.touch {
-  sources = touch.vala
+  sources = touch.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.ar {
-  sources = ar.vala
+  sources = ar.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.cat {
-  sources = cat.vala
+  sources = cat.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.cp {
-  sources = cp.vala
+  sources = cp.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.mkdir {
-  sources = mkdir.vala
+  sources = mkdir.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.rm {
-  sources = rm.vala
+  sources = rm.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.gcc {
-  sources = gcc.vala
+  sources = gcc.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.g++ {
-  sources = g++.vala
+  sources = g++.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.python {
-  sources = python.vala
+  sources = python.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
@@ -63,7 +63,7 @@ programs.python {
 
 programs.python27 {
   name = python2.7
-  sources = python.vala
+  sources = python.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
@@ -71,168 +71,168 @@ programs.python27 {
 
 programs.python32 {
   name = python3.2
-  sources = python3.vala
+  sources = python3.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.ghc {
-  sources = ghc.vala
+  sources = ghc.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.gccgo {
-  sources = gccgo.vala
+  sources = gccgo.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.valac {
-  sources = valac.vala
+  sources = valac.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.javac {
-  sources = javac.vala
+  sources = javac.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.jar {
-  sources = jar.vala
+  sources = jar.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.gmcs {
-  sources = gmcs.vala
+  sources = gmcs.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.dpkg-buildpackage {
-  sources = dpkg-buildpackage.vala
+  sources = dpkg-buildpackage.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.dpkg-architecture {
-  sources = dpkg-architecture.vala
+  sources = dpkg-architecture.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.tar {
-  sources = tar.vala
+  sources = tar.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.rpmbuild {
-  sources = rpmbuild.vala
+  sources = rpmbuild.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.lp-project-upload {
-  sources = lp-project-upload.vala
+  sources = lp-project-upload.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.dput {
-  sources = dput.vala
+  sources = dput.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.ssh {
-  sources = ssh.vala
+  sources = ssh.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.scp {
-  sources = scp.vala
+  sources = scp.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.bake-gettext {
-  sources = bake-gettext.vala
+  sources = bake-gettext.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.bake-template {
-  sources = bake-template.vala
+  sources = bake-template.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.bake-test {
-  sources = bake-test.vala
+  sources = bake-test.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.msgcat {
-  sources = msgcat.vala
+  sources = msgcat.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.msgfmt {
-  sources = msgfmt.vala
+  sources = msgfmt.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.g-ir-scanner {
-  sources = g-ir-scanner.vala
+  sources = g-ir-scanner.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.g-ir-compiler {
-  sources = g-ir-compiler.vala
+  sources = g-ir-compiler.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.moc {
-  sources = moc.vala
+  sources = moc.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
 }
 
 programs.itstool {
-  sources = itstool.vala
+  sources = itstool.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
