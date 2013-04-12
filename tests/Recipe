@@ -93,8 +93,8 @@ programs.test-runner {
     c-program-complex {
       args = c-program-complex
     }
-    c-program-source-directories {
-      args = c-program-source-directories
+    c-program-relative-directories {
+      args = c-program-relative-directories
     }
     c-program-library {
       args = c-program-library
@@ -206,8 +206,8 @@ programs.test-runner {
     vala-program-complex {
       args = vala-program-complex
     }
-    vala-program-source-directories {
-      args = vala-program-source-directories
+    vala-program-relative-directories {
+      args = vala-program-relative-directories
     }
     vala-library-simple {
       args = vala-library-simple
@@ -453,13 +453,13 @@ data.tests {
           c-program-complex/test1.c \
           c-program-complex/test2.c \
           c-program-complex/test3.c \
-          c-program-source-directories/expected \
-          c-program-source-directories/Recipe \
-          c-program-source-directories/parent.c \
-          c-program-source-directories/src/Recipe \
-          c-program-source-directories/src/test.c \
-          c-program-source-directories/src/child/child.c \
-          c-program-source-directories/uncle/uncle.c \
+          c-program-relative-directories/expected \
+          c-program-relative-directories/Recipe \
+          c-program-relative-directories/parent.c \
+          c-program-relative-directories/src/Recipe \
+          c-program-relative-directories/src/test.c \
+          c-program-relative-directories/src/child/child.c \
+          c-program-relative-directories/uncle/uncle.c \
           c-program-library/expected \
           c-program-library/Recipe \
           c-program-library/test.c \
@@ -581,13 +581,13 @@ data.tests {
           vala-program-complex/test1.vala \
           vala-program-complex/test2.vala \
           vala-program-complex/test3.vala \
-          vala-program-source-directories/expected \
-          vala-program-source-directories/Recipe \
-          vala-program-source-directories/parent.vala \
-          vala-program-source-directories/src/Recipe \
-          vala-program-source-directories/src/test.vala \
-          vala-program-source-directories/src/child/child.vala \
-          vala-program-source-directories/uncle/uncle.vala \
+          vala-program-relative-directories/expected \
+          vala-program-relative-directories/Recipe \
+          vala-program-relative-directories/parent.vala \
+          vala-program-relative-directories/src/Recipe \
+          vala-program-relative-directories/src/test.vala \
+          vala-program-relative-directories/src/child/child.vala \
+          vala-program-relative-directories/uncle/uncle.vala \
           vala-library-simple/expected \
           vala-library-simple/Recipe \
           vala-library-simple/test.vala \
