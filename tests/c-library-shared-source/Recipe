@@ -1,0 +1,11 @@
+project {
+  name = test
+}
+
+libraries.test1 {
+  sources = test1.c shared.c
+}
+
+libraries.test2 {
+  sources = test2.c shared.c
+}

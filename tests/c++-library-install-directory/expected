@@ -1,8 +1,8 @@
 !bake
 mkdir -p .built
-g++ -fPIC -MMD -MF .built/test.d -c test.cpp -o .built/test.o
-g++ -o libtest.so.0 -shared .built/test.o
-ar -cq libtest.a .built/test.o
+g++ -fPIC -MMD -MF .built/test-test.d -c test.cpp -o .built/test-test.o
+g++ -o libtest.so.0 -shared .built/test-test.o
+ar -cq libtest.a .built/test-test.o
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/lib/test

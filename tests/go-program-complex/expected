@@ -1,9 +1,9 @@
 !bake
 mkdir -p .built
-gccgo -c test1.go -o .built/test1.o
-gccgo -c test2.go -o .built/test2.o
-gccgo -c test3.go -o .built/test3.o
-gccgo -o test .built/test1.o .built/test2.o .built/test3.o
+gccgo -c test1.go -o .built/test-test1.o
+gccgo -c test2.go -o .built/test-test2.o
+gccgo -c test3.go -o .built/test-test3.o
+gccgo -o test .built/test-test1.o .built/test-test2.o .built/test-test3.o
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/bin

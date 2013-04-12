@@ -230,15 +230,15 @@ public class GCCModule : BuildModule
             var source_base = Path.get_basename (source);
 
             var input = source;
-            var output = recipe.get_build_path (replace_extension (source_base, "o"));
-            var deps_file = recipe.get_build_path (replace_extension (source_base, "d"));
+            var output = recipe.get_build_path (compilable.id + "-" + replace_extension (source_base, "o"));
+            var deps_file = recipe.get_build_path (compilable.id + "-" + replace_extension (source_base, "d"));
             var moc_file = replace_extension (source, "moc");
 
             var rule = recipe.add_rule ();
             rule.add_input (input);
             if (compiler == "gcc" || compiler == "g++")
             {
-                var includes = get_includes (recipe, source);
+                var includes = get_includes (recipe, deps_file);
                 foreach (var include in includes)
                     rule.add_input (include);
             }
@@ -298,11 +298,10 @@ public class GCCModule : BuildModule
         List<string> includes = null;
 
         /* Get dependencies for this file, it will not exist if the file hasn't built (but then we don't need it) */
-        var deps_file = recipe.get_build_path (replace_extension (Path.get_basename (filename), "d"));
         string data;
         try
         {
-            FileUtils.get_contents (deps_file, out data);
+            FileUtils.get_contents (filename, out data);
         }
         catch (FileError e)
         {

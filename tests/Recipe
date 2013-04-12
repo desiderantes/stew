@@ -96,6 +96,9 @@ programs.test-runner {
     c-program-relative-directories {
       args = c-program-relative-directories
     }
+    c-program-shared-source {
+      args = c-program-shared-source
+    }
     c-program-library {
       args = c-program-library
     }
@@ -128,6 +131,9 @@ programs.test-runner {
     }
     c-library-relative-directories {
       args = c-library-relative-directories
+    }
+    c-library-shared-source {
+      args = c-library-shared-source
     }
 
     # C++ tests
@@ -466,6 +472,11 @@ data.tests {
           c-program-relative-directories/src/test.c \
           c-program-relative-directories/src/child/child.c \
           c-program-relative-directories/uncle/uncle.c \
+          c-program-shared-source/expected \
+          c-program-shared-source/Recipe \
+          c-program-shared-source/shared.c \
+          c-program-shared-source/test1.c \
+          c-program-shared-source/test2.c \
           c-program-library/expected \
           c-program-library/Recipe \
           c-program-library/test.c \
@@ -506,6 +517,11 @@ data.tests {
           c-library-relative-directories/src/test.c \
           c-library-relative-directories/src/child/child.c \
           c-library-relative-directories/uncle/uncle.c \
+          c-library-shared-source/expected \
+          c-library-shared-source/Recipe \
+          c-library-shared-source/shared.c \
+          c-library-shared-source/test1.c \
+          c-library-shared-source/test2.c \
           c++-program-simple/expected \
           c++-program-simple/Recipe \
           c++-program-simple/test.cpp \

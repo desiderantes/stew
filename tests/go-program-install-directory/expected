@@ -1,7 +1,7 @@
 !bake
 mkdir -p .built
-gccgo -c test.go -o .built/test.o
-gccgo -o test .built/test.o
+gccgo -c test.go -o .built/test-test.o
+gccgo -o test .built/test-test.o
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/bin/test

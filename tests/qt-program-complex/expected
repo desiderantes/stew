@@ -1,12 +1,12 @@
 !bake
 moc -o test1.moc test1.cpp
 mkdir -p .built
-g++ -MMD -MF .built/test1.d -c test1.cpp -o .built/test1.o
+g++ -MMD -MF .built/test-test1.d -c test1.cpp -o .built/test-test1.o
 moc -o test2.moc test2.cpp
-g++ -MMD -MF .built/test2.d -c test2.cpp -o .built/test2.o
+g++ -MMD -MF .built/test-test2.d -c test2.cpp -o .built/test-test2.o
 moc -o test3.moc test3.cpp
-g++ -MMD -MF .built/test3.d -c test3.cpp -o .built/test3.o
-g++ -o test .built/test1.o .built/test2.o .built/test3.o
+g++ -MMD -MF .built/test-test3.d -c test3.cpp -o .built/test-test3.o
+g++ -o test .built/test-test1.o .built/test-test2.o .built/test-test3.o
 bake-gettext --mime-type text/x-c++src --output .built/test1.cpp.pot test1.cpp
 bake-gettext --mime-type text/x-c++src --output .built/test2.cpp.pot test2.cpp
 bake-gettext --mime-type text/x-c++src --output .built/test3.cpp.pot test3.cpp

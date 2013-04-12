@@ -1,8 +1,8 @@
 !bake
 moc -o test.moc test.cpp
 mkdir -p .built
-g++ -MMD -MF .built/test.d -c test.cpp -o .built/test.o
-g++ -o test .built/test.o
+g++ -MMD -MF .built/test-test.d -c test.cpp -o .built/test-test.o
+g++ -o test .built/test-test.o
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/bin
