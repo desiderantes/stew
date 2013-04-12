@@ -1,0 +1,27 @@
+!bake
+# Note we can't really tell which directory this is occurring in, but in this case it should all be in src/
+mkdir -p .built
+gcc -fPIC -MMD -MF .built/test.d -c test.c -o .built/test.o
+gcc -fPIC -MMD -MF .built/child.d -c child/child.c -o .built/child.o
+gcc -fPIC -MMD -MF .built/parent.d -c ../parent.c -o .built/parent.o
+gcc -fPIC -MMD -MF .built/uncle.d -c ../uncle/uncle.c -o .built/uncle.o
+gcc -o libtest.so.0 -shared .built/test.o .built/child.o .built/parent.o .built/uncle.o
+ar -cq libtest.a .built/test.o .built/child.o .built/parent.o .built/uncle.o
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/lib
+cp libtest.so /usr/lib/libtest.so
+cp libtest.so.0 /usr/lib/libtest.so.0
+cp libtest.a /usr/lib/libtest.a
+(exit SUCCESS)
+!bake uninstall
+rm -f /usr/lib/libtest.so
+rm -f /usr/lib/libtest.so.0
+rm -f /usr/lib/libtest.a
+(exit SUCCESS)
+!bake clean
+rm -f libtest.so.0
+rm -f libtest.a
+rm -rf .built/
+rm -f libtest.so
+(exit SUCCESS)

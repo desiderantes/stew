@@ -126,6 +126,9 @@ programs.test-runner {
     c-library-complex {
       args = c-library-complex
     }
+    c-library-relative-directories {
+      args = c-library-relative-directories
+    }
 
     # C++ tests
     c++-program-simple {
@@ -223,6 +226,9 @@ programs.test-runner {
     }
     vala-library-complex {
       args = vala-library-complex
+    }
+    vala-library-relative-directories {
+      args = vala-library-relative-directories
     }
 
     # Java tests
@@ -493,6 +499,13 @@ data.tests {
           c-library-complex/test2.c \
           c-library-complex/test3.c \
           c-library-complex/test.h \
+          c-library-relative-directories/expected \
+          c-library-relative-directories/Recipe \
+          c-library-relative-directories/parent.c \
+          c-library-relative-directories/src/Recipe \
+          c-library-relative-directories/src/test.c \
+          c-library-relative-directories/src/child/child.c \
+          c-library-relative-directories/uncle/uncle.c \
           c++-program-simple/expected \
           c++-program-simple/Recipe \
           c++-program-simple/test.cpp \
@@ -605,6 +618,13 @@ data.tests {
           vala-library-complex/test1.vala \
           vala-library-complex/test2.vala \
           vala-library-complex/test3.vala \
+          vala-library-relative-directories/expected \
+          vala-library-relative-directories/Recipe \
+          vala-library-relative-directories/parent.vala \
+          vala-library-relative-directories/src/Recipe \
+          vala-library-relative-directories/src/test.vala \
+          vala-library-relative-directories/src/child/child.vala \
+          vala-library-relative-directories/uncle/uncle.vala \
           java-program-simple/expected \
           java-program-simple/Recipe \
           java-program-simple/Test.java \
