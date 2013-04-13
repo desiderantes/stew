@@ -54,6 +54,9 @@ bake-bootstrap: $(SOURCES) bake-template bake-test
 install: bake-bootstrap
 	PATH=`pwd`:$$PATH ./bake-bootstrap install
 
+uninstall: bake-bootstrap
+	PATH=`pwd`:$$PATH ./bake-bootstrap uninstall
+
 test: bake-bootstrap
 	PATH=`pwd`:$$PATH ./bake-bootstrap test
 
