@@ -16,5 +16,6 @@ cp test_1.0.orig.tar.gz test_1.0-0.debian.tar.gz .bake-dpkg-builddir
 tar --extract --gzip --file ../test_1.0.orig.tar.gz
 tar --extract --gzip --file ../../test_1.0-0.debian.tar.gz
 dpkg-buildpackage -b
+mv .bake-dpkg-builddir/test_1.0-0_amd64.deb .
 rm -rf .bake-dpkg-builddir
 (exit SUCCESS)

@@ -46,6 +46,7 @@ tests/src/msgfmt
 tests/src/g-ir-scanner
 tests/src/g-ir-compiler
 tests/src/itstool
+tests/src/mv
 bake-0.1.19+bzr.tar.bz2
 bake_0.1.19+bzr.orig.tar.gz
 bake_0.1.19+bzr-0.debian.tar.gz

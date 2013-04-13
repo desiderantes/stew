@@ -26,6 +26,13 @@ programs.cp {
   install = false
 }
 
+programs.mv {
+  sources = mv.vala status.vala
+  vala-packages = posix gio-2.0 gio-unix-2.0
+  packages = gio-2.0 gio-unix-2.0
+  install = false
+}
+
 programs.mkdir {
   sources = mkdir.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
