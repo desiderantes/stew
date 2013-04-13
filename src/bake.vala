@@ -270,6 +270,9 @@ public string get_relative_path (string source_path, string target_path)
 
 public string join_relative_dir (string base_dir, string relative_dir)
 {
+    if (Path.is_absolute (relative_dir))
+        return relative_dir;
+
     var b = base_dir;
     var r = relative_dir;
     while (r.has_prefix ("../") && b != "")
