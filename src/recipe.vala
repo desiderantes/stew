@@ -590,8 +590,23 @@ public class Rule
             if (show_output)
                 GLib.print ("%s\n", c);
 
+            /* Run the command through the shell */
+            var args = new string[4];
+            args[0] = "/bin/sh";
+            args[1] = "-c";
+            args[2] = c;
+            args[3] = null;
+
             /* Run the command */
-            var exit_status = Posix.system (c);
+            int exit_status;
+            try
+            {
+                Process.spawn_sync (null, args, null, 0, null, null, null, out exit_status);
+            }
+            catch (SpawnError e)
+            {
+                throw new BuildError.COMMAND_FAILED ("Failed to run command: %s", e.message);
+            }
 
             /* On failure, make sure the command is visible and report the error */
             if (Process.if_signaled (exit_status))
