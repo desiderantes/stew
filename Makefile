@@ -40,7 +40,8 @@ SOURCES = src/bake.vala \
           src/module-xdg.vala \
           src/module-xzip.vala \
           src/pkg-config.vala \
-          src/recipe.vala
+          src/recipe.vala \
+          src/rule.vala
 
 bake-template: src/bake-template.vala
 	valac -o bake-template --pkg=posix src/bake-template.vala
