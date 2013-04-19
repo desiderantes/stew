@@ -89,63 +89,6 @@ public class Rule
         return false;
     }
 
-    public void build () throws BuildError
-    {
-        var commands = get_commands ();
-        foreach (var c in commands)
-        {
-            var show_output = true;
-            if (c.has_prefix ("@"))
-            {
-                c = c.substring (1);
-                show_output = !pretty_print;
-            }
-
-            c = recipe.substitute_variables (c);
-
-            if (show_output)
-                GLib.print ("%s\n", c);
-
-            /* Run the command through the shell */
-            var args = new string[4];
-            args[0] = "/bin/sh";
-            args[1] = "-c";
-            args[2] = c;
-            args[3] = null;
-
-            /* Run the command */
-            int exit_status;
-            try
-            {
-                Process.spawn_sync (null, args, null, 0, null, null, null, out exit_status);
-            }
-            catch (SpawnError e)
-            {
-                throw new BuildError.COMMAND_FAILED ("Failed to run command: %s", e.message);
-            }
-
-            /* On failure, make sure the command is visible and report the error */
-            if (Process.if_signaled (exit_status))
-            {
-                if (!show_output)
-                    GLib.print ("\x1B[1m%s\x1B[0m\n", c);
-                throw new BuildError.COMMAND_FAILED ("Caught signal %d", Process.term_sig (exit_status));
-            }
-            else if (Process.if_exited (exit_status) && Process.exit_status (exit_status) != 0)
-            {
-                if (!show_output)
-                    GLib.print ("\x1B[1m%s\x1B[0m\n", c);
-                throw new BuildError.COMMAND_FAILED ("Command exited with return value %d", Process.exit_status (exit_status));
-            }
-        }
-
-        foreach (var output in outputs)
-        {
-            if (!output.has_prefix ("%") && !FileUtils.test (output, FileTest.EXISTS))
-                throw new BuildError.MISSING_OUTPUT ("Failed to build file %s", output);
-        }
-    }
-
     public void add_input (string input)
     {
         inputs.append (input);    

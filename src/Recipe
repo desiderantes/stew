@@ -21,6 +21,7 @@ programs {
 
   bake {
     sources = bake.vala \
+              builder.vala \
               config.vala \
               fixes.vapi \
               module-bzip.vala \

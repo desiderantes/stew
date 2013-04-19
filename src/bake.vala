@@ -815,7 +815,8 @@ public class Bake
         last_logged_directory = Environment.get_current_dir ();
         try
         {
-            recipe.build_target (join_relative_dir (toplevel.dirname, target));
+            var builder = new Builder ();
+            builder.build_target (recipe, join_relative_dir (toplevel.dirname, target));
         }
         catch (BuildError e)
         {

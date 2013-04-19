@@ -12,6 +12,7 @@ PACKAGES = --pkg=glib-2.0 \
            --pkg=gio-2.0 \
            --pkg=posix
 SOURCES = src/bake.vala \
+          src/builder.vala \
           src/config-bootstrap.vala \
           src/fixes.vapi \
           src/module-bzip.vala \

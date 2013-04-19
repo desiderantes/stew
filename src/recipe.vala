@@ -413,63 +413,6 @@ public class Recipe
         return toplevel.targets.lookup (target);
     }
 
-    public bool build_target (string target) throws BuildError
-    {
-        if (debug_enabled)
-            stderr.printf ("Considering target %s\n", get_relative_path (original_dir, target));
-
-        /* Find the rule */
-        var rule = get_rule_with_target (target);
-        if (rule != null && rule.recipe != this)
-        {
-            if (debug_enabled)
-                stderr.printf ("Target %s defined in recipe %s\n",
-                               get_relative_path (original_dir, target),
-                               get_relative_path (original_dir, rule.recipe.filename));
-
-            return rule.recipe.build_target (target);
-        }
-
-        if (rule == null)
-        {
-            /* If it's already there then don't need to do anything */
-            if (FileUtils.test (target, FileTest.EXISTS))
-                return false;
-
-            /* If doesn't exist then we can't continue */
-            throw new BuildError.NO_RULE ("No rule to build '%s'", get_relative_path (original_dir, target));
-        }
-
-        /* Check the inputs first */
-        var force_build = false;
-        foreach (var input in rule.inputs)
-        {
-            if (build_target (join_relative_dir (dirname, input)))
-                force_build = true;
-        }
-
-        /* Don't bother if it's already up to date */
-        Environment.set_current_dir (dirname);
-        if (!force_build && !rule.needs_build ())
-            return false;
-
-        /* If we're about to do something then note which directory we are in and what we're building */
-        if (rule.get_commands () != null)
-        {
-            var dir = Environment.get_current_dir ();
-            if (last_logged_directory != dir)
-            {
-                GLib.print ("\x1B[1m[Entering directory %s]\x1B[0m\n", get_relative_path (original_dir, dir));
-                last_logged_directory = dir;
-            }
-        }
-
-        /* Run the commands */
-        rule.build ();
-
-        return true;
-    }
-
     public void print ()
     {
         foreach (var name in variable_names)
