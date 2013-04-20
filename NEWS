@@ -2,6 +2,7 @@ Overview of changes in bake 0.1.20
 
     * Fix absolute paths not working as inputs
     * Fix C dependency scanning not working
+    * Show command *before* output on command failure
 
 Overview of changes in bake 0.1.19
 
