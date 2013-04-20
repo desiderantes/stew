@@ -10,7 +10,7 @@
 
 public class Builder
 {
-    public bool build_target (Recipe recipe, string target) throws BuildError
+    public async bool build_target (Recipe recipe, string target) throws BuildError
     {
         if (debug_enabled)
             stderr.printf ("Considering target %s\n", get_relative_path (original_dir, target));
@@ -24,7 +24,7 @@ public class Builder
                                get_relative_path (original_dir, target),
                                get_relative_path (original_dir, rule.recipe.filename));
 
-            return build_target (rule.recipe, target);
+            return yield build_target (rule.recipe, target);
         }
 
         if (rule == null)
@@ -41,7 +41,8 @@ public class Builder
         var force_build = false;
         foreach (var input in rule.inputs)
         {
-            if (build_target (recipe, join_relative_dir (recipe.dirname, input)))
+            var result = yield build_target (recipe, join_relative_dir (recipe.dirname, input));
+            if (result)
                 force_build = true;
         }
 
@@ -56,18 +57,18 @@ public class Builder
             var dir = Environment.get_current_dir ();
             if (last_logged_directory != dir)
             {
-                GLib.print ("\x1B[1m[Entering directory %s]\x1B[0m\n", get_relative_path (original_dir, dir));
+                stdout.printf ("\x1B[1m[Entering directory %s]\x1B[0m\n", get_relative_path (original_dir, dir));
                 last_logged_directory = dir;
             }
         }
 
         /* Run the commands */
-        build_rule (rule);
+        yield build_rule (rule);
 
         return true;
     }
 
-    public void build_rule (Rule rule) throws BuildError
+    public async void build_rule (Rule rule) throws BuildError
     {
         var commands = rule.get_commands ();
         foreach (var c in commands)
@@ -82,39 +83,28 @@ public class Builder
             c = rule.recipe.substitute_variables (c);
 
             if (show_output)
-                GLib.print ("%s\n", c);
+                stdout.printf ("%s\n", c);
 
-            /* Run the command through the shell */
-            var args = new string[4];
-            args[0] = "/bin/sh";
-            args[1] = "-c";
-            args[2] = c;
-            args[3] = null;
-
-            /* Run the command */
-            int exit_status;
-            try
-            {
-                Process.spawn_sync (null, args, null, 0, null, null, null, out exit_status);
-            }
-            catch (SpawnError e)
-            {
-                throw new BuildError.COMMAND_FAILED ("Failed to run command: %s", e.message);
-            }
+            string output;
+            var exit_status = yield run_command (c, out output);
 
             /* On failure, make sure the command is visible and report the error */
             if (Process.if_signaled (exit_status))
             {
                 if (!show_output)
-                    GLib.print ("\x1B[1m%s\x1B[0m\n", c);
+                    stdout.printf ("\x1B[1m%s\x1B[0m\n", c);
+                stdout.printf ("%s", output);
                 throw new BuildError.COMMAND_FAILED ("Caught signal %d", Process.term_sig (exit_status));
             }
             else if (Process.if_exited (exit_status) && Process.exit_status (exit_status) != 0)
             {
                 if (!show_output)
-                    GLib.print ("\x1B[1m%s\x1B[0m\n", c);
+                    stdout.printf ("\x1B[1m%s\x1B[0m\n", c);
+                stdout.printf ("%s", output);
                 throw new BuildError.COMMAND_FAILED ("Command exited with return value %d", Process.exit_status (exit_status));
             }
+            else
+                stdout.printf ("%s", output);
         }
 
         foreach (var output in rule.outputs)
@@ -122,5 +112,63 @@ public class Builder
             if (!output.has_prefix ("%") && !FileUtils.test (output, FileTest.EXISTS))
                 throw new BuildError.MISSING_OUTPUT ("Failed to build file %s", output);
         }
+    }
+
+    private async int run_command (string command, out string output) throws BuildError
+    {
+        output = "";
+
+        /* Run the command through the shell */
+        var args = new string[4];
+        args[0] = "/bin/sh";
+        args[1] = "-c";
+        args[2] = command;
+        args[3] = null;
+
+        /* Write text output from the command to a pipe */
+        int output_pipe[2];
+        Posix.pipe (output_pipe);
+
+        /* Run the command in a child process */
+        Pid pid;
+        try
+        {
+            Process.spawn_async (null, args, null, SpawnFlags.DO_NOT_REAP_CHILD, () =>
+            {
+                Posix.close (output_pipe[0]);
+                Posix.dup2 (output_pipe[1], Posix.STDOUT_FILENO);
+                Posix.dup2 (output_pipe[1], Posix.STDERR_FILENO);
+            },
+            out pid);
+            Posix.close (output_pipe[1]);
+        }
+        catch (SpawnError e)
+        {
+            throw new BuildError.COMMAND_FAILED ("Failed to run command: %s", e.message);
+        }
+
+        /* Method completes when child process completes */
+        int exit_status = Posix.EXIT_SUCCESS;
+        ChildWatch.add (pid, (pid, status) =>
+        {
+            exit_status = status;
+            run_command.callback ();
+        });
+        yield;
+
+        /* Read back output from child process */
+        while (true)
+        {
+            var data = new uint8[1024];
+            var n_read = Posix.read (output_pipe[0], data, data.length - 1);
+            if (n_read <= 0)
+                break;
+            data[n_read] = '\0';
+            var s = (string) data;
+            output += s;
+        }
+        Posix.close (output_pipe[0]);
+
+        return exit_status;
     }
 }

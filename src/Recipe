@@ -52,7 +52,8 @@ programs {
               pkg-config.vala \
               recipe.vala \
               rule.vala
-     vala-packages = posix
+     vala-packages = posix gio-2.0
+     packages = gio-2.0
      compile-flags = -DGETTEXT_PACKAGE=\"bake\"
    }
 }

@@ -553,6 +553,8 @@ public class Bake
 
     public static int main (string[] args)
     {
+        var loop = new MainLoop ();
+
         original_dir = Environment.get_current_dir ();
 
         var context = new OptionContext (/* Arguments and description for --help text */
@@ -684,7 +686,7 @@ public class Bake
                 }
             }
 
-            GLib.print ("\x1B[1m[Configuring]\x1B[0m\n");
+            stdout.printf ("\x1B[1m[Configuring]\x1B[0m\n");
 
             /* Make directories absolute */
             // FIXME
@@ -823,19 +825,28 @@ public class Bake
             target = "%" + target;
 
         last_logged_directory = Environment.get_current_dir ();
-        try
+        var builder = new Builder ();
+        var exit_code = Posix.EXIT_SUCCESS;
+        builder.build_target.begin (recipe, join_relative_dir (toplevel.dirname, target), (o, x) =>
         {
-            var builder = new Builder ();
-            builder.build_target (recipe, join_relative_dir (toplevel.dirname, target));
-        }
-        catch (BuildError e)
-        {
-            printerr ("\x1B[1m\x1B[31m[%s]\x1B[0m\n", e.message);
-            GLib.print ("\x1B[1m\x1B[31m[Build failed]\x1B[0m\n");
-            return Posix.EXIT_FAILURE;
-        }
+            try
+            {
+                builder.build_target.end (x);
+            }
+            catch (BuildError e)
+            {
+                printerr ("\x1B[1m\x1B[31m[%s]\x1B[0m\n", e.message);
+                stdout.printf ("\x1B[1m\x1B[31m[Build failed]\x1B[0m\n");
+                exit_code = Posix.EXIT_FAILURE;
+                loop.quit ();
+            }
 
-        GLib.print ("\x1B[1m\x1B[32m[Build complete]\x1B[0m\n");
-        return Posix.EXIT_SUCCESS;
+            stdout.printf ("\x1B[1m\x1B[32m[Build complete]\x1B[0m\n");
+            loop.quit ();
+        });
+
+        loop.run ();
+
+        return exit_code;
     }
 }
