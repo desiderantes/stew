@@ -8,4 +8,5 @@ programs.test {
   vala-compile-flags = --target-glib 2.32
   compile-flags = -DFOO=1
   link-flags = -lm
+  debug = true
 }

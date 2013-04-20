@@ -118,8 +118,6 @@ public class ValaModule : BuildModule
 
         var valac_command = "@valac";
         var valac_flags = compilable.get_flags ("vala-compile-flags", "");
-        if (valac_flags != "")
-            valac_command += " " + valac_flags;
         var valac_inputs = new List<string> ();
         var link_rule = recipe.add_rule ();
         link_rule.add_output (binary_name);
@@ -127,6 +125,15 @@ public class ValaModule : BuildModule
         if (compilable is Library)
             link_command += " -shared";
         recipe.build_rule.add_input (binary_name);
+
+        if (compilable.debug)
+        {
+            compile_flags += " -g";
+            valac_flags += " -g";
+        }
+
+        if (valac_flags != "")
+            valac_command += " " + valac_flags;
 
         var archive_name = "lib%s.a".printf (compilable.name);
         Rule? archive_rule = null;

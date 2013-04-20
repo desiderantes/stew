@@ -50,6 +50,10 @@ Vala programs and libraries can set the following program <link xref="variables"
   <td><p>vala-header-name</p></td>
   <td><p>Name to use for .h file generated for libraries (optional)</p></td>
 </tr>
+<tr>
+  <td><p>debug</p></td>
+  <td><p>If debugging symbols should be generated</p></td>
+</tr>
 </table>
 <example>
 <p>
@@ -60,6 +64,7 @@ programs.example-program {
   sources = main.vala module.vala
   vala-packages = gtk+-3.0
   packages = gtk+-3.0
+  debug = true
 }
 </code>
 </example>

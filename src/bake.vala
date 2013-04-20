@@ -100,6 +100,8 @@ public class Compilable : Block
 
     public bool install { owned get { return get_boolean_variable ("install", true); } }
 
+    public bool debug { owned get { return get_boolean_variable ("debug", false); } }
+
     public string? get_flags (string name, string? fallback = null)
     {
         return get_variable (name, fallback).replace("\n", " ");

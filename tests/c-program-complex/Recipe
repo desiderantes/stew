@@ -7,4 +7,5 @@ programs.test {
   gettext-domain = test
   compile-flags = -DFOO=1
   link-flags = -lm
+  debug = true
 }

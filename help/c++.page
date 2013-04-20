@@ -35,6 +35,10 @@ C++ programs and libraries can set the following program <link xref="variables">
   <td><p>link-flags</p></td>
   <td><p>Additional command line flags to use when linking</p></td>
 </tr>
+<tr>
+  <td><p>debug</p></td>
+  <td><p>If debugging symbols should be generated</p></td>
+</tr>
 </table>
 <example>
 <p>
@@ -45,6 +49,7 @@ programs.example-program {
   sources = main.cpp module.cpp
   packages = alsa
   compile-flags = -Wall
+  debug = true
 }
 </code>
 </example>

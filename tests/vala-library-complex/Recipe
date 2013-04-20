@@ -9,4 +9,5 @@ libraries.test {
                        --define=TEST
   compile-flags = -DFOO=1
   link-flags = -lm
+  debug = true
 }

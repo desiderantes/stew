@@ -173,6 +173,9 @@ public class GCCModule : BuildModule
         if (link_flags == null)
             link_flags = "";
 
+        if (compilable.debug)
+            compile_flags += " -g";
+
         /* Get dependencies */
         var packages = compilable.packages;
         if (packages == null)
