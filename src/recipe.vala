@@ -22,7 +22,7 @@ public class Recipe
     public CleanRule clean_rule;
     public Rule test_rule;
     public HashTable<string, Rule> targets;
-    
+
     public string dirname { owned get { return Path.get_dirname (filename); } }
 
     public string build_directory { owned get { return Path.build_filename (dirname, ".built"); } }
@@ -274,7 +274,7 @@ public class Recipe
         if (variable_stack != null)
             throw new BuildError.INVALID ("Unmatched end variable block in file %s line %d:\n%s", get_relative_path (original_dir, filename), line_number, "");
     }
-    
+
     public Rule add_rule ()
     {
         var rule = new Rule (this);
@@ -299,7 +299,7 @@ public class Recipe
             var suffix = new_line.substring (end + 1);
 
             var value = get_variable (variable, "");
-            
+
             new_line = prefix + value + suffix;
         }
 
@@ -380,7 +380,7 @@ public class Recipe
     {
         get { return parent.parent == null; }
     }
-    
+
     public Recipe toplevel
     {
         get { if (is_toplevel) return this; else return parent.toplevel; }
