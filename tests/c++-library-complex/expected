@@ -25,9 +25,9 @@ rm -f /usr/lib/libtest.a
 rm -f /usr/include/test-0/test.h
 (exit SUCCESS)
 !bake clean
+rm -rf .built/
 rm -f libtest.so.0
 rm -f libtest.a
-rm -rf .built/
 rm -f test.pot
 rm -f libtest.so
 (exit SUCCESS)

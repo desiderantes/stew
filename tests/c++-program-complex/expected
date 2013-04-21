@@ -17,7 +17,7 @@ cp test /usr/bin/test
 rm -f /usr/bin/test
 (exit SUCCESS)
 !bake clean
-rm -f test
 rm -rf .built/
+rm -f test
 rm -f test.pot
 (exit SUCCESS)

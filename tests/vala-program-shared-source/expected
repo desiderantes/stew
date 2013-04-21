@@ -37,7 +37,7 @@ rm -f /usr/bin/test1
 rm -f /usr/bin/test2
 (exit SUCCESS)
 !bake clean
-rm -f test1
 rm -rf .built/
+rm -f test1
 rm -f test2
 (exit SUCCESS)

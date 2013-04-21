@@ -5,6 +5,7 @@ public class Tar
         report_status (args);
 
         string? filename = null;
+        string? directory = null;
         var do_create = false;
         var do_extract = false;
         var file_list = "";
@@ -21,11 +22,16 @@ public class Tar
                     do_create = true;
                 else if (args[i] == "--extract")
                     do_extract = true;
+                else if (args[i] == "--directory")
+                {
+                    directory = args[i+1];
+                    i++;
+                }
                 continue;
             }
 
             if (do_create)
-                file_list += list_files_recursive (args[i]);
+                file_list = list_files_recursive (directory, args[i]);
         }
 
         if (do_extract && filename != null)
@@ -40,7 +46,13 @@ public class Tar
             }
 
             foreach (var file in contents.split ("\n"))
-                create_file (file);
+            {
+                var f = file;
+                if (directory != null)
+                    f = Path.build_filename (directory, f);
+
+                create_file (f);
+            }
         }
 
         if (do_create && filename != null)
@@ -49,20 +61,24 @@ public class Tar
         return Posix.EXIT_SUCCESS;
     }
 
-    private static string list_files_recursive (string filename)
+    private static string list_files_recursive (string? directory, string filename)
     {
-        if (FileUtils.test (filename, FileTest.IS_DIR))
+        var f = filename;
+        if (directory != null)
+            f = Path.build_filename (directory, f);
+
+        if (FileUtils.test (f, FileTest.IS_DIR))
         {
             try
             {
                 var result = "";
-                var d = Dir.open (filename);
+                var d = Dir.open (f);
                 while (true)
                 {
                     var n = d.read_name ();
                     if (n == null)
                         return result;
-                    result += list_files_recursive (Path.build_filename (filename, n));
+                    result += list_files_recursive (directory, Path.build_filename (filename, n));
                 }
             }
             catch (Error e)

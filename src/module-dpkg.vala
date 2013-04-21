@@ -29,7 +29,7 @@ public class DpkgModule : BuildModule
             warning ("Failed to get dpkg build arch");
         }
 
-        var build_dir = ".bake-dpkg-builddir";
+        var build_dir = recipe.get_build_path ("dpkg-builddir");
         var gzip_file = "%s.tar.gz".printf (recipe.release_name);
         var orig_file = "%s_%s.orig.tar.gz".printf (recipe.project_name, recipe.project_version);
         var debian_file = "%s_%s-%s.debian.tar.gz".printf (recipe.project_name, recipe.project_version, debian_revision);
@@ -112,7 +112,7 @@ public class DpkgModule : BuildModule
         rule.add_command ("@mkdir -p %s/debian/source".printf (build_dir));
         rule.add_command ("@echo \"3.0 (quilt)\" > %s/debian/source/format".printf (build_dir));
 
-        rule.add_command ("@cd %s && tar --create --gzip --file ../%s debian".printf (build_dir, debian_file));
+        rule.add_command ("@tar --create --gzip --file %s --directory %s debian".printf (debian_file, build_dir));
         rule.add_command ("@rm -rf %s".printf (build_dir));
 
         /* Source build */
@@ -125,8 +125,8 @@ public class DpkgModule : BuildModule
         rule.add_command ("@rm -rf %s".printf (build_dir));
         rule.add_command ("@mkdir -p %s".printf (build_dir));
         rule.add_command ("@cp %s %s %s".printf (orig_file, debian_file, build_dir));
-        rule.add_command ("@cd %s && tar --extract --gzip --file ../%s".printf (build_dir, orig_file));
-        rule.add_command ("@cd %s/%s && tar --extract --gzip --file ../../%s".printf (build_dir, recipe.release_name, debian_file));
+        rule.add_command ("@tar --extract --gzip --file %s --directory %s".printf (orig_file, build_dir));
+        rule.add_command ("@tar --extract --gzip --file %s --directory %s/%s".printf (debian_file, build_dir, recipe.release_name));
         rule.add_command ("@cd %s/%s && dpkg-buildpackage -S".printf (build_dir, recipe.release_name));
         rule.add_command ("@mv %s/%s %s/%s .".printf (build_dir, dsc_file, build_dir, changes_file));
         rule.add_command ("@rm -rf %s".printf (build_dir));
@@ -140,8 +140,8 @@ public class DpkgModule : BuildModule
         rule.add_command ("@rm -rf %s".printf (build_dir));
         rule.add_command ("@mkdir -p %s".printf (build_dir));
         rule.add_command ("@cp %s %s %s".printf (orig_file, debian_file, build_dir));
-        rule.add_command ("@cd %s && tar --extract --gzip --file ../%s".printf (build_dir, orig_file));
-        rule.add_command ("@cd %s/%s && tar --extract --gzip --file ../../%s".printf (build_dir, recipe.release_name, debian_file));
+        rule.add_command ("@tar --extract --gzip --file %s --directory %s".printf (orig_file, build_dir));
+        rule.add_command ("@tar --extract --gzip --file %s --directory %s/%s".printf (debian_file, build_dir, recipe.release_name));
         rule.add_command ("@cd %s/%s && dpkg-buildpackage -b".printf (build_dir, recipe.release_name));
         rule.add_command ("@mv %s/%s .".printf (build_dir, deb_file));
         rule.add_command ("@rm -rf %s".printf (build_dir));

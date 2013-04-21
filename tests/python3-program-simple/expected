@@ -17,8 +17,8 @@ rm -f /usr/share/test/__pycache__/test.cpython-32.pyc
 rm -f /usr/bin/test
 (exit SUCCESS)
 !bake clean
+rm -rf .built/
 rm -f __pycache__/test.cpython-32.pyc
 rm -rf __pycache__/
 rm -f test
-rm -rf .built/
 (exit SUCCESS)

@@ -28,10 +28,10 @@ rm -f /usr/include/test-0/foo.h
 rm -f /usr/share/vala/vapi/foo.vapi
 (exit SUCCESS)
 !bake clean
+rm -rf .built/
 rm -f libtest.so.0
 rm -f libtest.a
 rm -f foo.h
 rm -f foo.vapi
-rm -rf .built/
 rm -f libtest.so
 (exit SUCCESS)

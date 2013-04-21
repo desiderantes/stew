@@ -1,9 +1,24 @@
 !bake release-gnome
 dpkg-architecture -qDEB_BUILD_ARCH
 rpmbuild --showrc
-mkdir -p test-1.0
-cp Recipe test-1.0/Recipe
-tar --create --xz --file test-1.0.tar.xz test-1.0
+mkdir -p .built
+mkdir -p .built/test-1.0
+cp Recipe .built/test-1.0/Recipe
+tar --create --xz --file test-1.0.tar.xz --directory .built test-1.0
 scp test-1.0.tar.xz master.gnome.org:
 ssh master.gnome.org install-module test-1.0.tar.xz
+(exit SUCCESS)
+!bake install
+dpkg-architecture -qDEB_BUILD_ARCH
+rpmbuild --showrc
+(exit SUCCESS)
+!bake uninstall
+dpkg-architecture -qDEB_BUILD_ARCH
+rpmbuild --showrc
+(exit SUCCESS)
+!bake clean
+dpkg-architecture -qDEB_BUILD_ARCH
+rpmbuild --showrc
+rm -rf .built/
+rm -f test-1.0.tar.xz
 (exit SUCCESS)

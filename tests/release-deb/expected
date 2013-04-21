@@ -1,21 +1,39 @@
 !bake release-deb
 dpkg-architecture -qDEB_BUILD_ARCH
 rpmbuild --showrc
-mkdir -p test-1.0
-cp Recipe test-1.0/Recipe
-tar --create --gzip --file test-1.0.tar.gz test-1.0
+mkdir -p .built
+mkdir -p .built/test-1.0
+cp Recipe .built/test-1.0/Recipe
+tar --create --gzip --file test-1.0.tar.gz --directory .built test-1.0
 cp test-1.0.tar.gz test_1.0.orig.tar.gz
-rm -rf .bake-dpkg-builddir
-mkdir -p .bake-dpkg-builddir/debian
-mkdir -p .bake-dpkg-builddir/debian/source
-tar --create --gzip --file ../test_1.0-0.debian.tar.gz debian
-rm -rf .bake-dpkg-builddir
-rm -rf .bake-dpkg-builddir
-mkdir -p .bake-dpkg-builddir
-cp test_1.0.orig.tar.gz test_1.0-0.debian.tar.gz .bake-dpkg-builddir
-tar --extract --gzip --file ../test_1.0.orig.tar.gz
-tar --extract --gzip --file ../../test_1.0-0.debian.tar.gz
+rm -rf .built/dpkg-builddir
+mkdir -p .built/dpkg-builddir/debian
+mkdir -p .built/dpkg-builddir/debian/source
+tar --create --gzip --file test_1.0-0.debian.tar.gz --directory .built/dpkg-builddir debian
+rm -rf .built/dpkg-builddir
+rm -rf .built/dpkg-builddir
+mkdir -p .built/dpkg-builddir
+cp test_1.0.orig.tar.gz test_1.0-0.debian.tar.gz .built/dpkg-builddir
+tar --extract --gzip --file test_1.0.orig.tar.gz --directory .built/dpkg-builddir
+tar --extract --gzip --file test_1.0-0.debian.tar.gz --directory .built/dpkg-builddir/test-1.0
 dpkg-buildpackage -b
-mv .bake-dpkg-builddir/test_1.0-0_amd64.deb .
-rm -rf .bake-dpkg-builddir
+mv .built/dpkg-builddir/test_1.0-0_amd64.deb .
+rm -rf .built/dpkg-builddir
+(exit SUCCESS)
+!bake install
+dpkg-architecture -qDEB_BUILD_ARCH
+rpmbuild --showrc
+(exit SUCCESS)
+!bake uninstall
+dpkg-architecture -qDEB_BUILD_ARCH
+rpmbuild --showrc
+(exit SUCCESS)
+!bake clean
+dpkg-architecture -qDEB_BUILD_ARCH
+rpmbuild --showrc
+rm -f test_1.0.orig.tar.gz
+rm -f test_1.0-0.debian.tar.gz
+rm -f test_1.0-0_amd64.deb
+rm -f test-1.0.tar.gz
+rm -rf .built/
 (exit SUCCESS)

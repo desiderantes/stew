@@ -27,9 +27,9 @@ rm -f /usr/lib/libtest2.so.0
 rm -f /usr/lib/libtest2.a
 (exit SUCCESS)
 !bake clean
+rm -rf .built/
 rm -f libtest1.so.0
 rm -f libtest1.a
-rm -rf .built/
 rm -f libtest1.so
 rm -f libtest2.so.0
 rm -f libtest2.a

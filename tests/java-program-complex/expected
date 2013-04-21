@@ -18,9 +18,9 @@ rm -f /usr/share/test/test.jar
 rm -f /usr/bin/test
 (exit SUCCESS)
 !bake clean
+rm -rf .built/
 rm -f test.jar
 rm -rf .built/com/example/
 rm -f test
-rm -rf .built/
 rm -f test.pot
 (exit SUCCESS)

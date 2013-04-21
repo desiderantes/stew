@@ -9,8 +9,8 @@ ar -cq libtest.a .built/test-test.o
 !bake uninstall
 (exit SUCCESS)
 !bake clean
+rm -rf .built/
 rm -f libtest.so.0
 rm -f libtest.a
-rm -rf .built/
 rm -f libtest.so
 (exit SUCCESS)

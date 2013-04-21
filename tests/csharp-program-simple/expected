@@ -13,7 +13,7 @@ rm -f /usr/share/test/test.exe
 rm -f /usr/bin/test
 (exit SUCCESS)
 !bake clean
+rm -rf .built/
 rm -f test.exe
 rm -f test
-rm -rf .built/
 (exit SUCCESS)

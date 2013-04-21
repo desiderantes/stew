@@ -15,6 +15,7 @@ cp test.jar /usr/share/java/test.jar
 rm -f /usr/share/java/test.jar
 (exit SUCCESS)
 !bake clean
+rm -rf .built/
 rm -f test.jar
 # FIXME: Not necessary - is within the .built/ dir (should be completely removed)
 rm -rf .built/com/example/

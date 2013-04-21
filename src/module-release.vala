@@ -46,7 +46,7 @@ public class ReleaseModule : BuildModule
     {
         var rule = new ReleaseRule (recipe);
         recipe.rules.append (rule);
-        rule.add_output ("%s/".printf (recipe.release_name));
+        rule.add_output (recipe.release_directory);
     }
 
     private static void add_release_file (ReleaseRule release_rule, string temp_dir, string directory, string filename)
@@ -65,7 +65,7 @@ public class ReleaseModule : BuildModule
     public override void recipe_complete (Recipe recipe)
     {
         var relative_dirname = recipe.relative_dirname;
-        var release_dir = "%s/".printf (recipe.release_name);
+        var release_dir = recipe.release_directory;
 
         var release_rule = (ReleaseRule) recipe.toplevel.find_rule (release_dir);
 

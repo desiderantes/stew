@@ -60,11 +60,11 @@ rm -f /usr/include/test2-0/test2.h
 rm -f /usr/share/vala/vapi/test2-0.vapi
 (exit SUCCESS)
 !bake clean
+rm -rf .built/
 rm -f libtest1.so.0
 rm -f libtest1.a
 rm -f test1.h
 rm -f test1-0.vapi
-rm -rf .built/
 rm -f libtest1.so
 rm -f libtest2.so.0
 rm -f libtest2.a

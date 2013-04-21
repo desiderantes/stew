@@ -8,6 +8,6 @@ ghc -o test .built/test.o
 !bake uninstall
 (exit SUCCESS)
 !bake clean
-rm -f test
 rm -rf .built/
+rm -f test
 (exit SUCCESS)

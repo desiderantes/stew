@@ -1,3 +1,7 @@
+Overview of changes in bake 0.1.21
+
+    * Use build directory to generate releases
+
 Overview of changes in bake 0.1.20
 
     * Fix absolute paths not working as inputs

@@ -14,7 +14,7 @@ cp test.dll /usr/lib/cli/test/test.dll
 rm -f /usr/lib/cli/test/test.dll
 (exit SUCCESS)
 !bake clean
-rm -f test.dll
 rm -rf .built/
+rm -f test.dll
 rm -f test.pot
 (exit SUCCESS)

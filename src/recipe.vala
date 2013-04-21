@@ -60,6 +60,10 @@ public class Recipe
                 return "%s-%s".printf (project_name, project_version);
         }
     }
+    public string release_directory
+    {
+        owned get { return toplevel.get_build_path (release_name); }
+    }
 
     public Recipe (string filename, bool allow_rules = true) throws FileError, BuildError
     {

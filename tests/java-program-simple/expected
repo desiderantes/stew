@@ -14,7 +14,7 @@ rm -f /usr/share/test/test.jar
 rm -f /usr/bin/test
 (exit SUCCESS)
 !bake clean
-rm -f test.jar
 rm -rf .built/
+rm -f test.jar
 rm -f test
 (exit SUCCESS)

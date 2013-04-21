@@ -45,7 +45,7 @@ public class RPMModule : BuildModule
             warning ("Failed to make rpmbuild regex");
         }
 
-        var build_dir = ".bake-rpm-builddir";
+        var build_dir = recipe.get_build_path ("rpm-builddir");
         var gzip_file = "%s.tar.gz".printf (recipe.release_name);
         var source_file = "%s.rpm.tar.gz".printf (recipe.project_name);
         var spec_file = "%s/%s/%s.spec".printf (build_dir, recipe.release_name, recipe.project_name);
@@ -56,7 +56,7 @@ public class RPMModule : BuildModule
         rule.add_output (rpm_file);
         rule.add_command ("@rm -rf %s".printf (build_dir));
         rule.add_command ("@mkdir %s".printf (build_dir));
-        rule.add_command ("@cd %s && tar --extract --gzip --file ../%s".printf (build_dir, gzip_file));
+        rule.add_command ("@tar --extract --gzip --file %s --directory %s".printf (gzip_file, build_dir));
         rule.add_status_command ("Writing %s.spec".printf (recipe.project_name));
         rule.add_command ("@echo \"Summary: %s\" > %s".printf (summary, spec_file));
         rule.add_command ("@echo \"Name: %s\" >> %s".printf (recipe.project_name, spec_file));
@@ -83,7 +83,7 @@ public class RPMModule : BuildModule
         rule.add_command ("@echo >> %s".printf (spec_file));
         rule.add_command ("@echo \"%%files -f FILE-LIST\" >> %s".printf (spec_file));
         rule.add_command ("@echo >> %s".printf (spec_file));
-        rule.add_command ("@cd %s && tar --create --gzip --file ../%s %s".printf (build_dir, source_file, recipe.release_name));
+        rule.add_command ("@tar --create --gzip --file %s %s/%s".printf (source_file, build_dir, recipe.release_name));
         rule.add_status_command ("RPM %s".printf (rpm_file));
         rule.add_command ("@rpmbuild -tb %s".printf (source_file));
         rule.add_command ("@cp %s/rpmbuild/RPMS/%s/%s .".printf (Environment.get_home_dir (), build_arch, rpm_file));

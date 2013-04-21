@@ -20,9 +20,9 @@ cp test /usr/bin/test
 rm -f /usr/bin/test
 (exit SUCCESS)
 !bake clean
+rm -rf .built/
 rm -f test
 rm -f test1.moc
-rm -rf .built/
 rm -f test2.moc
 rm -f test3.moc
 rm -f test.pot

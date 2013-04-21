@@ -7,7 +7,7 @@ mkdir -p .built
 !bake uninstall
 (exit SUCCESS)
 !bake clean
+rm -rf .built/
 rm -f test.pyc
 rm -f test
-rm -rf .built/
 (exit SUCCESS)

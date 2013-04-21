@@ -17,8 +17,8 @@ rm -f /usr/share/test/test.exe
 rm -f /usr/bin/test
 (exit SUCCESS)
 !bake clean
-rm -f test.exe
 rm -rf .built/
+rm -f test.exe
 rm -f test.pot
 rm -f test
 (exit SUCCESS)

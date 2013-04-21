@@ -15,10 +15,10 @@ valac --ccode --header=test.h --vapi=test-0.vapi --library=test --use-fast-vapi=
 !bake uninstall
 (exit SUCCESS)
 !bake clean
+rm -rf .built/
 rm -f libtest.so.0
 rm -f libtest.a
 rm -f test.h
 rm -f test-0.vapi
-rm -rf .built/
 rm -f libtest.so
 (exit SUCCESS)

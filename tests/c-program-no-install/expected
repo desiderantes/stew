@@ -8,6 +8,6 @@ gcc -o test .built/test-test.o
 !bake uninstall
 (exit SUCCESS)
 !bake clean
-rm -f test
 rm -rf .built/
+rm -f test
 (exit SUCCESS)

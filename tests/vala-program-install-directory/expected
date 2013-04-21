@@ -14,6 +14,6 @@ cp test /usr/bin/test/test
 rm -f /usr/bin/test/test
 (exit SUCCESS)
 !bake clean
-rm -f test
 rm -rf .built/
+rm -f test
 (exit SUCCESS)
