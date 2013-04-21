@@ -167,6 +167,15 @@ public class Recipe
     {
         variable_names.append (name);
         variables.insert (name, value);
+
+        /* Set parents of this variable */
+        var i = name.last_index_of (".");
+        if (i > 0)
+        {
+            var n = name.substring (0, i);
+            if (variables.lookup (n) == null)
+                set_variable (n, "");
+        }
     }
 
     private void parse (string filename, string contents, bool allow_rules) throws BuildError
@@ -226,6 +235,11 @@ public class Recipe
                     variable_stack.prepend (name);
                 else
                     variable_stack.prepend ("%s.%s".printf (variable_stack.nth_data (0), name));
+
+                /* Set variable so can allow empty blocks */
+                if (variables.lookup (name) == null)
+                    set_variable (name, "");
+
                 continue;
             }
 
