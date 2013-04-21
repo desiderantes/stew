@@ -1,0 +1,22 @@
+!bake
+mkdir -p .built
+gcc -fPIC -MMD -MF .built/testlib-test.d -c test.c -o .built/testlib-test.o
+gcc -o libtestlib.so.0 -shared .built/testlib-test.o
+ar -cq libtestlib.a .built/testlib-test.o
+gcc -MMD -MF .built/test-main.d -c main.c -o .built/test-main.o
+gcc -o test .built/test-main.o -L. -ltestlib
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/bin
+cp test /usr/bin/test
+(exit SUCCESS)
+!bake uninstall
+rm -f /usr/bin/test
+(exit SUCCESS)
+!bake clean
+rm -rf .built/
+rm -f libtestlib.so.0
+rm -f libtestlib.a
+rm -f libtestlib.so
+rm -f test
+(exit SUCCESS)

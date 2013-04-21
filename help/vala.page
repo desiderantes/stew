@@ -31,8 +31,12 @@ Vala programs and libraries can set the following program <link xref="variables"
   <td><p>Vala packages to use</p></td>
 </tr>
 <tr>
+  <td><p>libraries</p></td>
+  <td><p>Libraries to use (can be local or system libraries)</p></td>
+</tr>
+<tr>
   <td><p>packages</p></td>
-  <td><p>Library packages to use in C compile stage</p></td>
+  <td><p>pkg-config packages to use in C compile stage</p></td>
 </tr>
 <tr>
   <td><p>compile-flags</p></td>

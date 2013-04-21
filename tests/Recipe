@@ -117,6 +117,9 @@ programs.test-runner {
     c-program-library-old-major-version {
       args = c-program-library-old-major-version
     }
+    c-program-local-library {
+      args = c-program-local-library
+    }
     c-library-simple {
       args = c-library-simple
     }
@@ -148,6 +151,9 @@ programs.test-runner {
     }
     c++-program-complex {
       args = c++-program-complex
+    }
+    c++-program-local-library {
+      args = c++-program-local-library
     }
     c++-library-simple {
       args = c++-library-simple
@@ -220,6 +226,9 @@ programs.test-runner {
     }
     vala-program-shared-source {
       args = vala-program-shared-source
+    }
+    vala-program-local-library {
+      args = vala-program-local-library
     }
     vala-library-simple {
       args = vala-library-simple
@@ -501,6 +510,10 @@ data.tests {
           c-program-library-old-major-version/expected \
           c-program-library-old-major-version/Recipe \
           c-program-library-old-major-version/test.c \
+          c-program-local-library/expected \
+          c-program-local-library/Recipe \
+          c-program-local-library/main.c \
+          c-program-local-library/test.c \
           c-library-simple/expected \
           c-library-simple/Recipe \
           c-library-simple/test.c \
@@ -542,6 +555,10 @@ data.tests {
           c++-program-complex/test1.cpp \
           c++-program-complex/test2.cpp \
           c++-program-complex/test3.cpp \
+          c++-program-local-library/expected \
+          c++-program-local-library/Recipe \
+          c++-program-local-library/main.cpp \
+          c++-program-local-library/test.cpp \
           c++-library-simple/expected \
           c++-library-simple/Recipe \
           c++-library-simple/test.cpp \
@@ -628,6 +645,10 @@ data.tests {
           vala-program-shared-source/shared.vala \
           vala-program-shared-source/test1.vala \
           vala-program-shared-source/test2.vala \
+          vala-program-local-library/expected \
+          vala-program-local-library/Recipe \
+          vala-program-local-library/main.vala \
+          vala-program-local-library/test.vala \
           vala-library-simple/expected \
           vala-library-simple/Recipe \
           vala-library-simple/test.vala \

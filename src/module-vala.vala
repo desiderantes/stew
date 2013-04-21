@@ -148,6 +148,26 @@ public class ValaModule : BuildModule
 
         var link_errors = new List<string> ();
 
+        /* Link against libraries */
+        var libraries = compilable.libraries;
+        if (libraries == null)
+            libraries = "";
+        var library_list = split_variable (libraries);
+        foreach (var library in library_list)
+        {
+            /* Look for locally generated libraries */
+            var library_filename = "lib%s.so".printf (library);
+            var library_rule = recipe.toplevel.find_rule_recursive (library_filename);
+            if (library_rule != null)
+            {
+                var rel_dir = get_relative_path (recipe.dirname, library_rule.recipe.dirname);
+                link_rule.add_input (Path.build_filename (rel_dir, library_filename));
+                link_flags += " -L%s -l%s".printf (rel_dir, library);
+            }
+            else
+                link_flags += " -l%s".printf (library);
+        }
+
         /* Get dependencies */
         var packages = compilable.packages;
         if (packages == null)
@@ -158,20 +178,6 @@ public class ValaModule : BuildModule
         var have_glib = false;
         foreach (var package in package_list)
         {
-            /* Look for locally generated libraries */
-            var library_filename = "lib%s.so".printf (package);
-            var library_rule = recipe.toplevel.find_rule_recursive (library_filename);
-            if (library_rule != null)
-            {
-                var rel_dir = get_relative_path (recipe.dirname, library_rule.recipe.dirname);
-                // FIXME: Actually use the .pc file
-                compile_flags += " -I%s".printf (rel_dir);
-                link_rule.add_input (Path.build_filename (rel_dir, library_filename));
-                link_flags += " -L%s -l%s".printf (rel_dir, package);
-                continue;
-            }
-
-            /* Otherwise look for it externally */
             if (pkg_config_list != "")
                 pkg_config_list += " ";
             pkg_config_list += package;

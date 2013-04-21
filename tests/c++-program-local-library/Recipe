@@ -1,0 +1,13 @@
+project {
+  name = test
+}
+
+libraries.testlib {
+  sources = test.cpp
+  install = false
+}
+
+programs.test {
+  sources = main.cpp
+  libraries = testlib
+}

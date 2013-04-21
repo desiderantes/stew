@@ -1,0 +1,13 @@
+project {
+  name = test
+}
+
+libraries.testlib {
+  sources = test.c
+  install = false
+}
+
+programs.test {
+  sources = main.c
+  libraries = testlib
+}
