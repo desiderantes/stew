@@ -22,12 +22,12 @@ public class BuildModule
     public virtual void generate_rules (Recipe recipe)
     {
     }
-    
+
     public virtual bool can_generate_program_rules (Recipe recipe, Program program)
     {
         return false;
     }
-    
+
     public virtual void generate_program_rules (Recipe recipe, Program program)
     {
     }
@@ -254,7 +254,7 @@ public string get_relative_path (string source_path, string target_path)
     /* Already relative */
     if (!Path.is_absolute (target_path))
         return target_path;
-    
+
     /* It is the current directory */
     if (target_path == source_path)
         return ".";
@@ -313,7 +313,7 @@ public string replace_extension (string filename, string extension)
     return "%.*s.%s".printf (i, filename, extension);
 }
 
-public errordomain BuildError 
+public errordomain BuildError
 {
     INVALID,
     NO_RULE,
@@ -387,7 +387,7 @@ public class Bake
                 }
             }
         }
-        
+
         /* Make rules recurse */
         foreach (var c in f.children)
         {
