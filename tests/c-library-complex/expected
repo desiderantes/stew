@@ -3,7 +3,7 @@ mkdir -p .built
 gcc -fPIC -DFOO=1 -g -MMD -MF .built/test-test1.d -c test1.c -o .built/test-test1.o
 gcc -fPIC -DFOO=1 -g -MMD -MF .built/test-test2.d -c test2.c -o .built/test-test2.o
 gcc -fPIC -DFOO=1 -g -MMD -MF .built/test-test3.d -c test3.c -o .built/test-test3.o
-gcc -o libtest.so.0 -shared .built/test-test1.o .built/test-test2.o .built/test-test3.o -lm
+gcc -o libtest.so.1.2 -shared .built/test-test1.o .built/test-test2.o .built/test-test3.o -lm
 ar -cq libtest.a .built/test-test1.o .built/test-test2.o .built/test-test3.o
 bake-gettext --mime-type text/x-csrc --output .built/test1.c.pot test1.c
 bake-gettext --mime-type text/x-csrc --output .built/test2.c.pot test2.c
@@ -12,21 +12,21 @@ msgcat --force-po --output-file=test.pot .built/test1.c.pot .built/test2.c.pot .
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/lib
+cp libtest.so.1.2 /usr/lib/libtest.so.1.2
 cp libtest.so /usr/lib/libtest.so
-cp libtest.so.0 /usr/lib/libtest.so.0
 cp libtest.a /usr/lib/libtest.a
-mkdir -p /usr/include/test-0
-cp test.h /usr/include/test-0/test.h
+mkdir -p /usr/include
+cp test.h /usr/include/test.h
 (exit SUCCESS)
 !bake uninstall
+rm -f /usr/lib/libtest.so.1.2
 rm -f /usr/lib/libtest.so
-rm -f /usr/lib/libtest.so.0
 rm -f /usr/lib/libtest.a
-rm -f /usr/include/test-0/test.h
+rm -f /usr/include/test.h
 (exit SUCCESS)
 !bake clean
 rm -rf .built/
-rm -f libtest.so.0
+rm -f libtest.so.1.2
 rm -f libtest.a
 rm -f test.pot
 rm -f libtest.so

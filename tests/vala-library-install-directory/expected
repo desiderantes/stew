@@ -4,34 +4,31 @@ valac --ccode test.vala
 mv test.c .built/test-test.c
 touch .built/test-test.c-stamp
 gcc -Wno-unused -Wno-deprecated-declarations -fPIC -Igobject -Iglib -c .built/test-test.c -o .built/test-test.o
-gcc -o libtest.so.0 -shared .built/test-test.o -lgobject -lglib
+gcc -o libtest.so -shared .built/test-test.o -lgobject -lglib
 ar -cq libtest.a .built/test-test.o
 valac --fast-vapi=.built/test-test.vapi test.vala
 touch .built/test-test.vapi-stamp
-valac --ccode --header=test.h --vapi=test-0.vapi --library=test --use-fast-vapi=.built/test-test.vapi
+valac --ccode --header=test.h --vapi=test.vapi --library=test --use-fast-vapi=.built/test-test.vapi
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/lib/test
 cp libtest.so /usr/lib/test/libtest.so
-cp libtest.so.0 /usr/lib/test/libtest.so.0
 cp libtest.a /usr/lib/test/libtest.a
-mkdir -p /usr/include/test-0
-cp test.h /usr/include/test-0/test.h
+mkdir -p /usr/include
+cp test.h /usr/include/test.h
 mkdir -p /usr/share/vala/vapi
-cp test-0.vapi /usr/share/vala/vapi/test-0.vapi
+cp test.vapi /usr/share/vala/vapi/test.vapi
 (exit SUCCESS)
 !bake uninstall
 rm -f /usr/lib/test/libtest.so
-rm -f /usr/lib/test/libtest.so.0
 rm -f /usr/lib/test/libtest.a
-rm -f /usr/include/test-0/test.h
-rm -f /usr/share/vala/vapi/test-0.vapi
+rm -f /usr/include/test.h
+rm -f /usr/share/vala/vapi/test.vapi
 (exit SUCCESS)
 !bake clean
 rm -rf .built/
-rm -f libtest.so.0
+rm -f libtest.so
 rm -f libtest.a
 rm -f test.h
-rm -f test-0.vapi
-rm -f libtest.so
+rm -f test.vapi
 (exit SUCCESS)

@@ -4,6 +4,7 @@ project {
 
 libraries.test {
   sources = test1.cpp test2.cpp test3.cpp
+  so-version = 1.2
   qt = true
   headers = test.h
   gettext-domain = test

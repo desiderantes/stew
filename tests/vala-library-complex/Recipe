@@ -4,6 +4,7 @@ project {
 
 libraries.test {
   sources = test1.vala test2.vala test3.vala
+  so-version = 1.2
   gettext-domain = test
   vala-compile-flags = --target-glib 2.32 \
                        --define=TEST

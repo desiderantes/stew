@@ -154,10 +154,6 @@ public class Library : Compilable
         base (recipe, "libraries", id);
     }
 
-    public string version { owned get { return get_variable ("version", "0"); } }
-
-    public string? namespace { owned get { return get_variable ("namespace"); } }
-
     public string install_directory
     {
         owned get

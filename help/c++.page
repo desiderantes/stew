@@ -20,8 +20,16 @@ C++ programs and libraries can set the following program <link xref="variables">
 </tr>
 </thead>
 <tr>
+  <td><p>so-version</p></td>
+  <td><p>Shared object version for library (libraries only, optional)</p></td>
+</tr>
+<tr>
   <td><p>headers</p></td>
   <td><p>Header files that specify the library interface (libraries only)</p></td>
+</tr>
+<tr>
+  <td><p>header-install-directory</p></td>
+  <td><p>Directory to install headers (libraries only, defaults to <file>/usr/include</file>)</p></td>
 </tr>
 <tr>
   <td><p>libraries</p></td>

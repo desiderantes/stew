@@ -4,6 +4,7 @@ project {
 
 libraries.test {
   sources = test1.c test2.c test3.c
+  so-version = 1.2
   headers = test.h
   gettext-domain = test
   compile-flags = -DFOO=1

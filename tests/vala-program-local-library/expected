@@ -8,7 +8,7 @@ gcc -o libtestlib.so -shared .built/testlib-test.o -lgobject -lglib
 ar -cq libtestlib.a .built/testlib-test.o
 valac --fast-vapi=.built/testlib-test.vapi test.vala
 touch .built/testlib-test.vapi-stamp
-valac --ccode --header=testlib.h --vapi=testlib-0.vapi --library=testlib --use-fast-vapi=.built/testlib-test.vapi
+valac --ccode --header=testlib.h --vapi=testlib.vapi --library=testlib --use-fast-vapi=.built/testlib-test.vapi
 valac --ccode main.vala
 mv main.c .built/test-main.c
 touch .built/test-main.c-stamp
@@ -27,9 +27,9 @@ rm -f /usr/bin/test
 (exit SUCCESS)
 !bake clean
 rm -rf .built/
+rm -f libtestlib.so
 rm -f libtestlib.a
 rm -f testlib.h
-rm -f testlib-0.vapi
-rm -f libtestlib.so
+rm -f testlib.vapi
 rm -f test
 (exit SUCCESS)

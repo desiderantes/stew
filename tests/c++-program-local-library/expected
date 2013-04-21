@@ -1,7 +1,7 @@
 !bake
 mkdir -p .built
 g++ -fPIC -MMD -MF .built/testlib-test.d -c test.cpp -o .built/testlib-test.o
-g++ -o libtestlib.so.0 -shared .built/testlib-test.o
+g++ -o libtestlib.so -shared .built/testlib-test.o
 ar -cq libtestlib.a .built/testlib-test.o
 g++ -MMD -MF .built/test-main.d -c main.cpp -o .built/test-main.o
 g++ -o test .built/test-main.o -L. -ltestlib
@@ -15,8 +15,7 @@ rm -f /usr/bin/test
 (exit SUCCESS)
 !bake clean
 rm -rf .built/
-rm -f libtestlib.so.0
-rm -f libtestlib.a
 rm -f libtestlib.so
+rm -f libtestlib.a
 rm -f test
 (exit SUCCESS)

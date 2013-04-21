@@ -19,8 +19,8 @@ Vala programs and libraries can set the following program <link xref="variables"
 </tr>
 </thead>
 <tr>
-  <td><p>namespace</p></td>
-  <td><p>FIXME (libraries only)</p></td>
+  <td><p>so-version</p></td>
+  <td><p>Shared object version for library (libraries only, optional)</p></td>
 </tr>
 <tr>
   <td><p>vala-compile-flags</p></td>
@@ -55,8 +55,20 @@ Vala programs and libraries can set the following program <link xref="variables"
   <td><p>Name to use for .h file generated for libraries (optional)</p></td>
 </tr>
 <tr>
+  <td><p>header-install-directory</p></td>
+  <td><p>Directory to install headers (libraries only, defaults to <file>/usr/include</file>)</p></td>
+</tr>
+<tr>
   <td><p>debug</p></td>
   <td><p>If debugging symbols should be generated</p></td>
+</tr>
+<tr>
+  <td><p>gir-namespace</p></td>
+  <td><p>Namespace to use to generate gobject introspection metadata (libraries only, optional)</p></td>
+</tr>
+<tr>
+  <td><p>gir-namespace-version</p></td>
+  <td><p>Namespace version to use in gobject introspection metadata (libraries only, defaults to 0)</p></td>
 </tr>
 </table>
 <example>
