@@ -1,0 +1,13 @@
+project {
+  name = test
+}
+
+libraries.testlib {
+  sources = test.vala
+  install = false
+}
+
+programs.test {
+  sources = main.vala
+  libraries = testlib
+}
