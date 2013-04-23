@@ -147,7 +147,7 @@ public class Rule
 
     public void add_error_command (string status)
     {
-        add_command ("@echo '\x1B[1m\x1B[31m%s\x1B[0m'".printf (status));
+        add_command ("@echo '%s'".printf (format_error (status)));
     }
     
     protected string make_status_command (string status)

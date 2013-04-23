@@ -9,6 +9,7 @@
  */
 
 private bool pretty_print = true;
+private bool show_color = true;
 private bool debug_enabled = false;
 private string original_dir;
 private static string last_logged_directory;
@@ -311,6 +312,30 @@ public string replace_extension (string filename, string extension)
     return "%.*s.%s".printf (i, filename, extension);
 }
 
+public string format_status (string message)
+{
+    if (show_color)
+        return "\x1B[1m" + message + "\x1B[0m";
+    else
+        return message;
+}
+
+public string format_error (string message)
+{
+    if (show_color)
+        return "\x1B[1m\x1B[31m" + message + "\x1B[0m";
+    else
+        return message;
+}
+
+public string format_success (string message)
+{
+    if (show_color)
+        return "\x1B[1m\x1B[32m" + message + "\x1B[0m";
+    else
+        return message;
+}
+
 public errordomain BuildError
 {
     INVALID,
@@ -326,6 +351,7 @@ public class Bake
     private static bool do_configure = false;
     private static bool do_unconfigure = false;
     private static bool do_expand = false;
+    private static string color_mode = "auto";
     private static const OptionEntry[] options =
     {
         { "configure", 0, 0, OptionArg.NONE, ref do_configure,
@@ -343,6 +369,9 @@ public class Bake
         { "verbose", 0, 0, OptionArg.NONE, ref show_verbose,
           /* Help string for command line --verbose flag */
           N_("Show verbose output"), null},
+        { "color", 0, 0, OptionArg.STRING, ref color_mode,
+          /* Help string for command line --color flag */
+          N_("Colorize output. WHEN is 'always', 'never' or 'auto' (default)"), "WHEN"},
         { "debug", 'd', 0, OptionArg.NONE, ref debug_enabled,
           /* Help string for command line --debug flag */
           N_("Print debugging messages"), null},
@@ -580,6 +609,12 @@ public class Bake
         }
 
         pretty_print = !show_verbose;
+        if (color_mode == "never")
+            show_color = false;
+        else if (color_mode == "always")
+            show_color = true;
+        else
+            show_color = Posix.isatty (Posix.STDOUT_FILENO);
 
         modules.append (new BZIPModule ());
         modules.append (new BZRModule ());
@@ -686,7 +721,7 @@ public class Bake
                 }
             }
 
-            stdout.printf ("\x1B[1m[Configuring]\x1B[0m\n");
+            stdout.printf ("%s\n", format_status ("[Configuring]"));
 
             /* Make directories absolute */
             // FIXME
@@ -835,13 +870,13 @@ public class Bake
             }
             catch (BuildError e)
             {
-                printerr ("\x1B[1m\x1B[31m[%s]\x1B[0m\n", e.message);
-                stdout.printf ("\x1B[1m\x1B[31m[Build failed]\x1B[0m\n");
+                stdout.printf ("%s\n", format_error ("[%s]".printf (e.message)));
+                stdout.printf ("%s\n", format_error ("[Build failed]"));
                 exit_code = Posix.EXIT_FAILURE;
                 loop.quit ();
             }
 
-            stdout.printf ("\x1B[1m\x1B[32m[Build complete]\x1B[0m\n");
+            stdout.printf ("%s\n", format_success ("[Build complete]"));
             loop.quit ();
         });
 

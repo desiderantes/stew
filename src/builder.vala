@@ -57,7 +57,7 @@ public class Builder
             var dir = Environment.get_current_dir ();
             if (last_logged_directory != dir)
             {
-                stdout.printf ("\x1B[1m[Entering directory %s]\x1B[0m\n", get_relative_path (original_dir, dir));
+                stdout.printf ("%s\n", format_status ("[Entering directory %s]".printf (get_relative_path (original_dir, dir))));
                 last_logged_directory = dir;
             }
         }
@@ -92,14 +92,14 @@ public class Builder
             if (Process.if_signaled (exit_status))
             {
                 if (!show_output)
-                    stdout.printf ("\x1B[1m%s\x1B[0m\n", c);
+                    stdout.printf ("%s\n", format_status (c));
                 stdout.printf ("%s", output);
                 throw new BuildError.COMMAND_FAILED ("Caught signal %d", Process.term_sig (exit_status));
             }
             else if (Process.if_exited (exit_status) && Process.exit_status (exit_status) != 0)
             {
                 if (!show_output)
-                    stdout.printf ("\x1B[1m%s\x1B[0m\n", c);
+                    stdout.printf ("%s\n", format_status (c));
                 stdout.printf ("%s", output);
                 throw new BuildError.COMMAND_FAILED ("Command exited with return value %d", Process.exit_status (exit_status));
             }
