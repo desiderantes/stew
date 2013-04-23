@@ -336,14 +336,6 @@ public string format_success (string message)
         return message;
 }
 
-public errordomain BuildError
-{
-    INVALID,
-    NO_RULE,
-    COMMAND_FAILED,
-    MISSING_OUTPUT
-}
-
 public class Bake
 {
     private static bool show_version = false;
@@ -643,31 +635,47 @@ public class Bake
         modules.append (new XZIPModule ());
 
         /* Find the toplevel */
-        var toplevel_dir = Environment.get_current_dir ();
+        var toplevel_dir = original_dir;
+        var have_recipe = false;
         Recipe? toplevel = null;
         while (true)
         {
+            var filename = Path.build_filename (toplevel_dir, "Recipe");
             try
             {
-                toplevel = new Recipe (Path.build_filename (toplevel_dir, "Recipe"));
+                toplevel = new Recipe (filename);
                 if (toplevel.project_name != null)
                     break;
             }
             catch (Error e)
             {
                 if (e is FileError.NOENT)
-                    printerr ("Unable to find toplevel recipe\n");
-                else
-                    printerr ("Unable to build: %s\n", e.message);
+                {
+                    if (have_recipe)
+                    {
+                        stdout.printf ("%s\n", format_status ("No toplevel recipe found.\nThe toplevel recipe file must specify the project name.\nThe last file checked was '%s'.".printf (get_relative_path (original_dir, filename))));
+                    }
+                    else
+                    {
+                        stdout.printf ("%s\n", format_status ("No recipe found.\nTo build a project Bake requires a file called 'Recipe' in the current directory."));
+                    }
+                }
+                else if (e is RecipeError)
+                {
+                    stdout.printf ("%s\n", format_status ("Recipe file '%s' is invalid.\n%s".printf (get_relative_path (original_dir, filename), e.message)));
+                }
+                stdout.printf ("%s\n", format_error ("[Build failed]"));
                 return Posix.EXIT_FAILURE;
             }
             toplevel_dir = Path.get_dirname (toplevel_dir);
+            have_recipe = true;
         }
 
         var minimum_bake_version = toplevel.get_variable ("project.minimum-bake-version");
         if (minimum_bake_version != null && pkg_compare_version (VERSION, minimum_bake_version) < 0)
         {
-            printerr ("Unable to build: Bake version %s is older than project required version %s\n", VERSION, minimum_bake_version);
+            stdout.printf ("%s\n", format_status ("This version of Bake is too old for this project.\nVersion %s or greater is required.\nThis is Bake %s.".printf (minimum_bake_version, VERSION)));
+            stdout.printf ("%s\n", format_error ("[Build failed]"));
             return Posix.EXIT_FAILURE;
         }
 
@@ -867,16 +875,15 @@ public class Bake
             try
             {
                 builder.build_target.end (x);
+                stdout.printf ("%s\n", format_success ("[Build complete]"));
             }
             catch (BuildError e)
             {
-                stdout.printf ("%s\n", format_error ("[%s]".printf (e.message)));
+                stdout.printf ("%s\n", format_status ("%s".printf (e.message)));
                 stdout.printf ("%s\n", format_error ("[Build failed]"));
                 exit_code = Posix.EXIT_FAILURE;
-                loop.quit ();
             }
 
-            stdout.printf ("%s\n", format_success ("[Build complete]"));
             loop.quit ();
         });
 

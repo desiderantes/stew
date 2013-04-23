@@ -8,6 +8,11 @@
  * license.
  */
 
+public errordomain RecipeError
+{
+    INVALID
+}
+
 public class Recipe
 {
     public string filename;
@@ -65,7 +70,7 @@ public class Recipe
         owned get { return toplevel.get_build_path (release_name); }
     }
 
-    public Recipe (string filename, bool allow_rules = true) throws FileError, BuildError
+    public Recipe (string filename, bool allow_rules = true) throws FileError, RecipeError
     {
         this.filename = filename;
 
@@ -178,14 +183,14 @@ public class Recipe
         }
     }
 
-    private void parse (string filename, string contents, bool allow_rules) throws BuildError
+    private void parse (string filename, string contents, bool allow_rules) throws RecipeError
     {
         var lines = contents.split ("\n");
         var line_number = 0;
         var in_rule = false;
         string? rule_indent = null;
         var continued_line = "";
-        var variable_stack = new List<string> ();
+        var variable_stack = new List<VariableBlock> ();
         foreach (var line in lines)
         {
             line_number++;
@@ -232,9 +237,9 @@ public class Recipe
             {
                 var name = strip (statement.substring (0, index));
                 if (variable_stack == null)
-                    variable_stack.prepend (name);
+                    variable_stack.prepend (new VariableBlock (line_number, name));
                 else
-                    variable_stack.prepend ("%s.%s".printf (variable_stack.nth_data (0), name));
+                    variable_stack.prepend (new VariableBlock (line_number, "%s.%s".printf (variable_stack.nth_data (0).name, name)));
 
                 /* Set variable so can allow empty blocks */
                 if (variables.lookup (name) == null)
@@ -246,7 +251,7 @@ public class Recipe
             if (statement == "}")
             {
                 if (variable_stack == null)
-                    throw new BuildError.INVALID ("Unmatched end variable block in file %s line %d:\n%s", get_relative_path (original_dir, filename), line_number, line);
+                    throw new RecipeError.INVALID ("End of variable group when none expected in line %d:\n%s", line_number, line);
                 variable_stack.remove_link (variable_stack.nth (0));
                 continue;
             }
@@ -257,7 +262,7 @@ public class Recipe
             {
                 var name = strip (statement.substring (0, index));
                 if (variable_stack != null)
-                    name = "%s.%s".printf (variable_stack.nth_data (0), name);
+                    name = "%s.%s".printf (variable_stack.nth_data (0).name, name);
                 var value = strip (statement.substring (index + 1));
 
                 set_variable (name, value);
@@ -282,11 +287,14 @@ public class Recipe
                 continue;
             }
 
-            throw new BuildError.INVALID ("Invalid statement in file %s line %d:\n%s", get_relative_path (original_dir, filename), line_number, line);
+            throw new RecipeError.INVALID ("Unknown statement in line %d:\n%s", line_number, line);
         }
 
         if (variable_stack != null)
-            throw new BuildError.INVALID ("Unmatched end variable block in file %s line %d:\n%s", get_relative_path (original_dir, filename), line_number, "");
+        {
+            var last_block = variable_stack.nth_data (0);
+            throw new RecipeError.INVALID ("Variable group without end in line %d:\n%s", last_block.line_number, lines[last_block.line_number-1]);
+        }
     }
 
     public Rule add_rule ()
@@ -450,5 +458,17 @@ public class Recipe
             stdout.printf ("\n");
             rule.print ();
         }
+    }
+}
+
+private class VariableBlock
+{
+    public int line_number;
+    public string name;
+
+    public VariableBlock (int line_number, string name)
+    {
+        this.line_number = line_number;
+        this.name = name;
     }
 }

@@ -8,6 +8,13 @@
  * license.
  */
 
+public errordomain BuildError
+{
+    NO_RULE,
+    COMMAND_FAILED,
+    MISSING_OUTPUT
+}
+
 public class Builder
 {
     public async bool build_target (Recipe recipe, string target) throws BuildError
@@ -34,7 +41,7 @@ public class Builder
                 return false;
 
             /* If doesn't exist then we can't continue */
-            throw new BuildError.NO_RULE ("No rule to build '%s'", get_relative_path (original_dir, target));
+            throw new BuildError.NO_RULE ("File '%s' does not exist and no rule to build it", get_relative_path (original_dir, target));
         }
 
         /* Check the inputs first */
@@ -110,7 +117,7 @@ public class Builder
         foreach (var output in rule.outputs)
         {
             if (!output.has_prefix ("%") && !FileUtils.test (output, FileTest.EXISTS))
-                throw new BuildError.MISSING_OUTPUT ("Failed to build file %s", output);
+                throw new BuildError.MISSING_OUTPUT ("Failed to build file '%s'", output);
         }
     }
 
@@ -144,7 +151,7 @@ public class Builder
         }
         catch (SpawnError e)
         {
-            throw new BuildError.COMMAND_FAILED ("Failed to run command: %s", e.message);
+            throw new BuildError.COMMAND_FAILED ("Failed to run command '%s'", e.message);
         }
 
         /* Method completes when child process completes */

@@ -6,6 +6,7 @@ Overview of changes in bake 0.1.21
     * Stop automatically versioning libraries
     * Add more GIR variables
     * Add --color option to control color output
+    * Improve error messages when failed to build
 
 Overview of changes in bake 0.1.20
 
