@@ -1,6 +1,11 @@
 Overview of changes in bake 0.1.21
 
     * Use build directory to generate releases
+    * Use programs.*.libraries and libraries.*.libraries to specify libraries
+      (local or system) to link against.
+    * Stop automatically versioning libraries
+    * Add more GIR variables
+    * Add --color option to control color output
 
 Overview of changes in bake 0.1.20
 
