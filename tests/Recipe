@@ -102,20 +102,23 @@ programs.test-runner {
     c-program-library {
       args = c-program-library
     }
-    c-program-two-libraries {
-      args = c-program-two-libraries
+    c-program-package {
+      args = c-program-package
     }
-    c-program-library-version {
-      args = c-program-library-version
+    c-program-packages {
+      args = c-program-packages
     }
-    c-program-missing-library {
-      args = c-program-missing-library
+    c-program-package-version {
+      args = c-program-package-version
     }
-    c-program-library-old-minor-version {
-      args = c-program-library-old-minor-version
+    c-program-package-missing {
+      args = c-program-package-missing
     }
-    c-program-library-old-major-version {
-      args = c-program-library-old-major-version
+    c-program-package-old-minor-version {
+      args = c-program-package-old-minor-version
+    }
+    c-program-package-old-major-version {
+      args = c-program-package-old-major-version
     }
     c-program-local-library {
       args = c-program-local-library
@@ -492,24 +495,24 @@ data.tests {
           c-program-shared-source/shared.c \
           c-program-shared-source/test1.c \
           c-program-shared-source/test2.c \
-          c-program-library/expected \
-          c-program-library/Recipe \
-          c-program-library/test.c \
-          c-program-two-libraries/expected \
-          c-program-two-libraries/Recipe \
-          c-program-two-libraries/test.c \
-          c-program-library-version/expected \
-          c-program-library-version/Recipe \
-          c-program-library-version/test.c \
-          c-program-missing-library/expected \
-          c-program-missing-library/Recipe \
-          c-program-missing-library/test.c \
-          c-program-library-old-minor-version/expected \
-          c-program-library-old-minor-version/Recipe \
-          c-program-library-old-minor-version/test.c \
-          c-program-library-old-major-version/expected \
-          c-program-library-old-major-version/Recipe \
-          c-program-library-old-major-version/test.c \
+          c-program-package/expected \
+          c-program-package/Recipe \
+          c-program-package/test.c \
+          c-program-packages/expected \
+          c-program-packages/Recipe \
+          c-program-packages/test.c \
+          c-program-package-version/expected \
+          c-program-package-version/Recipe \
+          c-program-package-version/test.c \
+          c-program-package-missing/expected \
+          c-program-package-missing/Recipe \
+          c-program-package-missing/test.c \
+          c-program-package-old-minor-version/expected \
+          c-program-package-old-minor-version/Recipe \
+          c-program-package-old-minor-version/test.c \
+          c-program-package-old-major-version/expected \
+          c-program-package-old-major-version/Recipe \
+          c-program-package-old-major-version/test.c \
           c-program-local-library/expected \
           c-program-local-library/Recipe \
           c-program-local-library/main.c \

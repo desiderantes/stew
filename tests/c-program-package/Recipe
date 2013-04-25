@@ -4,5 +4,5 @@ project {
 
 programs.test {
   sources = test.c
-  libraries = m
+  packages = baketestlibrary
 }
