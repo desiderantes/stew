@@ -7,11 +7,11 @@ bake-gettext --mime-type text/x-csharp --output .built/test3.cs.pot test3.cs
 msgcat --force-po --output-file=test.pot .built/test1.cs.pot .built/test2.cs.pot .built/test3.cs.pot
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/lib/cli/test
-cp test.dll /usr/lib/cli/test/test.dll
+mkdir -p /usr/lib/cli/test-project
+cp test.dll /usr/lib/cli/test-project/test.dll
 (exit SUCCESS)
 !bake uninstall
-rm -f /usr/lib/cli/test/test.dll
+rm -f /usr/lib/cli/test-project/test.dll
 (exit SUCCESS)
 !bake clean
 rm -rf .built/

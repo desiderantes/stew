@@ -504,14 +504,27 @@ public class Bake
             recipe_complete (child);
     }
 
-    private static void optimise (HashTable<string, Rule> targets, Recipe recipe)
+    private static bool optimise (HashTable<string, Rule> targets, Recipe recipe)
     {
+        var result = true;
+
         foreach (var rule in recipe.rules)
             foreach (var output in rule.outputs)
-                targets.insert (Path.build_filename (recipe.dirname, output), rule);
+            {
+                var path = Path.build_filename (recipe.dirname, output);
+                if (targets.lookup (path) != null)
+                {
+                    stdout.printf ("%s\n", format_status ("Output %s is defined in multiple locations".printf (get_relative_path (original_dir, path))));
+                    result = false;
+                }
+                targets.insert (path, rule);
+            }
 
         foreach (var r in recipe.children)
-            optimise (targets, r);
+            if (!optimise (targets, r))
+                result = false;
+
+        return result;
     }
 
     private static void generate_library_rules (Recipe recipe)
@@ -881,7 +894,8 @@ public class Bake
         }
         catch (Error e)
         {
-            printerr ("Unable to build: %s\n", e.message);
+            stdout.printf ("%s\n", format_status ("%s".printf (e.message)));
+            stdout.printf ("%s\n", format_error ("[Build failed]"));
             return Posix.EXIT_FAILURE;
         }
 
@@ -922,7 +936,7 @@ public class Bake
 
         /* Optimise */
         toplevel.targets = new HashTable<string, Rule> (str_hash, str_equal);
-        optimise (toplevel.targets, toplevel);
+        var optimise_result = optimise (toplevel.targets, toplevel);
 
         recipe_complete (toplevel);
         foreach (var module in modules)
@@ -934,7 +948,13 @@ public class Bake
             return Posix.EXIT_SUCCESS;
         }
 
-        string target = "%build";
+        if (!optimise_result)
+        {
+            stdout.printf ("%s\n", format_error ("[Build failed]"));
+            return Posix.EXIT_FAILURE;
+        }
+
+        var target = "%build";
         if (args.length >= 2)
             target = args[1];
 

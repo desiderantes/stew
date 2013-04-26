@@ -1,0 +1,3 @@
+# Check output being multiply defined fails with an error
+!bake a
+(exit FAILURE)

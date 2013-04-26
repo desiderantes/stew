@@ -2,9 +2,9 @@
 dpkg-architecture -qDEB_BUILD_ARCH
 rpmbuild --showrc
 mkdir -p .built
-mkdir -p .built/test-1.0
-cp Recipe .built/test-1.0/Recipe
-tar --create --bzip2 --file test-1.0.tar.bz2 --directory .built test-1.0
+mkdir -p .built/test-project-1.0
+cp Recipe .built/test-project-1.0/Recipe
+tar --create --bzip2 --file test-project-1.0.tar.bz2 --directory .built test-project-1.0
 (exit SUCCESS)
 !bake install
 dpkg-architecture -qDEB_BUILD_ARCH
@@ -17,6 +17,6 @@ rpmbuild --showrc
 !bake clean
 dpkg-architecture -qDEB_BUILD_ARCH
 rpmbuild --showrc
-rm -f test-1.0.tar.bz2
+rm -f test-project-1.0.tar.bz2
 rm -rf .built/
 (exit SUCCESS)

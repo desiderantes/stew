@@ -1,5 +1,5 @@
 project {
-  name = test
+  name = test-project
 }
 
 libraries.test1 {

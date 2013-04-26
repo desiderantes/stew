@@ -5,13 +5,13 @@ gcc -o libtest.so -shared .built/test-test.o
 ar -cq libtest.a .built/test-test.o
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/lib/test
-cp libtest.so /usr/lib/test/libtest.so
-cp libtest.a /usr/lib/test/libtest.a
+mkdir -p /usr/lib/custom-directory
+cp libtest.so /usr/lib/custom-directory/libtest.so
+cp libtest.a /usr/lib/custom-directory/libtest.a
 (exit SUCCESS)
 !bake uninstall
-rm -f /usr/lib/test/libtest.so
-rm -f /usr/lib/test/libtest.a
+rm -f /usr/lib/custom-directory/libtest.so
+rm -f /usr/lib/custom-directory/libtest.a
 (exit SUCCESS)
 !bake clean
 rm -rf .built/

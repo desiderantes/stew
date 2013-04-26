@@ -7,13 +7,13 @@ bake-gettext --mime-type text/x-csharp --output .built/test3.cs.pot test3.cs
 msgcat --force-po --output-file=test.pot .built/test1.cs.pot .built/test2.cs.pot .built/test3.cs.pot
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/share/test
-cp test.exe /usr/share/test/test.exe
+mkdir -p /usr/share/test-project
+cp test.exe /usr/share/test-project/test.exe
 mkdir -p /usr/bin
 cp .built/test /usr/bin/test
 (exit SUCCESS)
 !bake uninstall
-rm -f /usr/share/test/test.exe
+rm -f /usr/share/test-project/test.exe
 rm -f /usr/bin/test
 (exit SUCCESS)
 !bake clean

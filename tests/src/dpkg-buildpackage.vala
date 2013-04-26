@@ -17,13 +17,13 @@ public class DpkgBuildpackage
 
         // FIXME: Hack
         if (do_binary)
-            create_file ("../test_1.0-0_amd64.deb");
+            create_file ("../test-project_1.0-0_amd64.deb");
 
         // FIXME: Hack
         if (do_source)
         {
-            create_file ("../test_1.0-0.dsc");
-            create_file ("../test_1.0-0_source.changes");
+            create_file ("../test-project_1.0-0.dsc");
+            create_file ("../test-project_1.0-0_source.changes");
         }
 
         return Posix.EXIT_SUCCESS;

@@ -2,11 +2,11 @@
 gmcs -target:library -out:test.dll test.cs
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/lib/test/cli/test
-cp test.dll /usr/lib/test/cli/test/test.dll
+mkdir -p /usr/lib/custom-directory/cli/test-project
+cp test.dll /usr/lib/custom-directory/cli/test-project/test.dll
 (exit SUCCESS)
 !bake uninstall
-rm -f /usr/lib/test/cli/test/test.dll
+rm -f /usr/lib/custom-directory/cli/test-project/test.dll
 (exit SUCCESS)
 !bake clean
 rm -f test.dll

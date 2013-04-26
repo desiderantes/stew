@@ -1,8 +1,8 @@
 project {
-  name = test
+  name = test-project
 }
 
 libraries.test {
   sources = test.c
-  install-directory = $(library-directory)/test
+  install-directory = $(library-directory)/custom-directory
 }

@@ -16,7 +16,7 @@ public class RPMBuild
         // FIXME: Hack
         var dir = Path.build_filename (Environment.get_home_dir (), "rpmbuild", "RPMS", "x86_64");
         DirUtils.create_with_parents (dir, 0755);
-        create_file (Path.build_filename (dir, "test-1.0-1.x86_64.rpm"));
+        create_file (Path.build_filename (dir, "test-project-1.0-1.x86_64.rpm"));
 
         return Posix.EXIT_SUCCESS;
     }

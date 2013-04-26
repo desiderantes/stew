@@ -1,4 +1,9 @@
 project {
   name = test-project
-  minimum-bake-version = 100.1
 }
+
+a:
+    touch a
+
+a:
+    touch a

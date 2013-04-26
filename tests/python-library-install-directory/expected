@@ -2,11 +2,11 @@
 python -m py_compile test.py
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/lib/test
-cp test.pyc /usr/lib/test/test.pyc
+mkdir -p /usr/lib/custom-directory
+cp test.pyc /usr/lib/custom-directory/test.pyc
 (exit SUCCESS)
 !bake uninstall
-rm -f /usr/lib/test/test.pyc
+rm -f /usr/lib/custom-directory/test.pyc
 (exit SUCCESS)
 !bake clean
 rm -f test.pyc

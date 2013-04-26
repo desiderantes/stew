@@ -22,6 +22,9 @@ programs.test-runner {
     clean {
       args = clean
     }
+    duplicate-output {
+      args = duplicate-output
+    }
     minimum-version-older {
       args = minimum-version-older
     }

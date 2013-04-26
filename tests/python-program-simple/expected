@@ -3,13 +3,13 @@ python -m py_compile test.py
 mkdir -p .built
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/share/test
-cp test.pyc /usr/share/test/test.pyc
+mkdir -p /usr/share/test-project
+cp test.pyc /usr/share/test-project/test.pyc
 mkdir -p /usr/bin
 cp .built/test /usr/bin/test
 (exit SUCCESS)
 !bake uninstall
-rm -f /usr/share/test/test.pyc
+rm -f /usr/share/test-project/test.pyc
 rm -f /usr/bin/test
 (exit SUCCESS)
 !bake clean

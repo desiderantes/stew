@@ -1,11 +1,11 @@
 !bake
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/share/test
-cp test.ui /usr/share/test/test.ui
+mkdir -p /usr/share/test-project
+cp test.ui /usr/share/test-project/test.ui
 (exit SUCCESS)
 !bake uninstall
-rm -f /usr/share/test/test.ui
+rm -f /usr/share/test-project/test.ui
 (exit SUCCESS)
 !bake clean
 (exit SUCCESS)

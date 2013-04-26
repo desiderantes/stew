@@ -1,9 +1,9 @@
 project {
-  name = test
+  name = test-project
 }
 
 libraries.test {
   sources = test.cpp
-  install-directory = $(library-directory)/test
+  install-directory = $(library-directory)/custom-directory
 }
 

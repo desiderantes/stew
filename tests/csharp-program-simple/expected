@@ -3,13 +3,13 @@ gmcs -out:test.exe test.cs
 mkdir -p .built
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/share/test
-cp test.exe /usr/share/test/test.exe
+mkdir -p /usr/share/test-project
+cp test.exe /usr/share/test-project/test.exe
 mkdir -p /usr/bin
 cp .built/test /usr/bin/test
 (exit SUCCESS)
 !bake uninstall
-rm -f /usr/share/test/test.exe
+rm -f /usr/share/test-project/test.exe
 rm -f /usr/bin/test
 (exit SUCCESS)
 !bake clean

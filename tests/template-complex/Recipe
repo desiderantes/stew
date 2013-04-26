@@ -1,5 +1,5 @@
 project {
-  name = test
+  name = test-project
 }
 
 foo_variable=foo

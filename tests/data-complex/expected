@@ -1,13 +1,13 @@
 !bake
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/share/test/test
-cp test1 /usr/share/test/test/test1
-cp test2 /usr/share/test/test/test2
+mkdir -p /usr/share/test-project/test
+cp test1 /usr/share/test-project/test/test1
+cp test2 /usr/share/test-project/test/test2
 (exit SUCCESS)
 !bake uninstall
-rm -f /usr/share/test/test/test1
-rm -f /usr/share/test/test/test2
+rm -f /usr/share/test-project/test/test1
+rm -f /usr/share/test-project/test/test2
 (exit SUCCESS)
 !bake clean
 (exit SUCCESS)
