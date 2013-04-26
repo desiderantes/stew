@@ -4,7 +4,7 @@ g++ -fPIC -MMD -MF .built/testlib-test.d -c test.cpp -o .built/testlib-test.o
 g++ -o libtestlib.so -shared .built/testlib-test.o
 ar -cq libtestlib.a .built/testlib-test.o
 g++ -MMD -MF .built/test-main.d -c main.cpp -o .built/test-main.o
-g++ -o test .built/test-main.o -L. -ltestlib
+g++ -o test .built/test-main.o libtestlib.so
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/bin

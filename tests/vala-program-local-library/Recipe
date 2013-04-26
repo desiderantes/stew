@@ -9,5 +9,5 @@ libraries.testlib {
 
 programs.test {
   sources = main.vala
-  libraries = testlib
+  libraries = testlib (local)
 }

@@ -59,11 +59,9 @@ public class GCCModule : BuildModule
 
         /* Install headers */
         var include_directory = library.get_variable ("header-install-directory", recipe.include_directory);
-        var header_list = library.get_variable ("headers");
-        var headers = new List<string> ();
-        if (library.install && header_list != null)
+        var headers = library.get_file_list ("headers");
+        if (library.install)
         {
-            headers = split_variable (header_list);
             foreach (var header in headers)
                 recipe.add_install_rule (header, include_directory);
         }
@@ -186,24 +184,54 @@ public class GCCModule : BuildModule
         if (compilable.debug)
             compile_flags += " -g";
 
+        var link_errors = new List<string> ();
+
         /* Link against libraries */
-        var libraries = compilable.libraries;
-        if (libraries == null)
-            libraries = "";
-        var library_list = split_variable (libraries);
-        foreach (var library in library_list)
+        var libraries = new List<TaggedEntry> ();
+        try
         {
-            /* Look for locally generated libraries */
-            var library_filename = "lib%s.so".printf (library);
-            var library_rule = recipe.toplevel.find_rule_recursive (library_filename);
-            if (library_rule != null)
+            libraries = compilable.get_tagged_list ("libraries");
+        }
+        catch (TaggedListError e)
+        {
+            link_errors.append (e.message);
+        }
+        foreach (var library in libraries)
+        {
+            var local = false;
+            var static = false;
+            foreach (var tag in library.tags)
             {
-                var rel_dir = get_relative_path (recipe.dirname, library_rule.recipe.dirname);
-                link_rule.add_input (Path.build_filename (rel_dir, library_filename));
-                link_flags += " -L%s -l%s".printf (rel_dir, library);
+                if (tag == "local")
+                    local = true;
+                else if (tag == "static")
+                    static = true;
+                else
+                    link_errors.append ("Unknown tag (%s) for library %s".printf (tag, library.name));
+            }
+
+            /* Look for locally generated libraries */
+            if (local)
+            {
+                var library_filename = "lib%s.so".printf (library.name);
+                if (static)
+                    library_filename = "lib%s.a".printf (library.name);
+                var library_rule = recipe.toplevel.find_rule_recursive (library_filename);
+                if (library_rule != null)
+                {
+                    var path = get_relative_path (recipe.dirname, Path.build_filename (library_rule.recipe.dirname, library_filename));
+                    link_rule.add_input (path);
+                    link_flags += " %s".printf (path);
+                }
+                else
+                    link_errors.append ("Unable to find local library %s".printf (library.name));
             }
             else
-                link_flags += " -l%s".printf (library);
+            {
+                // FIXME: Static system libraries
+                // Need to find the file ourselves since the linker doesn't handle mixed static and dynamic libraries well
+                link_flags += " -l%s".printf (library.name);
+            }
         }
 
         /* Get dependencies */
@@ -211,7 +239,6 @@ public class GCCModule : BuildModule
         if (packages == null)
             packages = "";
         var package_list = split_variable (packages);
-        var link_errors = new List<string> ();
         var pkg_config_list = "";
         foreach (var package in package_list)
         {

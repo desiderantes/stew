@@ -102,6 +102,12 @@ programs.test-runner {
     c-program-library {
       args = c-program-library
     }
+    c-program-library-tag-before-entry {
+      args = c-program-library-tag-before-entry
+    }
+    c-program-library-unterminated-tag {
+      args = c-program-library-unterminated-tag
+    }
     c-program-package {
       args = c-program-package
     }
@@ -122,6 +128,9 @@ programs.test-runner {
     }
     c-program-local-library {
       args = c-program-local-library
+    }
+    c-program-local-library-static {
+      args = c-program-local-library-static
     }
     c-library-simple {
       args = c-library-simple
@@ -157,6 +166,9 @@ programs.test-runner {
     }
     c++-program-local-library {
       args = c++-program-local-library
+    }
+    c++-program-local-library-static {
+      args = c++-program-local-library-static
     }
     c++-library-simple {
       args = c++-library-simple
@@ -232,6 +244,9 @@ programs.test-runner {
     }
     vala-program-local-library {
       args = vala-program-local-library
+    }
+    vala-program-local-library-static {
+      args = vala-program-local-library-static
     }
     vala-library-simple {
       args = vala-library-simple
@@ -495,6 +510,15 @@ data.tests {
           c-program-shared-source/shared.c \
           c-program-shared-source/test1.c \
           c-program-shared-source/test2.c \
+          c-program-library/expected \
+          c-program-library/Recipe \
+          c-program-library/test.c \
+          c-program-library-tag-before-entry/expected \
+          c-program-library-tag-before-entry/Recipe \
+          c-program-library-tag-before-entry/test.c \
+          c-program-library-unterminated-tag/expected \
+          c-program-library-unterminated-tag/Recipe \
+          c-program-library-unterminated-tag/test.c \
           c-program-package/expected \
           c-program-package/Recipe \
           c-program-package/test.c \
@@ -517,6 +541,10 @@ data.tests {
           c-program-local-library/Recipe \
           c-program-local-library/main.c \
           c-program-local-library/test.c \
+          c-program-local-library-static/expected \
+          c-program-local-library-static/Recipe \
+          c-program-local-library-static/main.c \
+          c-program-local-library-static/test.c \
           c-library-simple/expected \
           c-library-simple/Recipe \
           c-library-simple/test.c \
@@ -562,6 +590,10 @@ data.tests {
           c++-program-local-library/Recipe \
           c++-program-local-library/main.cpp \
           c++-program-local-library/test.cpp \
+          c++-program-local-library-static/expected \
+          c++-program-local-library-static/Recipe \
+          c++-program-local-library-static/main.cpp \
+          c++-program-local-library-static/test.cpp \
           c++-library-simple/expected \
           c++-library-simple/Recipe \
           c++-library-simple/test.cpp \
@@ -652,6 +684,10 @@ data.tests {
           vala-program-local-library/Recipe \
           vala-program-local-library/main.vala \
           vala-program-local-library/test.vala \
+          vala-program-local-library-static/expected \
+          vala-program-local-library-static/Recipe \
+          vala-program-local-library-static/main.vala \
+          vala-program-local-library-static/test.vala \
           vala-library-simple/expected \
           vala-library-simple/Recipe \
           vala-library-simple/test.vala \

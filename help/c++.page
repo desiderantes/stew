@@ -33,7 +33,7 @@ C++ programs and libraries can set the following program <link xref="variables">
 </tr>
 <tr>
   <td><p>libraries</p></td>
-  <td><p>Libraries to use (can be local or system libraries)</p></td>
+  <td><p>Libraries to use (see below for details)</p></td>
 </tr>
 <tr>
   <td><p>packages</p></td>
@@ -62,6 +62,27 @@ programs.example-program {
   packages = alsa
   compile-flags = -Wall
   debug = true
+}
+</code>
+</example>
+<p>
+Libraries are specified using the <code>libraries</code> variable.
+By default each library name listed is searched for in the system paths and dynamically linked to.
+Static linking is performed by following the library with <code>(static)</code>.
+If the library is built inside the project then it will be searched for if the library name is followed with <code>(local)</code>.
+</p>
+<example>
+<p>
+The following shows a recipe that builds a program and a library and statically links them together.
+</p>
+<code>
+programs.example-program {
+  sources = main.cpp
+  libraries = example-library (local) (static)
+}
+
+libraries.example-library {
+  sources = module.cpp
 }
 </code>
 </example>

@@ -1,3 +1,7 @@
+Overview of changes in bake 0.1.22
+
+    * Support static linking against locally built libraries
+
 Overview of changes in bake 0.1.21
 
     * Use build directory to generate releases

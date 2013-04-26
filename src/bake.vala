@@ -55,6 +55,12 @@ public class BuildModule
     }
 }
 
+public errordomain TaggedListError
+{
+    TAG_BEFORE_ENTRY,
+    UNTERMINATED_TAG
+}
+
 public class Block
 {
     public Recipe recipe;
@@ -85,6 +91,75 @@ public class Block
             return new List<string> ();
 
         return split_variable (list);
+    }
+
+    public List<TaggedEntry> get_tagged_list (string name) throws TaggedListError
+    {
+        var list = new List<TaggedEntry> ();
+
+        var value = get_variable (name);
+        if (value == null)
+            return list;
+
+        var start = 0;
+        TaggedEntry? entry = null;
+        while (true)
+        {
+            while (value[start].isspace ())
+                start++;
+            if (value[start] == '\0')
+                break;
+
+            if (value[start] == '(')
+            {
+                /* Error if no current entry */
+                if (entry == null)
+                    throw new TaggedListError.TAG_BEFORE_ENTRY ("List starts with tag - tags must follow entries");
+
+                /* Tag is surrounded by parenthesis, error if not terminated */
+                start++;
+                var end = start + 1;
+                while (value[end] != '\0' && value[end] != ')')
+                    end++;
+                if (value[end] != ')')
+                    throw new TaggedListError.UNTERMINATED_TAG ("Unterminated tag");
+                var text = value.substring (start, end - start);
+                start = end + 1;
+
+                /* Add tag to current entry */
+                entry.tags.append (text);
+            }
+            else
+            {
+                /* Entry is terminated by whitespace */
+                var end = start + 1;
+                while (value[end] != '\0' && !value[end].isspace ())
+                    end++;
+                var text = value.substring (start, end - start);
+                start = end;
+
+                /* Finish last entry and start a new one */
+                if (entry != null)
+                    list.append (entry);
+                entry = new TaggedEntry (text);
+            }
+        }
+        if (entry != null)
+            list.append (entry);
+
+        return list;
+    }
+}
+
+public class TaggedEntry
+{
+    public string name;
+    public List<string> tags;
+    
+    public TaggedEntry (string name)
+    {
+        this.name = name;
+        tags = new List<string> ();
     }
 }
 

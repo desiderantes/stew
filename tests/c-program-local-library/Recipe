@@ -9,5 +9,5 @@ libraries.testlib {
 
 programs.test {
   sources = main.c
-  libraries = testlib
+  libraries = testlib (local)
 }

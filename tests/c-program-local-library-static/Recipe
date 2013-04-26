@@ -3,11 +3,11 @@ project {
 }
 
 libraries.testlib {
-  sources = test.cpp
+  sources = test.c
   install = false
 }
 
 programs.test {
-  sources = main.cpp
-  libraries = testlib (local)
+  sources = main.c
+  libraries = testlib (local) (static)
 }

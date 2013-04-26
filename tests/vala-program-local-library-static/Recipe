@@ -3,11 +3,11 @@ project {
 }
 
 libraries.testlib {
-  sources = test.cpp
+  sources = test.vala
   install = false
 }
 
 programs.test {
-  sources = main.cpp
-  libraries = testlib (local)
+  sources = main.vala
+  libraries = testlib (local) (static)
 }

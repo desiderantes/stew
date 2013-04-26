@@ -13,7 +13,7 @@ valac --ccode main.vala
 mv main.c .built/test-main.c
 touch .built/test-main.c-stamp
 gcc -Wno-unused -Wno-deprecated-declarations -Igobject -Iglib -c .built/test-main.c -o .built/test-main.o
-gcc -o test .built/test-main.o libtestlib.so -lgobject -lglib
+gcc -o test .built/test-main.o libtestlib.a -lgobject -lglib
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/bin
