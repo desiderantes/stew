@@ -2,6 +2,7 @@ Overview of changes in bake 0.1.22
 
     * Support static linking against locally built libraries
     * Fail build if an output is defined in multiple rules
+    * Detect build loops
 
 Overview of changes in bake 0.1.21
 

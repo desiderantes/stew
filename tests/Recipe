@@ -47,15 +47,15 @@ programs.test-runner {
     rule-duplicate-output {
       args = rule-duplicate-output
     }
-    #rule-loop-1 {
-    #  args = rule-loop-1
-    #}
-    #rule-loop-2 {
-    #  args = rule-loop-2
-    #}
-    #rule-loop-3 {
-    #  args = rule-loop-3
-    #}
+    rule-loop-1 {
+      args = rule-loop-1
+    }
+    rule-loop-2 {
+      args = rule-loop-2
+    }
+    rule-loop-3 {
+      args = rule-loop-3
+    }
 
     # Test project.minimum-bake-version
     minimum-version-older {

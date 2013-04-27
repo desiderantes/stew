@@ -12,12 +12,19 @@ public errordomain BuildError
 {
     NO_RULE,
     COMMAND_FAILED,
-    MISSING_OUTPUT
+    MISSING_OUTPUT,
+    LOOP
 }
 
 public class Builder
 {
     public async bool build_target (Recipe recipe, string target) throws BuildError
+    {
+        var used_rules = new List<Rule> ();
+        return yield build_target_recursive (recipe, target, used_rules);
+    }
+
+    private async bool build_target_recursive (Recipe recipe, string target, List<Rule> used_rules) throws BuildError
     {
         if (debug_enabled)
             stderr.printf ("Considering target %s\n", get_relative_path (original_dir, target));
@@ -44,11 +51,17 @@ public class Builder
             throw new BuildError.NO_RULE ("File '%s' does not exist and no rule to build it", get_relative_path (original_dir, target));
         }
 
+        if (used_rules.find (rule) != null)
+            throw new BuildError.LOOP ("Build loop detected");
+
+        var new_used_rules = used_rules.copy ();
+        new_used_rules.append (rule);
+
         /* Check the inputs first */
         var force_build = false;
         foreach (var input in rule.inputs)
         {
-            var result = yield build_target (recipe, join_relative_dir (recipe.dirname, input));
+            var result = yield build_target_recursive (recipe, join_relative_dir (recipe.dirname, input), new_used_rules);
             if (result)
                 force_build = true;
         }
