@@ -1,0 +1,10 @@
+project {
+  name = test-project
+}
+
+a b:
+    touch a
+    touch b
+
+c: a b
+    cat a b > c

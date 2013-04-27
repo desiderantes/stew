@@ -1,0 +1,5 @@
+# Build the target
+!bake c
+touch a
+touch b
+cat a b

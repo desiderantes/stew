@@ -20,6 +20,12 @@ programs.test-runner {
     rule-multiple-inputs {
       args = rule-multiple-inputs
     }
+    rule-multiple-outputs-require-one {
+      args = rule-multiple-outputs-require-one
+    }
+    rule-multiple-outputs-require-both {
+      args = rule-multiple-outputs-require-both
+    }
     rule-chain {
       args = rule-chain
     }
@@ -470,6 +476,10 @@ data.tests {
           rule-missing-output/Recipe \
           rule-multiple-inputs/expected \
           rule-multiple-inputs/Recipe \
+          rule-multiple-outputs-require-one/expected \
+          rule-multiple-outputs-require-one/Recipe \
+          rule-multiple-outputs-require-both/expected \
+          rule-multiple-outputs-require-both/Recipe \
           rule-newer-input/expected \
           rule-newer-input/Recipe \
           rule-simple/expected \
