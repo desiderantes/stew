@@ -13,18 +13,45 @@ programs.test-runner {
   install = false
 
   tests {
-    build-rule {
-      args = build-rule
+    # Rule tests
+    rule-simple {
+      args = rule-simple
     }
-    chain {
-      args = chain
+    rule-multiple-inputs {
+      args = rule-multiple-inputs
     }
-    clean {
-      args = clean
+    rule-chain {
+      args = rule-chain
     }
-    duplicate-output {
-      args = duplicate-output
+    rule-missing-input {
+      args = rule-missing-input
     }
+    rule-missing-output {
+      args = rule-missing-output
+    }
+    rule-newer-input {
+      args = rule-newer-input
+    }
+    rule-build {
+      args = rule-build
+    }
+    rule-clean {
+      args = rule-clean
+    }
+    rule-duplicate-output {
+      args = rule-duplicate-output
+    }
+    #rule-loop-1 {
+    #  args = rule-loop-1
+    #}
+    #rule-loop-2 {
+    #  args = rule-loop-2
+    #}
+    #rule-loop-3 {
+    #  args = rule-loop-3
+    #}
+
+    # Test project.minimum-bake-version
     minimum-version-older {
       args = minimum-version-older
     }
@@ -32,28 +59,12 @@ programs.test-runner {
       args = minimum-version-newer
     }
 
+    # Test handle unknown programs and libraries
     unknown-program {
       args = unknown-program
     }
     unknown-library {
       args = unknown-library
-    }
-
-    # Rule tests
-    missing-input {
-      args = missing-input
-    }
-    missing-output {
-      args = missing-output
-    }
-    multi-input {
-      args = multi-input
-    }
-    newer {
-      args = newer
-    }
-    rule {
-      args = rule
     }
 
     # Template tests
@@ -439,12 +450,30 @@ programs.test-runner {
 
 data.tests {
   install = false
-  files = build-rule/expected \
-          build-rule/Recipe \
-          chain/expected \
-          chain/Recipe \
-          clean/expected \
-          clean/Recipe \
+  files = rule-build/expected \
+          rule-build/Recipe \
+          rule-chain/expected \
+          rule-chain/Recipe \
+          rule-clean/expected \
+          rule-clean/Recipe \
+          rule-duplicate-output/expected \
+          rule-duplicate-output/Recipe \
+          rule-loop-1/expected \
+          rule-loop-1/Recipe \
+          rule-loop-2/expected \
+          rule-loop-2/Recipe \
+          rule-loop-3/expected \
+          rule-loop-3/Recipe \
+          rule-missing-input/expected \
+          rule-missing-input/Recipe \
+          rule-missing-output/expected \
+          rule-missing-output/Recipe \
+          rule-multiple-inputs/expected \
+          rule-multiple-inputs/Recipe \
+          rule-newer-input/expected \
+          rule-newer-input/Recipe \
+          rule-simple/expected \
+          rule-simple/Recipe \
           minimum-version-older/expected \
           minimum-version-older/Recipe \
           minimum-version-newer/expected \
@@ -455,16 +484,6 @@ data.tests {
           unknown-library/expected \
           unknown-library/Recipe \
           unknown-library/test.unknown \
-          missing-input/expected \
-          missing-input/Recipe \
-          missing-output/expected \
-          missing-output/Recipe \
-          multi-input/expected \
-          multi-input/Recipe \
-          newer/expected \
-          newer/Recipe \
-          rule/expected \
-          rule/Recipe \
           template-simple/expected \
           template-simple/Recipe \
           template-simple/test.template \

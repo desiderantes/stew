@@ -1,0 +1,9 @@
+project {
+  name = test-project
+}
+
+a: b
+    touch a
+
+b: a
+    touch b
