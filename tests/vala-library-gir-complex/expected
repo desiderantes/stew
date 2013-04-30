@@ -9,7 +9,7 @@ ar -cq libtest.a .built/test-test.o
 valac --fast-vapi=.built/test-test.vapi test.vala
 touch .built/test-test.vapi-stamp
 valac --ccode --header=test.h --vapi=test.vapi --library=test --gir=Test-1.2.gir --use-fast-vapi=.built/test-test.vapi
-g-ir-compiler --shared-library=test Test-1.2.gir -o Test-1.2.typelib
+g-ir-compiler --shared-library=libtest.so Test-1.2.gir -o Test-1.2.typelib
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/lib

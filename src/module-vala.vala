@@ -99,7 +99,7 @@ public class ValaModule : BuildModule
             typelib_rule.add_input ("lib%s.so".printf (library.name));
             typelib_rule.add_output (typelib_filename);
             typelib_rule.add_status_command ("G-IR-COMPILER %s".printf (typelib_filename));
-            typelib_rule.add_command ("@g-ir-compiler --shared-library=%s %s -o %s".printf (name, gir_filename, typelib_filename));
+            typelib_rule.add_command ("@g-ir-compiler --shared-library=%s %s -o %s".printf (binary_name, gir_filename, typelib_filename));
             var typelib_directory = Path.build_filename (library.install_directory, "girepository-1.0");
             if (library.install)
                 recipe.add_install_rule (typelib_filename, typelib_directory);
