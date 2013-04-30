@@ -1,0 +1,8 @@
+project {
+  name = test-project
+}
+
+libraries.test {
+  sources = test.c
+  gir-namespace = Test
+}

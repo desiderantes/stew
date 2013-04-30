@@ -170,6 +170,12 @@ programs.test-runner {
     c-library-shared-source {
       args = c-library-shared-source
     }
+    c-library-gir-simple {
+      args = c-library-gir-simple
+    }
+    c-library-gir-complex {
+      args = c-library-gir-complex
+    }
 
     # C++ tests
     c++-program-simple {
@@ -604,6 +610,12 @@ data.tests {
           c-library-shared-source/shared.c \
           c-library-shared-source/test1.c \
           c-library-shared-source/test2.c \
+          c-library-gir-simple/expected \
+          c-library-gir-simple/Recipe \
+          c-library-gir-simple/test.c \
+          c-library-gir-complex/expected \
+          c-library-gir-complex/Recipe \
+          c-library-gir-complex/test.c \
           c++-program-simple/expected \
           c++-program-simple/Recipe \
           c++-program-simple/test.cpp \
