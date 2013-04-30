@@ -92,7 +92,7 @@ public class ValaModule : BuildModule
             if (library.install)
                 recipe.add_install_rule (gir_filename, gir_directory);
 
-            var typelib_filename = "%s-%s.typelib".printf (name, gir_namespace_version);
+            var typelib_filename = "%s-%s.typelib".printf (gir_namespace, gir_namespace_version);
             recipe.build_rule.add_input (typelib_filename);
             var typelib_rule = recipe.add_rule ();
             typelib_rule.add_input (gir_filename);

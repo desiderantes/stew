@@ -24,6 +24,8 @@ public class Valac
                 create_file (args[i].substring (9));
             else if (args[i].has_prefix ("--vapi="))
                 create_file (args[i].substring (7));
+            else if (args[i].has_prefix ("--gir="))
+                create_file (args[i].substring (6));
             else if (args[i].has_prefix ("-"))
             {
             }

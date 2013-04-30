@@ -295,6 +295,12 @@ programs.test-runner {
     vala-library-shared-source {
       args = vala-library-shared-source
     }
+    vala-library-gir-simple {
+      args = vala-library-gir-simple
+    }
+    vala-library-gir-complex {
+      args = vala-library-gir-complex
+    }
 
     # Java tests
     java-program-simple {
@@ -761,6 +767,12 @@ data.tests {
           vala-library-shared-source/shared.vala \
           vala-library-shared-source/test1.vala \
           vala-library-shared-source/test2.vala \
+          vala-library-gir-simple/expected \
+          vala-library-gir-simple/Recipe \
+          vala-library-gir-simple/test.vala \
+          vala-library-gir-complex/expected \
+          vala-library-gir-complex/Recipe \
+          vala-library-gir-complex/test.vala \
           java-program-simple/expected \
           java-program-simple/Recipe \
           java-program-simple/Test.java \

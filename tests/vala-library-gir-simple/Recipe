@@ -1,0 +1,8 @@
+project {
+  name = test-project
+}
+
+libraries.test {
+  sources = test.vala
+  gir-namespace = Test
+}
