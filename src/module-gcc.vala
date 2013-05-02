@@ -280,6 +280,9 @@ public class GCCModule : BuildModule
         /* Compile */
         foreach (var source in compilable.sources)
         {
+            if (source.has_suffix (".h") || source.has_suffix (".hpp"))
+                continue;
+
             var source_base = Path.get_basename (source);
 
             var input = source;
@@ -424,7 +427,7 @@ public class GCCModule : BuildModule
                  source.has_suffix (".cp") ||
                  source.has_suffix (".cxx"))
             return "text/x-c++src";
-        else if (source.has_suffix (".h"))
+        else if (source.has_suffix (".h") || source.has_suffix (".hpp"))
             return "text/x-chdr"; // FIXME: Also could use text/x-c++hdr?
         else
             return null;
