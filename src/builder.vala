@@ -145,15 +145,36 @@ public class Builder
         args[2] = command;
         args[3] = null;
 
+        var have_output = false;
+        var process_complete = false;
+
         /* Write text output from the command to a pipe */
         int output_pipe[2];
         Posix.pipe (output_pipe);
+        var channel = new IOChannel.unix_new (output_pipe[0]);
+        var text = "";
+        channel.add_watch (IOCondition.IN | IOCondition.HUP, (source, condition) =>
+        {
+            var data = new uint8[1024];
+            var n_read = Posix.read (output_pipe[0], data, data.length - 1);
+            if (n_read <= 0)
+            {
+                have_output = true;
+                if (process_complete && have_output)
+                    run_command.callback ();
+                return false;
+            }
+            data[n_read] = '\0';
+            text += (string) data;
+
+            return true;
+        });
 
         /* Run the command in a child process */
         Pid pid;
         try
         {
-            Process.spawn_async (null, args, null, SpawnFlags.DO_NOT_REAP_CHILD, () =>
+            Process.spawn_async (null, args, null, SpawnFlags.DO_NOT_REAP_CHILD | SpawnFlags.LEAVE_DESCRIPTORS_OPEN, () =>
             {
                 Posix.close (output_pipe[0]);
                 Posix.dup2 (output_pipe[1], Posix.STDOUT_FILENO);
@@ -172,23 +193,17 @@ public class Builder
         ChildWatch.add (pid, (pid, status) =>
         {
             exit_status = status;
-            run_command.callback ();
+            process_complete = true;
+            if (process_complete && have_output)
+                run_command.callback ();
         });
+
+        /* Wait until the process completes and we have all the output */
         yield;
 
-        /* Read back output from child process */
-        while (true)
-        {
-            var data = new uint8[1024];
-            var n_read = Posix.read (output_pipe[0], data, data.length - 1);
-            if (n_read <= 0)
-                break;
-            data[n_read] = '\0';
-            var s = (string) data;
-            output += s;
-        }
         Posix.close (output_pipe[0]);
 
+        output = text;
         return exit_status;
     }
 }
