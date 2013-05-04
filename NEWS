@@ -1,3 +1,10 @@
+Overview of changes in bake 0.1.23
+
+    * Don't try and compile C/C++ header files
+    * Fix documentation to state only project.name is required
+    * Fix shared library name passed to g-ir-compiler
+    * Fix typelib name generated for Vala libraries
+
 Overview of changes in bake 0.1.22
 
     * Support static linking against locally built libraries
