@@ -2,6 +2,7 @@ Overview of changes in bake 0.1.24
 
     * Read from subprocesses asynchronously so pipe doesn't fill up for
       processes with a lot of output
+    * Use .vapi file when linking Vala programs against local libraries
 
 Overview of changes in bake 0.1.23
 

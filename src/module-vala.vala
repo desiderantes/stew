@@ -161,6 +161,7 @@ public class ValaModule : BuildModule
 
         /* Link against libraries */
         var libraries = new List<TaggedEntry> ();
+        var library_vapis = new List<string> ();
         try
         {
             libraries = compilable.get_tagged_list ("libraries");
@@ -189,12 +190,15 @@ public class ValaModule : BuildModule
                 var library_filename = "lib%s.so".printf (library.name);
                 if (static)
                     library_filename = "lib%s.a".printf (library.name);
+                var vapi_filename = "%s.vapi".printf (library.name); // FIXME: Could be overridden
                 var library_rule = recipe.toplevel.find_rule_recursive (library_filename);
                 if (library_rule != null)
                 {
                     var path = get_relative_path (recipe.dirname, Path.build_filename (library_rule.recipe.dirname, library_filename));
                     link_rule.add_input (path);
                     link_flags += " %s".printf (path);
+                    library_vapis.append (vapi_filename);
+                    compile_flags += " -I%s".printf (get_relative_path (recipe.dirname, library_rule.recipe.dirname));
                 }
                 else
                     link_errors.append ("Unable to find local library %s".printf (library.name));
@@ -385,6 +389,12 @@ public class ValaModule : BuildModule
                     rule.add_input (other_vapi_filename);
                 }
             }
+            foreach (var v in library_vapis)
+            {
+                command += " %s".printf (v);
+                rule.add_input (v);
+            }
+
             rule.add_status_command ("VALAC %s".printf (source));
             rule.add_command (command);
             /* valac doesn't allow the output file to be configured so we have to move them
