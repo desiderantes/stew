@@ -1,5 +1,5 @@
 !bake
-gmcs -unsafe -out:Test.exe Test1.cs Test2.cs Test3.cs
+gmcs -unsafe -out:Test.exe Test1.cs Test2.cs Test3.cs -resource:Icon.png -resource:Data.xml,data-id
 mkdir -p .built
 bake-gettext --mime-type text/x-csharp --output .built/Test1.cs.pot Test1.cs
 bake-gettext --mime-type text/x-csharp --output .built/Test2.cs.pot Test2.cs

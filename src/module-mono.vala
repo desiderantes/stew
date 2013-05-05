@@ -121,6 +121,33 @@ public class MonoModule : BuildModule
             }
         }
 
+        /* Embed resources */
+        var resources = new List<TaggedEntry> ();
+        try
+        {
+            resources = compilable.get_tagged_list ("resources");
+        }
+        catch (TaggedListError e)
+        {
+            compile_errors.append (e.message);
+        }
+        foreach (var resource in resources)
+        {
+            string? id = null;
+            foreach (var tag in resource.tags)
+            {
+                if (tag.has_prefix ("id "))
+                    id = strip (tag.substring (3));
+                else
+                    compile_errors.append ("Unknown tag (%s) for resource %s".printf (tag, resource.name));
+            }
+
+            rule.add_input (resource.name);
+            command += " -resource:%s".printf (resource.name);
+            if (id != null)
+                command += ",%s".printf (id);
+        }
+
         if (compile_errors.length () != 0)
         {
             if (compilable is Library)

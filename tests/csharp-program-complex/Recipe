@@ -3,7 +3,11 @@ project {
 }
 
 programs.Test {
-  sources = Test1.cs Test2.cs Test3.cs
+  sources = Test1.cs \
+            Test2.cs \
+            Test3.cs
+  resources = Icon.png \
+              Data.xml (id data-id)
   compile-flags = -unsafe
   gettext-domain = test
 }

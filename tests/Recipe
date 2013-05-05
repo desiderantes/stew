@@ -250,6 +250,9 @@ programs.test-runner {
     csharp-program-complex {
       args = csharp-program-complex
     }
+    csharp-program-resource-missing {
+      args = csharp-program-resource-missing
+    }
     csharp-program-local-library {
       args = csharp-program-local-library
     }
@@ -725,6 +728,11 @@ data.tests {
           csharp-program-complex/Test1.cs \
           csharp-program-complex/Test2.cs \
           csharp-program-complex/Test3.cs \
+          csharp-program-complex/Icon.png \
+          csharp-program-complex/Data.xml \
+          csharp-program-resource-missing/expected \
+          csharp-program-resource-missing/Recipe \
+          csharp-program-resource-missing/Test.cs \
           csharp-program-local-library/expected \
           csharp-program-local-library/Recipe \
           csharp-program-local-library/Main.cs \

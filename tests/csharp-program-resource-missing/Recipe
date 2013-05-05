@@ -1,0 +1,8 @@
+project {
+  name = test-project
+}
+
+programs.Test {
+  sources = Test.cs
+  resources = Icon.png
+}

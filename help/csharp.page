@@ -24,6 +24,10 @@ C# programs and libraries can set the following program <link xref="variables">v
   <td><p>Libraries to use (see below for details)</p></td>
 </tr>
 <tr>
+  <td><p>resources</p></td>
+  <td><p>Resources to use (see below for details)</p></td>
+</tr>
+<tr>
   <td><p>compile-flags</p></td>
   <td><p>Additional command line flags to use when compiling</p></td>
 </tr>
@@ -55,6 +59,23 @@ programs.ExampleProgram {
 
 libraries.ExampleLibrary {
   sources = Module.cs
+}
+</code>
+</example>
+<p>
+C# programs and libraries can contain resource files.
+Resources are specified using the <em>resources</em> variables.
+By default the resource has the name of the file being embedded, this can be overridden by setting the resource id after the file name.
+</p>
+<example>
+<p>
+The following shows a C# program with an embedded icon file and a data file.
+</p>
+<code>
+programs.ExampleProgram {
+  sources = Main.cs
+  resources = Icon.png \
+              Data.xml (id special-data)
 }
 </code>
 </example>
