@@ -1,10 +1,10 @@
 !bake
-gmcs -out:Test Test.cs
+gmcs -out:Test.exe Test.cs
 (exit SUCCESS)
 !bake install
 (exit SUCCESS)
 !bake uninstall
 (exit SUCCESS)
 !bake clean
-rm -f Test
+rm -f Test.exe
 (exit SUCCESS)

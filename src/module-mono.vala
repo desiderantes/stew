@@ -17,9 +17,9 @@ public class MonoModule : BuildModule
 
     public override void generate_program_rules (Recipe recipe, Program program)
     {
-        var program_name = generate_compile_rules (recipe, program);
+        var binary_name = generate_compile_rules (recipe, program);
         if (program.install)
-            recipe.add_install_rule (program_name, program.install_directory);
+            recipe.add_install_rule (binary_name, program.install_directory);
     }
 
     public override bool can_generate_library_rules (Recipe recipe, Library library)
@@ -29,10 +29,9 @@ public class MonoModule : BuildModule
 
     public override void generate_library_rules (Recipe recipe, Library library)
     {
-        var dll_file = generate_compile_rules (recipe, library);
-
+        var binary_name = generate_compile_rules (recipe, library);
         if (library.install)
-            recipe.add_install_rule (dll_file, Path.build_filename (library.install_directory, "cli", recipe.project_name));
+            recipe.add_install_rule (binary_name, Path.build_filename (library.install_directory, "cli", recipe.project_name));
     }
 
     private bool can_generate_rules (Recipe recipe, List<string> sources)
@@ -55,7 +54,7 @@ public class MonoModule : BuildModule
 
     private string generate_compile_rules (Recipe recipe, Compilable compilable)
     {
-        var binary_name = compilable.name;
+        var binary_name = "%s.exe".printf (compilable.name);
         if (compilable is Library)
             binary_name = "%s.dll".printf (compilable.name);
 

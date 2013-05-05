@@ -1,13 +1,13 @@
 !bake
-gmcs -out:Test Test.cs
+gmcs -out:Test.exe Test.cs
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/bin/test
-cp Test /usr/bin/test/Test
+cp Test.exe /usr/bin/test/Test.exe
 (exit SUCCESS)
 !bake uninstall
-rm -f /usr/bin/test/Test
+rm -f /usr/bin/test/Test.exe
 (exit SUCCESS)
 !bake clean
-rm -f Test
+rm -f Test.exe
 (exit SUCCESS)
