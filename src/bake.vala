@@ -180,7 +180,10 @@ public class Compilable : Block
 
     public string? get_flags (string name, string? fallback = null)
     {
-        return get_variable (name, fallback).replace("\n", " ");
+        var v = get_variable (name, fallback);
+        if (v == null)
+            return null;
+        return v.replace("\n", " ");
     }
 
     public List<string> sources
