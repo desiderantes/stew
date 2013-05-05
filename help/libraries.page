@@ -44,6 +44,12 @@ The following variables are allowed:
   <td><p>Translation domain to use for translatable strings</p></td>
 </tr>
 </table>
+<note>
+<p>
+The ID must be a valid variable name and cannot contain period characters.
+If you require period characters set the <em>name</em> variable.
+</p>
+</note>
 <p>
 Bake will attempt to <link xref="building">build</link> your library by checking the filenames in the <code>sources</code> variable and generating the required <link xref="rules">rules</link>.
 Depending on what <link xref="index#programs-and-libraries">language</link> your library uses additional variables may be allowed.
