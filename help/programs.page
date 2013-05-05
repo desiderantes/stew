@@ -9,7 +9,7 @@
 A <em>program</em> is executable code that can be run by a user.
 </p>
 <p>
-To specify a program you need to set <code>programs.<em>name</em>.*</code> <link xref="variables">variables</link> where <em>name</em> is a unique name for the program.
+To specify a program you need to set <code>programs.<em>id</em>.*</code> <link xref="variables">variables</link> where <em>id</em> is a unique ID for the program.
 The following variables are allowed:
 </p>
 <table frame="all" shade="rows">
@@ -19,6 +19,10 @@ The following variables are allowed:
   <td><p>Description</p></td>
 </tr>
 </thead>
+<tr>
+  <td><p>name</p></td>
+  <td><p>The name of this program (optional, defaults to the ID)</p></td>
+</tr>
 <tr>
   <td><p>sources</p></td>
   <td><p>The files that make up this program</p></td>
