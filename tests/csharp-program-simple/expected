@@ -1,19 +1,13 @@
 !bake
-gmcs -out:Test.exe Test.cs
-mkdir -p .built
+gmcs -out:Test Test.cs
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/share/test-project
-cp Test.exe /usr/share/test-project/Test.exe
 mkdir -p /usr/bin
-cp .built/Test /usr/bin/Test
+cp Test /usr/bin/Test
 (exit SUCCESS)
 !bake uninstall
-rm -f /usr/share/test-project/Test.exe
 rm -f /usr/bin/Test
 (exit SUCCESS)
 !bake clean
-rm -rf .built/
-rm -f Test.exe
 rm -f Test
 (exit SUCCESS)

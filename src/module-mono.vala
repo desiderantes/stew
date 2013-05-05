@@ -17,30 +17,9 @@ public class MonoModule : BuildModule
 
     public override void generate_program_rules (Recipe recipe, Program program)
     {
-        var exe_file = generate_compile_rules (recipe, program);
-
+        var program_name = generate_compile_rules (recipe, program);
         if (program.install)
-            recipe.add_install_rule (exe_file, recipe.project_data_directory);
-
-        /* Script to run locally */
-        var binary_name = program.name;
-        var rule = recipe.add_rule ();
-        rule.add_output (binary_name);
-        rule.add_command ("@echo '#!/bin/sh' > %s".printf (binary_name));
-        rule.add_command ("@echo 'exec mono %s' >> %s".printf (exe_file, binary_name));
-        rule.add_command ("@chmod +x %s".printf (binary_name));
-        recipe.build_rule.add_input (binary_name);
-
-        /* Script to run when installed */
-        var script = recipe.get_build_path (binary_name);
-        rule = recipe.add_rule ();
-        rule.add_output (script);
-        rule.add_command ("@echo '#!/bin/sh' > %s".printf (script));
-        rule.add_command ("@echo 'exec mono %s' >> %s".printf (Path.build_filename (recipe.project_data_directory, exe_file), script));
-        rule.add_command ("@chmod +x %s".printf (script));
-        recipe.build_rule.add_input (script);
-        if (program.install)
-            recipe.add_install_rule (script, program.install_directory, binary_name);
+            recipe.add_install_rule (program_name, program.install_directory);
     }
 
     public override bool can_generate_library_rules (Recipe recipe, Library library)
@@ -76,7 +55,7 @@ public class MonoModule : BuildModule
 
     private string generate_compile_rules (Recipe recipe, Compilable compilable)
     {
-        var binary_name = "%s.exe".printf (compilable.name);
+        var binary_name = compilable.name;
         if (compilable is Library)
             binary_name = "%s.dll".printf (compilable.name);
 

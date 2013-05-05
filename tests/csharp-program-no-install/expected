@@ -1,13 +1,10 @@
 !bake
-gmcs -out:Test.exe Test.cs
-mkdir -p .built
+gmcs -out:Test Test.cs
 (exit SUCCESS)
 !bake install
 (exit SUCCESS)
 !bake uninstall
 (exit SUCCESS)
 !bake clean
-rm -rf .built/
-rm -f Test.exe
 rm -f Test
 (exit SUCCESS)
