@@ -1,6 +1,8 @@
 data.pkg-config {
-  files = pkg-config/baketestlibrary.pc \
-          pkg-config/baketestlibrary2.pc \
+  files = pkg-config/baketest-dependency.pc \
+          pkg-config/baketest-library.pc \
+          pkg-config/baketest-library2.pc \
+          pkg-config/baketest-variable-dependency.pc \
           pkg-config/glib-2.0.pc \
           pkg-config/gobject-2.0.pc
   install = false;
@@ -133,6 +135,12 @@ programs.test-runner {
     }
     c-program-packages {
       args = c-program-packages
+    }
+    c-program-package-dependency {
+      args = c-program-package-dependency
+    }
+    c-program-package-variable-dependency {
+      args = c-program-package-variable-dependency
     }
     c-program-package-version {
       args = c-program-package-version
@@ -569,6 +577,12 @@ data.tests {
           c-program-packages/expected \
           c-program-packages/Recipe \
           c-program-packages/test.c \
+          c-program-package-dependency/expected \
+          c-program-package-dependency/Recipe \
+          c-program-package-dependency/test.c \
+          c-program-package-variable-dependency/expected \
+          c-program-package-variable-dependency/Recipe \
+          c-program-package-variable-dependency/test.c \
           c-program-package-version/expected \
           c-program-package-version/Recipe \
           c-program-package-version/test.c \

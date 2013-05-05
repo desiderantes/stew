@@ -1,7 +1,7 @@
 !bake
 mkdir -p .built
-gcc -Ibaketest-library -Ibaketest-library2 -MMD -MF .built/test-test.d -c test.c -o .built/test-test.o
-gcc -o test .built/test-test.o -lbaketest-library -lbaketest-library2
+gcc -Ibaketest-dependency -Ibaketest-library -MMD -MF .built/test-test.d -c test.c -o .built/test-test.o
+gcc -o test .built/test-test.o -lbaketest-dependency -lbaketest-library
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/bin

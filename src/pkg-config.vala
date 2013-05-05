@@ -184,9 +184,44 @@ public class PkgConfigFile
         return variables.lookup (name);
     }
 
-    private string? get_keyword (string name)
+    private string? get_raw_keyword (string name)
     {
         return keywords.lookup (name);
+    }
+
+    private string? get_keyword (string name)
+    {
+        var keyword = get_raw_keyword (name);
+        if (keyword == null)
+            return null;
+
+        return substitute_variables (keyword);
+    }
+
+    public string substitute_variables (string line)
+    {
+        var new_line = line;
+        while (true)
+        {
+            var start = new_line.index_of ("${");
+            if (start < 0)
+                break;
+            var end = new_line.index_of ("}", start);
+            if (end < 0)
+                break;
+
+            var prefix = new_line.substring (0, start);
+            var variable = new_line.substring (start + 2, end - start - 2);
+            var suffix = new_line.substring (end + 1);
+
+            var value = get_variable (variable);
+            if (value == null)
+                value = ""; // FIXME: Throw error instead?
+
+            new_line = prefix + value + suffix;
+        }
+
+        return new_line;
     }
 
     public string expand (string value)

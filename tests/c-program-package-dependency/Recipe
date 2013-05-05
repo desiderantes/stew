@@ -4,6 +4,5 @@ project {
 
 programs.test {
   sources = test.c
-  packages = baketest-library \
-             baketest-library2
+  packages = baketest-dependency
 }

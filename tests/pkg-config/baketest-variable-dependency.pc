@@ -1,0 +1,8 @@
+dependency_name=library
+
+Name: Bake Test Library (variable dependency)
+Description: Test library for bake tests that has a dependency containing a variable
+Version: 1.2.3
+Libs: -lbaketest-variable-dependency
+Cflags: -Ibaketest-variable-dependency
+Requires: baketest-${dependency_name}
