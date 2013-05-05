@@ -1,6 +1,7 @@
 Overview of changes in bake 0.1.25
 
     * Handle pkg-config files that use variable substitutions
+    * Small documentation improvements
 
 Overview of changes in bake 0.1.24
 
