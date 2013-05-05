@@ -244,6 +244,12 @@ programs.test-runner {
     csharp-program-complex {
       args = csharp-program-complex
     }
+    csharp-program-local-library {
+      args = csharp-program-local-library
+    }
+    csharp-program-local-library-missing {
+      args = csharp-program-local-library-missing
+    }
     csharp-library-simple {
       args = csharp-library-simple
     }
@@ -704,6 +710,13 @@ data.tests {
           csharp-program-complex/Test1.cs \
           csharp-program-complex/Test2.cs \
           csharp-program-complex/Test3.cs \
+          csharp-program-local-library/expected \
+          csharp-program-local-library/Recipe \
+          csharp-program-local-library/Main.cs \
+          csharp-program-local-library/Test.cs \
+          csharp-program-local-library-missing/expected \
+          csharp-program-local-library-missing/Recipe \
+          csharp-program-local-library-missing/Main.cs \
           csharp-library-simple/expected \
           csharp-library-simple/Recipe \
           csharp-library-simple/Test.cs \

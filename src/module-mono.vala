@@ -66,6 +66,9 @@ public class MonoModule : BuildModule
 
         var rule = recipe.add_rule ();
         rule.add_output (binary_name);
+        recipe.build_rule.add_input (binary_name);
+
+        /* Compile */
         var command = "@gmcs";
         if (compile_flags != "")
             command += " " + compile_flags;
@@ -73,13 +76,68 @@ public class MonoModule : BuildModule
             command += " -target:library";
         command += " -out:%s".printf (binary_name);
         foreach (var source in sources)
-        {
-            rule.add_input (source);
             command += " %s".printf (source);
+
+        var compile_errors = new List<string> ();
+
+        /* Link against libraries */
+        var libraries = new List<TaggedEntry> ();
+        try
+        {
+            libraries = compilable.get_tagged_list ("libraries");
         }
+        catch (TaggedListError e)
+        {
+            compile_errors.append (e.message);
+        }
+        foreach (var library in libraries)
+        {
+            var local = false;
+            foreach (var tag in library.tags)
+            {
+                if (tag == "local")
+                    local = true;
+                else
+                    compile_errors.append ("Unknown tag (%s) for library %s".printf (tag, library.name));
+            }
+
+            /* Look for locally generated libraries */
+            if (local)
+            {
+                var library_filename = "%s.dll".printf (library.name);
+                var library_rule = recipe.toplevel.find_rule_recursive (library_filename);
+                if (library_rule != null)
+                {
+                    var path = get_relative_path (recipe.dirname, Path.build_filename (library_rule.recipe.dirname, library_filename));
+                    rule.add_input (path);
+                    command += " -reference:%s".printf (path);
+                }
+                else
+                    compile_errors.append ("Unable to find local library %s".printf (library.name));
+            }
+            else
+            {
+                command += " -reference:%s".printf (library.name);
+            }
+        }
+
+        if (compile_errors.length () != 0)
+        {
+            if (compilable is Library)
+                rule.add_error_command ("Unable to compile library %s:".printf (compilable.id));
+            else
+                rule.add_error_command ("Unable to compile program %s:".printf (compilable.id));
+            foreach (var e in compile_errors)
+                rule.add_error_command (" - %s".printf (e));
+            rule.add_command ("@false");
+            return binary_name;
+        }
+
+        /* Compile */
+        foreach (var source in sources)
+            rule.add_input (source);
         rule.add_status_command ("MONO-COMPILE %s".printf (binary_name));
         rule.add_command (command);
-        recipe.build_rule.add_input (binary_name);
 
         if (compilable.gettext_domain != null)
         {

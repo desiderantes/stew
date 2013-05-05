@@ -20,6 +20,10 @@ C# programs and libraries can set the following program <link xref="variables">v
 </tr>
 </thead>
 <tr>
+  <td><p>libraries</p></td>
+  <td><p>Libraries to use (see below for details)</p></td>
+</tr>
+<tr>
   <td><p>compile-flags</p></td>
   <td><p>Additional command line flags to use when compiling</p></td>
 </tr>
@@ -31,6 +35,26 @@ The following shows a recipe for a two file C# program:
 <code>
 programs.ExampleProgram {
   sources = Main.cs Module.cs
+}
+</code>
+</example>
+<p>
+Libraries are specified using the <code>libraries</code> variable.
+By default each library name listed is searched for in the system paths.
+If the library is built inside the project then it will be searched for if the name is followed with <code>(local)</code>.
+</p>
+<example>
+<p>
+The following shows a recipe that builds a program and a library and links them together.
+</p>
+<code>
+programs.ExampleProgram {
+  sources = Main.cs
+  libraries = ExampleLibrary (local)
+}
+
+libraries.ExampleLibrary {
+  sources = Module.cs
 }
 </code>
 </example>

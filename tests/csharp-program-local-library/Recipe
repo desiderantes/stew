@@ -1,0 +1,13 @@
+project {
+  name = test-project
+}
+
+libraries.Testlib {
+  sources = Test.cs
+  install = false
+}
+
+programs.Test {
+  sources = Main.cs
+  libraries = Testlib (local)
+}

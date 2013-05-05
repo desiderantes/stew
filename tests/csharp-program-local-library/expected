@@ -1,0 +1,15 @@
+!bake
+gmcs -target:library -out:Testlib.dll Test.cs
+gmcs -out:Test.exe Main.cs -reference:Testlib.dll
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/bin
+cp Test.exe /usr/bin/Test.exe
+(exit SUCCESS)
+!bake uninstall
+rm -f /usr/bin/Test.exe
+(exit SUCCESS)
+!bake clean
+rm -f Testlib.dll
+rm -f Test.exe
+(exit SUCCESS)

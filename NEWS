@@ -5,6 +5,7 @@ Overview of changes in bake 0.1.25
     * Pretty print C# output
     * Support arbitrary compile flags in C# programs
     * Don't run C# programs through a script
+    * Support linking against C# libraries
 
 Overview of changes in bake 0.1.24
 
