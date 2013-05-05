@@ -1,9 +1,9 @@
 !bake
 mkdir -p .built
-gcc -DFOO=1 -g -MMD -MF .built/test-test1.d -c test1.c -o .built/test-test1.o
-gcc -DFOO=1 -g -MMD -MF .built/test-test2.d -c test2.c -o .built/test-test2.o
-gcc -DFOO=1 -g -MMD -MF .built/test-test3.d -c test3.c -o .built/test-test3.o
-gcc -o test .built/test-test1.o .built/test-test2.o .built/test-test3.o -lm
+gcc -DFOO=1 -DBAR=2 -g -MMD -MF .built/test-test1.d -c test1.c -o .built/test-test1.o
+gcc -DFOO=1 -DBAR=2 -g -MMD -MF .built/test-test2.d -c test2.c -o .built/test-test2.o
+gcc -DFOO=1 -DBAR=2 -g -MMD -MF .built/test-test3.d -c test3.c -o .built/test-test3.o
+gcc -o test .built/test-test1.o .built/test-test2.o .built/test-test3.o -lm -lz
 bake-gettext --mime-type text/x-csrc --output .built/test1.c.pot test1.c
 bake-gettext --mime-type text/x-csrc --output .built/test2.c.pot test2.c
 bake-gettext --mime-type text/x-csrc --output .built/test3.c.pot test3.c

@@ -6,6 +6,7 @@ Overview of changes in bake 0.1.25
     * Support arbitrary compile flags in C# programs
     * Don't run C# programs through a script
     * Support linking against C# libraries
+    * Allow multi-line compile-flags and link-flags variables
 
 Overview of changes in bake 0.1.24
 

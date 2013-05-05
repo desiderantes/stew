@@ -194,11 +194,9 @@ public class Compilable : Block
         }
     }
 
-    public string? compile_flags { owned get { return get_variable ("compile-flags"); } }
+    public string? compile_flags { owned get { return get_flags ("compile-flags"); } }
 
-    public string? link_flags { owned get { return get_variable ("link-flags"); } }
-
-    public string? libraries { owned get { return get_variable ("libraries"); } }
+    public string? link_flags { owned get { return get_flags ("link-flags"); } }
 
     public string? packages { owned get { return get_variable ("packages"); } }
 }

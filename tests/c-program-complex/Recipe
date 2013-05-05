@@ -3,9 +3,13 @@ project {
 }
 
 programs.test {
-  sources = test1.c test2.c test3.c
+  sources = test1.c \
+            test2.c \
+            test3.c
   gettext-domain = test
-  compile-flags = -DFOO=1
-  link-flags = -lm
+  compile-flags = -DFOO=1 \
+                  -DBAR=2
+  link-flags = -lm \
+               -lz
   debug = true
 }
