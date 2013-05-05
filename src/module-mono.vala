@@ -25,12 +25,13 @@ public class MonoModule : BuildModule
 
         var rule = recipe.add_rule ();
         rule.add_output (exe_file);
-        var command = "gmcs -out:%s".printf (exe_file);
+        var command = "@gmcs -out:%s".printf (exe_file);
         foreach (var source in sources)
         {
             rule.add_input (source);
             command += " %s".printf (source);
         }
+        rule.add_status_command ("MONO-COMPILE %s".printf (exe_file));
         rule.add_command (command);
         recipe.build_rule.add_input (exe_file);
         if (program.install)
@@ -75,12 +76,13 @@ public class MonoModule : BuildModule
 
         var rule = recipe.add_rule ();
         rule.add_output (dll_file);
-        var command = "gmcs -target:library -out:%s".printf (dll_file);
+        var command = "@gmcs -target:library -out:%s".printf (dll_file);
         foreach (var source in sources)
         {
             rule.add_input (source);
             command += " %s".printf (source);
         }
+        rule.add_status_command ("MONO-COMPILE %s".printf (dll_file));
         rule.add_command (command);
         recipe.build_rule.add_input (dll_file);
         if (library.install)
