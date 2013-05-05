@@ -1,0 +1,8 @@
+project {
+  name = test-project
+}
+
+programs.test {
+  sources = main.c
+  libraries = testlib (local)
+}

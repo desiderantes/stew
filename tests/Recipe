@@ -160,6 +160,9 @@ programs.test-runner {
     c-program-local-library-static {
       args = c-program-local-library-static
     }
+    c-program-local-library-missing {
+      args = c-program-local-library-missing
+    }
     c-library-simple {
       args = c-library-simple
     }
@@ -203,6 +206,9 @@ programs.test-runner {
     }
     c++-program-local-library-static {
       args = c++-program-local-library-static
+    }
+    c++-program-local-library-missing {
+      args = c++-program-local-library-missing
     }
     c++-library-simple {
       args = c++-library-simple
@@ -287,6 +293,9 @@ programs.test-runner {
     }
     vala-program-local-library-static {
       args = vala-program-local-library-static
+    }
+    vala-program-local-library-missing {
+      args = vala-program-local-library-missing
     }
     vala-library-simple {
       args = vala-library-simple
@@ -609,6 +618,9 @@ data.tests {
           c-program-local-library-static/Recipe \
           c-program-local-library-static/main.c \
           c-program-local-library-static/test.c \
+          c-program-local-library-missing/expected \
+          c-program-local-library-missing/Recipe \
+          c-program-local-library-missing/main.c \
           c-library-simple/expected \
           c-library-simple/Recipe \
           c-library-simple/test.c \
@@ -664,6 +676,9 @@ data.tests {
           c++-program-local-library-static/Recipe \
           c++-program-local-library-static/main.cpp \
           c++-program-local-library-static/test.cpp \
+          c++-program-local-library-missing/expected \
+          c++-program-local-library-missing/Recipe \
+          c++-program-local-library-missing/main.cpp \
           c++-library-simple/expected \
           c++-library-simple/Recipe \
           c++-library-simple/test.cpp \
@@ -765,6 +780,9 @@ data.tests {
           vala-program-local-library-static/Recipe \
           vala-program-local-library-static/main.vala \
           vala-program-local-library-static/test.vala \
+          vala-program-local-library-missing/expected \
+          vala-program-local-library-missing/Recipe \
+          vala-program-local-library-missing/main.vala \
           vala-library-simple/expected \
           vala-library-simple/Recipe \
           vala-library-simple/test.vala \

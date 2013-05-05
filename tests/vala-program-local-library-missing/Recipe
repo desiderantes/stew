@@ -1,0 +1,8 @@
+project {
+  name = test-project
+}
+
+programs.test {
+  sources = main.vala
+  libraries = testlib (local)
+}
