@@ -32,10 +32,6 @@ The following variables are allowed:
   <td><p>Directory to install the program to (defaults to system directory)</p></td>
 </tr>
 <tr>
-  <td><p>icon</p></td>
-  <td><p>File to use as the icon for this program</p></td>
-</tr>
-<tr>
   <td><p>gettext-domain</p></td>
   <td><p>Translation domain to use for translatable strings</p></td>
 </tr>
