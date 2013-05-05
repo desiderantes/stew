@@ -2,6 +2,6 @@ project {
   name = test-project
 }
 
-libraries.test {
-  sources = test.cs
+libraries.Test {
+  sources = Test.cs
 }

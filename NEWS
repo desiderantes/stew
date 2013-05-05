@@ -3,6 +3,7 @@ Overview of changes in bake 0.1.25
     * Handle pkg-config files that use variable substitutions
     * Small documentation improvements
     * Pretty print C# output
+    * Support arbitrary compile flags in C# programs
 
 Overview of changes in bake 0.1.24
 

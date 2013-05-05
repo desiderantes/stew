@@ -2,7 +2,8 @@ project {
   name = test-project
 }
 
-libraries.test {
-  sources = test1.cs test2.cs test3.cs
+libraries.Test {
+  sources = Test1.cs Test2.cs Test3.cs
+  compile-flags = -unsafe
   gettext-domain = test
 }

@@ -1,20 +1,20 @@
 !bake
-gmcs -target:library -out:test.dll test1.cs test2.cs test3.cs
+gmcs -unsafe -target:library -out:Test.dll Test1.cs Test2.cs Test3.cs
 mkdir -p .built
-bake-gettext --mime-type text/x-csharp --output .built/test1.cs.pot test1.cs
-bake-gettext --mime-type text/x-csharp --output .built/test2.cs.pot test2.cs
-bake-gettext --mime-type text/x-csharp --output .built/test3.cs.pot test3.cs
-msgcat --force-po --output-file=test.pot .built/test1.cs.pot .built/test2.cs.pot .built/test3.cs.pot
+bake-gettext --mime-type text/x-csharp --output .built/Test1.cs.pot Test1.cs
+bake-gettext --mime-type text/x-csharp --output .built/Test2.cs.pot Test2.cs
+bake-gettext --mime-type text/x-csharp --output .built/Test3.cs.pot Test3.cs
+msgcat --force-po --output-file=test.pot .built/Test1.cs.pot .built/Test2.cs.pot .built/Test3.cs.pot
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/lib/cli/test-project
-cp test.dll /usr/lib/cli/test-project/test.dll
+cp Test.dll /usr/lib/cli/test-project/Test.dll
 (exit SUCCESS)
 !bake uninstall
-rm -f /usr/lib/cli/test-project/test.dll
+rm -f /usr/lib/cli/test-project/Test.dll
 (exit SUCCESS)
 !bake clean
 rm -rf .built/
-rm -f test.dll
+rm -f Test.dll
 rm -f test.pot
 (exit SUCCESS)

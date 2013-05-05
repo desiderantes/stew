@@ -2,7 +2,7 @@ project {
   name = test-project
 }
 
-programs.test {
-  sources = test.cs
+programs.Test {
+  sources = Test.cs
   install = false
 }

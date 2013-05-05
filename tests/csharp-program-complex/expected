@@ -1,24 +1,24 @@
 !bake
-gmcs -out:test.exe test1.cs test2.cs test3.cs
+gmcs -unsafe -out:Test.exe Test1.cs Test2.cs Test3.cs
 mkdir -p .built
-bake-gettext --mime-type text/x-csharp --output .built/test1.cs.pot test1.cs
-bake-gettext --mime-type text/x-csharp --output .built/test2.cs.pot test2.cs
-bake-gettext --mime-type text/x-csharp --output .built/test3.cs.pot test3.cs
-msgcat --force-po --output-file=test.pot .built/test1.cs.pot .built/test2.cs.pot .built/test3.cs.pot
+bake-gettext --mime-type text/x-csharp --output .built/Test1.cs.pot Test1.cs
+bake-gettext --mime-type text/x-csharp --output .built/Test2.cs.pot Test2.cs
+bake-gettext --mime-type text/x-csharp --output .built/Test3.cs.pot Test3.cs
+msgcat --force-po --output-file=test.pot .built/Test1.cs.pot .built/Test2.cs.pot .built/Test3.cs.pot
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/share/test-project
-cp test.exe /usr/share/test-project/test.exe
+cp Test.exe /usr/share/test-project/Test.exe
 mkdir -p /usr/bin
-cp .built/test /usr/bin/test
+cp .built/Test /usr/bin/Test
 (exit SUCCESS)
 !bake uninstall
-rm -f /usr/share/test-project/test.exe
-rm -f /usr/bin/test
+rm -f /usr/share/test-project/Test.exe
+rm -f /usr/bin/Test
 (exit SUCCESS)
 !bake clean
 rm -rf .built/
-rm -f test.exe
+rm -f Test.exe
 rm -f test.pot
-rm -f test
+rm -f Test
 (exit SUCCESS)

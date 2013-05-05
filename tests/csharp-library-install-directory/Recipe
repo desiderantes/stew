@@ -2,8 +2,8 @@ project {
   name = test-project
 }
 
-libraries.test {
-  sources = test.cs
+libraries.Test {
+  sources = Test.cs
   install-directory = $(library-directory)/custom-directory
 }
 

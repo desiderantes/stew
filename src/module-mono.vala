@@ -17,34 +17,14 @@ public class MonoModule : BuildModule
 
     public override void generate_program_rules (Recipe recipe, Program program)
     {
-        var binary_name = program.name;
+        var exe_file = generate_compile_rules (recipe, program);
 
-        var sources = program.sources;
-
-        var exe_file = "%s.exe".printf (binary_name);
-
-        var rule = recipe.add_rule ();
-        rule.add_output (exe_file);
-        var command = "@gmcs -out:%s".printf (exe_file);
-        foreach (var source in sources)
-        {
-            rule.add_input (source);
-            command += " %s".printf (source);
-        }
-        rule.add_status_command ("MONO-COMPILE %s".printf (exe_file));
-        rule.add_command (command);
-        recipe.build_rule.add_input (exe_file);
         if (program.install)
             recipe.add_install_rule (exe_file, recipe.project_data_directory);
 
-        if (program.gettext_domain != null)
-        {
-            foreach (var source in sources)
-                GettextModule.add_translatable_file (recipe, program.gettext_domain, "text/x-csharp", source);
-        }
-
         /* Script to run locally */
-        rule = recipe.add_rule ();
+        var binary_name = program.name;
+        var rule = recipe.add_rule ();
         rule.add_output (binary_name);
         rule.add_command ("@echo '#!/bin/sh' > %s".printf (binary_name));
         rule.add_command ("@echo 'exec mono %s' >> %s".printf (exe_file, binary_name));
@@ -70,29 +50,10 @@ public class MonoModule : BuildModule
 
     public override void generate_library_rules (Recipe recipe, Library library)
     {
-        var sources = library.sources;
+        var dll_file = generate_compile_rules (recipe, library);
 
-        var dll_file = "%s.dll".printf (library.id);
-
-        var rule = recipe.add_rule ();
-        rule.add_output (dll_file);
-        var command = "@gmcs -target:library -out:%s".printf (dll_file);
-        foreach (var source in sources)
-        {
-            rule.add_input (source);
-            command += " %s".printf (source);
-        }
-        rule.add_status_command ("MONO-COMPILE %s".printf (dll_file));
-        rule.add_command (command);
-        recipe.build_rule.add_input (dll_file);
         if (library.install)
             recipe.add_install_rule (dll_file, Path.build_filename (library.install_directory, "cli", recipe.project_name));
-
-        if (library.gettext_domain != null)
-        {
-            foreach (var source in sources)
-                GettextModule.add_translatable_file (recipe, library.gettext_domain, "text/x-csharp", source);
-        }
     }
 
     private bool can_generate_rules (Recipe recipe, List<string> sources)
@@ -111,5 +72,43 @@ public class MonoModule : BuildModule
             return false;
 
         return true;
+    }
+
+    private string generate_compile_rules (Recipe recipe, Compilable compilable)
+    {
+        var binary_name = "%s.exe".printf (compilable.name);
+        if (compilable is Library)
+            binary_name = "%s.dll".printf (compilable.name);
+
+        var sources = compilable.sources;
+
+        var compile_flags = compilable.compile_flags;
+        if (compile_flags == null)
+            compile_flags = "";
+
+        var rule = recipe.add_rule ();
+        rule.add_output (binary_name);
+        var command = "@gmcs";
+        if (compile_flags != "")
+            command += " " + compile_flags;
+        if (compilable is Library)
+            command += " -target:library";
+        command += " -out:%s".printf (binary_name);
+        foreach (var source in sources)
+        {
+            rule.add_input (source);
+            command += " %s".printf (source);
+        }
+        rule.add_status_command ("MONO-COMPILE %s".printf (binary_name));
+        rule.add_command (command);
+        recipe.build_rule.add_input (binary_name);
+
+        if (compilable.gettext_domain != null)
+        {
+            foreach (var source in sources)
+                GettextModule.add_translatable_file (recipe, compilable.gettext_domain, "text/x-csharp", source);
+        }
+
+        return binary_name;
     }
 }

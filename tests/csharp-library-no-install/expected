@@ -1,10 +1,10 @@
 !bake
-gmcs -target:library -out:test.dll test.cs
+gmcs -target:library -out:Test.dll Test.cs
 (exit SUCCESS)
 !bake install
 (exit SUCCESS)
 !bake uninstall
 (exit SUCCESS)
 !bake clean
-rm -f test.dll
+rm -f Test.dll
 (exit SUCCESS)

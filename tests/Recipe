@@ -692,32 +692,32 @@ data.tests {
           qt-library-complex/test3.cpp \
           csharp-program-simple/expected \
           csharp-program-simple/Recipe \
-          csharp-program-simple/test.cs \
+          csharp-program-simple/Test.cs \
           csharp-program-no-install/expected \
           csharp-program-no-install/Recipe \
-          csharp-program-no-install/test.cs \
+          csharp-program-no-install/Test.cs \
           csharp-program-install-directory/expected \
           csharp-program-install-directory/Recipe \
-          csharp-program-install-directory/test.cs \
+          csharp-program-install-directory/Test.cs \
           csharp-program-complex/expected \
           csharp-program-complex/Recipe \
-          csharp-program-complex/test1.cs \
-          csharp-program-complex/test2.cs \
-          csharp-program-complex/test3.cs \
+          csharp-program-complex/Test1.cs \
+          csharp-program-complex/Test2.cs \
+          csharp-program-complex/Test3.cs \
           csharp-library-simple/expected \
           csharp-library-simple/Recipe \
-          csharp-library-simple/test.cs \
+          csharp-library-simple/Test.cs \
           csharp-library-no-install/expected \
           csharp-library-no-install/Recipe \
-          csharp-library-no-install/test.cs \
+          csharp-library-no-install/Test.cs \
           csharp-library-install-directory/expected \
           csharp-library-install-directory/Recipe \
-          csharp-library-install-directory/test.cs \
+          csharp-library-install-directory/Test.cs \
           csharp-library-complex/expected \
           csharp-library-complex/Recipe \
-          csharp-library-complex/test1.cs \
-          csharp-library-complex/test2.cs \
-          csharp-library-complex/test3.cs \
+          csharp-library-complex/Test1.cs \
+          csharp-library-complex/Test2.cs \
+          csharp-library-complex/Test3.cs \
           vala-program-simple/expected \
           vala-program-simple/Recipe \
           vala-program-simple/test.vala \

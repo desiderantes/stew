@@ -7,14 +7,30 @@
 
 <p>
 Bake supports <link xref="programs">programs</link> and <link xref="libraries">libraries</link> written in the C# language.
+Only the Mono compiler is supported.
 </p>
+<p>
+C# programs and libraries can set the following program <link xref="variables">variables</link> to control compiling:
+</p>
+<table frame="all" shade="rows">
+<thead>
+<tr>
+  <td><p>Name</p></td>
+  <td><p>Description</p></td>
+</tr>
+</thead>
+<tr>
+  <td><p>compile-flags</p></td>
+  <td><p>Additional command line flags to use when compiling</p></td>
+</tr>
+</table>
 <example>
 <p>
 The following shows a recipe for a two file C# program:
 </p>
 <code>
-programs.example-program {
-  sources = main.cs module.cs
+programs.ExampleProgram {
+  sources = Main.cs Module.cs
 }
 </code>
 </example>
