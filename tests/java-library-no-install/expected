@@ -1,7 +1,7 @@
 !bake
 mkdir -p .built
 javac -d .built Test.java
-jar cfe test.jar -C .built Test.class
+jar cf test.jar -C .built Test.class
 (exit SUCCESS)
 !bake install
 (exit SUCCESS)

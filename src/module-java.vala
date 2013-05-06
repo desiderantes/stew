@@ -25,11 +25,12 @@ public class JavaModule : BuildModule
 
         var rule = recipe.add_rule ();
         var build_directory = get_relative_path (recipe.dirname, recipe.build_directory);
-        var command = "javac -d %s".printf (build_directory);
+        var command = "@javac -d %s".printf (build_directory);
+        var status_command = "JAVAC";
 
         var jar_rule = recipe.add_rule ();
         jar_rule.add_output (jar_file);
-        var jar_command = "jar cfe %s".printf (jar_file);
+        var jar_command = "@jar cf %s".printf (jar_file);
 
         // FIXME: Would like a better way of determining this automatically
         var entrypoint = program.get_variable ("entrypoint");
@@ -49,9 +50,12 @@ public class JavaModule : BuildModule
             rule.add_input (source);
             rule.add_output (class_path);
             command += " %s".printf (source);
+            status_command += " %s".printf (source);
         }
+        rule.add_status_command (status_command);
         rule.add_command (command);
 
+        jar_rule.add_status_command ("JAR %s".printf (jar_file));
         jar_rule.add_command (jar_command);
         recipe.build_rule.add_input (jar_file);
         if (program.install)
@@ -96,11 +100,12 @@ public class JavaModule : BuildModule
 
         var rule = recipe.add_rule ();
         var build_directory = get_relative_path (recipe.dirname, recipe.build_directory);
-        var command = "javac -d %s".printf (build_directory);
+        var command = "@javac -d %s".printf (build_directory);
+        var status_command = "JAVAC";
 
         var jar_rule = recipe.add_rule ();
         jar_rule.add_output (jar_file);
-        var jar_command = "jar cfe %s".printf (jar_file);
+        var jar_command = "@jar cf %s".printf (jar_file);
 
         jar_command += " -C %s".printf (build_directory);
 
@@ -115,11 +120,14 @@ public class JavaModule : BuildModule
             rule.add_input (source);
             rule.add_output (class_path);
             command += " %s".printf (source);
+            status_command += " %s".printf (source);
         }
+        rule.add_status_command (status_command);
         rule.add_command (command);
 
         // FIXME: Version .jar files
 
+        jar_rule.add_status_command ("JAR %s".printf (jar_file));
         jar_rule.add_command (jar_command);
         recipe.build_rule.add_input (jar_file);
         if (library.install)
