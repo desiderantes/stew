@@ -341,6 +341,9 @@ programs.test-runner {
     java-program-complex {
       args = java-program-complex
     }
+    java-program-manifest-missing {
+      args = java-program-manifest-missing
+    }
     java-library-simple {
       args = java-library-simple
     }
@@ -841,6 +844,9 @@ data.tests {
           java-program-complex/com/example/Test1.java \
           java-program-complex/com/example/Test2.java \
           java-program-complex/com/example/Test3.java \
+          java-program-manifest-missing/expected \
+          java-program-manifest-missing/Recipe \
+          java-program-manifest-missing/Test.java \
           java-library-simple/expected \
           java-library-simple/Recipe \
           java-library-simple/Test.java \
