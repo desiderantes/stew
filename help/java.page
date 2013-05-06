@@ -26,15 +26,20 @@ C programs and libraries can set the following program <link xref="variables">va
   <td><p>manifest</p></td>
   <td><p>Manifest file to use in generated JAR archive file (optional)</p></td>
 </tr>
+<tr>
+  <td><p>resources</p></td>
+  <td><p>Data files to add to the JAR archive file (optional)</p></td>
+</tr>
 </table>
 <example>
 <p>
-The following shows a recipe for a two file Java program:
+The following shows a recipe for a two file Java program with an icon:
 </p>
 <code>
 programs.ExampleProgram {
   sources = Main.java Module.java
   entrypoint = Main
+  resources = Icon.png
 }
 </code>
 </example>

@@ -1,0 +1,13 @@
+!bake
+mkdir -p .built
+javac -d .built Test.java
+(exit FAILURE)
+!bake install
+(exit FAILURE)
+!bake uninstall
+rm -f /usr/share/test-project/test.jar
+rm -f /usr/bin/test
+(exit SUCCESS)
+!bake clean
+rm -rf .built/
+(exit SUCCESS)

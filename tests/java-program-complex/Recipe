@@ -8,5 +8,6 @@ programs.test {
             com/example/Test3.java
   entrypoint = TestEntrypoint
   manifest = Manifest.txt
+  resources = Icon.png
   gettext-domain = test
 }

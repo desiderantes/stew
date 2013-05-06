@@ -344,6 +344,9 @@ programs.test-runner {
     java-program-manifest-missing {
       args = java-program-manifest-missing
     }
+    java-program-resource-missing {
+      args = java-program-resource-missing
+    }
     java-library-simple {
       args = java-library-simple
     }
@@ -840,6 +843,7 @@ data.tests {
           java-program-install-directory/Test.java \
           java-program-complex/expected \
           java-program-complex/Recipe \
+          java-program-complex/Icon.png \
           java-program-complex/Manifest.txt \
           java-program-complex/com/example/Test1.java \
           java-program-complex/com/example/Test2.java \
@@ -847,6 +851,9 @@ data.tests {
           java-program-manifest-missing/expected \
           java-program-manifest-missing/Recipe \
           java-program-manifest-missing/Test.java \
+          java-program-resource-missing/expected \
+          java-program-resource-missing/Recipe \
+          java-program-resource-missing/Test.java \
           java-library-simple/expected \
           java-library-simple/Recipe \
           java-library-simple/Test.java \

@@ -80,6 +80,7 @@ public class JavaModule : BuildModule
 
         var entrypoint = compilable.get_variable ("entrypoint");
         var manifest = compilable.get_variable ("manifest");
+        var resources = compilable.get_file_list ("resources");
 
         var jar_rule = recipe.add_rule ();
         jar_rule.add_output (jar_file);
@@ -112,6 +113,13 @@ public class JavaModule : BuildModule
             command += " %s".printf (source);
             status_command += " %s".printf (source);
         }
+
+        foreach (var resource in resources)
+        {
+            jar_rule.add_input (resource);
+            jar_command += " %s".printf (resource);
+        }
+
         rule.add_status_command (status_command);
         rule.add_command (command);
 
