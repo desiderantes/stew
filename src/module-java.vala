@@ -99,16 +99,13 @@ public class JavaModule : BuildModule
         if (entrypoint != null)
             jar_command += " %s".printf (entrypoint);
 
-        /* Source class files from the build directory */
-        jar_command += " -C %s".printf (build_directory);
-
         foreach (var source in compilable.sources)
         {
             var class_file = replace_extension (source, "class");
             var class_path = Path.build_filename (build_directory, class_file);
 
             jar_rule.add_input (class_path);
-            jar_command += " %s".printf (class_file);
+            jar_command += " -C %s %s".printf (build_directory, class_file);
 
             rule.add_input (source);
             rule.add_output (class_path);
