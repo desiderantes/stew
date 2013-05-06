@@ -8,13 +8,33 @@
 <p>
 Bake supports <link xref="programs">programs</link> and <link xref="libraries">libraries</link> written in the Java language.
 </p>
+<p>
+C programs and libraries can set the following program <link xref="variables">variables</link> to control compiling:
+</p>
+<table frame="all" shade="rows">
+<thead>
+<tr>
+  <td><p>Name</p></td>
+  <td><p>Description</p></td>
+</tr>
+</thead>
+<tr>
+  <td><p>entrypoint</p></td>
+  <td><p>Class to use as application entrypoint (optional)</p></td>
+</tr>
+<tr>
+  <td><p>manifest</p></td>
+  <td><p>Manifest file to use in generated JAR archive file (optional)</p></td>
+</tr>
+</table>
 <example>
 <p>
 The following shows a recipe for a two file Java program:
 </p>
 <code>
-programs.example-program {
-  sources = main.java module.java
+programs.ExampleProgram {
+  sources = Main.java Module.java
+  entrypoint = Main
 }
 </code>
 </example>

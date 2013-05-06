@@ -1,7 +1,7 @@
 !bake
 mkdir -p .built/com/example
 javac -d .built com/example/Test1.java com/example/Test2.java com/example/Test3.java
-jar cf test.jar -C .built com/example/Test1.class com/example/Test2.class com/example/Test3.class
+jar cfme test.jar Manifest.txt TestEntrypoint -C .built com/example/Test1.class com/example/Test2.class com/example/Test3.class
 bake-gettext --mime-type text/x-java --output .built/com/example/Test1.java.pot com/example/Test1.java
 bake-gettext --mime-type text/x-java --output .built/com/example/Test2.java.pot com/example/Test2.java
 bake-gettext --mime-type text/x-java --output .built/com/example/Test3.java.pot com/example/Test3.java
@@ -21,6 +21,6 @@ rm -f /usr/bin/test
 rm -rf .built/
 rm -f test.jar
 rm -rf .built/com/example/
-rm -f test
 rm -f test.pot
+rm -f test
 (exit SUCCESS)

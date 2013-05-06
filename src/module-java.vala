@@ -17,52 +17,12 @@ public class JavaModule : BuildModule
 
     public override void generate_program_rules (Recipe recipe, Program program)
     {
+        var jar_file = generate_compile_rules (recipe, program);
+
         var binary_name = program.name;
 
-        var sources = program.sources;
-
-        var jar_file = "%s.jar".printf (binary_name);
-
-        var rule = recipe.add_rule ();
-        var build_directory = get_relative_path (recipe.dirname, recipe.build_directory);
-        var command = "@javac -d %s".printf (build_directory);
-        var status_command = "JAVAC";
-
-        var jar_rule = recipe.add_rule ();
-        jar_rule.add_output (jar_file);
-        var jar_command = "@jar cf %s".printf (jar_file);
-
-        // FIXME: Would like a better way of determining this automatically
-        var entrypoint = program.get_variable ("entrypoint");
-        if (entrypoint != null)
-            jar_command += " %s".printf (entrypoint);
-
-        jar_command += " -C %s".printf (build_directory);
-
-        foreach (var source in sources)
-        {
-            var class_file = replace_extension (source, "class");
-            var class_path = Path.build_filename (build_directory, class_file);
-
-            jar_rule.add_input (class_path);
-            jar_command += " %s".printf (class_file);
-
-            rule.add_input (source);
-            rule.add_output (class_path);
-            command += " %s".printf (source);
-            status_command += " %s".printf (source);
-        }
-        rule.add_status_command (status_command);
-        rule.add_command (command);
-
-        jar_rule.add_status_command ("JAR %s".printf (jar_file));
-        jar_rule.add_command (jar_command);
-        recipe.build_rule.add_input (jar_file);
-        if (program.install)
-            recipe.add_install_rule (jar_file, recipe.project_data_directory);
-
         /* Script to run locally */
-        rule = recipe.add_rule ();
+        var rule = recipe.add_rule ();
         rule.add_output (binary_name);
         rule.add_command ("@echo '#!/bin/sh' > %s".printf (binary_name));
         rule.add_command ("@echo 'exec java -jar %s' >> %s".printf (jar_file, binary_name));
@@ -79,12 +39,6 @@ public class JavaModule : BuildModule
         recipe.build_rule.add_input (script);
         if (program.install)
             recipe.add_install_rule (script, program.install_directory, binary_name);
-
-        if (program.gettext_domain != null)
-        {
-            foreach (var source in sources)
-                GettextModule.add_translatable_file (recipe, program.gettext_domain, "text/x-java", source);
-        }
     }
 
     public override bool can_generate_library_rules (Recipe recipe, Library library)
@@ -93,51 +47,8 @@ public class JavaModule : BuildModule
     }
 
     public override void generate_library_rules (Recipe recipe, Library library)
-    {    
-        var sources = library.sources;
-
-        var jar_file = "%s.jar".printf (library.id);
-
-        var rule = recipe.add_rule ();
-        var build_directory = get_relative_path (recipe.dirname, recipe.build_directory);
-        var command = "@javac -d %s".printf (build_directory);
-        var status_command = "JAVAC";
-
-        var jar_rule = recipe.add_rule ();
-        jar_rule.add_output (jar_file);
-        var jar_command = "@jar cf %s".printf (jar_file);
-
-        jar_command += " -C %s".printf (build_directory);
-
-        foreach (var source in sources)
-        {
-            var class_file = replace_extension (source, "class");
-            var class_path = Path.build_filename (build_directory, class_file);
-
-            jar_rule.add_input (class_path);
-            jar_command += " %s".printf (class_file);
-
-            rule.add_input (source);
-            rule.add_output (class_path);
-            command += " %s".printf (source);
-            status_command += " %s".printf (source);
-        }
-        rule.add_status_command (status_command);
-        rule.add_command (command);
-
-        // FIXME: Version .jar files
-
-        jar_rule.add_status_command ("JAR %s".printf (jar_file));
-        jar_rule.add_command (jar_command);
-        recipe.build_rule.add_input (jar_file);
-        if (library.install)
-            recipe.add_install_rule (jar_file, Path.build_filename (recipe.data_directory, "java"));
-
-        if (library.gettext_domain != null)
-        {
-            foreach (var source in sources)
-                GettextModule.add_translatable_file (recipe, library.gettext_domain, "text/x-java", source);
-        }
+    {
+        generate_compile_rules (recipe, library);
     }
 
     private bool can_generate_rules (Recipe recipe, List<string> sources)
@@ -156,5 +67,74 @@ public class JavaModule : BuildModule
             return false;
 
         return true;
+    }
+
+    private string generate_compile_rules (Recipe recipe, Compilable compilable)
+    {
+        var jar_file = "%s.jar".printf (compilable.name);
+
+        var rule = recipe.add_rule ();
+        var build_directory = get_relative_path (recipe.dirname, recipe.build_directory);
+        var command = "@javac -d %s".printf (build_directory);
+        var status_command = "JAVAC";
+
+        var entrypoint = compilable.get_variable ("entrypoint");
+        var manifest = compilable.get_variable ("manifest");
+
+        var jar_rule = recipe.add_rule ();
+        jar_rule.add_output (jar_file);
+
+        var jar_command = "@jar cf";
+        if (manifest != null)
+            jar_command += "m";
+        if (entrypoint != null)
+            jar_command += "e";
+
+        jar_command += " %s".printf (jar_file);
+        if (manifest != null)
+        {
+            jar_command += " %s".printf (manifest);
+            jar_rule.add_input (manifest);
+        }
+        if (entrypoint != null)
+            jar_command += " %s".printf (entrypoint);
+
+        /* Source class files from the build directory */
+        jar_command += " -C %s".printf (build_directory);
+
+        foreach (var source in compilable.sources)
+        {
+            var class_file = replace_extension (source, "class");
+            var class_path = Path.build_filename (build_directory, class_file);
+
+            jar_rule.add_input (class_path);
+            jar_command += " %s".printf (class_file);
+
+            rule.add_input (source);
+            rule.add_output (class_path);
+            command += " %s".printf (source);
+            status_command += " %s".printf (source);
+        }
+        rule.add_status_command (status_command);
+        rule.add_command (command);
+
+        jar_rule.add_status_command ("JAR %s".printf (jar_file));
+        jar_rule.add_command (jar_command);
+        recipe.build_rule.add_input (jar_file);
+        if (compilable.install)
+        {
+            if (compilable is Library)
+                recipe.add_install_rule (jar_file, Path.build_filename (recipe.data_directory, "java"));
+            else
+                recipe.add_install_rule (jar_file, recipe.project_data_directory);
+        }
+
+        if (compilable.gettext_domain != null)
+        {
+            foreach (var source in compilable.sources)
+                GettextModule.add_translatable_file (recipe, compilable.gettext_domain, "text/x-java", source);
+        }
+
+        return jar_file;
     }
 }

@@ -837,6 +837,7 @@ data.tests {
           java-program-install-directory/Test.java \
           java-program-complex/expected \
           java-program-complex/Recipe \
+          java-program-complex/Manifest.txt \
           java-program-complex/com/example/Test1.java \
           java-program-complex/com/example/Test2.java \
           java-program-complex/com/example/Test3.java \

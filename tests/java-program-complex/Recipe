@@ -6,5 +6,7 @@ programs.test {
   sources = com/example/Test1.java \
             com/example/Test2.java \
             com/example/Test3.java
+  entrypoint = TestEntrypoint
+  manifest = Manifest.txt
   gettext-domain = test
 }

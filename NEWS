@@ -2,6 +2,7 @@ Overview of changes in bake 0.1.26
 
     * Pretty print Java output
     * Fix Java jar creation
+    * Support setting entrypoint and manifest for Java programs
 
 Overview of changes in bake 0.1.25
 
