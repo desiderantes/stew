@@ -418,6 +418,7 @@ public class Bake
     private static bool show_verbose = false;
     private static bool do_configure = false;
     private static bool do_unconfigure = false;
+    private static bool do_parallel = false;
     private static bool do_expand = false;
     private static string color_mode = "auto";
     private static const OptionEntry[] options =
@@ -428,6 +429,9 @@ public class Bake
         { "unconfigure", 0, 0, OptionArg.NONE, ref do_unconfigure,
           /* Help string for command line --unconfigure flag */
           N_("Clear configuration"), null},
+        { "parallel", 0, 0, OptionArg.NONE, ref do_parallel,
+          /* Help string for command line --parallel flag */
+          N_("Run commands in parallel"), null},
         { "expand", 0, 0, OptionArg.NONE, ref do_expand,
           /* Help string for command line --expand flag */
           N_("Expand current recipe and print to stdout"), null},
@@ -964,7 +968,7 @@ public class Bake
             target = "%" + target;
 
         last_logged_directory = Environment.get_current_dir ();
-        var builder = new Builder ();
+        var builder = new Builder (do_parallel);
         var exit_code = Posix.EXIT_SUCCESS;
         builder.build_target.begin (recipe, join_relative_dir (toplevel.dirname, target), (o, x) =>
         {
