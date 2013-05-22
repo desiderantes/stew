@@ -80,6 +80,9 @@ programs.test-runner {
     options-default-value {
       args = options-default-value
     }
+    options-multiple {
+      args = options-multiple
+    }
 
     # Test handle unknown programs and libraries
     unknown-program {
@@ -554,6 +557,8 @@ data.tests {
           options-unknown-option/Recipe \
           options-default-value/expected \
           options-default-value/Recipe \
+          options-multiple/expected \
+          options-multiple/Recipe \
           unknown-program/expected \
           unknown-program/Recipe \
           unknown-program/test.unknown \
