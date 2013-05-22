@@ -168,7 +168,7 @@ public class Recipe
         return false;
     }
 
-    public void set_variable (string name, string value)
+    public void set_variable (string name, string? value)
     {
         variable_names.append (name);
         variables.insert (name, value);
@@ -179,7 +179,7 @@ public class Recipe
         {
             var n = name.substring (0, i);
             if (variables.lookup (n) == null)
-                set_variable (n, "");
+                set_variable (n, null);
         }
     }
 
@@ -452,7 +452,11 @@ public class Recipe
     public void print ()
     {
         foreach (var name in variable_names)
-            stdout.printf ("%s=%s\n", name, get_variable (name));
+        {
+            var value = get_variable (name);
+            if (value != null)
+                stdout.printf ("%s=%s\n", name, value);
+        }
         foreach (var rule in rules)
         {
             stdout.printf ("\n");

@@ -163,6 +163,28 @@ public class TaggedEntry
     }
 }
 
+public class Option : Block
+{
+    public Option (Recipe recipe, string id)
+    {
+        base (recipe, "options", id);
+    }
+
+    public string description { owned get { return get_variable ("description"); } }
+    public string default { owned get { return get_variable ("default"); } }
+    public string? value
+    {
+        owned get
+        {
+            return recipe.get_variable ("options.%s".printf (id));
+        }
+        set
+        {
+            recipe.set_variable ("options.%s".printf (id), value);
+        }
+    }
+}
+
 public class Compilable : Block
 {
     public Compilable (Recipe recipe, string type_name, string id)
@@ -416,12 +438,16 @@ public class Bake
 {
     private static bool show_version = false;
     private static bool show_verbose = false;
+    private static bool do_list_options = false;
     private static bool do_configure = false;
     private static bool do_unconfigure = false;
     private static bool do_expand = false;
     private static string color_mode = "auto";
-    private static const OptionEntry[] options =
+    private static const OptionEntry[] command_line_options =
     {
+        { "list-options", 0, 0, OptionArg.NONE, ref do_list_options,
+          /* Help string for command line --list-options flag */
+          N_("List project options"), null},
         { "configure", 0, 0, OptionArg.NONE, ref do_configure,
           /* Help string for command line --configure flag */
           N_("Configure build options"), null},
@@ -447,6 +473,11 @@ public class Bake
     };
 
     public static List<BuildModule> modules;
+
+    public static List<Option> options;
+    public static List<Program> programs;
+    public static List<Library> libraries;
+    public static List<Data> datas;
 
     public static Recipe? load_recipes (string filename, bool is_toplevel = true) throws Error
     {
@@ -528,99 +559,110 @@ public class Bake
         return result;
     }
 
-    private static void generate_library_rules (Recipe recipe)
+    private static void find_objects (Recipe recipe)
     {
-        var libraries = recipe.get_variable_children ("libraries");
-        foreach (var id in libraries)
+        foreach (var id in recipe.get_variable_children ("options"))
         {
-            var library = new Library (recipe, id);
-
-            var buildable_modules = new List<BuildModule> ();
-            foreach (var module in modules)
-            {
-                if (module.can_generate_library_rules (recipe, library))
-                    buildable_modules.append (module);
-            }
-
-            if (buildable_modules.length () > 0)
-                buildable_modules.nth_data (0).generate_library_rules (recipe, library);
-            else
-            {
-                var rule = recipe.add_rule ();
-                rule.add_output (library.name);
-                rule.add_command ("@echo 'Unable to compile library %s:'".printf (id));
-                rule.add_command ("@echo ' - No compiler found that matches source files'");
-                rule.add_command ("@false");
-                recipe.build_rule.add_input (library.name);
-                recipe.add_install_rule (id, library.install_directory);
-            }
+            var option = new Option (recipe, id);
+            options.append (option);
         }
-
-        /* Traverse the recipe tree */
-        foreach (var child in recipe.children)
-            generate_library_rules (child);
-    }
-
-    private static void generate_program_rules (Recipe recipe)
-    {
-        var programs = recipe.get_variable_children ("programs");
-        foreach (var id in programs)
+        foreach (var id in recipe.get_variable_children ("programs"))
         {
             var program = new Program (recipe, id);
-
-            var buildable_modules = new List<BuildModule> ();
-            foreach (var module in modules)
-            {
-                if (module.can_generate_program_rules (recipe, program))
-                    buildable_modules.append (module);
-            }
-
-            if (buildable_modules.length () > 0)
-            {
-                buildable_modules.nth_data (0).generate_program_rules (recipe, program);
-
-                foreach (var test_id in recipe.get_variable_children ("programs.%s.tests".printf (id)))
-                {
-                    var command = "./%s".printf (program.name); // FIXME: Might not be called this for some compilers
-                    var args = recipe.get_variable ("programs.%s.tests.%s.args".printf (id, test_id));
-                    if (args != null)
-                        command += " " + args;
-                    var results_filename = recipe.get_build_path ("%s.%s.test-results".printf (id, test_id));
-                    recipe.test_rule.add_output (results_filename);
-                    recipe.test_rule.add_status_command ("TEST %s.%s".printf (id, test_id));
-                    recipe.test_rule.add_command ("@bake-test run %s %s".printf (results_filename, command));
-                }
-            }
-            else
-            {
-                var rule = recipe.add_rule ();
-                rule.add_output (id);
-                rule.add_command ("@echo 'Unable to compile program %s:'".printf (id));
-                rule.add_command ("@echo ' - No compiler found that matches source files'");
-                rule.add_command ("@false");
-                recipe.build_rule.add_input (id);
-                recipe.add_install_rule (id, program.install_directory);
-            }
+            programs.append (program);
         }
-
-        /* Traverse the recipe tree */
-        foreach (var child in recipe.children)
-            generate_program_rules (child);
-    }
-
-    private static void generate_data_rules (Recipe recipe)
-    {
-        var data_blocks = recipe.get_variable_children ("data");
-        foreach (var id in data_blocks)
+        foreach (var id in recipe.get_variable_children ("libraries"))
+        {
+            var library = new Library (recipe, id);
+            libraries.append (library);
+        }
+        foreach (var id in recipe.get_variable_children ("data"))
         {
             var data = new Data (recipe, id);
-            foreach (var module in modules)
-                module.generate_data_rules (recipe, data);
+            datas.append (data);
         }
 
-        /* Traverse the recipe tree */
         foreach (var child in recipe.children)
-            generate_data_rules (child);
+            find_objects (child);
+    }
+
+    private static Option? get_option (string id)
+    {
+        foreach (var option in options)
+            if (option.id == id)
+                return option;
+
+        return null;
+    }
+
+    private static void generate_library_rules (Library library)
+    {
+        var recipe = library.recipe;
+
+        var buildable_modules = new List<BuildModule> ();
+        foreach (var module in modules)
+        {
+            if (module.can_generate_library_rules (recipe, library))
+                buildable_modules.append (module);
+        }
+
+        if (buildable_modules.length () > 0)
+            buildable_modules.nth_data (0).generate_library_rules (recipe, library);
+        else
+        {
+            var rule = recipe.add_rule ();
+            rule.add_output (library.name);
+            rule.add_command ("@echo 'Unable to compile library %s:'".printf (library.id));
+            rule.add_command ("@echo ' - No compiler found that matches source files'");
+            rule.add_command ("@false");
+            recipe.build_rule.add_input (library.name);
+            recipe.add_install_rule (library.id, library.install_directory);
+        }
+    }
+
+    private static void generate_program_rules (Program program)
+    {
+        var recipe = program.recipe;
+
+        var buildable_modules = new List<BuildModule> ();
+        foreach (var module in modules)
+        {
+            if (module.can_generate_program_rules (recipe, program))
+                buildable_modules.append (module);
+        }
+
+        if (buildable_modules.length () > 0)
+        {
+            buildable_modules.nth_data (0).generate_program_rules (recipe, program);
+
+            foreach (var test_id in recipe.get_variable_children ("programs.%s.tests".printf (program.id)))
+            {
+                var command = "./%s".printf (program.name); // FIXME: Might not be called this for some compilers
+                var args = recipe.get_variable ("programs.%s.tests.%s.args".printf (program.id, test_id));
+                if (args != null)
+                    command += " " + args;
+                var results_filename = recipe.get_build_path ("%s.%s.test-results".printf (program.id, test_id));
+                recipe.test_rule.add_output (results_filename);
+                recipe.test_rule.add_status_command ("TEST %s.%s".printf (program.id, test_id));
+                recipe.test_rule.add_command ("@bake-test run %s %s".printf (results_filename, command));
+            }
+        }
+        else
+        {
+            var rule = recipe.add_rule ();
+            rule.add_output (program.name);
+            rule.add_command ("@echo 'Unable to compile program %s:'".printf (program.id));
+            rule.add_command ("@echo ' - No compiler found that matches source files'");
+            rule.add_command ("@false");
+            recipe.build_rule.add_input (program.name);
+            recipe.add_install_rule (program.name, program.install_directory);
+        }
+    }
+
+    private static void generate_data_rules (Data data)
+    {
+        foreach (var module in modules)
+            module.generate_data_rules (data.recipe, data);
     }
 
     private static void generate_rules (Recipe recipe)
@@ -669,7 +711,7 @@ public class Bake
 
         var context = new OptionContext (/* Arguments and description for --help text */
                                          _("[TARGET] - Build system"));
-        context.add_main_entries (options, GETTEXT_PACKAGE);
+        context.add_main_entries (command_line_options, GETTEXT_PACKAGE);
         try
         {
             context.parse (ref args);
@@ -792,6 +834,42 @@ public class Bake
             }
         }
 
+        /* Load the recipe tree */
+        var filename = Path.build_filename (toplevel_dir, "Recipe");
+        try
+        {
+            toplevel = load_recipes (filename);
+        }
+        catch (Error e)
+        {
+            stdout.printf ("%s\n", format_status ("%s".printf (e.message)));
+            stdout.printf ("%s\n", format_error ("[Build failed]"));
+            return Posix.EXIT_FAILURE;
+        }
+        find_objects (toplevel);
+
+        if (do_list_options)
+        {
+            var name_length = 0;
+            foreach (var option in options)
+            {
+                if (option.id.length > name_length)
+                    name_length = option.id.length;
+            }
+
+            stdout.printf ("Project options:\n");
+            foreach (var option in options)
+            {
+                var name = option.id;
+                for (var i = name.length; i < name_length; i++)
+                    name += " ";
+
+                stdout.printf ("  %s - %s\n", name, option.description);
+            }
+
+            return Posix.EXIT_SUCCESS;
+        }
+
         if (do_configure || need_configure)
         {
             var conf_variables = new HashTable<string, string> (str_hash, str_equal);
@@ -799,22 +877,36 @@ public class Bake
             /* Load args from the command line */
             if (do_configure)
             {
+                var n_unknown_options = 0;
                 for (var i = 1; i < args.length; i++)
                 {
                     var arg = args[i];
                     var index = arg.index_of ("=");
-                    var name = "", value = "";
+                    var id = "", value = "";
                     if (index >= 0)
                     {
-                        name = strip (arg.substring (0, index));
+                        id = strip (arg.substring (0, index));
                         value = strip (arg.substring (index + 1));
                     }
-                    if (name == "" || value == "")
+                    if (id == "" || value == "")
                     {
                         stderr.printf ("Invalid configure argument '%s'.  Arguments should be in the form name=value\n", arg);
                         return Posix.EXIT_FAILURE;
                     }
-                    conf_variables.insert (name, value);
+                    var option = get_option (id);
+                    if (option == null)
+                    {
+                        stdout.printf ("%s\n", format_status ("Unknown option '%s'".printf (id)));
+                        n_unknown_options++;
+                    }
+
+                    conf_variables.insert ("options.%s".printf (id), value);
+                }
+
+                if (n_unknown_options > 0)
+                {
+                    stdout.printf ("%s\n", format_error ("[Build failed]"));
+                    return Posix.EXIT_FAILURE;
                 }
             }
 
@@ -856,6 +948,31 @@ public class Bake
             }
         }
 
+        /* Make the configuration the toplevel file so everything inherits from it */
+        conf_file.children.append (toplevel);
+        toplevel.parent = conf_file;
+
+        /* Check all options set */
+        var n_missing_options = 0;
+        foreach (var option in options)
+        {
+            if (option.value == null)
+            {
+                if (option.default != null)
+                    option.value = option.default;
+                else
+                {
+                    stdout.printf ("%s\n", format_status ("Option '%s' not set".printf (option.id)));
+                    n_missing_options++;
+                }
+            }
+        }
+        if (n_missing_options > 0)
+        {
+            stdout.printf ("%s\n", format_error ("[Build failed]"));
+            return Posix.EXIT_FAILURE;
+        }
+
         /* Derived values */
         var root_directory = conf_file.get_variable ("root-directory");
         if (root_directory == null)
@@ -887,23 +1004,6 @@ public class Bake
         if (conf_file.get_variable ("project-data-directory") == null)
             conf_file.set_variable ("project-data-directory", Path.build_filename (data_directory, "$(project.name)"));
 
-        /* Load the recipe tree */
-        var filename = Path.build_filename (toplevel_dir, "Recipe");
-        try
-        {
-            toplevel = load_recipes (filename);
-        }
-        catch (Error e)
-        {
-            stdout.printf ("%s\n", format_status ("%s".printf (e.message)));
-            stdout.printf ("%s\n", format_error ("[Build failed]"));
-            return Posix.EXIT_FAILURE;
-        }
-
-        /* Make the configuration the toplevel file so everything inherits from it */
-        conf_file.children.append (toplevel);
-        toplevel.parent = conf_file;
-
         /* Find the recipe in the current directory */
         var recipe = toplevel;
         while (recipe.dirname != original_dir)
@@ -924,9 +1024,12 @@ public class Bake
             module.generate_toplevel_rules (toplevel);
 
         /* Generate libraries first (as other things may depend on it) then the other rules */
-        generate_library_rules (toplevel);
-        generate_program_rules (toplevel);
-        generate_data_rules (toplevel);
+        foreach (var library in libraries)
+            generate_library_rules (library);
+        foreach (var program in programs)
+            generate_program_rules (program);
+        foreach (var data in datas)
+            generate_data_rules (data);
         generate_rules (toplevel);
 
         /* Generate clean rule */

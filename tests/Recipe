@@ -67,6 +67,20 @@ programs.test-runner {
       args = minimum-version-newer
     }
 
+    # Options
+    options-simple {
+      args = options-simple
+    }
+    options-unset {
+      args = options-unset
+    }
+    options-unknown-option {
+      args = options-unknown-option
+    }
+    options-default-value {
+      args = options-default-value
+    }
+
     # Test handle unknown programs and libraries
     unknown-program {
       args = unknown-program
@@ -532,6 +546,14 @@ data.tests {
           minimum-version-older/Recipe \
           minimum-version-newer/expected \
           minimum-version-newer/Recipe \
+          options-simple/expected \
+          options-simple/Recipe \
+          options-unset/expected \
+          options-unset/Recipe \
+          options-unknown-option/expected \
+          options-unknown-option/Recipe \
+          options-default-value/expected \
+          options-default-value/Recipe \
           unknown-program/expected \
           unknown-program/Recipe \
           unknown-program/test.unknown \
