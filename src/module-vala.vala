@@ -10,29 +10,31 @@
 
 public class ValaModule : BuildModule
 {
-    public override bool can_generate_program_rules (Recipe recipe, Program program)
+    public override bool can_generate_program_rules (Program program)
     {
-        return can_generate_rules (recipe, program);
+        return can_generate_rules (program);
     }
 
-    public override void generate_program_rules (Recipe recipe, Program program)
+    public override void generate_program_rules (Program program)
     {
-        generate_compile_rules (recipe, program);
+        generate_compile_rules (program);
         if (program.install)
-            recipe.add_install_rule (program.name, program.install_directory);
+            program.recipe.add_install_rule (program.name, program.install_directory);
 
-        generate_gettext_rules (recipe, program);
+        generate_gettext_rules (program);
     }
 
-    public override bool can_generate_library_rules (Recipe recipe, Library library)
+    public override bool can_generate_library_rules (Library library)
     {
-        return can_generate_rules (recipe, library);
+        return can_generate_rules (library);
     }
 
-    public override void generate_library_rules (Recipe recipe, Library library)
+    public override void generate_library_rules (Library library)
     {
-        generate_compile_rules (recipe, library);
-           
+        var recipe = library.recipe;
+
+        generate_compile_rules (library);
+
         /* Generate a symbolic link to the library and install both the link and the library */
         var binary_name = "lib%s.so".printf (library.name);
         var so_version = library.get_variable ("so-version");
@@ -105,11 +107,13 @@ public class ValaModule : BuildModule
                 recipe.add_install_rule (typelib_filename, typelib_directory);
         }
 
-        generate_gettext_rules (recipe, library);
+        generate_gettext_rules (library);
     }
 
-    private void generate_compile_rules (Recipe recipe, Compilable compilable)
+    private void generate_compile_rules (Compilable compilable)
     {
+        var recipe = compilable.recipe;
+
         var compile_flags = compilable.compile_flags;
         if (compile_flags == null)
             compile_flags = "";
@@ -442,7 +446,7 @@ public class ValaModule : BuildModule
         }
     }
     
-    private bool can_generate_rules (Recipe recipe, Compilable compilable)
+    private bool can_generate_rules (Compilable compilable)
     {
         var n_sources = 0;
         foreach (var source in compilable.sources)
@@ -460,12 +464,12 @@ public class ValaModule : BuildModule
         return true;
     }
 
-    private void generate_gettext_rules (Recipe recipe, Compilable compilable)
+    private void generate_gettext_rules (Compilable compilable)
     {
         if (compilable.gettext_domain == null)
             return;
 
         foreach (var source in compilable.sources)
-            GettextModule.add_translatable_file (recipe, compilable.gettext_domain, "text/x-vala", source);
+            GettextModule.add_translatable_file (compilable.recipe, compilable.gettext_domain, "text/x-vala", source);
     }
 }

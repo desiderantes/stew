@@ -10,26 +10,28 @@
 
 public class GCCModule : BuildModule
 {
-    public override bool can_generate_program_rules (Recipe recipe, Program program)
+    public override bool can_generate_program_rules (Program program)
     {
-        return can_generate_rules (recipe, program);
+        return can_generate_rules (program);
     }
 
-    public override void generate_program_rules (Recipe recipe, Program program)
+    public override void generate_program_rules (Program program)
     {
-        generate_compile_rules (recipe, program);
+        generate_compile_rules (program);
         if (program.install)
-            recipe.add_install_rule (program.name, program.install_directory);
+            program.recipe.add_install_rule (program.name, program.install_directory);
     }
 
-    public override bool can_generate_library_rules (Recipe recipe, Library library)
+    public override bool can_generate_library_rules (Library library)
     {
-        return can_generate_rules (recipe, library);
+        return can_generate_rules (library);
     }
 
-    public override void generate_library_rules (Recipe recipe, Library library)
+    public override void generate_library_rules (Library library)
     {
-        generate_compile_rules (recipe, library);
+        var recipe = library.recipe;
+
+        generate_compile_rules (library);
 
         var binary_name = "lib%s.so".printf (library.name);
         var so_version = library.get_variable ("so-version");
@@ -112,15 +114,15 @@ public class GCCModule : BuildModule
         }
     }
 
-    private bool can_generate_rules (Recipe recipe, Compilable compilable)
+    private bool can_generate_rules (Compilable compilable)
     {
-        if (get_compiler (recipe, compilable) == null)
+        if (get_compiler (compilable) == null)
             return false;
 
         return true;
     }
 
-    private string? get_compiler (Recipe recipe, Compilable compilable)
+    private string? get_compiler (Compilable compilable)
     {
         string? compiler = null;
         foreach (var source in compilable.sources)
@@ -140,9 +142,11 @@ public class GCCModule : BuildModule
         return compiler;
     }
 
-    private void generate_compile_rules (Recipe recipe, Compilable compilable)
+    private void generate_compile_rules (Compilable compilable)
     {
-        var compiler = get_compiler (recipe, compilable);
+        var recipe = compilable.recipe;
+
+        var compiler = get_compiler (compilable);
 
         var is_qt = compilable.get_boolean_variable ("qt");
 
@@ -294,7 +298,7 @@ public class GCCModule : BuildModule
             rule.add_input (input);
             if (compiler == "gcc" || compiler == "g++")
             {
-                var includes = get_includes (recipe, deps_file);
+                var includes = get_includes (deps_file);
                 foreach (var include in includes)
                     rule.add_input (include);
             }
@@ -354,7 +358,7 @@ public class GCCModule : BuildModule
         }
     }
 
-    private List<string> get_includes (Recipe recipe, string filename)
+    private List<string> get_includes (string filename)
     {
         List<string> includes = null;
 

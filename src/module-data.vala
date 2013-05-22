@@ -10,8 +10,9 @@
 
 public class DataModule : BuildModule
 {
-    public override void generate_data_rules (Recipe recipe, Data data)
+    public override void generate_data_rules (Data data)
     {
+        var recipe = data.recipe;
         foreach (var file in data.get_file_list ("files"))
         {
             recipe.build_rule.add_input (file);

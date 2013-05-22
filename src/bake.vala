@@ -24,25 +24,25 @@ public class BuildModule
     {
     }
 
-    public virtual bool can_generate_program_rules (Recipe recipe, Program program)
+    public virtual bool can_generate_program_rules (Program program)
     {
         return false;
     }
 
-    public virtual void generate_program_rules (Recipe recipe, Program program)
+    public virtual void generate_program_rules (Program program)
     {
     }
 
-    public virtual bool can_generate_library_rules (Recipe recipe, Library library)
+    public virtual bool can_generate_library_rules (Library library)
     {
         return false;
     }
 
-    public virtual void generate_library_rules (Recipe recipe, Library library)
+    public virtual void generate_library_rules (Library library)
     {
     }
 
-    public virtual void generate_data_rules (Recipe recipe, Data data)
+    public virtual void generate_data_rules (Data data)
     {
     }
 
@@ -602,12 +602,12 @@ public class Bake
         var buildable_modules = new List<BuildModule> ();
         foreach (var module in modules)
         {
-            if (module.can_generate_library_rules (recipe, library))
+            if (module.can_generate_library_rules (library))
                 buildable_modules.append (module);
         }
 
         if (buildable_modules.length () > 0)
-            buildable_modules.nth_data (0).generate_library_rules (recipe, library);
+            buildable_modules.nth_data (0).generate_library_rules (library);
         else
         {
             var rule = recipe.add_rule ();
@@ -627,13 +627,13 @@ public class Bake
         var buildable_modules = new List<BuildModule> ();
         foreach (var module in modules)
         {
-            if (module.can_generate_program_rules (recipe, program))
+            if (module.can_generate_program_rules (program))
                 buildable_modules.append (module);
         }
 
         if (buildable_modules.length () > 0)
         {
-            buildable_modules.nth_data (0).generate_program_rules (recipe, program);
+            buildable_modules.nth_data (0).generate_program_rules (program);
 
             foreach (var test_id in recipe.get_variable_children ("programs.%s.tests".printf (program.id)))
             {
@@ -662,7 +662,7 @@ public class Bake
     private static void generate_data_rules (Data data)
     {
         foreach (var module in modules)
-            module.generate_data_rules (data.recipe, data);
+            module.generate_data_rules (data);
     }
 
     private static void generate_rules (Recipe recipe)

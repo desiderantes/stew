@@ -10,13 +10,14 @@
 
 public class PythonModule : BuildModule
 {
-    public override bool can_generate_program_rules (Recipe recipe, Program program)
+    public override bool can_generate_program_rules (Program program)
     {
-        return can_generate_rules (recipe, program.sources, program.get_variable ("python-version"));
+        return can_generate_rules (program.sources, program.get_variable ("python-version"));
     }
 
-    public override void generate_program_rules (Recipe recipe, Program program)
+    public override void generate_program_rules (Program program)
     {
+        var recipe = program.recipe;
         var binary_name = program.name;
 
         var sources = program.sources;
@@ -84,13 +85,14 @@ public class PythonModule : BuildModule
             recipe.add_install_rule (script, program.install_directory, binary_name);
     }
 
-    public override bool can_generate_library_rules (Recipe recipe, Library library)
+    public override bool can_generate_library_rules (Library library)
     {
-        return can_generate_rules (recipe, library.sources, library.get_variable ("python-version"));
+        return can_generate_rules (library.sources, library.get_variable ("python-version"));
     }
 
-    public override void generate_library_rules (Recipe recipe, Library library)
+    public override void generate_library_rules (Library library)
     {
+        var recipe = library.recipe;
         var sources = library.sources;
 
         var python_version = library.get_variable ("python-version");
@@ -141,7 +143,7 @@ public class PythonModule : BuildModule
         }
     }
 
-    private bool can_generate_rules (Recipe recipe, List<string> sources, string? python_version)
+    private bool can_generate_rules (List<string> sources, string? python_version)
     {
         var count = 0;
         foreach (var source in sources)
