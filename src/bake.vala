@@ -848,20 +848,20 @@ public class Bake
         }
         find_objects (toplevel);
 
+        var max_option_name_length = 0;
+        foreach (var option in options)
+        {
+            if (option.id.length > max_option_name_length)
+                max_option_name_length = option.id.length;
+        }
+
         if (do_list_options)
         {
-            var name_length = 0;
-            foreach (var option in options)
-            {
-                if (option.id.length > name_length)
-                    name_length = option.id.length;
-            }
-
             stdout.printf ("Project options:\n");
             foreach (var option in options)
             {
                 var name = option.id;
-                for (var i = name.length; i < name_length; i++)
+                for (var i = name.length; i < max_option_name_length; i++)
                     name += " ";
 
                 stdout.printf ("  %s - %s\n", name, option.description);
@@ -870,9 +870,16 @@ public class Bake
             return Posix.EXIT_SUCCESS;
         }
 
+        /* Must configure if options are not all set */
+        foreach (var option in options)
+            if (option.value == null && option.default == null)
+                need_configure = true;
+
         if (do_configure || need_configure)
         {
             var conf_variables = new HashTable<string, string> (str_hash, str_equal);
+
+            stdout.printf ("%s\n", format_status ("[Configuring]"));
 
             /* Load args from the command line */
             if (do_configure)
@@ -905,12 +912,23 @@ public class Bake
 
                 if (n_unknown_options > 0)
                 {
-                    stdout.printf ("%s\n", format_error ("[Build failed]"));
+                    stdout.printf ("%s\n", format_error ("[Configure failed]"));
                     return Posix.EXIT_FAILURE;
                 }
             }
 
-            stdout.printf ("%s\n", format_status ("[Configuring]"));
+            /* Print summary of configuration options */
+            foreach (var option in options)
+            {
+                var name = option.id;
+                for (var i = name.length; i < max_option_name_length; i++)
+                    name += " ";
+
+                if (option.value != null)
+                    stdout.printf ("  %s - %s\n", name, option.value);
+                else
+                    stdout.printf ("  %s - (unset)\n", name);
+            }
 
             /* Make directories absolute */
             // FIXME
@@ -946,32 +964,32 @@ public class Bake
                 printerr ("Failed to read back configuration: %s\n", e.message);
                 return Posix.EXIT_FAILURE;
             }
+
+            /* Check all options set */
+            var n_missing_options = 0;
+            foreach (var option in options)
+            {
+                if (option.value == null)
+                {
+                    if (option.default != null)
+                        option.value = option.default;
+                    else
+                    {
+                        stdout.printf ("%s\n", format_status ("Option '%s' not set".printf (option.id)));
+                        n_missing_options++;
+                    }
+                }
+            }
+            if (n_missing_options > 0)
+            {
+                stdout.printf ("%s\n", format_error ("[Configure failed]"));
+                return Posix.EXIT_FAILURE;
+            }
         }
 
         /* Make the configuration the toplevel file so everything inherits from it */
         conf_file.children.append (toplevel);
         toplevel.parent = conf_file;
-
-        /* Check all options set */
-        var n_missing_options = 0;
-        foreach (var option in options)
-        {
-            if (option.value == null)
-            {
-                if (option.default != null)
-                    option.value = option.default;
-                else
-                {
-                    stdout.printf ("%s\n", format_status ("Option '%s' not set".printf (option.id)));
-                    n_missing_options++;
-                }
-            }
-        }
-        if (n_missing_options > 0)
-        {
-            stdout.printf ("%s\n", format_error ("[Build failed]"));
-            return Posix.EXIT_FAILURE;
-        }
 
         /* Derived values */
         var root_directory = conf_file.get_variable ("root-directory");
