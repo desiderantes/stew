@@ -953,7 +953,10 @@ public class Bake
 
             /* Stop if only configure stage requested */
             if (do_configure)
+            {
+                stdout.printf ("%s\n", format_success ("[Configure complete]"));
                 return Posix.EXIT_SUCCESS;
+            }
 
             try
             {
