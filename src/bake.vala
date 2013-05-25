@@ -862,18 +862,15 @@ public class Bake
 
         /* Load options */
         make_built_in_option (conf_file, "install-directory", "Directory to install files to", "/");
-        var root_directory = "/";
-        make_built_in_option (conf_file, "system-config-directory", "Directory to install system configuration", Path.build_filename (root_directory, "etc"));
-        make_built_in_option (conf_file, "system-binary-directory", "Directory to install system binaries", Path.build_filename (root_directory, "sbin"));
-        make_built_in_option (conf_file, "system-library-directory", "Directory to install system libraries", Path.build_filename (root_directory, "lib"));
-        make_built_in_option (conf_file, "resource-directory", "Directory to install system libraries", Path.build_filename (root_directory, "usr"));
-        var resource_directory = Path.build_filename (root_directory, "usr");
-        make_built_in_option (conf_file, "binary-directory", "Directory to install binaries", Path.build_filename (resource_directory, "bin"));
-        make_built_in_option (conf_file, "library-directory", "Directory to install libraries", Path.build_filename (resource_directory, "lib"));
-        var data_directory = Path.build_filename (resource_directory, "share");
-        make_built_in_option (conf_file, "data-directory", "Directory to install data", data_directory);
-        make_built_in_option (conf_file, "include-directory", "Directory to install headers", Path.build_filename (resource_directory, "include"));
-        make_built_in_option (conf_file, "project-data-directory", "Directory to install project files to", Path.build_filename (data_directory, toplevel.project_name));
+        make_built_in_option (conf_file, "system-config-directory", "Directory to install system configuration", Path.build_filename ("/", "etc"));
+        make_built_in_option (conf_file, "system-binary-directory", "Directory to install system binaries", Path.build_filename ("/", "sbin"));
+        make_built_in_option (conf_file, "system-library-directory", "Directory to install system libraries", Path.build_filename ("/", "lib"));
+        make_built_in_option (conf_file, "resource-directory", "Directory to install system libraries", Path.build_filename ("/", "usr"));
+        make_built_in_option (conf_file, "binary-directory", "Directory to install binaries", "$(options.resource-directory)/bin");
+        make_built_in_option (conf_file, "library-directory", "Directory to install libraries", "$(options.resource-directory)/lib");
+        make_built_in_option (conf_file, "data-directory", "Directory to install data", "$(options.resource-directory)/share");
+        make_built_in_option (conf_file, "include-directory", "Directory to install headers", "$(options.resource-directory)/include");
+        make_built_in_option (conf_file, "project-data-directory", "Directory to install project files to", "$(options.data-directory)/%s".printf (toplevel.project_name));
         find_objects (toplevel);
 
         /* Make the configuration the toplevel file so everything inherits from it */
