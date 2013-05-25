@@ -484,7 +484,7 @@ public class Bake
         if (debug_enabled)
             stderr.printf ("Loading %s\n", get_relative_path (original_dir, filename));
 
-        var f = new Recipe (filename);
+        var f = new Recipe.from_file (filename);
 
         /* Children can't be new toplevel recipes */
         if (!is_toplevel && f.project_name != null)
@@ -557,6 +557,16 @@ public class Bake
                 result = false;
 
         return result;
+    }
+
+    private static Option make_built_in_option (Recipe conf_file, string id, string description, string default)
+    {
+        conf_file.set_variable ("options.%s.description".printf (id), description);
+        conf_file.set_variable ("options.%s.default".printf (id), default);
+        var option = new Option (conf_file, id);
+        options.append (option);
+
+        return option;
     }
 
     private static void find_objects (Recipe recipe)
@@ -774,7 +784,7 @@ public class Bake
             var filename = Path.build_filename (toplevel_dir, "Recipe");
             try
             {
-                toplevel = new Recipe (filename);
+                toplevel = new Recipe.from_file (filename);
                 if (toplevel.project_name != null)
                     break;
             }
@@ -821,23 +831,14 @@ public class Bake
         Recipe conf_file = null;
         try
         {
-            conf_file = new Recipe (Path.build_filename (toplevel_dir, "Recipe.conf"), false);
+            conf_file = new Recipe.from_file (Path.build_filename (toplevel_dir, "Recipe.conf"), false);
         }
         catch (Error e)
         {
             if (e is FileError.NOENT)
             {
                 need_configure = true;
-                try
-                {
-                    FileUtils.set_contents (Path.build_filename (toplevel_dir, "Recipe.conf"), "");
-                    conf_file = new Recipe ("Recipe.conf");
-                }
-                catch (Error e)
-                {
-                    printerr ("Failed to create configuration: %s\n", e.message);
-                    return Posix.EXIT_FAILURE;
-                }
+                conf_file = new Recipe ();
             }
             else
             {
@@ -858,6 +859,21 @@ public class Bake
             stdout.printf ("%s\n", format_error ("[Build failed]"));
             return Posix.EXIT_FAILURE;
         }
+
+        /* Load options */
+        make_built_in_option (conf_file, "install-directory", "Directory to install files to", "/");
+        var root_directory = "/";
+        make_built_in_option (conf_file, "system-config-directory", "Directory to install system configuration", Path.build_filename (root_directory, "etc"));
+        make_built_in_option (conf_file, "system-binary-directory", "Directory to install system binaries", Path.build_filename (root_directory, "sbin"));
+        make_built_in_option (conf_file, "system-library-directory", "Directory to install system libraries", Path.build_filename (root_directory, "lib"));
+        make_built_in_option (conf_file, "resource-directory", "Directory to install system libraries", Path.build_filename (root_directory, "usr"));
+        var resource_directory = Path.build_filename (root_directory, "usr");
+        make_built_in_option (conf_file, "binary-directory", "Directory to install binaries", Path.build_filename (resource_directory, "bin"));
+        make_built_in_option (conf_file, "library-directory", "Directory to install libraries", Path.build_filename (resource_directory, "lib"));
+        var data_directory = Path.build_filename (resource_directory, "share");
+        make_built_in_option (conf_file, "data-directory", "Directory to install data", data_directory);
+        make_built_in_option (conf_file, "include-directory", "Directory to install headers", Path.build_filename (resource_directory, "include"));
+        make_built_in_option (conf_file, "project-data-directory", "Directory to install project files to", Path.build_filename (data_directory, toplevel.project_name));
         find_objects (toplevel);
 
         /* Make the configuration the toplevel file so everything inherits from it */
@@ -994,37 +1010,6 @@ public class Bake
         foreach (var option in options)
             if (option.value == null && option.default != null)
                 option.value = option.default;
-
-        /* Derived values */
-        var root_directory = conf_file.get_variable ("root-directory");
-        if (root_directory == null)
-        {
-            root_directory = "/";
-            conf_file.set_variable ("root-directory", root_directory);
-        }
-        var resource_directory = conf_file.get_variable ("resource-directory");
-        if (resource_directory == null)
-        {
-            resource_directory = Path.build_filename (root_directory, "usr");
-            conf_file.set_variable ("resource-directory", resource_directory);
-        }
-        if (conf_file.get_variable ("system-config-directory") == null)
-            conf_file.set_variable ("system-config-directory", Path.build_filename (root_directory, "etc"));
-        if (conf_file.get_variable ("system-binary-directory") == null)
-            conf_file.set_variable ("system-binary-directory", Path.build_filename (root_directory, "sbin"));
-        if (conf_file.get_variable ("system-library-directory") == null)
-            conf_file.set_variable ("system-library-directory", Path.build_filename (root_directory, "lib"));
-        if (conf_file.get_variable ("binary-directory") == null)
-            conf_file.set_variable ("binary-directory", Path.build_filename (resource_directory, "bin"));
-        if (conf_file.get_variable ("library-directory") == null)
-            conf_file.set_variable ("library-directory", Path.build_filename (resource_directory, "lib"));
-        if (conf_file.get_variable ("data-directory") == null)
-            conf_file.set_variable ("data-directory", Path.build_filename (resource_directory, "share"));
-        if (conf_file.get_variable ("include-directory") == null)
-            conf_file.set_variable ("include-directory", Path.build_filename (resource_directory, "include"));
-        var data_directory = conf_file.get_variable ("data-directory");
-        if (conf_file.get_variable ("project-data-directory") == null)
-            conf_file.set_variable ("project-data-directory", Path.build_filename (data_directory, "$(project.name)"));
 
         /* Find the recipe in the current directory */
         var recipe = toplevel;

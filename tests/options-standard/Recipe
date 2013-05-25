@@ -1,0 +1,15 @@
+project {
+  name = test-project
+}
+
+%build:
+  mkdir -p $(options.install-directory)
+  mkdir -p $(options.system-config-directory)
+  mkdir -p $(options.system-binary-directory)
+  mkdir -p $(options.system-library-directory)
+  mkdir -p $(options.resource-directory)
+  mkdir -p $(options.binary-directory)
+  mkdir -p $(options.library-directory)
+  mkdir -p $(options.data-directory)
+  mkdir -p $(options.include-directory)
+  mkdir -p $(options.project-data-directory)

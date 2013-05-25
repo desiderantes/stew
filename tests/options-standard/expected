@@ -1,0 +1,12 @@
+!bake
+mkdir -p /
+mkdir -p /etc
+mkdir -p /sbin
+mkdir -p /lib
+mkdir -p /usr
+mkdir -p /usr/bin
+mkdir -p /usr/lib
+mkdir -p /usr/share
+mkdir -p /usr/include
+mkdir -p /usr/share/test-project
+(exit SUCCESS)

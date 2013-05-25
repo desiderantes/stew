@@ -68,6 +68,9 @@ programs.test-runner {
     }
 
     # Options
+    options-standard {
+      args = options-standard
+    }
     options-simple {
       args = options-simple
     }
@@ -549,6 +552,8 @@ data.tests {
           minimum-version-older/Recipe \
           minimum-version-newer/expected \
           minimum-version-newer/Recipe \
+          options-standard/expected \
+          options-standard/Recipe \
           options-simple/expected \
           options-simple/Recipe \
           options-unset/expected \

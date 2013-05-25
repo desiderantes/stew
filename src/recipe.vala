@@ -36,22 +36,20 @@ public class Recipe
     {
         owned get
         {
-            var dir = get_variable ("install-directory");
-            if (dir == null || Path.is_absolute (dir))
+            var dir = get_variable ("options.install-directory");
+            if (Path.is_absolute (dir))
                 return dir;
             return Path.build_filename (original_dir, dir);
         }
     }
 
-    public string source_directory { owned get { return get_variable ("source-directory"); } }
-    public string top_source_directory { owned get { return get_variable ("top-source-directory"); } }
-    public string binary_directory { owned get { return get_variable ("binary-directory"); } }
-    public string system_binary_directory { owned get { return get_variable ("system-binary-directory"); } }
-    public string library_directory { owned get { return get_variable ("library-directory"); } }
-    public string system_library_directory { owned get { return get_variable ("system-library-directory"); } }
-    public string data_directory { owned get { return get_variable ("data-directory"); } }
-    public string include_directory { owned get { return get_variable ("include-directory"); } }
-    public string project_data_directory { owned get { return get_variable ("project-data-directory"); } }
+    public string binary_directory { owned get { return get_variable ("options.binary-directory"); } }
+    public string system_binary_directory { owned get { return get_variable ("options.system-binary-directory"); } }
+    public string library_directory { owned get { return get_variable ("options.library-directory"); } }
+    public string system_library_directory { owned get { return get_variable ("options.system-library-directory"); } }
+    public string data_directory { owned get { return get_variable ("options.data-directory"); } }
+    public string include_directory { owned get { return get_variable ("options.include-directory"); } }
+    public string project_data_directory { owned get { return get_variable ("options.project-data-directory"); } }
 
     public string project_name { owned get { return get_variable ("project.name"); } }
     public string project_version { owned get { return get_variable ("project.version"); } }
@@ -70,12 +68,17 @@ public class Recipe
         owned get { return toplevel.get_build_path (release_name); }
     }
 
-    public Recipe (string filename, bool allow_rules = true) throws FileError, RecipeError
+    public Recipe ()
     {
-        this.filename = filename;
-
         variable_names = new List<string> ();
         variables = new HashTable<string, string> (str_hash, str_equal);
+    }
+
+    public Recipe.from_file (string filename, bool allow_rules = true) throws FileError, RecipeError
+    {
+        this ();
+
+        this.filename = filename;
 
         string contents;
         FileUtils.get_contents (filename, out contents);
@@ -338,7 +341,7 @@ public class Recipe
 
     public string get_install_path (string path)
     {
-        if (install_directory == null || install_directory == "")
+        if (install_directory == "/")
             return path;
         else
             return "%s%s".printf (install_directory, path);

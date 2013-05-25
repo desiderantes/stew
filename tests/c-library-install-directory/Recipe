@@ -4,5 +4,5 @@ project {
 
 libraries.test {
   sources = test.c
-  install-directory = $(library-directory)/custom-directory
+  install-directory = $(options.library-directory)/custom-directory
 }
