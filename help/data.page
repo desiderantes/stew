@@ -22,7 +22,7 @@ For example, the foo project can specify images that are required to be installe
 <code>
 data.images {
   files = image1.png
-  install-directory = $(project-data-directory)/images
+  install-directory = $(options.project-data-directory)/images
 }
 </code>
 <p>
