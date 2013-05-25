@@ -18,7 +18,7 @@ public class Recipe
     public string filename;
     public Recipe? parent = null;
     public List<Recipe> children;
-    private List<string> variable_names;
+    public List<string> variable_names;
     private HashTable<string, string> variables;
     public List<Rule> rules;
     public Rule build_rule;
@@ -449,19 +449,23 @@ public class Recipe
         return toplevel.targets.lookup (target);
     }
 
-    public void print ()
+    public string to_string ()
     {
+        var text = "";
+
         foreach (var name in variable_names)
         {
             var value = get_variable (name);
             if (value != null)
-                stdout.printf ("%s=%s\n", name, value);
+                text += "%s=%s\n".printf (name, value);
         }
         foreach (var rule in rules)
         {
-            stdout.printf ("\n");
-            rule.print ();
+            text += "\n";
+            text += rule.to_string ();
         }
+
+        return text;
     }
 }
 

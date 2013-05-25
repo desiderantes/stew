@@ -164,17 +164,26 @@ public class Rule
         return commands;
     }
 
-    public void print ()
+    public string to_string ()
     {
+        var text = "";
+
+        var n = 0;
         foreach (var output in outputs)
-            stdout.printf ("%s ", output);
-        stdout.printf (":");
+        {
+            if (n != 0)
+                text += " ";
+            text += output;
+        }
+        text += ":";
         foreach (var input in inputs)
-            stdout.printf (" %s", input);
-        stdout.printf ("\n");
+            text += " " + input;
+        text += "\n";
         var commands = get_commands ();
         foreach (var c in commands)
-            stdout.printf ("    %s\n", c);
+            text += "    " + c;
+
+        return text;
     }
 }
 
