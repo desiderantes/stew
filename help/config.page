@@ -59,4 +59,55 @@ You can see the options for a project by running <code>bake --list-options</code
 Configuring is an optional step, if run on an unconfigured project Bake will configure using default values.
 </p>
 </note>
+<p>
+The following options are always available to all projects.
+</p>
+<table frame="all" shade="rows">
+<thead>
+<tr>
+  <td><p>Name</p></td>
+  <td><p>Description</p></td>
+</tr>
+</thead>
+<tr>
+  <td><p>options.install-directory</p></td>
+  <td><p>Directory to install files to</p></td>
+</tr>  
+<tr>  
+  <td><p>options.system-config-directory</p></td>
+  <td><p>Directory to install system configuration</p></td>
+</tr>  
+<tr>  
+  <td><p>options.system-binary-directory</p></td>
+  <td><p>Directory to install system binaries</p></td>
+</tr>  
+<tr>  
+  <td><p>options.system-library-directory</p></td>
+  <td><p>Directory to install system libraries</p></td>
+</tr>  
+<tr>  
+  <td><p>options.resource-directory</p></td>
+  <td><p>Directory to install system libraries</p></td>
+</tr>  
+<tr>  
+  <td><p>options.binary-directory</p></td>
+  <td><p>Directory to install binaries</p></td>
+</tr>  
+<tr>  
+  <td><p>options.library-directory</p></td>
+  <td><p>Directory to install libraries</p></td>
+</tr>  
+<tr>  
+  <td><p>options.data-directory</p></td>
+  <td><p>Directory to install data</p></td>
+</tr>  
+<tr>  
+  <td><p>options.include-directory</p></td>
+  <td><p>Directory to install headers</p></td>
+</tr>  
+<tr>  
+  <td><p>options.project-data-directory</p></td>
+  <td><p>Directory to install project files to</p></td>
+</tr>  
+</table>
 </page>
