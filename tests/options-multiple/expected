@@ -1,0 +1,5 @@
+!bake --configure name=apple color=red taste=sweet sound=crunch
+(exit SUCCESS)
+!bake
+touch apple red sweet crunch
+(exit SUCCESS)

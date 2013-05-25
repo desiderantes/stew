@@ -10,7 +10,7 @@
 
 public class GHCModule : BuildModule
 {
-    public override bool can_generate_program_rules (Recipe recipe, Program program)
+    public override bool can_generate_program_rules (Program program)
     {
         var count = 0;
         foreach (var source in program.sources)
@@ -28,8 +28,10 @@ public class GHCModule : BuildModule
         return true;
     }
 
-    public override void generate_program_rules (Recipe recipe, Program program)
+    public override void generate_program_rules (Program program)
     {
+        var recipe = program.recipe;
+
         var binary_name = program.name;
 
         var link_rule = recipe.add_rule ();

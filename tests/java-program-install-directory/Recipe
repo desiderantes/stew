@@ -4,6 +4,6 @@ project {
 
 programs.test {
   sources = Test.java
-  install-directory = $(binary-directory)/test
+  install-directory = $(options.binary-directory)/test
 }
 

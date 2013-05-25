@@ -18,7 +18,7 @@ public class Recipe
     public string filename;
     public Recipe? parent = null;
     public List<Recipe> children;
-    private List<string> variable_names;
+    public List<string> variable_names;
     private HashTable<string, string> variables;
     public List<Rule> rules;
     public Rule build_rule;
@@ -36,22 +36,20 @@ public class Recipe
     {
         owned get
         {
-            var dir = get_variable ("install-directory");
-            if (dir == null || Path.is_absolute (dir))
+            var dir = get_variable ("options.install-directory");
+            if (Path.is_absolute (dir))
                 return dir;
             return Path.build_filename (original_dir, dir);
         }
     }
 
-    public string source_directory { owned get { return get_variable ("source-directory"); } }
-    public string top_source_directory { owned get { return get_variable ("top-source-directory"); } }
-    public string binary_directory { owned get { return get_variable ("binary-directory"); } }
-    public string system_binary_directory { owned get { return get_variable ("system-binary-directory"); } }
-    public string library_directory { owned get { return get_variable ("library-directory"); } }
-    public string system_library_directory { owned get { return get_variable ("system-library-directory"); } }
-    public string data_directory { owned get { return get_variable ("data-directory"); } }
-    public string include_directory { owned get { return get_variable ("include-directory"); } }
-    public string project_data_directory { owned get { return get_variable ("project-data-directory"); } }
+    public string binary_directory { owned get { return get_variable ("options.binary-directory"); } }
+    public string system_binary_directory { owned get { return get_variable ("options.system-binary-directory"); } }
+    public string library_directory { owned get { return get_variable ("options.library-directory"); } }
+    public string system_library_directory { owned get { return get_variable ("options.system-library-directory"); } }
+    public string data_directory { owned get { return get_variable ("options.data-directory"); } }
+    public string include_directory { owned get { return get_variable ("options.include-directory"); } }
+    public string project_data_directory { owned get { return get_variable ("options.project-data-directory"); } }
 
     public string project_name { owned get { return get_variable ("project.name"); } }
     public string project_version { owned get { return get_variable ("project.version"); } }
@@ -70,12 +68,17 @@ public class Recipe
         owned get { return toplevel.get_build_path (release_name); }
     }
 
-    public Recipe (string filename, bool allow_rules = true) throws FileError, RecipeError
+    public Recipe ()
     {
-        this.filename = filename;
-
         variable_names = new List<string> ();
         variables = new HashTable<string, string> (str_hash, str_equal);
+    }
+
+    public Recipe.from_file (string filename, bool allow_rules = true) throws FileError, RecipeError
+    {
+        this ();
+
+        this.filename = filename;
 
         string contents;
         FileUtils.get_contents (filename, out contents);
@@ -168,7 +171,7 @@ public class Recipe
         return false;
     }
 
-    public void set_variable (string name, string value)
+    public void set_variable (string name, string? value)
     {
         variable_names.append (name);
         variables.insert (name, value);
@@ -179,7 +182,7 @@ public class Recipe
         {
             var n = name.substring (0, i);
             if (variables.lookup (n) == null)
-                set_variable (n, "");
+                set_variable (n, null);
         }
     }
 
@@ -338,7 +341,7 @@ public class Recipe
 
     public string get_install_path (string path)
     {
-        if (install_directory == null || install_directory == "")
+        if (install_directory == "/")
             return path;
         else
             return "%s%s".printf (install_directory, path);
@@ -449,15 +452,23 @@ public class Recipe
         return toplevel.targets.lookup (target);
     }
 
-    public void print ()
+    public string to_string ()
     {
+        var text = "";
+
         foreach (var name in variable_names)
-            stdout.printf ("%s=%s\n", name, get_variable (name));
+        {
+            var value = get_variable (name);
+            if (value != null)
+                text += "%s=%s\n".printf (name, value);
+        }
         foreach (var rule in rules)
         {
-            stdout.printf ("\n");
-            rule.print ();
+            text += "\n";
+            text += rule.to_string ();
         }
+
+        return text;
     }
 }
 

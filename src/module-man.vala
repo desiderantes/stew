@@ -10,8 +10,9 @@
 
 public class ManModule : BuildModule
 {
-    public override void generate_data_rules (Recipe recipe, Data data)
+    public override void generate_data_rules (Data data)
     {
+        var recipe = data.recipe;
         foreach (var page in data.get_file_list ("man-pages"))
         {
             var i = page.last_index_of_char ('.');

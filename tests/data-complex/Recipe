@@ -4,5 +4,5 @@ project {
 
 data.test {
   files = test1 test2
-  install-directory = $(project-data-directory)/test
+  install-directory = $(options.project-data-directory)/test
 }

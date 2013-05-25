@@ -4,6 +4,6 @@ project {
 
 libraries.Test {
   sources = Test.cs
-  install-directory = $(library-directory)/custom-directory
+  install-directory = $(options.library-directory)/custom-directory
 }
 

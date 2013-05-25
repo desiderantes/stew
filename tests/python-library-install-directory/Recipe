@@ -4,6 +4,6 @@ project {
 
 libraries.test {
   sources = test.py
-  install-directory = $(library-directory)/custom-directory
+  install-directory = $(options.library-directory)/custom-directory
 }
 
