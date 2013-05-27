@@ -7,24 +7,36 @@
  * version. See http://www.gnu.org/copyleft/gpl.html the full text of the
  * license.
  */
-
+ 
 public errordomain BuildError
 {
-    NO_RULE,
-    COMMAND_FAILED,
-    MISSING_OUTPUT,
-    LOOP
+    ERROR
 }
 
 public class Builder
 {
+    private HashTable<Rule, RuleBuilder> builders;
+    private bool parallel = false;
+    private List<string> errors;
+
+    public Builder (bool parallel = false)
+    {
+        builders = new HashTable<Rule, RuleBuilder> (direct_hash, direct_equal);
+        this.parallel = parallel;
+    }
+
     public async bool build_target (Recipe recipe, string target) throws BuildError
     {
         var used_rules = new List<Rule> ();
-        return yield build_target_recursive (recipe, target, used_rules);
+        var result = yield build_target_recursive (recipe, target, used_rules);
+        
+        if (errors.length () > 0)
+            throw new BuildError.ERROR (errors.nth_data (0));
+
+        return result;
     }
 
-    private async bool build_target_recursive (Recipe recipe, string target, List<Rule> used_rules) throws BuildError
+    private async bool build_target_recursive (Recipe recipe, string target, List<Rule> used_rules)
     {
         if (debug_enabled)
             stderr.printf ("Considering target %s\n", get_relative_path (original_dir, target));
@@ -38,7 +50,7 @@ public class Builder
                                get_relative_path (original_dir, target),
                                get_relative_path (original_dir, rule.recipe.filename));
 
-            return yield build_target (rule.recipe, target);
+            return yield build_target_recursive (rule.recipe, target, used_rules);
         }
 
         if (rule == null)
@@ -48,23 +60,22 @@ public class Builder
                 return false;
 
             /* If doesn't exist then we can't continue */
-            throw new BuildError.NO_RULE ("File '%s' does not exist and no rule to build it", get_relative_path (original_dir, target));
+            errors.append ("File '%s' does not exist and no rule to build it".printf (get_relative_path (original_dir, target)));
+            return false;
         }
 
         if (used_rules.find (rule) != null)
-            throw new BuildError.LOOP ("Build loop detected");
+        {
+            errors.append ("Build loop detected");
+            return false;
+        }
 
+        /* Build the inputs first */
         var new_used_rules = used_rules.copy ();
         new_used_rules.append (rule);
-
-        /* Check the inputs first */
-        var force_build = false;
-        foreach (var input in rule.inputs)
-        {
-            var result = yield build_target_recursive (recipe, join_relative_dir (recipe.dirname, input), new_used_rules);
-            if (result)
-                force_build = true;
-        }
+        var force_build = yield build_inputs (recipe, rule, new_used_rules);
+        if (errors.length () > 0)
+            return false;
 
         /* Don't bother if it's already up to date */
         Environment.set_current_dir (recipe.dirname);
@@ -88,7 +99,64 @@ public class Builder
         return true;
     }
 
-    public async void build_rule (Rule rule) throws BuildError
+    private async bool build_inputs (Recipe recipe, Rule rule, List<Rule> used_rules)
+    {
+        /* Build the inputs, possibly in parallel */
+        var n_building = 0;
+        var force_build = false;
+        foreach (var input in rule.inputs)
+        {
+            n_building++;
+            build_target_recursive.begin (recipe, join_relative_dir (recipe.dirname, input), used_rules, (o, x) =>
+            {
+                var result = build_target_recursive.end (x);
+                n_building--;
+
+                /* Ensure we build this rule if the inputs change */
+                if (result)
+                    force_build = true;
+
+                if (n_building == 0)
+                    build_inputs.callback ();
+            });
+
+            /* Wait for each result if not running in parallel mode */
+            if (!parallel)
+                yield;
+        }
+
+        /* Wait for all inputs to complete in parallel mode */
+        if (parallel && n_building > 0)
+            yield;
+
+        return force_build;
+    }
+
+    private async void build_rule (Rule rule)
+    {
+        var builder = builders.lookup (rule);
+        if (builder != null)
+            return;
+
+        builder = new RuleBuilder (rule);
+        builders.insert (rule, builder);
+        yield builder.build ();
+        if (builder.error != null)
+            errors.append (builder.error);
+    }
+}
+
+public class RuleBuilder
+{
+    public Rule rule;
+    public string? error = null;
+
+    public RuleBuilder (Rule rule)
+    {
+        this.rule = rule;
+    }
+
+    public async bool build ()
     {
         var commands = rule.get_commands ();
         foreach (var c in commands)
@@ -107,6 +175,8 @@ public class Builder
 
             string output;
             var exit_status = yield run_command (c, out output);
+            if (error != null)
+                return false;
 
             /* On failure, make sure the command is visible and report the error */
             if (Process.if_signaled (exit_status))
@@ -114,14 +184,16 @@ public class Builder
                 if (!show_output)
                     stdout.printf ("%s\n", format_status (c));
                 stdout.printf ("%s", output);
-                throw new BuildError.COMMAND_FAILED ("Caught signal %d", Process.term_sig (exit_status));
+                error = "Caught signal %d".printf (Process.term_sig (exit_status));
+                return false;
             }
             else if (Process.if_exited (exit_status) && Process.exit_status (exit_status) != 0)
             {
                 if (!show_output)
                     stdout.printf ("%s\n", format_status (c));
                 stdout.printf ("%s", output);
-                throw new BuildError.COMMAND_FAILED ("Command exited with return value %d", Process.exit_status (exit_status));
+                error = "Command exited with return value %d".printf (Process.exit_status (exit_status));
+                return false;
             }
             else
                 stdout.printf ("%s", output);
@@ -130,11 +202,16 @@ public class Builder
         foreach (var output in rule.outputs)
         {
             if (!output.has_prefix ("%") && !FileUtils.test (output, FileTest.EXISTS))
-                throw new BuildError.MISSING_OUTPUT ("Failed to build file '%s'", output);
+            {
+                error = "Failed to build file '%s'".printf (output);
+                return false;
+            }
         }
+
+        return true;
     }
 
-    private async int run_command (string command, out string output) throws BuildError
+    private async int run_command (string command, out string output)
     {
         output = "";
 
@@ -171,7 +248,8 @@ public class Builder
         });
 
         /* Run the command in a child process */
-        Pid pid;
+        Pid pid = 0;
+        int exit_status = Posix.EXIT_SUCCESS;
         try
         {
             Process.spawn_async (null, args, null, SpawnFlags.DO_NOT_REAP_CHILD | SpawnFlags.LEAVE_DESCRIPTORS_OPEN, () =>
@@ -185,21 +263,24 @@ public class Builder
         }
         catch (SpawnError e)
         {
-            throw new BuildError.COMMAND_FAILED ("Failed to run command '%s'", e.message);
+            error = "Failed to run command '%s'".printf (e.message);
+            exit_status = Posix.EXIT_FAILURE;
         }
 
         /* Method completes when child process completes */
-        int exit_status = Posix.EXIT_SUCCESS;
-        ChildWatch.add (pid, (pid, status) =>
+        if (pid != 0)
         {
-            exit_status = status;
-            process_complete = true;
-            if (process_complete && have_output)
-                run_command.callback ();
-        });
+            ChildWatch.add (pid, (pid, status) =>
+            {
+                exit_status = status;
+                process_complete = true;
+                if (process_complete && have_output)
+                    run_command.callback ();
+            });
 
-        /* Wait until the process completes and we have all the output */
-        yield;
+            /* Wait until the process completes and we have all the output */
+            yield;
+        }
 
         Posix.close (output_pipe[0]);
 

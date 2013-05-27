@@ -26,4 +26,9 @@ will take the C source code for this project and compile it to an executable fil
 You can remove any built files using the <link xref="cleaning">clean</link> rule.
 </p>
 </note>
+<note>
+<p>
+You can build in parallel mode using the <code>--parallel</code> option to Bake.
+</p>
+</note>
 </page>
