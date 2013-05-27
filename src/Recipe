@@ -1,6 +1,6 @@
 templates.config {
   files = config.vala
-  variables = %VERSION%=$(project.version) %LIBRARY_DIRECTORY%=$(library-directory)
+  variables = %VERSION%=$(project.version) %LIBRARY_DIRECTORY%=$(options.library-directory)
 }
 
 programs {
