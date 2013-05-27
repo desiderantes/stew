@@ -1,3 +1,8 @@
+Overview of changes in bake 0.1.29
+
+    * Fix pkg-config use of library-directory broken in 0.1.27
+    * Fix incorrect newlines in --expand
+
 Overview of changes in bake 0.1.28
 
     * Support parallel builds
