@@ -1,0 +1,21 @@
+project {
+  name = test-project
+}
+
+options {
+  name {
+    description = Name
+  }
+  color {
+    description = Color
+  }
+  taste {
+    description = Taste
+  }
+  sound {
+    description = Sound
+  }
+}
+
+%build:
+  touch $(options.name) $(options.color) $(options.taste) $(options.sound)

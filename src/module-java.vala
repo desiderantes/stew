@@ -10,14 +10,16 @@
 
 public class JavaModule : BuildModule
 {
-    public override bool can_generate_program_rules (Recipe recipe, Program program)
+    public override bool can_generate_program_rules (Program program)
     {
-        return can_generate_rules (recipe, program.sources);
+        return can_generate_rules (program.sources);
     }
 
-    public override void generate_program_rules (Recipe recipe, Program program)
+    public override void generate_program_rules (Program program)
     {
-        var jar_file = generate_compile_rules (recipe, program);
+        var recipe = program.recipe;
+
+        var jar_file = generate_compile_rules (program);
 
         var binary_name = program.name;
 
@@ -41,17 +43,17 @@ public class JavaModule : BuildModule
             recipe.add_install_rule (script, program.install_directory, binary_name);
     }
 
-    public override bool can_generate_library_rules (Recipe recipe, Library library)
+    public override bool can_generate_library_rules (Library library)
     {
-        return can_generate_rules (recipe, library.sources);
+        return can_generate_rules (library.sources);
     }
 
-    public override void generate_library_rules (Recipe recipe, Library library)
+    public override void generate_library_rules (Library library)
     {
-        generate_compile_rules (recipe, library);
+        generate_compile_rules (library);
     }
 
-    private bool can_generate_rules (Recipe recipe, List<string> sources)
+    private bool can_generate_rules (List<string> sources)
     {
         if (Environment.find_program_in_path ("javac") == null || Environment.find_program_in_path ("jar") == null)
             return false;
@@ -69,8 +71,10 @@ public class JavaModule : BuildModule
         return true;
     }
 
-    private string generate_compile_rules (Recipe recipe, Compilable compilable)
+    private string generate_compile_rules (Compilable compilable)
     {
+        var recipe = compilable.recipe;
+
         var jar_file = "%s.jar".printf (compilable.name);
 
         var rule = recipe.add_rule ();

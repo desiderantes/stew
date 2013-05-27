@@ -10,7 +10,7 @@
 
 public class ScriptModule : BuildModule
 {
-    public override bool can_generate_program_rules (Recipe recipe, Program program)
+    public override bool can_generate_program_rules (Program program)
     {
         if (program.sources != null)
             return false;
@@ -18,9 +18,9 @@ public class ScriptModule : BuildModule
         return true;
     }
 
-    public override void generate_program_rules (Recipe recipe, Program program)
+    public override void generate_program_rules (Program program)
     {
         if (program.install)
-            recipe.add_install_rule (program.name, program.install_directory);
+            program.recipe.add_install_rule (program.name, program.install_directory);
     }
 }

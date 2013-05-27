@@ -4,5 +4,5 @@ project {
 
 programs.Test {
   sources = Test.cs
-  install-directory = $(binary-directory)/test
+  install-directory = $(options.binary-directory)/test
 }

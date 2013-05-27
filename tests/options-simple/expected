@@ -1,0 +1,5 @@
+!bake --configure color=green
+(exit SUCCESS)
+!bake
+touch green
+(exit SUCCESS)

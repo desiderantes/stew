@@ -10,31 +10,31 @@
 
 public class MonoModule : BuildModule
 {
-    public override bool can_generate_program_rules (Recipe recipe, Program program)
+    public override bool can_generate_program_rules (Program program)
     {
-        return can_generate_rules (recipe, program.sources);
+        return can_generate_rules (program.sources);
     }
 
-    public override void generate_program_rules (Recipe recipe, Program program)
+    public override void generate_program_rules (Program program)
     {
-        var binary_name = generate_compile_rules (recipe, program);
+        var binary_name = generate_compile_rules (program);
         if (program.install)
-            recipe.add_install_rule (binary_name, program.install_directory);
+            program.recipe.add_install_rule (binary_name, program.install_directory);
     }
 
-    public override bool can_generate_library_rules (Recipe recipe, Library library)
+    public override bool can_generate_library_rules (Library library)
     {
-        return can_generate_rules (recipe, library.sources);
+        return can_generate_rules (library.sources);
     }
 
-    public override void generate_library_rules (Recipe recipe, Library library)
+    public override void generate_library_rules (Library library)
     {
-        var binary_name = generate_compile_rules (recipe, library);
+        var binary_name = generate_compile_rules (library);
         if (library.install)
-            recipe.add_install_rule (binary_name, Path.build_filename (library.install_directory, "cli", recipe.project_name));
+            library.recipe.add_install_rule (binary_name, Path.build_filename (library.install_directory, "cli", library.recipe.project_name));
     }
 
-    private bool can_generate_rules (Recipe recipe, List<string> sources)
+    private bool can_generate_rules (List<string> sources)
     {
         var count = 0;
         foreach (var source in sources)
@@ -52,8 +52,10 @@ public class MonoModule : BuildModule
         return true;
     }
 
-    private string generate_compile_rules (Recipe recipe, Compilable compilable)
+    private string generate_compile_rules (Compilable compilable)
     {
+        var recipe = compilable.recipe;
+
         var binary_name = "%s.exe".printf (compilable.name);
         if (compilable is Library)
             binary_name = "%s.dll".printf (compilable.name);

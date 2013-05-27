@@ -125,8 +125,10 @@ public class GettextModule : BuildModule
         }
     }
 
-    public override void generate_data_rules (Recipe recipe, Data data)
+    public override void generate_data_rules (Data data)
     {
+        var recipe = data.recipe;
+
         var translation_list = data.get_variable ("gettext-translations");
         if (translation_list == null)
             return;

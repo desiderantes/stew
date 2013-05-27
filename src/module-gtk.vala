@@ -10,8 +10,9 @@
 
 public class GTKModule : BuildModule
 {
-    public override void generate_data_rules (Recipe recipe, Data data)
+    public override void generate_data_rules (Data data)
     {
+        var recipe = data.recipe;
         var gettext_domain = data.gettext_domain;
         var install_directory = data.install_directory;
         foreach (var file in data.get_file_list ("gtk-ui-files"))

@@ -10,8 +10,10 @@
 
 public class MallardModule : BuildModule
 {
-    public override void generate_data_rules (Recipe recipe, Data data)
+    public override void generate_data_rules (Data data)
     {
+        var recipe = data.recipe;
+
         var id = data.get_variable ("mallard-id");
         if (id == null)
             id = data.id;

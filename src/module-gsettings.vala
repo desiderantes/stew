@@ -10,8 +10,10 @@
 
 public class GSettingsModule : BuildModule
 {
-    public override void generate_data_rules (Recipe recipe, Data data)
+    public override void generate_data_rules (Data data)
     {
+        var recipe = data.recipe;
+
         var gettext_domain = data.gettext_domain;
 
         foreach (var schema in data.get_file_list ("gsettings-schemas"))

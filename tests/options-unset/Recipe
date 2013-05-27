@@ -1,0 +1,9 @@
+project {
+  name = test-project
+}
+
+options {
+  color {
+    description = Color to use
+  }
+}

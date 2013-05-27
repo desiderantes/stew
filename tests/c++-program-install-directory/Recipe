@@ -4,5 +4,5 @@ project {
 
 programs.test {
   sources = test.cpp
-  install-directory = $(binary-directory)/test
+  install-directory = $(options.binary-directory)/test
 }

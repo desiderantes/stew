@@ -35,7 +35,7 @@ programs.example-program {
 # Describe an image that is required for this project
 data.images {
   files = image1.png
-  install-directory = $(project-data-directory)/images
+  install-directory = $(options.project-data-directory)/images
 }
 </code>
 <p>
