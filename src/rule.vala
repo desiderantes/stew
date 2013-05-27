@@ -181,7 +181,7 @@ public class Rule
         text += "\n";
         var commands = get_commands ();
         foreach (var c in commands)
-            text += "    " + c;
+            text += "    " + c + "\n";
 
         return text;
     }
