@@ -56,3 +56,4 @@ bake_0.1.29+bzr-0_amd64.deb
 bake-0.1.29+bzr.tar.gz
 bake-0.1.29+bzr-1.x86_64.rpm
 bake-0.1.29+bzr.tar.xz
+tests/test-bake-gettext

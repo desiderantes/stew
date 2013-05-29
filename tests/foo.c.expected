@@ -1,0 +1,19 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: foo.c:3
+msgid "One"
+msgstr ""
+
+#: foo.c:4
+msgid "Two"
+msgstr ""
+
+#: foo.c:5
+msgid "Three"
+msgstr ""
+
+#: foo.c:6
+msgid "Four"
+msgstr ""

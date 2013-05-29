@@ -1030,3 +1030,12 @@ data.tests {
           release-gnome/expected \
           release-gnome/Recipe
 }
+
+programs.test-bake-gettext {
+  sources = test-bake-gettext.vala
+  vala-packages = posix
+  install = false
+
+  tests {
+  }
+}
