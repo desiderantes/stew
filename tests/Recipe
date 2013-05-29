@@ -1037,5 +1037,8 @@ programs.test-bake-gettext {
   install = false
 
   tests {
+    c {
+      args = text/x-csrc foo.c foo.c.expected
+    }
   }
 }

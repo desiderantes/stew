@@ -2,18 +2,34 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
-#: foo.c:3
-msgid "One"
+#: foo.c:13
+msgid "gettext"
 msgstr ""
 
-#: foo.c:4
-msgid "Two"
+#: foo.c:14
+msgid "_"
 msgstr ""
 
-#: foo.c:5
-msgid "Three"
+#: foo.c:15
+msgid "N_"
 msgstr ""
 
-#: foo.c:6
-msgid "Four"
+#: foo.c:18
+msgid "whitespace1"
+msgstr ""
+
+#: foo.c:19
+msgid "whitespace2"
+msgstr ""
+
+#: foo.c:20
+msgid "whitespace3"
+msgstr ""
+
+#: foo.c:21
+msgid "whitespace4"
+msgstr ""
+
+#: foo.c:24
+msgid "whitespace5"
 msgstr ""
