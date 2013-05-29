@@ -13,6 +13,7 @@ int main (int argc, char **argv)
     char *x1 = gettext("gettext");
     char *x2 = _("_");
     char *x3 = N_("N_");
+    char *x4 = gettext(Z); /* Ignored, must be string constants */
 
     /* Whitespace */
     char *w1 = _ ("whitespace1");

@@ -14,22 +14,22 @@ msgstr ""
 msgid "N_"
 msgstr ""
 
-#: foo.c:18
+#: foo.c:19
 msgid "whitespace1"
 msgstr ""
 
-#: foo.c:19
+#: foo.c:20
 msgid "whitespace2"
 msgstr ""
 
-#: foo.c:20
+#: foo.c:21
 msgid "whitespace3"
 msgstr ""
 
-#: foo.c:21
+#: foo.c:22
 msgid "whitespace4"
 msgstr ""
 
-#: foo.c:24
+#: foo.c:25
 msgid "whitespace5"
 msgstr ""
