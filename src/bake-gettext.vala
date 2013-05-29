@@ -221,9 +221,12 @@ private static void translate_c_source (Translations translations, string filena
                     if (function == "_" || function == "N_" || function == "gettext")
                     {
                         var msgid = data.substring (string_start + 1, i - string_start - 1);
-                        var location = translations.add_location (msgid);
-                        location.filename = filename;
-                        location.line = line;
+                        if (msgid != "")
+                        {
+                            var location = translations.add_location (msgid);
+                            location.filename = filename;
+                            location.line = line;
+                        }
                     }
                     string_start = -1;
                 }
