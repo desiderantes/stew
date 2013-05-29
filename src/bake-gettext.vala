@@ -128,6 +128,8 @@ private static string strip (string value)
 
 private static void translate_c_source (Translations translations, string filename, string data)
 {
+    var in_c_comment = false;
+    var in_cpp_comment = false;
     var in_word = false;
     var word_start = -1;
     var word_end = -1;
@@ -141,6 +143,35 @@ private static void translate_c_source (Translations translations, string filena
 
         if (c == '\n')
             line++;
+
+        if (in_c_comment)
+        {
+            if (c == '*' && data[i+1] == '/')
+            {
+                in_c_comment = false;
+                i++;
+            }
+            continue;
+        }
+        else if (in_cpp_comment)
+        {
+            if (c == '\n')
+                in_cpp_comment = false;
+            continue;
+        }
+
+        if (c == '/' && data[i+1] == '*')
+        {
+            in_c_comment = true;
+            i++;
+            continue;
+        }
+        if (c == '/' && data[i+1] == '/')
+        {
+            in_cpp_comment = true;
+            i++;
+            continue;
+        }
 
         if (string_start < 0)
         {
