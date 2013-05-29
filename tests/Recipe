@@ -1040,5 +1040,8 @@ programs.test-bake-gettext {
     c {
       args = text/x-csrc foo.c foo.c.expected
     }
+    pyton {
+      args = text/x-python foo.py foo.py.expected
+    }
   }
 }
