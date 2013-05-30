@@ -8,8 +8,8 @@ data.pkg-config {
   install = false;
 }
 
-programs.test-runner {
-  sources = test-runner.vala
+programs.test-bake {
+  sources = test-bake.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
   packages = gio-2.0 gio-unix-2.0
   install = false
