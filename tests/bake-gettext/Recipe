@@ -28,8 +28,14 @@ programs.test-bake-gettext {
     c-ngettext {
       args = c-ngettext
     }
+    python-simple {
+      args = python-simple
+    }
     python-alias {
       args = python-alias
+    }
+    python-duplicate {
+      args = python-duplicate
     }
     python-blank {
       args = python-blank
@@ -37,17 +43,14 @@ programs.test-bake-gettext {
     python-comments {
       args = python-comments
     }
+    python-whitespace {
+      args = python-whitespace
+    }
     python-dgettext {
       args = python-dgettext
     }
     python-ngettext {
       args = python-ngettext
-    }
-    python-simple {
-      args = python-simple
-    }
-    python-whitespace {
-      args = python-whitespace
     }
   }
 }
@@ -90,6 +93,9 @@ data.bake-gettext-tests {
           python-dgettext/expected \
           python-dgettext/test.conf \
           python-dgettext/source.py \
+          python-duplicate/expected \
+          python-duplicate/test.conf \
+          python-duplicate/source.py \
           python-ngettext/expected \
           python-ngettext/test.conf \
           python-ngettext/source.py \
