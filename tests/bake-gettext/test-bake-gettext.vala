@@ -33,6 +33,19 @@ public class TestBakeGettext
             stderr.printf ("Failed to run command %s: %s\n", command, e.message);
             return Posix.EXIT_FAILURE;
         }
+        if (Process.if_exited (exit_status))
+        {
+            if (Process.exit_status (exit_status) != 0)
+            {
+                stderr.printf ("bake-gettext returned with exit code %d\n", Process.exit_status (exit_status));
+                return Posix.EXIT_FAILURE;
+            }
+        }
+        else
+        {
+             stderr.printf ("bake-gettext exited with signal %d\n", Process.term_sig (exit_status));
+             return Posix.EXIT_FAILURE;
+        }
 
         if (output != expected_output)
         {
