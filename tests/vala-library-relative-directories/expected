@@ -10,21 +10,21 @@ touch .built/test-uncle.vapi-stamp
 valac --ccode test.vala --use-fast-vapi=.built/test-child.vapi --use-fast-vapi=.built/test-parent.vapi --use-fast-vapi=.built/test-uncle.vapi
 mv test.c .built/test-test.c
 touch .built/test-test.c-stamp
-gcc -Wno-unused -Wno-deprecated-declarations -fPIC -Igobject -Iglib -c .built/test-test.c -o .built/test-test.o
+gcc -w -fPIC -Igobject -Iglib -c .built/test-test.c -o .built/test-test.o
 valac --fast-vapi=.built/test-test.vapi test.vala
 touch .built/test-test.vapi-stamp
 valac --ccode child/child.vala --use-fast-vapi=.built/test-test.vapi --use-fast-vapi=.built/test-parent.vapi --use-fast-vapi=.built/test-uncle.vapi
 mv child/child.c .built/test-child.c
 touch .built/test-child.c-stamp
-gcc -Wno-unused -Wno-deprecated-declarations -fPIC -Igobject -Iglib -c .built/test-child.c -o .built/test-child.o
+gcc -w -fPIC -Igobject -Iglib -c .built/test-child.c -o .built/test-child.o
 valac --ccode ../parent.vala --use-fast-vapi=.built/test-test.vapi --use-fast-vapi=.built/test-child.vapi --use-fast-vapi=.built/test-uncle.vapi
 mv parent.c .built/test-parent.c
 touch .built/test-parent.c-stamp
-gcc -Wno-unused -Wno-deprecated-declarations -fPIC -Igobject -Iglib -c .built/test-parent.c -o .built/test-parent.o
+gcc -w -fPIC -Igobject -Iglib -c .built/test-parent.c -o .built/test-parent.o
 valac --ccode ../uncle/uncle.vala --use-fast-vapi=.built/test-test.vapi --use-fast-vapi=.built/test-child.vapi --use-fast-vapi=.built/test-parent.vapi
 mv uncle.c .built/test-uncle.c
 touch .built/test-uncle.c-stamp
-gcc -Wno-unused -Wno-deprecated-declarations -fPIC -Igobject -Iglib -c .built/test-uncle.c -o .built/test-uncle.o
+gcc -w -fPIC -Igobject -Iglib -c .built/test-uncle.c -o .built/test-uncle.o
 gcc -o libtest.so -shared .built/test-test.o .built/test-child.o .built/test-parent.o .built/test-uncle.o -lgobject -lglib
 ar -cq libtest.a .built/test-test.o .built/test-child.o .built/test-parent.o .built/test-uncle.o
 valac --ccode --header=test.h --vapi=test.vapi --library=test --use-fast-vapi=.built/test-test.vapi --use-fast-vapi=.built/test-child.vapi --use-fast-vapi=.built/test-parent.vapi --use-fast-vapi=.built/test-uncle.vapi
