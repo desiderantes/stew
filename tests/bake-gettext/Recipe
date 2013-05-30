@@ -28,8 +28,26 @@ programs.test-bake-gettext {
     c-ngettext {
       args = c-ngettext
     }
-    pyton {
-      args = text/x-python foo.py foo.py.expected
+    python-alias {
+      args = python-alias
+    }
+    python-blank {
+      args = python-blank
+    }
+    python-comments {
+      args = python-comments
+    }
+    python-dgettext {
+      args = python-dgettext
+    }
+    python-ngettext {
+      args = python-ngettext
+    }
+    python-simple {
+      args = python-simple
+    }
+    python-whitespace {
+      args = python-whitespace
     }
   }
 }
@@ -59,5 +77,26 @@ data.bake-gettext-tests {
           c-simple/test.conf \
           c-whitespace/expected \
           c-whitespace/source.c \
-          c-whitespace/test.conf
+          c-whitespace/test.conf \
+          python-alias/expected \
+          python-alias/test.conf \
+          python-alias/source.py \
+          python-blank/expected \
+          python-blank/test.conf \
+          python-blank/source.py \
+          python-comments/expected \
+          python-comments/test.conf \
+          python-comments/source.py \
+          python-dgettext/expected \
+          python-dgettext/test.conf \
+          python-dgettext/source.py \
+          python-ngettext/expected \
+          python-ngettext/test.conf \
+          python-ngettext/source.py \
+          python-simple/expected \
+          python-simple/test.conf \
+          python-simple/source.py \
+          python-whitespace/expected \
+          python-whitespace/test.conf \
+          python-whitespace/source.py
 }

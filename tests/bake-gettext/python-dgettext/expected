@@ -1,0 +1,11 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: source.py:3
+msgid "dgettext1"
+msgstr ""
+
+#: source.py:4
+msgid "dgettext2"
+msgstr ""
