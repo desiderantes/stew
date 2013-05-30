@@ -136,8 +136,13 @@ public static int main (string[] args)
     foreach (var string in translations.strings)
     {
          output_file.printf ("\n");
-         foreach (var location in string.locations)
-             output_file.printf ("#: %s:%d\n", location.filename, location.line);
+         if (string.locations.length () > 0)
+         {
+             output_file.printf ("#:");
+             foreach (var location in string.locations)
+                 output_file.printf (" %s:%d", location.filename, location.line);
+             output_file.printf ("\n");
+         }
          if (string.msgid.contains ("\n"))
          {
              output_file.printf ("msgid \"\"\n");
