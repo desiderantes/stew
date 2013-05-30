@@ -1,0 +1,42 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: foo.py:8
+msgid "gettext"
+msgstr ""
+
+#: foo.py:10
+msgid "_"
+msgstr ""
+
+#: foo.py:11
+msgid "N_"
+msgstr ""
+
+#: foo.py:15
+msgid "whitespace1"
+msgstr ""
+
+#: foo.py:16
+msgid "whitespace2"
+msgstr ""
+
+#: foo.py:17
+msgid "whitespace3"
+msgstr ""
+
+#: foo.py:18
+msgid "whitespace4"
+msgstr ""
+
+#: foo.py:21
+msgid "whitespace5"
+msgstr ""
+
+#: foo.py:27
+msgid ""
+"multi\n"
+"line\n"
+"string"
+msgstr ""

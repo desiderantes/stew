@@ -21,6 +21,11 @@ w5 = _
     "whitespace5"
 )
 
+# Multi-line strings
+m1 = _("""multi
+line
+string""")
+
 # dgettext
 d1 = gettext.dgettext("test-domain", "dgettext1")
 d2 = gettext.dgettext("some-other-domain", "dgettext2")

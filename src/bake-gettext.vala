@@ -69,9 +69,41 @@ public static int main (string[] args)
     case "text/x-csrc":
     case "text/x-c++src":
     case "text/x-chdr":
+        var translator = new CLikeTranslator (translations);
+        translator.allow_c_comments = true;
+        translator.allow_cpp_comments = true;
+        translator.gettext_function_names.append ("gettext");
+        translator.gettext_function_names.append ("_");
+        translator.null_function_names.append ("N_");
+        translator.allow_double_quoted_strings = true;
+        translator.translate (filename, data);
+        break;
     case "text/x-vala":
+        var translator = new CLikeTranslator (translations);
+        translator.gettext_function_names.append ("gettext");
+        translator.gettext_function_names.append ("_");
+        translator.null_function_names.append ("N_");
+        translator.allow_c_comments = true;
+        translator.allow_cpp_comments = true;
+        translator.allow_double_quoted_strings = true;
+        translator.translate (filename, data);
+        break;
     case "text/x-java":
-        translate_c_source (translations, filename, data);
+        var translator = new CLikeTranslator (translations);
+        translator.allow_c_comments = true;
+        translator.allow_cpp_comments = true;
+        translator.allow_double_quoted_strings = true;
+        translator.translate (filename, data);
+        break;
+    case "text/x-python":
+        var translator = new CLikeTranslator (translations);
+        translator.gettext_function_names.append ("gettext.gettext");
+        translator.gettext_function_names.append ("_");
+        translator.null_function_names.append ("N_");
+        translator.allow_hash_comments = true;
+        translator.allow_double_quoted_strings = true;
+        translator.allow_single_quoted_strings = true;
+        translator.translate (filename, data);
         break;
     case "application/x-desktop":
         translate_xdg_desktop (translations, filename, data);
@@ -106,7 +138,27 @@ public static int main (string[] args)
          output_file.printf ("\n");
          foreach (var location in string.locations)
              output_file.printf ("#: %s:%d\n", location.filename, location.line);
-         output_file.printf ("msgid \"%s\"\n", string.msgid);
+         if (string.msgid.contains ("\n"))
+         {
+             output_file.printf ("msgid \"\"\n");
+             var i = 0;
+             while (true)
+             {
+                 var index = string.msgid.index_of_char ('\n', i);
+                 if (index >= 0)
+                 {
+                     output_file.printf ("\"%s\\n\"\n", string.msgid.slice (i, index));
+                     i = index + 1;
+                 }
+                 else
+                 {
+                     output_file.printf ("\"%s\"\n", string.msgid.substring (i));
+                     break;
+                 }
+             }
+         }
+         else
+             output_file.printf ("msgid \"%s\"\n", string.msgid);
          output_file.printf ("msgstr \"\"\n");
     }
 
@@ -126,73 +178,138 @@ private static string strip (string value)
     return value.slice (start, end);
 }
 
-private static void translate_c_source (Translations translations, string filename, string data)
+private class CLikeTranslator
 {
-    var in_c_comment = false;
-    var in_cpp_comment = false;
-    var in_word = false;
-    var word_start = -1;
-    var word_end = -1;
-    var functions = new List<string> ();
-    var string_start = -1;
-    var escape = false;
-    var line = 1;
-    for (var i = 0; i < data.length; i++)
+    private Translations translations;
+    public bool allow_c_comments = false;
+    public bool allow_cpp_comments = false;
+    public bool allow_hash_comments = false;
+    public bool allow_single_quoted_strings = false;
+    public bool allow_double_quoted_strings = false;
+    public List<string> gettext_function_names;
+    public List<string> null_function_names;
+
+    public CLikeTranslator (Translations translations)
     {
-        var c = data[i];
+        this.translations = translations;
+    }
 
-        if (c == '\n')
-            line++;
+    public void translate (string filename, string data)
+    {
+        var in_c_comment = false;
+        var in_cpp_comment = false;
+        var in_hash_comment = false;
+        var in_token = false;
+        var word_start = -1;
+        var word_end = -1;
+        var functions = new List<string> ();
+        var string_start = -1;
+        var escape = false;
+        var line = 1;
+        for (var i = 0; i < data.length; i++)
+        {
+            var c = data[i];
 
-        if (in_c_comment)
-        {
-            if (c == '*' && data[i+1] == '/')
-            {
-                in_c_comment = false;
-                i++;
-            }
-            continue;
-        }
-        else if (in_cpp_comment)
-        {
             if (c == '\n')
-                in_cpp_comment = false;
-            continue;
-        }
+                line++;
 
-        if (c == '/' && data[i+1] == '*')
-        {
-            in_c_comment = true;
-            i++;
-            continue;
-        }
-        if (c == '/' && data[i+1] == '/')
-        {
-            in_cpp_comment = true;
-            i++;
-            continue;
-        }
+            /* Handle comments */
+            if (in_c_comment)
+            {
+                if (c == '*' && data[i+1] == '/')
+                {
+                    in_c_comment = false;
+                    i++;
+                }
+                continue;
+            }
+            else if (in_cpp_comment)
+            {
+                if (c == '\n')
+                    in_cpp_comment = false;
+                continue;
+            }
+            else if (in_hash_comment)
+            {
+                if (c == '\n')
+                    in_hash_comment = false;
+                continue;
+            }
+            if (allow_c_comments && c == '/' && data[i+1] == '*')
+            {
+                in_c_comment = true;
+                i++;
+                continue;
+            }
+            if (allow_cpp_comments && c == '/' && data[i+1] == '/')
+            {
+                in_cpp_comment = true;
+                i++;
+                continue;
+            }
+            if (allow_hash_comments && c == '#')
+            {
+                in_hash_comment = true;
+                continue;
+            }
 
-        if (string_start < 0)
-        {
-            if (c == '\"')
+            /* Accumulate strings */
+            if (string_start >= 0)
+            {
+                if (escape)
+                    escape = false;
+                else
+                {
+                    if (c == '\\')
+                        escape = true;
+                    else if (c == data[string_start])
+                    {
+                        var function = functions.nth_data (0);
+                        if (function != null && (has_function (gettext_function_names, function) || has_function (null_function_names, function)))
+                        {
+                            var msgid = data.substring (string_start + 1, i - string_start - 1);
+                            if (msgid != "")
+                            {
+                                var location = translations.add_location (msgid);
+                                location.filename = filename;
+                                location.line = line;
+                            }
+                        }
+                        string_start = -1;
+                    }
+                }
+                continue;
+            }
+            if (c == '\"' && allow_double_quoted_strings)
+            {
                 string_start = i;
-            else if (in_word)
+                continue;
+            }
+            else if (c == '\'' && allow_single_quoted_strings)
+            {
+                string_start = i;
+                continue;
+            }
+
+            if (in_token)
             {
                 if (c.isspace ())
                 {
                     word_end = i;
-                    in_word = false;
+                    in_token = false;
+                    continue;
                 }
-                else if (c == '(')
+                else if (c == '(' || c == ')')
                 {
                     word_end = i;
-                    var name = data.substring (word_start, word_end - word_start);
-                    functions.prepend (name);
-                    in_word = false;
+                    in_token = false;
+                    /* Fall through to process */
                 }
+                else
+                    continue;
             }
-            else if (c == '(')
+
+            if (c == '(')
             {
                 var name = data.substring (word_start, word_end - word_start);
                 functions.prepend (name);
@@ -204,34 +321,17 @@ private static void translate_c_source (Translations translations, string filena
             else if (c == '_' || c.isalpha ())
             {
                 word_start = i;
-                in_word = true;
+                in_token = true;
             }
         }
-        else
-        {
-            if (escape)
-                escape = false;
-            else
-            {
-                if (c == '\\')
-                    escape = true;
-                else if (c == '\"')
-                {
-                    var function = functions.nth_data (0);
-                    if (function == "_" || function == "N_" || function == "gettext")
-                    {
-                        var msgid = data.substring (string_start + 1, i - string_start - 1);
-                        if (msgid != "")
-                        {
-                            var location = translations.add_location (msgid);
-                            location.filename = filename;
-                            location.line = line;
-                        }
-                    }
-                    string_start = -1;
-                }
-            }
-        }
+    }
+
+    private bool has_function (List<string> functions, string name)
+    {
+        foreach (var f in functions)
+            if (f == name)
+                return true;
+        return false;
     }
 }
 

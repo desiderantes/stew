@@ -9,11 +9,17 @@
 
 int main (int argc, char **argv)
 {
+    /* Comments (ignored) */
+    /* _("In C comment") */
+    // _("In C++ comment") 
+
     /* Basic case */
     char *x1 = gettext("gettext");
     char *x2 = _("_");
     char *x3 = N_("N_");
     char *x4 = gettext(Z); /* Ignored, must be string constants */
+    char *x5 = "Z"; /* Ignored, not in a gettext function */
+    char *x6 = "_(" Z ")"; /* Ignored, inside a string constant */
 
     /* Whitespace */
     char *w1 = _ ("whitespace1");
@@ -45,10 +51,5 @@ int main (int argc, char **argv)
     /* Blank string (ignored) */
     char *i = _("");
 
-    /* False positives */
-    /* _("In C comment") */
-    // _("In C++ comment")
-    char *z = "_(" Z ")"; // Inside a string constant
-  
     return 0;
 }
