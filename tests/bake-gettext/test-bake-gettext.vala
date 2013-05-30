@@ -2,14 +2,29 @@ public class TestBakeGettext
 {
     public static int main (string[] args)
     {
-        if (args.length != 4)
+        if (args.length != 2)
         {
-            stderr.printf ("Usage: %s mime-type file-to-translate expected-output\n", args[0]);
+            stderr.printf ("Usage: %s test-name\n", args[0]);
             return Posix.EXIT_FAILURE;
         }
-        var mime_type = args[1];
-        var file_to_translate = args[2];
-        var expected_output_file = args[3];
+        var test_name = args[1];
+        var config = new KeyFile ();
+        var config_filename = Path.build_filename (test_name, "test.conf");
+        string mime_type;
+        string file_to_translate;
+        try
+        {
+            config.load_from_file (config_filename, KeyFileFlags.NONE);
+            mime_type = config.get_value ("gettext-test", "mime-type");
+            file_to_translate = config.get_value ("gettext-test", "source");
+        }
+        catch (Error e)
+        {
+            stderr.printf ("Failed to load test config %s: %s\n", config_filename, e.message);
+            return Posix.EXIT_FAILURE;
+        }
+
+        var expected_output_file = Path.build_filename (test_name, "expected");
         string expected_output;
         try
         {
@@ -21,14 +36,16 @@ public class TestBakeGettext
             return Posix.EXIT_FAILURE;
         }
 
-        var command = "../../src/bake-gettext --mime-type %s %s".printf (mime_type, file_to_translate);
+        var command = "../../../src/bake-gettext --mime-type %s %s".printf (mime_type, file_to_translate);
         string output;
         int exit_status;
         try
         {
-            Process.spawn_command_line_sync (command, out output, null, out exit_status);
+            string[] argv;
+            Shell.parse_argv (command, out argv);
+            Process.spawn_sync (test_name, argv, null, 0, null, out output, null, out exit_status);
         }
-        catch (SpawnError e)
+        catch (Error e)
         {
             stderr.printf ("Failed to run command %s: %s\n", command, e.message);
             return Posix.EXIT_FAILURE;

@@ -1,0 +1,23 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: source.c:6
+msgid "dgettext1"
+msgstr ""
+
+#: source.c:7
+msgid "dgettext2"
+msgstr ""
+
+#: source.c:9
+msgid "dcgettext1"
+msgstr ""
+
+#: source.c:10
+msgid "dcgettext2"
+msgstr ""
+
+#: source.c:11
+msgid "dcgettext3"
+msgstr ""

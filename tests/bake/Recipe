@@ -765,7 +765,7 @@ programs.test-bake {
   }
 }
 
-data.tests {
+data.bake-tests {
   install = false
   files = rule-build/expected \
           rule-build/Recipe \
