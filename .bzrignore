@@ -9,7 +9,7 @@ src/bake-gettext
 src/bake-template
 src/bake-test
 src/config.vala
-tests/bake/test-runner
+tests/bake/test-bake
 tests/bake/src/ar
 tests/bake/src/bake-gettext
 tests/bake/src/bake-template
@@ -57,4 +57,3 @@ bake_0.1.29+bzr-0_amd64.deb
 bake-0.1.29+bzr.tar.gz
 bake-0.1.29+bzr-1.x86_64.rpm
 bake-0.1.29+bzr.tar.xz
-tests/bake/test-bake
