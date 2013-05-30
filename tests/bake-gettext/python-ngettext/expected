@@ -2,4 +2,20 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
-FIXME
+#: source.c:4
+msgid "ngettext1"
+msgid_plural "ngettext1-plural"
+msgstr[0] ""
+msgstr[1] ""
+
+#: source.c:5
+msgid "dngettext1"
+msgid_plural "dngettext1-plural"
+msgstr[0] ""
+msgstr[1] ""
+
+#: source.c:6
+msgid "dngettext2"
+msgid_plural "dngettext2-plural"
+msgstr[0] ""
+msgstr[1] ""
