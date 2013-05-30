@@ -267,7 +267,7 @@ public class TestRunner
         status_source.attach (null);
 
         /* Only run our special versions of the tools */
-        Environment.set_variable ("PATH", "%s/src:%s/../../src:%s".printf (Environment.get_current_dir (), Environment.get_current_dir (), Environment.get_variable ("PATH")), true);
+        Environment.set_variable ("PATH", "%s:%s/../../src:%s".printf (Environment.get_current_dir (), Environment.get_current_dir (), Environment.get_variable ("PATH")), true);
         Environment.set_variable ("BAKE_TEST_STATUS_SOCKET", status_socket_name, true);
         Environment.set_variable ("PKG_CONFIG_PATH", Path.build_filename (Environment.get_current_dir (), "pkg-config"), true);
 
