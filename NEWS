@@ -1,3 +1,7 @@
+Overview of changes in bake 0.1.30
+
+    * Ignore all warnings in Vala generated C code
+
 Overview of changes in bake 0.1.29
 
     * Fix pkg-config use of library-directory broken in 0.1.27

@@ -3,7 +3,7 @@ mkdir -p .built
 valac --ccode test.vala
 mv test.c .built/testlib-test.c
 touch .built/testlib-test.c-stamp
-gcc -Wno-unused -Wno-deprecated-declarations -fPIC -Igobject -Iglib -c .built/testlib-test.c -o .built/testlib-test.o
+gcc -w -fPIC -Igobject -Iglib -c .built/testlib-test.c -o .built/testlib-test.o
 gcc -o libtestlib.so -shared .built/testlib-test.o -lgobject -lglib
 ar -cq libtestlib.a .built/testlib-test.o
 valac --fast-vapi=.built/testlib-test.vapi test.vala
@@ -12,7 +12,7 @@ valac --ccode --header=testlib.h --vapi=testlib.vapi --library=testlib --use-fas
 valac --ccode main.vala testlib.vapi
 mv main.c .built/test-main.c
 touch .built/test-main.c-stamp
-gcc -Wno-unused -Wno-deprecated-declarations -I. -Igobject -Iglib -c .built/test-main.c -o .built/test-main.o
+gcc -w -I. -Igobject -Iglib -c .built/test-main.c -o .built/test-main.o
 gcc -o test .built/test-main.o libtestlib.a -lgobject -lglib
 (exit SUCCESS)
 !bake install
