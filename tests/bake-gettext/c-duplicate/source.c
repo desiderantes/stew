@@ -2,8 +2,8 @@
 
 int main (int argc, char **argv)
 {
-    gettext("duplicate")
-    gettext("duplicate")
+    char *x1 = gettext("duplicate");
+    char *x2 = gettext("duplicate");
 
     return 0;
 }

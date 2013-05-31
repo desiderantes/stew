@@ -1,4 +1,4 @@
-pulibc static int main (string[] args)
+public static int main (string[] args)
 {
     var x1 = _("_");
     var x2 = N_("N_");
