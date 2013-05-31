@@ -28,6 +28,30 @@ programs.test-bake-gettext {
     c-ngettext {
       args = c-ngettext
     }
+    c++-simple {
+      args = c++-simple
+    }
+    c++-alias {
+      args = c++-alias
+    }
+    c++-duplicate {
+      args = c++-duplicate
+    }
+    c++-blank {
+      args = c++-blank
+    }
+    c++-whitespace {
+      args = c++-whitespace
+    }
+    c++-comments {
+      args = c++-comments
+    }
+    c++-dgettext {
+      args = c++-dgettext
+    }
+    c++-ngettext {
+      args = c++-ngettext
+    }
     vala-simple {
       args = vala-simple
     }
@@ -105,6 +129,30 @@ data.bake-gettext-tests {
           c-whitespace/expected \
           c-whitespace/source.c \
           c-whitespace/test.conf \
+          c++-alias/expected \
+          c++-alias/source.c \
+          c++-alias/test.conf \
+          c++-blank/expected \
+          c++-blank/source.c \
+          c++-blank/test.conf \
+          c++-comments/expected \
+          c++-comments/source.c \
+          c++-comments/test.conf \
+          c++-dgettext/expected \
+          c++-dgettext/source.c \
+          c++-dgettext/test.conf \
+          c++-duplicate/expected \
+          c++-duplicate/source.c \
+          c++-duplicate/test.conf \
+          c++-ngettext/expected \
+          c++-ngettext/source.c \
+          c++-ngettext/test.conf \
+          c++-simple/expected \
+          c++-simple/source.c \
+          c++-simple/test.conf \
+          c++-whitespace/expected \
+          c++-whitespace/source.c \
+          c++-whitespace/test.conf \
           python-alias/expected \
           python-alias/test.conf \
           python-alias/source.py \
