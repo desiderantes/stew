@@ -1,0 +1,23 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: source.vala:3
+msgid "whitespace1"
+msgstr ""
+
+#: source.vala:4
+msgid "whitespace2"
+msgstr ""
+
+#: source.vala:5
+msgid "whitespace3"
+msgstr ""
+
+#: source.vala:6
+msgid "whitespace4"
+msgstr ""
+
+#: source.vala:8
+msgid "whitespace5"
+msgstr ""

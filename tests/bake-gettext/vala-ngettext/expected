@@ -1,0 +1,21 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: source.vala:4
+msgid "ngettext1"
+msgid_plural "ngettext1-plural"
+msgstr[0] ""
+msgstr[1] ""
+
+#: source.vala:5
+msgid "dngettext1"
+msgid_plural "dngettext1-plural"
+msgstr[0] ""
+msgstr[1] ""
+
+#: source.vala:7
+msgid "dcngettext1"
+msgid_plural "dcngettext1-plural"
+msgstr[0] ""
+msgstr[1] ""

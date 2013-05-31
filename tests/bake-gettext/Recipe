@@ -28,6 +28,30 @@ programs.test-bake-gettext {
     c-ngettext {
       args = c-ngettext
     }
+    vala-simple {
+      args = vala-simple
+    }
+    vala-alias {
+      args = vala-alias
+    }
+    vala-duplicate {
+      args = vala-duplicate
+    }
+    vala-blank {
+      args = vala-blank
+    }
+    vala-whitespace {
+      args = vala-whitespace
+    }
+    vala-comments {
+      args = vala-comments
+    }
+    vala-dgettext {
+      args = vala-dgettext
+    }
+    vala-ngettext {
+      args = vala-ngettext
+    }
     python-simple {
       args = python-simple
     }
@@ -104,5 +128,29 @@ data.bake-gettext-tests {
           python-simple/source.py \
           python-whitespace/expected \
           python-whitespace/test.conf \
-          python-whitespace/source.py
+          python-whitespace/source.py \
+          vala-alias/expected \
+          vala-alias/source.c \
+          vala-alias/test.conf \
+          vala-blank/expected \
+          vala-blank/source.c \
+          vala-blank/test.conf \
+          vala-comments/expected \
+          vala-comments/source.c \
+          vala-comments/test.conf \
+          vala-dgettext/expected \
+          vala-dgettext/source.c \
+          vala-dgettext/test.conf \
+          vala-duplicate/expected \
+          vala-duplicate/source.c \
+          vala-duplicate/test.conf \
+          vala-ngettext/expected \
+          vala-ngettext/source.c \
+          vala-ngettext/test.conf \
+          vala-simple/expected \
+          vala-simple/source.c \
+          vala-simple/test.conf \
+          vala-whitespace/expected \
+          vala-whitespace/source.c \
+          vala-whitespace/test.conf
 }
