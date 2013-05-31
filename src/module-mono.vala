@@ -170,6 +170,7 @@ public class MonoModule : BuildModule
 
         if (compilable.gettext_domain != null)
         {
+            // FIXME: We don't support gettext
             foreach (var source in sources)
                 GettextModule.add_translatable_file (recipe, compilable.gettext_domain, "text/x-csharp", source);
         }
