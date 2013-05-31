@@ -6,16 +6,8 @@ msgstr ""
 msgid "dgettext1"
 msgstr ""
 
-#: source.c:7
-msgid "dgettext2"
-msgstr ""
-
 #: source.c:9
 msgid "dcgettext1"
-msgstr ""
-
-#: source.c:10
-msgid "dcgettext2"
 msgstr ""
 
 #: source.c:11
