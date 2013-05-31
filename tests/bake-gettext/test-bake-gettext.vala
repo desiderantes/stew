@@ -66,10 +66,11 @@ public class TestBakeGettext
 
         if (output != expected_output)
         {
-            stderr.printf ("Got:\n");
+            stderr.printf ("-------got------\n");
             stderr.printf (output);
-            stderr.printf ("Expected:\n");
+            stderr.printf ("----expected----\n");
             stderr.printf (expected_output);
+            stderr.printf ("-------end------\n");
             return Posix.EXIT_FAILURE;
         }
 
