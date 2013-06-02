@@ -174,6 +174,7 @@ public class Rule
             if (n != 0)
                 text += " ";
             text += output;
+            n++;
         }
         text += ":";
         foreach (var input in inputs)
