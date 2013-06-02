@@ -1,6 +1,10 @@
 Overview of changes in bake 0.1.30
 
+    * Fix regression where requested target was always built in the toplevel
     * Ignore all warnings in Vala generated C code
+    * Fix spacing between outputs in --expand
+    * Regression test bake-gettext and improve scanning
+    * Regression test bake-template
 
 Overview of changes in bake 0.1.29
 
