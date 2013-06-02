@@ -5,9 +5,9 @@ gcc -fPIC -DFOO=1 -g -MMD -MF .built/test-test2.d -c test2.c -o .built/test-test
 gcc -fPIC -DFOO=1 -g -MMD -MF .built/test-test3.d -c test3.c -o .built/test-test3.o
 gcc -o libtest.so.1.2 -shared .built/test-test1.o .built/test-test2.o .built/test-test3.o -lm
 ar -cq libtest.a .built/test-test1.o .built/test-test2.o .built/test-test3.o
-bake-gettext --mime-type text/x-csrc --output .built/test1.c.pot test1.c
-bake-gettext --mime-type text/x-csrc --output .built/test2.c.pot test2.c
-bake-gettext --mime-type text/x-csrc --output .built/test3.c.pot test3.c
+bake-gettext --domain test --mime-type text/x-csrc --output .built/test1.c.pot test1.c
+bake-gettext --domain test --mime-type text/x-csrc --output .built/test2.c.pot test2.c
+bake-gettext --domain test --mime-type text/x-csrc --output .built/test3.c.pot test3.c
 msgcat --force-po --output-file=test.pot .built/test1.c.pot .built/test2.c.pot .built/test3.c.pot
 (exit SUCCESS)
 !bake install

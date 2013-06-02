@@ -21,9 +21,9 @@ gcc -w -fPIC -DFOO=1 -g -Igobject -Iglib -c .built/test-test3.c -o .built/test-t
 gcc -o libtest.so.1.2 -shared .built/test-test1.o .built/test-test2.o .built/test-test3.o -lm -lgobject -lglib
 ar -cq libtest.a .built/test-test1.o .built/test-test2.o .built/test-test3.o
 valac --target-glib 2.32 --define=TEST -g --ccode --header=test.h --vapi=test.vapi --library=test --use-fast-vapi=.built/test-test1.vapi --use-fast-vapi=.built/test-test2.vapi --use-fast-vapi=.built/test-test3.vapi
-bake-gettext --mime-type text/x-vala --output .built/test1.vala.pot test1.vala
-bake-gettext --mime-type text/x-vala --output .built/test2.vala.pot test2.vala
-bake-gettext --mime-type text/x-vala --output .built/test3.vala.pot test3.vala
+bake-gettext --domain test --mime-type text/x-vala --output .built/test1.vala.pot test1.vala
+bake-gettext --domain test --mime-type text/x-vala --output .built/test2.vala.pot test2.vala
+bake-gettext --domain test --mime-type text/x-vala --output .built/test3.vala.pot test3.vala
 msgcat --force-po --output-file=test.pot .built/test1.vala.pot .built/test2.vala.pot .built/test3.vala.pot
 (exit SUCCESS)
 !bake install

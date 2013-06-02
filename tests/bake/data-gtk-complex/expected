@@ -1,6 +1,6 @@
 !bake
 mkdir -p .built
-bake-gettext --mime-type application/x-glade --output .built/test.ui.pot test.ui
+bake-gettext --domain test --mime-type application/x-glade --output .built/test.ui.pot test.ui
 msgcat --force-po --output-file=test.pot .built/test.ui.pot
 (exit SUCCESS)
 !bake install

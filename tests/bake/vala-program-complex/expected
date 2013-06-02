@@ -19,9 +19,9 @@ mv test3.c .built/test-test3.c
 touch .built/test-test3.c-stamp
 gcc -w -DFOO=1 -g -Igobject -Iglib -c .built/test-test3.c -o .built/test-test3.o
 gcc -o test .built/test-test1.o .built/test-test2.o .built/test-test3.o -lm -lgobject -lglib
-bake-gettext --mime-type text/x-vala --output .built/test1.vala.pot test1.vala
-bake-gettext --mime-type text/x-vala --output .built/test2.vala.pot test2.vala
-bake-gettext --mime-type text/x-vala --output .built/test3.vala.pot test3.vala
+bake-gettext --domain test --mime-type text/x-vala --output .built/test1.vala.pot test1.vala
+bake-gettext --domain test --mime-type text/x-vala --output .built/test2.vala.pot test2.vala
+bake-gettext --domain test --mime-type text/x-vala --output .built/test3.vala.pot test3.vala
 msgcat --force-po --output-file=test.pot .built/test1.vala.pot .built/test2.vala.pot .built/test3.vala.pot
 (exit SUCCESS)
 !bake install

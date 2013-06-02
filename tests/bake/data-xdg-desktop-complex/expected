@@ -1,6 +1,6 @@
 !bake
 mkdir -p .built
-bake-gettext --mime-type application/x-desktop --output .built/test.desktop.pot test.desktop
+bake-gettext --domain test --mime-type application/x-desktop --output .built/test.desktop.pot test.desktop
 msgcat --force-po --output-file=test.pot .built/test.desktop.pot
 (exit SUCCESS)
 !bake install

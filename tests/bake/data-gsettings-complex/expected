@@ -1,6 +1,6 @@
 !bake
 mkdir -p .built
-bake-gettext --mime-type application/x-gschema+xml --output .built/com.example.Test.gschema.xml.pot com.example.Test.gschema.xml
+bake-gettext --domain test --mime-type application/x-gschema+xml --output .built/com.example.Test.gschema.xml.pot com.example.Test.gschema.xml
 msgcat --force-po --output-file=test.pot .built/com.example.Test.gschema.xml.pot
 (exit SUCCESS)
 !bake install
