@@ -1077,7 +1077,7 @@ public class Bake
         last_logged_directory = Environment.get_current_dir ();
         var builder = new Builder (do_parallel);
         var exit_code = Posix.EXIT_SUCCESS;
-        builder.build_target.begin (recipe, join_relative_dir (toplevel.dirname, target), (o, x) =>
+        builder.build_target.begin (recipe, join_relative_dir (recipe.dirname, target), (o, x) =>
         {
             try
             {
