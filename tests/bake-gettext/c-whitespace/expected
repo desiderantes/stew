@@ -1,0 +1,23 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: source.c:5
+msgid "whitespace1"
+msgstr ""
+
+#: source.c:6
+msgid "whitespace2"
+msgstr ""
+
+#: source.c:7
+msgid "whitespace3"
+msgstr ""
+
+#: source.c:8
+msgid "whitespace4"
+msgstr ""
+
+#: source.c:11
+msgid "whitespace5"
+msgstr ""

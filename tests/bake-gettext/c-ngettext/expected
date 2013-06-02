@@ -1,0 +1,21 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: source.c:7
+msgid "ngettext1"
+msgid_plural "ngettext1-plural"
+msgstr[0] ""
+msgstr[1] ""
+
+#: source.c:8
+msgid "dngettext1"
+msgid_plural "dngettext1-plural"
+msgstr[0] ""
+msgstr[1] ""
+
+#: source.c:10
+msgid "dcngettext1"
+msgid_plural "dcngettext1-plural"
+msgstr[0] ""
+msgstr[1] ""

@@ -1,0 +1,7 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: source.py:3 source.py:4
+msgid "gettext"
+msgstr ""

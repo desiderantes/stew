@@ -1,0 +1,15 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: source.py:4
+msgid "ngettext1"
+msgid_plural "ngettext1-plural"
+msgstr[0] ""
+msgstr[1] ""
+
+#: source.py:5
+msgid "dngettext1"
+msgid_plural "dngettext1-plural"
+msgstr[0] ""
+msgstr[1] ""

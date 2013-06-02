@@ -47,7 +47,7 @@ public class GettextModule : BuildModule
         else
         {
             rule.add_status_command ("GETTEXT %s".printf (filename));
-            var extract_command = "@bake-gettext --mime-type %s --output %s %s".printf (mime_type, translation_file, filename);
+            var extract_command = "@bake-gettext --domain %s --mime-type %s --output %s %s".printf (gettext_domain, mime_type, translation_file, filename);
             rule.add_command (extract_command);
         }
 

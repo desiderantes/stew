@@ -1,0 +1,18 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: source.py:3
+msgid "gettext"
+msgstr ""
+
+#: source.py:4
+msgid "lgettext"
+msgstr ""
+
+#: source.py:5
+msgid ""
+"multi\n"
+"line\n"
+"string"
+msgstr ""

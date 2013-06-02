@@ -1,0 +1,23 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: source.cpp:5
+msgid "whitespace1"
+msgstr ""
+
+#: source.cpp:6
+msgid "whitespace2"
+msgstr ""
+
+#: source.cpp:7
+msgid "whitespace3"
+msgstr ""
+
+#: source.cpp:8
+msgid "whitespace4"
+msgstr ""
+
+#: source.cpp:11
+msgid "whitespace5"
+msgstr ""
