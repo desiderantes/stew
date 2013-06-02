@@ -1,0 +1,42 @@
+programs.test-bake-template {
+  sources = test-bake-template.vala
+  vala-packages = posix
+  install = false
+
+  tests {
+    no-variables {
+      args = no-variables
+    }
+    single-variable {
+      args = single-variable
+    }
+    multiple-variables {
+      args = multiple-variables
+    }
+    variable-chain {
+      args = variable-chain
+    }
+    multiple-lines {
+      args = multiple-lines
+    }
+  }
+}
+
+data.bake-template-tests {
+  install = false
+  files = no-variables/expected \
+          no-variables/input \
+          no-variables/test.conf \
+          single-variable/expected \
+          single-variable/input \
+          single-variable/test.conf \
+          multiple-variables/expected \
+          multiple-variables/input \
+          multiple-variables/test.conf \
+          variable-chain/expected \
+          variable-chain/input \
+          variable-chain/test.conf \
+          multiple-lines/expected \
+          multiple-lines/input \
+          multiple-lines/test.conf
+}
