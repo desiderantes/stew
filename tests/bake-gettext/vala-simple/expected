@@ -5,3 +5,10 @@ msgstr ""
 #: source.vala:3
 msgid "gettext"
 msgstr ""
+
+#: source.vala:5
+msgid ""
+"multi\n"
+"line\n"
+"string"
+msgstr ""

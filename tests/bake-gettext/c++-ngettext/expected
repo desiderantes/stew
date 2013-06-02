@@ -14,20 +14,8 @@ msgid_plural "dngettext1-plural"
 msgstr[0] ""
 msgstr[1] ""
 
-#: source.cpp:9
-msgid "dngettext2"
-msgid_plural "dngettext2-plural"
-msgstr[0] ""
-msgstr[1] ""
-
 #: source.cpp:10
 msgid "dcngettext1"
 msgid_plural "dcngettext1-plural"
-msgstr[0] ""
-msgstr[1] ""
-
-#: source.cpp:11
-msgid "dcngettext2"
-msgid_plural "dcngettext2-plural"
 msgstr[0] ""
 msgstr[1] ""

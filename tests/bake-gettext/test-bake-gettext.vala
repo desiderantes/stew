@@ -36,7 +36,7 @@ public class TestBakeGettext
             return Posix.EXIT_FAILURE;
         }
 
-        var command = "../../../src/bake-gettext --mime-type %s %s".printf (mime_type, file_to_translate);
+        var command = "../../../src/bake-gettext --domain test-domain --mime-type %s %s".printf (mime_type, file_to_translate);
         string output;
         int exit_status;
         try
