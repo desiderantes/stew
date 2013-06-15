@@ -1,0 +1,13 @@
+!bake
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/share/test-project
+cp test /usr/share/test-project/test
+cp test-enabled /usr/share/test-project/test-enabled
+(exit SUCCESS)
+!bake uninstall
+rm -f /usr/share/test-project/test
+rm -f /usr/share/test-project/test-enabled
+(exit SUCCESS)
+!bake clean
+(exit SUCCESS)

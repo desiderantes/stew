@@ -10,34 +10,34 @@
 
 public class MonoModule : BuildModule
 {
-    public override bool can_generate_program_rules (Program program)
+    public override bool can_generate_program_rules (Program program) throws Error
     {
         return can_generate_rules (program);
     }
 
-    public override void generate_program_rules (Program program)
+    public override void generate_program_rules (Program program) throws Error
     {
         var binary_name = generate_compile_rules (program);
         if (program.install)
             program.recipe.add_install_rule (binary_name, program.install_directory);
     }
 
-    public override bool can_generate_library_rules (Library library)
+    public override bool can_generate_library_rules (Library library) throws Error
     {
         return can_generate_rules (library);
     }
 
-    public override void generate_library_rules (Library library)
+    public override void generate_library_rules (Library library) throws Error
     {
         var binary_name = generate_compile_rules (library);
         if (library.install)
             library.recipe.add_install_rule (binary_name, Path.build_filename (library.install_directory, "cli", library.recipe.project_name));
     }
 
-    private bool can_generate_rules (Compilable compilable)
+    private bool can_generate_rules (Compilable compilable) throws Error
     {
         var count = 0;
-        foreach (var entry in compilable.sources)
+        foreach (var entry in compilable.get_sources ())
         {
             if (!entry.name.has_suffix (".cs"))
                 return false;
@@ -52,7 +52,7 @@ public class MonoModule : BuildModule
         return true;
     }
 
-    private string generate_compile_rules (Compilable compilable)
+    private string generate_compile_rules (Compilable compilable) throws Error
     {
         var recipe = compilable.recipe;
 
@@ -75,7 +75,7 @@ public class MonoModule : BuildModule
         if (compilable is Library)
             command += " -target:library";
         command += " -out:%s".printf (binary_name);
-        foreach (var entry in compilable.sources)
+        foreach (var entry in compilable.get_sources ())
             command += " %s".printf (entry.name);
 
         var compile_errors = new List<string> ();
@@ -161,7 +161,7 @@ public class MonoModule : BuildModule
         }
 
         /* Compile */
-        foreach (var entry in compilable.sources)
+        foreach (var entry in compilable.get_sources ())
             rule.add_input (entry.name);
         rule.add_status_command ("MONO-COMPILE %s".printf (binary_name));
         rule.add_command (command);
@@ -169,7 +169,7 @@ public class MonoModule : BuildModule
         if (compilable.gettext_domain != null)
         {
             // FIXME: We don't support gettext
-            foreach (var entry in compilable.sources)
+            foreach (var entry in compilable.get_sources ())
                 GettextModule.add_translatable_file (recipe, compilable.gettext_domain, "text/x-csharp", entry.name);
         }
 

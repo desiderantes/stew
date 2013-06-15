@@ -1,0 +1,12 @@
+project {
+  name = test-project
+}
+
+build-enabled = true
+build-disabled = false
+
+data.test {
+  files = test \
+          test-enabled (if $(build-enabled) == true) \
+          test-disabled (if $(build-disabled) == true)
+}

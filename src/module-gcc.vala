@@ -10,24 +10,24 @@
 
 public class GCCModule : BuildModule
 {
-    public override bool can_generate_program_rules (Program program)
+    public override bool can_generate_program_rules (Program program) throws Error
     {
         return can_generate_rules (program);
     }
 
-    public override void generate_program_rules (Program program)
+    public override void generate_program_rules (Program program) throws Error
     {
         generate_compile_rules (program);
         if (program.install)
             program.recipe.add_install_rule (program.name, program.install_directory);
     }
 
-    public override bool can_generate_library_rules (Library library)
+    public override bool can_generate_library_rules (Library library) throws Error
     {
         return can_generate_rules (library);
     }
 
-    public override void generate_library_rules (Library library)
+    public override void generate_library_rules (Library library) throws Error
     {
         var recipe = library.recipe;
 
@@ -84,9 +84,9 @@ public class GCCModule : BuildModule
             var scan_command = "@g-ir-scanner --no-libtool --namespace=%s --nsversion=%s --library=%s --output %s".printf (gir_namespace, gir_namespace_version, library.name, gir_filename);
             // FIXME: Need to sort out inputs correctly
             scan_command += " --include=GObject-2.0";
-            foreach (var entry in library.sources)
+            foreach (var entry in library.get_sources ())
             {
-                if (!library.compile_source (entry))
+                if (!entry.is_allowed)
                     continue;
                 gir_rule.add_input (entry.name);
                 scan_command += " %s".printf (entry.name);
@@ -116,7 +116,7 @@ public class GCCModule : BuildModule
         }
     }
 
-    private bool can_generate_rules (Compilable compilable)
+    private bool can_generate_rules (Compilable compilable) throws Error
     {
         if (get_compiler (compilable) == null)
             return false;
@@ -124,10 +124,10 @@ public class GCCModule : BuildModule
         return true;
     }
 
-    private string? get_compiler (Compilable compilable)
+    private string? get_compiler (Compilable compilable) throws Error
     {
         string? compiler = null;
-        foreach (var entry in compilable.sources)
+        foreach (var entry in compilable.get_sources ())
         {
             var source = entry.name;
 
@@ -146,7 +146,7 @@ public class GCCModule : BuildModule
         return compiler;
     }
 
-    private void generate_compile_rules (Compilable compilable)
+    private void generate_compile_rules (Compilable compilable) throws Error
     {
         var recipe = compilable.recipe;
 
@@ -286,14 +286,14 @@ public class GCCModule : BuildModule
         }
 
         /* Compile */
-        foreach (var entry in compilable.sources)
+        foreach (var entry in compilable.get_sources ())
         {
             var source = entry.name;
 
             if (source.has_suffix (".h") || source.has_suffix (".hpp"))
                 continue;
 
-            if (!compilable.compile_source (entry))
+            if (!entry.is_allowed)
                 continue;
 
             var source_base = Path.get_basename (source);
@@ -358,7 +358,7 @@ public class GCCModule : BuildModule
 
         if (compilable.gettext_domain != null)
         {
-            foreach (var entry in compilable.sources)
+            foreach (var entry in compilable.get_sources ())
             {
                 var source = entry.name;
                 var mime_type = get_mime_type (source);

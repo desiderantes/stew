@@ -10,12 +10,12 @@
 
 public class JavaModule : BuildModule
 {
-    public override bool can_generate_program_rules (Program program)
+    public override bool can_generate_program_rules (Program program) throws Error
     {
         return can_generate_rules (program);
     }
 
-    public override void generate_program_rules (Program program)
+    public override void generate_program_rules (Program program) throws Error
     {
         var recipe = program.recipe;
 
@@ -43,23 +43,23 @@ public class JavaModule : BuildModule
             recipe.add_install_rule (script, program.install_directory, binary_name);
     }
 
-    public override bool can_generate_library_rules (Library library)
+    public override bool can_generate_library_rules (Library library) throws Error
     {
         return can_generate_rules (library);
     }
 
-    public override void generate_library_rules (Library library)
+    public override void generate_library_rules (Library library) throws Error
     {
         generate_compile_rules (library);
     }
 
-    private bool can_generate_rules (Compilable compilable)
+    private bool can_generate_rules (Compilable compilable) throws Error
     {
         if (Environment.find_program_in_path ("javac") == null || Environment.find_program_in_path ("jar") == null)
             return false;
 
         var count = 0;
-        foreach (var entry in compilable.sources)
+        foreach (var entry in compilable.get_sources ())
         {
             if (!entry.name.has_suffix (".java"))
                 return false;
@@ -71,7 +71,7 @@ public class JavaModule : BuildModule
         return true;
     }
 
-    private string generate_compile_rules (Compilable compilable)
+    private string generate_compile_rules (Compilable compilable) throws Error
     {
         var recipe = compilable.recipe;
 
@@ -104,7 +104,7 @@ public class JavaModule : BuildModule
         if (entrypoint != null)
             jar_command += " %s".printf (entrypoint);
 
-        foreach (var entry in compilable.sources)
+        foreach (var entry in compilable.get_sources ())
         {
             var source = entry.name;
             var class_file = replace_extension (source, "class");
@@ -142,7 +142,7 @@ public class JavaModule : BuildModule
         if (compilable.gettext_domain != null)
         {
             // FIXME: We don't support gettext
-            foreach (var entry in compilable.sources)
+            foreach (var entry in compilable.get_sources ())
                 GettextModule.add_translatable_file (recipe, compilable.gettext_domain, "text/x-java", entry.name);
         }
 

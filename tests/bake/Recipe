@@ -697,6 +697,9 @@ programs.test-bake {
     data-no-install {
       args = data-no-install
     }
+    data-conditional {
+      args = data-conditional
+    }
 
     data-man {
       args = data-man
@@ -1223,6 +1226,11 @@ data.bake-tests {
           data-no-install/expected \
           data-no-install/Recipe \
           data-no-install/test \
+          data-conditional/expected \
+          data-conditional/Recipe \
+          data-conditional/test \
+          data-conditional/test-enabled \
+          data-conditional/test-disabled \
           data-man/expected \
           data-man/Recipe \
           data-man/test.1 \

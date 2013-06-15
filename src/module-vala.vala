@@ -10,12 +10,12 @@
 
 public class ValaModule : BuildModule
 {
-    public override bool can_generate_program_rules (Program program)
+    public override bool can_generate_program_rules (Program program) throws Error
     {
         return can_generate_rules (program);
     }
 
-    public override void generate_program_rules (Program program)
+    public override void generate_program_rules (Program program) throws Error
     {
         generate_compile_rules (program);
         if (program.install)
@@ -24,12 +24,12 @@ public class ValaModule : BuildModule
         generate_gettext_rules (program);
     }
 
-    public override bool can_generate_library_rules (Library library)
+    public override bool can_generate_library_rules (Library library) throws Error
     {
         return can_generate_rules (library);
     }
 
-    public override void generate_library_rules (Library library)
+    public override void generate_library_rules (Library library) throws Error
     {
         var recipe = library.recipe;
 
@@ -110,7 +110,7 @@ public class ValaModule : BuildModule
         generate_gettext_rules (library);
     }
 
-    private void generate_compile_rules (Compilable compilable)
+    private void generate_compile_rules (Compilable compilable) throws Error
     {
         var recipe = compilable.recipe;
 
@@ -330,7 +330,7 @@ public class ValaModule : BuildModule
         }
 
         /* Compile the sources */
-        foreach (var entry in compilable.sources)
+        foreach (var entry in compilable.get_sources ())
         {
             var source = entry.name;
 
@@ -377,7 +377,7 @@ public class ValaModule : BuildModule
             rule.add_output (c_filename);
             rule.add_output (c_stamp_filename);
             var command = valac_command + " --ccode %s".printf (source);
-            foreach (var e in compilable.sources)
+            foreach (var e in compilable.get_sources ())
             {
                 var s = e.name;
 
@@ -450,10 +450,10 @@ public class ValaModule : BuildModule
         }
     }
     
-    private bool can_generate_rules (Compilable compilable)
+    private bool can_generate_rules (Compilable compilable) throws Error
     {
         var n_sources = 0;
-        foreach (var entry in compilable.sources)
+        foreach (var entry in compilable.get_sources ())
         {
             var source = entry.name;
             if (!(source.has_suffix (".vala") || source.has_suffix (".vapi")))
@@ -469,12 +469,12 @@ public class ValaModule : BuildModule
         return true;
     }
 
-    private void generate_gettext_rules (Compilable compilable)
+    private void generate_gettext_rules (Compilable compilable) throws Error
     {
         if (compilable.gettext_domain == null)
             return;
 
-        foreach (var entry in compilable.sources)
+        foreach (var entry in compilable.get_sources ())
             GettextModule.add_translatable_file (compilable.recipe, compilable.gettext_domain, "text/x-vala", entry.name);
     }
 }

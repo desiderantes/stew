@@ -20,29 +20,29 @@ public class BuildModule
     {
     }
 
-    public virtual void generate_rules (Recipe recipe)
+    public virtual void generate_rules (Recipe recipe) throws Error
     {
     }
 
-    public virtual bool can_generate_program_rules (Program program)
-    {
-        return false;
-    }
-
-    public virtual void generate_program_rules (Program program)
-    {
-    }
-
-    public virtual bool can_generate_library_rules (Library library)
+    public virtual bool can_generate_program_rules (Program program) throws Error
     {
         return false;
     }
 
-    public virtual void generate_library_rules (Library library)
+    public virtual void generate_program_rules (Program program) throws Error
     {
     }
 
-    public virtual void generate_data_rules (Data data)
+    public virtual bool can_generate_library_rules (Library library) throws Error
+    {
+        return false;
+    }
+
+    public virtual void generate_library_rules (Library library) throws Error
+    {
+    }
+
+    public virtual void generate_data_rules (Data data) throws Error
     {
     }
 
@@ -151,7 +151,7 @@ public class Block
                 /* Finish last entry and start a new one */
                 if (entry != null)
                     list.append (entry);
-                entry = new TaggedEntry (text);
+                entry = new TaggedEntry (recipe, text);
             }
         }
         if (entry != null)
@@ -163,13 +163,46 @@ public class Block
 
 public class TaggedEntry
 {
+    public Recipe recipe;
     public string name;
     public List<string> tags;
     
-    public TaggedEntry (string name)
+    public TaggedEntry (Recipe recipe, string name)
     {
+        this.recipe = recipe;
         this.name = name;
         tags = new List<string> ();
+    }
+
+    public bool is_allowed
+    {
+        get {
+            foreach (var tag in tags)
+            {
+                if (tag.has_prefix ("if "))
+                {
+                    var condition = tag.substring (3);
+                    if (!solve_condition (condition))
+                        return false;
+                }
+            }
+
+            return true;
+        }
+    }
+
+    private bool solve_condition (string condition)
+    {
+        // FIXME: Support && || ()
+        // FIXME: Substitute variables
+
+        var tokens = condition.split ("==");
+        if (tokens.length != 2)
+            return false;
+
+        var lhs = recipe.substitute_variables (tokens[0]).strip ();
+        var rhs = recipe.substitute_variables (tokens[1]).strip ();
+        return lhs == rhs;
     }
 }
 
@@ -197,7 +230,8 @@ public class Option : Block
 
 public class Compilable : Block
 {
-    public List<TaggedEntry> sources;
+    private List<TaggedEntry> sources;
+    private bool have_sources;
 
     public Compilable (Recipe recipe, string type_name, string id)
     {
@@ -217,7 +251,18 @@ public class Compilable : Block
         var v = get_variable (name, fallback);
         if (v == null)
             return null;
-        return v.replace("\n", " ");
+        return v.replace ("\n", " ");
+    }
+
+    public unowned List<TaggedEntry> get_sources () throws Error
+    {
+        if (have_sources)
+            return sources;
+
+        sources = get_tagged_list ("sources");
+        have_sources = true;
+
+        return sources;
     }
 
     public string? compile_flags { owned get { return get_flags ("compile-flags"); } }
@@ -225,35 +270,6 @@ public class Compilable : Block
     public string? link_flags { owned get { return get_flags ("link-flags"); } }
 
     public string? packages { owned get { return get_variable ("packages"); } }
-
-    public bool compile_source (TaggedEntry entry)
-    {
-        foreach (var tag in entry.tags)
-        {
-            if (tag.has_prefix ("if "))
-            {
-                var condition = tag.substring (3);
-                if (!solve_condition (condition))
-                    return false;
-            }
-        }
-
-        return true;
-    }
-
-    private bool solve_condition (string condition)
-    {
-        // FIXME: Support && || ()
-        // FIXME: Substitute variables
-
-        var tokens = condition.split ("==");
-        if (tokens.length != 2)
-            return false;
-
-        var lhs = recipe.substitute_variables (tokens[0]).strip ();
-        var rhs = recipe.substitute_variables (tokens[1]).strip ();
-        return lhs == rhs;
-    }
 }
 
 public class Program : Compilable
@@ -603,7 +619,7 @@ public class Bake
         return option;
     }
 
-    private static void find_objects (Recipe recipe) throws TaggedListError
+    private static void find_objects (Recipe recipe)
     {
         foreach (var id in recipe.get_variable_children ("options"))
         {
@@ -613,13 +629,11 @@ public class Bake
         foreach (var id in recipe.get_variable_children ("programs"))
         {
             var program = new Program (recipe, id);
-            program.sources = program.get_tagged_list ("sources");
             programs.append (program);
         }
         foreach (var id in recipe.get_variable_children ("libraries"))
         {
             var library = new Library (recipe, id);
-            library.sources = library.get_tagged_list ("sources");
             libraries.append (library);
         }
         foreach (var id in recipe.get_variable_children ("data"))
@@ -641,7 +655,7 @@ public class Bake
         return null;
     }
 
-    private static void generate_library_rules (Library library)
+    private static void generate_library_rules (Library library) throws Error
     {
         var recipe = library.recipe;
 
@@ -666,7 +680,7 @@ public class Bake
         }
     }
 
-    private static void generate_program_rules (Program program)
+    private static void generate_program_rules (Program program) throws Error
     {
         var recipe = program.recipe;
 
@@ -705,13 +719,13 @@ public class Bake
         }
     }
 
-    private static void generate_data_rules (Data data)
+    private static void generate_data_rules (Data data) throws Error
     {
         foreach (var module in modules)
             module.generate_data_rules (data);
     }
 
-    private static void generate_rules (Recipe recipe)
+    private static void generate_rules (Recipe recipe) throws Error
     {
         foreach (var module in modules)
             module.generate_rules (recipe);
@@ -907,16 +921,7 @@ public class Bake
         make_built_in_option (conf_file, "data-directory", "Directory to install data", "$(options.resource-directory)/share");
         make_built_in_option (conf_file, "include-directory", "Directory to install headers", "$(options.resource-directory)/include");
         make_built_in_option (conf_file, "project-data-directory", "Directory to install project files to", "$(options.data-directory)/%s".printf (toplevel.project_name));
-        try
-        {
-            find_objects (toplevel);
-        }
-        catch (Error e)
-        {
-            stdout.printf ("%s\n", format_status ("%s".printf (e.message)));
-            stdout.printf ("%s\n", format_error ("[Build failed]"));
-            return Posix.EXIT_FAILURE;
-        }
+        find_objects (toplevel);
 
         /* Make the configuration the toplevel file so everything inherits from it */
         conf_file.children.append (toplevel);
@@ -1073,13 +1078,22 @@ public class Bake
             module.generate_toplevel_rules (toplevel);
 
         /* Generate libraries first (as other things may depend on it) then the other rules */
-        foreach (var library in libraries)
-            generate_library_rules (library);
-        foreach (var program in programs)
-            generate_program_rules (program);
-        foreach (var data in datas)
-            generate_data_rules (data);
-        generate_rules (toplevel);
+        try
+        {
+            foreach (var library in libraries)
+                generate_library_rules (library);
+            foreach (var program in programs)
+                generate_program_rules (program);
+            foreach (var data in datas)
+                generate_data_rules (data);
+            generate_rules (toplevel);
+        }
+        catch (Error e)
+        {
+            stdout.printf ("%s\n", format_status ("%s".printf (e.message)));
+            stdout.printf ("%s\n", format_error ("[Build failed]"));
+            return Posix.EXIT_FAILURE;
+        }
 
         /* Generate clean rule */
         generate_clean_rules (toplevel);

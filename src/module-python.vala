@@ -10,12 +10,12 @@
 
 public class PythonModule : BuildModule
 {
-    public override bool can_generate_program_rules (Program program)
+    public override bool can_generate_program_rules (Program program) throws Error
     {
         return can_generate_rules (program);
     }
 
-    public override void generate_program_rules (Program program)
+    public override void generate_program_rules (Program program) throws Error
     {
         var recipe = program.recipe;
         var binary_name = program.name;
@@ -28,7 +28,7 @@ public class PythonModule : BuildModule
         var python_cache_dir = "__pycache__";
         var install_sources = program.get_boolean_variable ("install-sources");
         var main_file = "";
-        foreach (var entry in program.sources)
+        foreach (var entry in program.get_sources ())
         {
             var source = entry.name;
             var output = "";
@@ -60,7 +60,7 @@ public class PythonModule : BuildModule
 
         if (program.gettext_domain != null)
         {
-            foreach (var entry in program.sources)
+            foreach (var entry in program.get_sources ())
                 GettextModule.add_translatable_file (recipe, program.gettext_domain, "text/x-python", entry.name);
         }
 
@@ -84,12 +84,12 @@ public class PythonModule : BuildModule
             recipe.add_install_rule (script, program.install_directory, binary_name);
     }
 
-    public override bool can_generate_library_rules (Library library)
+    public override bool can_generate_library_rules (Library library) throws Error
     {
         return can_generate_rules (library);
     }
 
-    public override void generate_library_rules (Library library)
+    public override void generate_library_rules (Library library) throws Error
     {
         var recipe = library.recipe;
 
@@ -116,7 +116,7 @@ public class PythonModule : BuildModule
             install_directory = Path.build_filename (library.install_directory, install_dir, "site-packages", library.id);
         }
 
-        foreach (var entry in library.sources)
+        foreach (var entry in library.get_sources ())
         {
             var source = entry.name;
             var output = replace_extension (source, "pyc");
@@ -137,15 +137,15 @@ public class PythonModule : BuildModule
 
         if (library.gettext_domain != null)
         {
-            foreach (var entry in library.sources)
+            foreach (var entry in library.get_sources ())
                 GettextModule.add_translatable_file (recipe, library.gettext_domain, "text/x-python", entry.name);
         }
     }
 
-    private bool can_generate_rules (Compilable compilable)
+    private bool can_generate_rules (Compilable compilable) throws Error
     {
         var count = 0;
-        foreach (var entry in compilable.sources)
+        foreach (var entry in compilable.get_sources ())
         {
             if (!entry.name.has_suffix (".py"))
                 return false;

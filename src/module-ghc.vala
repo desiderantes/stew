@@ -10,10 +10,10 @@
 
 public class GHCModule : BuildModule
 {
-    public override bool can_generate_program_rules (Program program)
+    public override bool can_generate_program_rules (Program program) throws Error
     {
         var count = 0;
-        foreach (var entry in program.sources)
+        foreach (var entry in program.get_sources ())
         {
             if (!entry.name.has_suffix (".hs"))
                 return false;
@@ -28,7 +28,7 @@ public class GHCModule : BuildModule
         return true;
     }
 
-    public override void generate_program_rules (Program program)
+    public override void generate_program_rules (Program program) throws Error
     {
         var recipe = program.recipe;
 
@@ -38,7 +38,7 @@ public class GHCModule : BuildModule
         link_rule.add_output (binary_name);
         var link_pretty_command = "LINK";
         var link_command = "@ghc -o %s".printf (binary_name);
-        foreach (var entry in program.sources)
+        foreach (var entry in program.get_sources ())
         {
             var source = entry.name;
             var output = recipe.get_build_path (replace_extension (source, "o"));

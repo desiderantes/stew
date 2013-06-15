@@ -10,14 +10,17 @@
 
 public class DataModule : BuildModule
 {
-    public override void generate_data_rules (Data data)
+    public override void generate_data_rules (Data data) throws Error
     {
         var recipe = data.recipe;
-        foreach (var file in data.get_file_list ("files"))
+        foreach (var entry in data.get_tagged_list ("files"))
         {
-            recipe.build_rule.add_input (file);
+            if (!entry.is_allowed)
+                continue;
+
+            recipe.build_rule.add_input (entry.name);
             if (data.install)
-                recipe.add_install_rule (file, data.install_directory);
+                recipe.add_install_rule (entry.name, data.install_directory);
         }
     }
 }
