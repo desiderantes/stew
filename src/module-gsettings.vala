@@ -10,34 +10,49 @@
 
 public class GSettingsModule : BuildModule
 {
-    public override void generate_data_rules (Data data)
+    public override void generate_data_rules (Data data) throws Error
     {
         var recipe = data.recipe;
 
         var gettext_domain = data.gettext_domain;
 
-        foreach (var schema in data.get_file_list ("gsettings-schemas"))
+        foreach (var entry in data.get_tagged_list ("gsettings-schemas"))
         {
-            // FIXME: Validate schema in build rule with glib-compile-schemas?
+            var schema = entry.name;
 
             // NOTE: Doesn't seem to be a mime type for schemas
             if (gettext_domain != null)
                 GettextModule.add_translatable_file (recipe, gettext_domain, "application/x-gschema+xml", schema);
 
+            if (!entry.is_allowed)
+                continue;
+
+            // FIXME: Validate schema in build rule with glib-compile-schemas?
+
             var dir = Path.build_filename (recipe.data_directory, "glib-2.0", "schemas");
             recipe.add_install_rule (schema, dir);
         }
 
-        foreach (var override in data.get_file_list ("gsettings-overrides"))
+        foreach (var entry in data.get_tagged_list ("gsettings-overrides"))
         {
+            var override = entry.name;
+
+            if (!entry.is_allowed)
+                continue;
+
             // FIXME: Validate override in build rule
 
             var dir = Path.build_filename (recipe.data_directory, "glib-2.0", "schemas");
             recipe.add_install_rule (override, dir);
         }
 
-        foreach (var convert in data.get_file_list ("gsettings-convert-files"))
+        foreach (var entry in data.get_tagged_list ("gsettings-convert-files"))
         {
+            var convert = entry.name;
+
+            if (!entry.is_allowed)
+                continue;
+
             // FIXME: Validate convert in build rule
 
             var dir = Path.build_filename (recipe.data_directory, "GConf", "gsettings");

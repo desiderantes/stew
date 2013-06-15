@@ -3,8 +3,11 @@ project {
 }
 
 data.test {
-  gsettings-schemas = com.example.Test.gschema.xml
-  gsettings-overrides = test.override
-  gsettings-convert-files = test.convert
+  gsettings-schemas = com.example.Test.gschema.xml \
+                      com.example.Disabled.gschema.xml (if false)
+  gsettings-overrides = test.override \
+                        test-disabled.override (if false)
+  gsettings-convert-files = test.convert \
+                            test-disabled.convert (if false)
   gettext-domain = test
 }

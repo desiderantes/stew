@@ -332,6 +332,9 @@ public class ValaModule : BuildModule
         /* Compile the sources */
         foreach (var entry in compilable.get_sources ())
         {
+            if (!entry.is_allowed)
+                continue;
+
             var source = entry.name;
 
             if (!source.has_suffix (".vala"))
@@ -379,6 +382,9 @@ public class ValaModule : BuildModule
             var command = valac_command + " --ccode %s".printf (source);
             foreach (var e in compilable.get_sources ())
             {
+                if (!e.is_allowed)
+                    continue;
+
                 var s = e.name;
 
                 if (s == source)

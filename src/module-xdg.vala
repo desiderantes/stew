@@ -10,15 +10,21 @@
 
 public class XdgModule : BuildModule
 {
-    public override void generate_data_rules (Data data)
+    public override void generate_data_rules (Data data) throws Error
     {
         var recipe = data.recipe;
 
         var desktop_dir = Path.build_filename (recipe.data_directory, "applications");
-        foreach (var desktop_file in data.get_file_list ("xdg-desktop-files"))
+        foreach (var entry in data.get_tagged_list ("xdg-desktop-files"))
         {
+            var desktop_file = entry.name;
+
             if (data.gettext_domain != null)
                 GettextModule.add_translatable_file (recipe, data.gettext_domain, "application/x-desktop", desktop_file);
+
+            if (!entry.is_allowed)
+                continue;
+
             recipe.add_install_rule (desktop_file, desktop_dir);
         }
 
@@ -26,7 +32,13 @@ public class XdgModule : BuildModule
         var icon_size = data.get_variable ("xdg-icon-size", "scalable");
         var icon_category = data.get_variable ("xdg-icon-category", "apps");
         var icon_dir = Path.build_filename (recipe.data_directory, "icons", icon_theme, icon_size, icon_category);
-        foreach (var icon_file in data.get_file_list ("xdg-icons"))
+        foreach (var entry in data.get_tagged_list ("xdg-icons"))
+        {
+            if (!entry.is_allowed)
+                continue;
+
+            var icon_file = entry.name;
             recipe.add_install_rule (icon_file, icon_dir, Path.get_basename (icon_file));
+        }
     }
 }

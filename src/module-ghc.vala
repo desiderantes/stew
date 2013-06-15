@@ -44,6 +44,9 @@ public class GHCModule : BuildModule
             var output = recipe.get_build_path (replace_extension (source, "o"));
             var interface_file = recipe.get_build_path (replace_extension (source, "hi"));
 
+            if (!entry.is_allowed)
+                continue;
+
             var rule = recipe.add_rule ();
             rule.add_input (source);
             rule.add_output (output);

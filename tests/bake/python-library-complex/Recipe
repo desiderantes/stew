@@ -3,6 +3,9 @@ project {
 }
 
 libraries.test {
-  sources = test1.py test2.py test3.py
+  sources = test1.py \
+            test2.py \
+            test3.py \
+            test-disabled.py (if false)
   gettext-domain = test
 }

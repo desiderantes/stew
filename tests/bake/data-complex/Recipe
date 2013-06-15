@@ -3,6 +3,8 @@ project {
 }
 
 data.test {
-  files = test1 test2
+  files = test1 \
+          test2 \
+          test-disabled (if false)
   install-directory = $(options.project-data-directory)/test
 }

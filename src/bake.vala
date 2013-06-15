@@ -20,10 +20,6 @@ public class BuildModule
     {
     }
 
-    public virtual void generate_rules (Recipe recipe) throws Error
-    {
-    }
-
     public virtual bool can_generate_program_rules (Program program) throws Error
     {
         return false;
@@ -82,15 +78,6 @@ public class Block
     public bool get_boolean_variable (string name, bool? fallback = false)
     {
         return recipe.get_boolean_variable ("%s.%s.%s".printf (type_name, id, name), fallback);
-    }
-
-    public List<string> get_file_list (string name)
-    {
-        var list = get_variable (name);
-        if (list == null)
-            return new List<string> ();
-
-        return split_variable (list);
     }
 
     public List<TaggedEntry> get_tagged_list (string name) throws TaggedListError
@@ -226,6 +213,14 @@ public class Option : Block
         {
             recipe.set_variable ("options.%s".printf (id), value);
         }
+    }
+}
+
+public class Template : Block
+{
+    public Template (Recipe recipe, string id)
+    {
+        base (recipe, "templates", id);
     }
 }
 
@@ -526,6 +521,7 @@ public class Bake
     public static List<BuildModule> modules;
 
     public static List<Option> options;
+    public static List<Template> templates;
     public static List<Program> programs;
     public static List<Library> libraries;
     public static List<Data> datas;
@@ -627,6 +623,11 @@ public class Bake
             var option = new Option (recipe, id);
             options.append (option);
         }
+        foreach (var id in recipe.get_variable_children ("templates"))
+        {
+            var template = new Template (recipe, id);
+            templates.append (template);
+        }
         foreach (var id in recipe.get_variable_children ("programs"))
         {
             var program = new Program (recipe, id);
@@ -726,14 +727,29 @@ public class Bake
             module.generate_data_rules (data);
     }
 
-    private static void generate_rules (Recipe recipe) throws Error
+    private static void generate_template_rules (Template template) throws Error
     {
-        foreach (var module in modules)
-            module.generate_rules (recipe);
+        var variables = template.get_variable ("variables").replace ("\n", " ");
+        /* FIXME: Validate and expand the variables and escape suitable for command line */
 
-        /* Traverse the recipe tree */
-        foreach (var child in recipe.children)
-            generate_rules (child);
+        foreach (var entry in template.get_tagged_list ("files"))
+        {
+            if (!entry.is_allowed)
+                continue;
+
+            var file = entry.name;
+            var template_file = "%s.template".printf (file);
+            var rule = template.recipe.add_rule ();
+            rule.add_input (template_file);
+            rule.add_output (file);
+            rule.add_status_command ("TEMPLATE %s".printf (file));
+            var command = "@bake-template %s %s".printf (template_file, file);
+            if (variables != null)
+                command += " %s".printf (variables);
+            rule.add_command (command);
+
+            template.recipe.build_rule.add_input (file);
+        }
     }
 
     private static void generate_clean_rules (Recipe recipe)
@@ -821,7 +837,6 @@ public class Bake
         modules.append (new ReleaseModule ());
         modules.append (new RPMModule ());
         modules.append (new ScriptModule ());
-        modules.append (new TemplateModule ());
         modules.append (new ValaModule ());
         modules.append (new XdgModule ());
         modules.append (new XZIPModule ());
@@ -1081,13 +1096,14 @@ public class Bake
         /* Generate libraries first (as other things may depend on it) then the other rules */
         try
         {
+            foreach (var template in templates)
+                generate_template_rules (template);
             foreach (var library in libraries)
                 generate_library_rules (library);
             foreach (var program in programs)
                 generate_program_rules (program);
             foreach (var data in datas)
                 generate_data_rules (data);
-            generate_rules (toplevel);
         }
         catch (Error e)
         {

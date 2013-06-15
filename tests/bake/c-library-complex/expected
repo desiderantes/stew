@@ -8,7 +8,8 @@ ar -cq libtest.a .built/test-test1.o .built/test-test2.o .built/test-test3.o
 bake-gettext --domain test --mime-type text/x-csrc --output .built/test1.c.pot test1.c
 bake-gettext --domain test --mime-type text/x-csrc --output .built/test2.c.pot test2.c
 bake-gettext --domain test --mime-type text/x-csrc --output .built/test3.c.pot test3.c
-msgcat --force-po --output-file=test.pot .built/test1.c.pot .built/test2.c.pot .built/test3.c.pot
+bake-gettext --domain test --mime-type text/x-csrc --output .built/test-disabled.c.pot test-disabled.c
+msgcat --force-po --output-file=test.pot .built/test1.c.pot .built/test2.c.pot .built/test3.c.pot .built/test-disabled.c.pot
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/lib

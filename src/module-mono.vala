@@ -76,7 +76,8 @@ public class MonoModule : BuildModule
             command += " -target:library";
         command += " -out:%s".printf (binary_name);
         foreach (var entry in compilable.get_sources ())
-            command += " %s".printf (entry.name);
+            if (entry.is_allowed)
+                command += " %s".printf (entry.name);
 
         var compile_errors = new List<string> ();
 
@@ -162,7 +163,8 @@ public class MonoModule : BuildModule
 
         /* Compile */
         foreach (var entry in compilable.get_sources ())
-            rule.add_input (entry.name);
+            if (entry.is_allowed)
+                rule.add_input (entry.name);
         rule.add_status_command ("MONO-COMPILE %s".printf (binary_name));
         rule.add_command (command);
 

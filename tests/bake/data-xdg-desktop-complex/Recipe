@@ -3,6 +3,7 @@ project {
 }
 
 data.test {
-  xdg-desktop-files = test.desktop
+  xdg-desktop-files = test.desktop \
+                      test-disabled.desktop (if false)
   gettext-domain = test
 }

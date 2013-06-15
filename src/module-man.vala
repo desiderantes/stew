@@ -10,11 +10,16 @@
 
 public class ManModule : BuildModule
 {
-    public override void generate_data_rules (Data data)
+    public override void generate_data_rules (Data data) throws Error
     {
         var recipe = data.recipe;
-        foreach (var page in data.get_file_list ("man-pages"))
+        foreach (var entry in data.get_tagged_list ("man-pages"))
         {
+            if (!entry.is_allowed)
+                continue;
+
+            var page = entry.name;
+
             var i = page.last_index_of_char ('.');
             var number = 0;
             if (i > 0)

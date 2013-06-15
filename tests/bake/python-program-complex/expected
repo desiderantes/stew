@@ -6,7 +6,8 @@ mkdir -p .built
 bake-gettext --domain test --mime-type text/x-python --output .built/test1.py.pot test1.py
 bake-gettext --domain test --mime-type text/x-python --output .built/test2.py.pot test2.py
 bake-gettext --domain test --mime-type text/x-python --output .built/test3.py.pot test3.py
-msgcat --force-po --output-file=test.pot .built/test1.py.pot .built/test2.py.pot .built/test3.py.pot
+bake-gettext --domain test --mime-type text/x-python --output .built/test-disabled.py.pot test-disabled.py
+msgcat --force-po --output-file=test.pot .built/test1.py.pot .built/test2.py.pot .built/test3.py.pot .built/test-disabled.py.pot
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/share/test-project

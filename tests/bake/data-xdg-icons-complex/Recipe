@@ -3,7 +3,8 @@ project {
 }
 
 data.icon32 {
-  xdg-icons = 32x32/test.png
+  xdg-icons = 32x32/test.png \
+              32x32/disabled.png (if false)
   xdg-icon-size = 32x32
   xdg-icon-theme = HighContrast
   xdg-icon-category = actions

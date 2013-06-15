@@ -61,11 +61,15 @@ public class GCCModule : BuildModule
 
         /* Install headers */
         var include_directory = library.get_variable ("header-install-directory", recipe.include_directory);
-        var headers = library.get_file_list ("headers");
+        var headers = library.get_tagged_list ("headers");
         if (library.install)
         {
-            foreach (var header in headers)
-                recipe.add_install_rule (header, include_directory);
+            foreach (var entry in headers)
+            {
+                if (!entry.is_allowed)
+                    continue;
+                recipe.add_install_rule (entry.name, include_directory);
+            }
         }
 
         /* Generate introspection */
@@ -91,8 +95,12 @@ public class GCCModule : BuildModule
                 gir_rule.add_input (entry.name);
                 scan_command += " %s".printf (entry.name);
             }
-            foreach (var header in headers)
+            foreach (var entry in headers)
             {
+                if (!entry.is_allowed)
+                    continue;
+
+                var header = entry.name;
                 gir_rule.add_input (header);
                 scan_command += " %s".printf (header);
             }

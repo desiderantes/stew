@@ -3,5 +3,8 @@ project {
 }
 
 programs.test {
-  sources = test1.hs test2.hs test3.hs
+  sources = test1.hs \
+            test2.hs \
+            test3.hs \
+            test-disabled.hs (if false)
 }

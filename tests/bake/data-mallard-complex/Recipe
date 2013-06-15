@@ -3,7 +3,9 @@ project {
 }
 
 data.test {
-  mallard-pages = index.page test.page
+  mallard-pages = index.page \
+                  test.page \
+                  test-disabled.page (if false)
   gettext-domain = test
   gettext-translations = fr.po it.po
   install = false

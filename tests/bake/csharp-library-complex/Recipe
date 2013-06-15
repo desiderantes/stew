@@ -3,7 +3,10 @@ project {
 }
 
 libraries.Test {
-  sources = Test1.cs Test2.cs Test3.cs
+  sources = Test1.cs \
+            Test2.cs \
+            Test3.cs \
+            TestDisabled.cs (if false)
   compile-flags = -unsafe
   gettext-domain = test
 }

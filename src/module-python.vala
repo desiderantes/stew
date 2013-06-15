@@ -17,52 +17,17 @@ public class PythonModule : BuildModule
 
     public override void generate_program_rules (Program program) throws Error
     {
-        var recipe = program.recipe;
-        var binary_name = program.name;
+        generate_compile_rules (program);
 
-        var python_version = program.get_variable ("python-version");
-        var python_bin = "python";
-        if (python_version != null)
-            python_bin += python_version;
-
-        var python_cache_dir = "__pycache__";
-        var install_sources = program.get_boolean_variable ("install-sources");
+        /* Treat the first source file as the main program file */
         var main_file = "";
         foreach (var entry in program.get_sources ())
-        {
-            var source = entry.name;
-            var output = "";
-            var rule = recipe.add_rule ();
-            if (python_version >= "3.0")
-            {
-                output = "%s/%scpython-%s.pyc".printf (python_cache_dir, replace_extension (source, ""), string.joinv ("", python_version.split (".")));
-                rule.add_input (python_cache_dir + "/");
-            }
-            else
-                output = replace_extension (source, "pyc");
-
             if (main_file == "")
-                main_file = output;
+                main_file = entry.name;
 
-            rule.add_input (source);
-            rule.add_output (output);
-            rule.add_status_command ("PYC %s".printf (source));		
-            rule.add_command ("@%s -m py_compile %s".printf (python_bin, source));
-            recipe.build_rule.add_input (output);
-
-            if (program.install)
-            {
-                if (install_sources || (python_version >= "3.0"))
-                    recipe.add_install_rule (source, recipe.project_data_directory);
-                recipe.add_install_rule (output, recipe.project_data_directory);
-            }
-        }
-
-        if (program.gettext_domain != null)
-        {
-            foreach (var entry in program.get_sources ())
-                GettextModule.add_translatable_file (recipe, program.gettext_domain, "text/x-python", entry.name);
-        }
+        var python_bin = get_python_bin (program);
+        var recipe = program.recipe;
+        var binary_name = program.name;
 
         /* Script to run locally */
         var rule = recipe.add_rule ();
@@ -91,55 +56,17 @@ public class PythonModule : BuildModule
 
     public override void generate_library_rules (Library library) throws Error
     {
-        var recipe = library.recipe;
-
-        var python_version = library.get_variable ("python-version");
+        generate_compile_rules (library);
+    }
+    
+    private string get_python_bin (Compilable compilable)
+    {
         var python_bin = "python";
+        var python_version = compilable.get_variable ("python-version");
         if (python_version != null)
             python_bin += python_version;
 
-        var install_directory = recipe.get_variable ("libraries.%s.install-directory".printf (library.id));
-        var install_sources = library.get_boolean_variable ("install-sources");
-        if (install_directory == null)
-        {
-            var install_dir = python_bin;
-            if (python_version == null)
-            {
-                var version = get_version (python_bin);
-                if (version != null)
-                {
-                    var tokens = version.split (".");
-                    if (tokens.length > 2)
-                        install_dir = "python%s.%s".printf (tokens[0], tokens[1]);
-                }
-            }
-            install_directory = Path.build_filename (library.install_directory, install_dir, "site-packages", library.id);
-        }
-
-        foreach (var entry in library.get_sources ())
-        {
-            var source = entry.name;
-            var output = replace_extension (source, "pyc");
-            var rule = recipe.add_rule ();
-            rule.add_input (source);
-            rule.add_output (output);
-            rule.add_status_command ("PYC %s".printf (source));		
-            rule.add_command ("@%s -m py_compile %s".printf (python_bin, source));
-            recipe.build_rule.add_input (output);
-
-            if (library.install)
-            {
-                if (install_sources)
-                    recipe.add_install_rule (source, install_directory);
-                recipe.add_install_rule (output, install_directory);
-            }
-        }
-
-        if (library.gettext_domain != null)
-        {
-            foreach (var entry in library.get_sources ())
-                GettextModule.add_translatable_file (recipe, library.gettext_domain, "text/x-python", entry.name);
-        }
+        return python_bin;
     }
 
     private bool can_generate_rules (Compilable compilable) throws Error
@@ -154,14 +81,78 @@ public class PythonModule : BuildModule
         if (count == 0)
             return false;
 
-        var python_bin = "python";
-        var python_version = compilable.get_variable ("python-version");
-        if (python_version != null)
-            python_bin += python_version;
-        if (Environment.find_program_in_path (python_bin) == null)
+        if (Environment.find_program_in_path (get_python_bin (compilable)) == null)
             return false;
 
         return true;
+    }
+
+    private void generate_compile_rules (Compilable compilable) throws Error
+    {
+        var recipe = compilable.recipe;
+
+        var python_version = compilable.get_variable ("python-version");
+        var python_bin = get_python_bin (compilable);
+        var python_cache_dir = "__pycache__";
+
+        var install_sources = compilable.get_boolean_variable ("install-sources");
+        var install_directory = compilable.get_variable ("install-directory");
+        if (compilable is Library)
+        {
+            if (install_directory == null)
+            {
+                var install_dir = python_bin;
+                if (python_version == null)
+                {
+                    var version = get_version (python_bin);
+                    if (version != null)
+                    {
+                        var tokens = version.split (".");
+                        if (tokens.length > 2)
+                            install_dir = "python%s.%s".printf (tokens[0], tokens[1]);
+                    }
+                }
+                install_directory = Path.build_filename (recipe.library_directory, install_dir, "site-packages", compilable.id);
+            }
+        }
+        else
+            install_directory = recipe.project_data_directory;
+
+        foreach (var entry in compilable.get_sources ())
+        {
+            if (!entry.is_allowed)
+                continue;
+
+            var source = entry.name;
+            var output = "";
+            var rule = recipe.add_rule ();
+            if (python_version >= "3.0")
+            {
+                output = "%s/%scpython-%s.pyc".printf (python_cache_dir, replace_extension (source, ""), string.joinv ("", python_version.split (".")));
+                rule.add_input (python_cache_dir + "/");
+            }
+            else
+                output = replace_extension (source, "pyc");
+
+            rule.add_input (source);
+            rule.add_output (output);
+            rule.add_status_command ("PYC %s".printf (source));		
+            rule.add_command ("@%s -m py_compile %s".printf (python_bin, source));
+            recipe.build_rule.add_input (output);
+
+            if (compilable.install)
+            {
+                if (install_sources || (python_version >= "3.0"))
+                    recipe.add_install_rule (source, install_directory);
+                recipe.add_install_rule (output, install_directory);
+            }
+        }
+
+        if (compilable.gettext_domain != null)
+        {
+            foreach (var entry in compilable.get_sources ())
+                GettextModule.add_translatable_file (recipe, compilable.gettext_domain, "text/x-python", entry.name);
+        }
     }
 
     private string? get_version (string python_bin)

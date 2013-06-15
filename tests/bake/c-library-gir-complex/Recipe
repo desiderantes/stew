@@ -3,7 +3,8 @@ project {
 }
 
 libraries.test {
-  sources = test.c
+  sources = test.c \
+            test-disabled.c (if false)
   gir-namespace = Test
   gir-namespace-version = 1.2
 }

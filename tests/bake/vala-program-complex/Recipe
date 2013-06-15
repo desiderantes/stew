@@ -3,7 +3,10 @@ project {
 }
 
 programs.test {
-  sources = test1.vala test2.vala test3.vala
+  sources = test1.vala \
+            test2.vala \
+            test3.vala \
+            test-disabled.vala (if false)
   gettext-domain = test
   vala-compile-flags = --target-glib 2.32
   compile-flags = -DFOO=1

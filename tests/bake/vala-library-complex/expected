@@ -24,7 +24,8 @@ valac --target-glib 2.32 --define=TEST -g --ccode --header=test.h --vapi=test.va
 bake-gettext --domain test --mime-type text/x-vala --output .built/test1.vala.pot test1.vala
 bake-gettext --domain test --mime-type text/x-vala --output .built/test2.vala.pot test2.vala
 bake-gettext --domain test --mime-type text/x-vala --output .built/test3.vala.pot test3.vala
-msgcat --force-po --output-file=test.pot .built/test1.vala.pot .built/test2.vala.pot .built/test3.vala.pot
+bake-gettext --domain test --mime-type text/x-vala --output .built/test-disabled.vala.pot test-disabled.vala
+msgcat --force-po --output-file=test.pot .built/test1.vala.pot .built/test2.vala.pot .built/test3.vala.pot .built/test-disabled.vala.pot
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/lib
