@@ -1,0 +1,17 @@
+!bake
+mkdir -p .built
+gcc -MMD -MF .built/test-test.d -c test.c -o .built/test-test.o
+gcc -MMD -MF .built/test-test-enabled.d -c test-enabled.c -o .built/test-test-enabled.o
+gcc -o test .built/test-test.o .built/test-test-enabled.o
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/bin
+cp test /usr/bin/test
+(exit SUCCESS)
+!bake uninstall
+rm -f /usr/bin/test
+(exit SUCCESS)
+!bake clean
+rm -rf .built/
+rm -f test
+(exit SUCCESS)

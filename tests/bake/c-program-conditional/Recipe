@@ -1,0 +1,12 @@
+project {
+  name = test-project
+}
+
+build-enabled = true
+build-disabled = false
+
+programs.test {
+  sources = test.c \
+            test-enabled.c (if $(build-enabled) == true) \
+            test-disabled.c (if $(build-disabled) == true)
+}

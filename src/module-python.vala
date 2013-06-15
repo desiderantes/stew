@@ -12,15 +12,13 @@ public class PythonModule : BuildModule
 {
     public override bool can_generate_program_rules (Program program)
     {
-        return can_generate_rules (program.sources, program.get_variable ("python-version"));
+        return can_generate_rules (program);
     }
 
     public override void generate_program_rules (Program program)
     {
         var recipe = program.recipe;
         var binary_name = program.name;
-
-        var sources = program.sources;
 
         var python_version = program.get_variable ("python-version");
         var python_bin = "python";
@@ -30,14 +28,15 @@ public class PythonModule : BuildModule
         var python_cache_dir = "__pycache__";
         var install_sources = program.get_boolean_variable ("install-sources");
         var main_file = "";
-        foreach (var source in sources)
+        foreach (var entry in program.sources)
         {
+            var source = entry.name;
             var output = "";
             var rule = recipe.add_rule ();
             if (python_version >= "3.0")
             {
                 output = "%s/%scpython-%s.pyc".printf (python_cache_dir, replace_extension (source, ""), string.joinv ("", python_version.split (".")));
-                rule.add_input(python_cache_dir + "/");
+                rule.add_input (python_cache_dir + "/");
             }
             else
                 output = replace_extension (source, "pyc");
@@ -61,8 +60,8 @@ public class PythonModule : BuildModule
 
         if (program.gettext_domain != null)
         {
-            foreach (var source in sources)
-                GettextModule.add_translatable_file (recipe, program.gettext_domain, "text/x-python", source);
+            foreach (var entry in program.sources)
+                GettextModule.add_translatable_file (recipe, program.gettext_domain, "text/x-python", entry.name);
         }
 
         /* Script to run locally */
@@ -87,13 +86,12 @@ public class PythonModule : BuildModule
 
     public override bool can_generate_library_rules (Library library)
     {
-        return can_generate_rules (library.sources, library.get_variable ("python-version"));
+        return can_generate_rules (library);
     }
 
     public override void generate_library_rules (Library library)
     {
         var recipe = library.recipe;
-        var sources = library.sources;
 
         var python_version = library.get_variable ("python-version");
         var python_bin = "python";
@@ -118,8 +116,9 @@ public class PythonModule : BuildModule
             install_directory = Path.build_filename (library.install_directory, install_dir, "site-packages", library.id);
         }
 
-        foreach (var source in sources)
+        foreach (var entry in library.sources)
         {
+            var source = entry.name;
             var output = replace_extension (source, "pyc");
             var rule = recipe.add_rule ();
             rule.add_input (source);
@@ -138,17 +137,17 @@ public class PythonModule : BuildModule
 
         if (library.gettext_domain != null)
         {
-            foreach (var source in sources)
-                GettextModule.add_translatable_file (recipe, library.gettext_domain, "text/x-python", source);
+            foreach (var entry in library.sources)
+                GettextModule.add_translatable_file (recipe, library.gettext_domain, "text/x-python", entry.name);
         }
     }
 
-    private bool can_generate_rules (List<string> sources, string? python_version)
+    private bool can_generate_rules (Compilable compilable)
     {
         var count = 0;
-        foreach (var source in sources)
+        foreach (var entry in compilable.sources)
         {
-            if (!source.has_suffix (".py"))
+            if (!entry.name.has_suffix (".py"))
                 return false;
             count++;
         }
@@ -156,6 +155,7 @@ public class PythonModule : BuildModule
             return false;
 
         var python_bin = "python";
+        var python_version = compilable.get_variable ("python-version");
         if (python_version != null)
             python_bin += python_version;
         if (Environment.find_program_in_path (python_bin) == null)

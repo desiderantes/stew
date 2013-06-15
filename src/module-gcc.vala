@@ -84,10 +84,12 @@ public class GCCModule : BuildModule
             var scan_command = "@g-ir-scanner --no-libtool --namespace=%s --nsversion=%s --library=%s --output %s".printf (gir_namespace, gir_namespace_version, library.name, gir_filename);
             // FIXME: Need to sort out inputs correctly
             scan_command += " --include=GObject-2.0";
-            foreach (var source in library.sources)
+            foreach (var entry in library.sources)
             {
-                gir_rule.add_input (source);
-                scan_command += " %s".printf (source);
+                if (!library.compile_source (entry))
+                    continue;
+                gir_rule.add_input (entry.name);
+                scan_command += " %s".printf (entry.name);
             }
             foreach (var header in headers)
             {
@@ -125,8 +127,10 @@ public class GCCModule : BuildModule
     private string? get_compiler (Compilable compilable)
     {
         string? compiler = null;
-        foreach (var source in compilable.sources)
+        foreach (var entry in compilable.sources)
         {
+            var source = entry.name;
+
             if (source.has_suffix (".h"))
                 continue;
 
@@ -282,9 +286,14 @@ public class GCCModule : BuildModule
         }
 
         /* Compile */
-        foreach (var source in compilable.sources)
+        foreach (var entry in compilable.sources)
         {
+            var source = entry.name;
+
             if (source.has_suffix (".h") || source.has_suffix (".hpp"))
+                continue;
+
+            if (!compilable.compile_source (entry))
                 continue;
 
             var source_base = Path.get_basename (source);
@@ -349,8 +358,9 @@ public class GCCModule : BuildModule
 
         if (compilable.gettext_domain != null)
         {
-            foreach (var source in compilable.sources)
+            foreach (var entry in compilable.sources)
             {
+                var source = entry.name;
                 var mime_type = get_mime_type (source);
                 if (mime_type != null)
                     GettextModule.add_translatable_file (recipe, compilable.gettext_domain, mime_type, source);

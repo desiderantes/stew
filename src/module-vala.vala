@@ -330,8 +330,10 @@ public class ValaModule : BuildModule
         }
 
         /* Compile the sources */
-        foreach (var source in compilable.sources)
+        foreach (var entry in compilable.sources)
         {
+            var source = entry.name;
+
             if (!source.has_suffix (".vala"))
                 continue;
 
@@ -375,8 +377,10 @@ public class ValaModule : BuildModule
             rule.add_output (c_filename);
             rule.add_output (c_stamp_filename);
             var command = valac_command + " --ccode %s".printf (source);
-            foreach (var s in compilable.sources)
+            foreach (var e in compilable.sources)
             {
+                var s = e.name;
+
                 if (s == source)
                     continue;
 
@@ -449,8 +453,9 @@ public class ValaModule : BuildModule
     private bool can_generate_rules (Compilable compilable)
     {
         var n_sources = 0;
-        foreach (var source in compilable.sources)
+        foreach (var entry in compilable.sources)
         {
+            var source = entry.name;
             if (!(source.has_suffix (".vala") || source.has_suffix (".vapi")))
                 return false;
             n_sources++;
@@ -469,7 +474,7 @@ public class ValaModule : BuildModule
         if (compilable.gettext_domain == null)
             return;
 
-        foreach (var source in compilable.sources)
-            GettextModule.add_translatable_file (compilable.recipe, compilable.gettext_domain, "text/x-vala", source);
+        foreach (var entry in compilable.sources)
+            GettextModule.add_translatable_file (compilable.recipe, compilable.gettext_domain, "text/x-vala", entry.name);
     }
 }

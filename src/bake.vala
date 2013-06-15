@@ -118,10 +118,20 @@ public class Block
 
                 /* Tag is surrounded by parenthesis, error if not terminated */
                 start++;
+                var bracket_count = 1;
                 var end = start + 1;
-                while (value[end] != '\0' && value[end] != ')')
-                    end++;
-                if (value[end] != ')')
+                for (; value[end] != '\0'; end++)
+                {
+                    if (value[end] == '(')
+                        bracket_count++;
+                    if (value[end] == ')')
+                    {
+                        bracket_count--;
+                        if (bracket_count == 0)
+                            break;
+                    }
+                }
+                if (bracket_count != 0)
                     throw new TaggedListError.UNTERMINATED_TAG ("Unterminated tag");
                 var text = value.substring (start, end - start);
                 start = end + 1;
@@ -187,6 +197,8 @@ public class Option : Block
 
 public class Compilable : Block
 {
+    public List<TaggedEntry> sources;
+
     public Compilable (Recipe recipe, string type_name, string id)
     {
         base (recipe, type_name, id);
@@ -208,22 +220,40 @@ public class Compilable : Block
         return v.replace("\n", " ");
     }
 
-    public List<string> sources
-    {
-        owned get
-        {
-            var source_list = get_variable ("sources");
-            if (source_list == null)
-                return new List<string> ();
-            return split_variable (source_list);
-        }
-    }
-
     public string? compile_flags { owned get { return get_flags ("compile-flags"); } }
 
     public string? link_flags { owned get { return get_flags ("link-flags"); } }
 
     public string? packages { owned get { return get_variable ("packages"); } }
+
+    public bool compile_source (TaggedEntry entry)
+    {
+        foreach (var tag in entry.tags)
+        {
+            if (tag.has_prefix ("if "))
+            {
+                var condition = tag.substring (3);
+                if (!solve_condition (condition))
+                    return false;
+            }
+        }
+
+        return true;
+    }
+
+    private bool solve_condition (string condition)
+    {
+        // FIXME: Support && || ()
+        // FIXME: Substitute variables
+
+        var tokens = condition.split ("==");
+        if (tokens.length != 2)
+            return false;
+
+        var lhs = recipe.substitute_variables (tokens[0]).strip ();
+        var rhs = recipe.substitute_variables (tokens[1]).strip ();
+        return lhs == rhs;
+    }
 }
 
 public class Program : Compilable
@@ -573,7 +603,7 @@ public class Bake
         return option;
     }
 
-    private static void find_objects (Recipe recipe)
+    private static void find_objects (Recipe recipe) throws TaggedListError
     {
         foreach (var id in recipe.get_variable_children ("options"))
         {
@@ -583,11 +613,13 @@ public class Bake
         foreach (var id in recipe.get_variable_children ("programs"))
         {
             var program = new Program (recipe, id);
+            program.sources = program.get_tagged_list ("sources");
             programs.append (program);
         }
         foreach (var id in recipe.get_variable_children ("libraries"))
         {
             var library = new Library (recipe, id);
+            library.sources = library.get_tagged_list ("sources");
             libraries.append (library);
         }
         foreach (var id in recipe.get_variable_children ("data"))
@@ -875,7 +907,16 @@ public class Bake
         make_built_in_option (conf_file, "data-directory", "Directory to install data", "$(options.resource-directory)/share");
         make_built_in_option (conf_file, "include-directory", "Directory to install headers", "$(options.resource-directory)/include");
         make_built_in_option (conf_file, "project-data-directory", "Directory to install project files to", "$(options.data-directory)/%s".printf (toplevel.project_name));
-        find_objects (toplevel);
+        try
+        {
+            find_objects (toplevel);
+        }
+        catch (Error e)
+        {
+            stdout.printf ("%s\n", format_status ("%s".printf (e.message)));
+            stdout.printf ("%s\n", format_error ("[Build failed]"));
+            return Posix.EXIT_FAILURE;
+        }
 
         /* Make the configuration the toplevel file so everything inherits from it */
         conf_file.children.append (toplevel);

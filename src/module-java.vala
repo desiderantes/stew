@@ -12,7 +12,7 @@ public class JavaModule : BuildModule
 {
     public override bool can_generate_program_rules (Program program)
     {
-        return can_generate_rules (program.sources);
+        return can_generate_rules (program);
     }
 
     public override void generate_program_rules (Program program)
@@ -45,7 +45,7 @@ public class JavaModule : BuildModule
 
     public override bool can_generate_library_rules (Library library)
     {
-        return can_generate_rules (library.sources);
+        return can_generate_rules (library);
     }
 
     public override void generate_library_rules (Library library)
@@ -53,15 +53,15 @@ public class JavaModule : BuildModule
         generate_compile_rules (library);
     }
 
-    private bool can_generate_rules (List<string> sources)
+    private bool can_generate_rules (Compilable compilable)
     {
         if (Environment.find_program_in_path ("javac") == null || Environment.find_program_in_path ("jar") == null)
             return false;
 
         var count = 0;
-        foreach (var source in sources)
+        foreach (var entry in compilable.sources)
         {
-            if (!source.has_suffix (".java"))
+            if (!entry.name.has_suffix (".java"))
                 return false;
             count++;
         }
@@ -104,8 +104,9 @@ public class JavaModule : BuildModule
         if (entrypoint != null)
             jar_command += " %s".printf (entrypoint);
 
-        foreach (var source in compilable.sources)
+        foreach (var entry in compilable.sources)
         {
+            var source = entry.name;
             var class_file = replace_extension (source, "class");
             var class_path = Path.build_filename (build_directory, class_file);
 
@@ -141,8 +142,8 @@ public class JavaModule : BuildModule
         if (compilable.gettext_domain != null)
         {
             // FIXME: We don't support gettext
-            foreach (var source in compilable.sources)
-                GettextModule.add_translatable_file (recipe, compilable.gettext_domain, "text/x-java", source);
+            foreach (var entry in compilable.sources)
+                GettextModule.add_translatable_file (recipe, compilable.gettext_domain, "text/x-java", entry.name);
         }
 
         return jar_file;

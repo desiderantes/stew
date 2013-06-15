@@ -388,6 +388,9 @@ programs.test-bake {
     c-program-shared-source {
       args = c-program-shared-source
     }
+    c-program-conditional {
+      args = c-program-conditional
+    }
     c-program-library {
       args = c-program-library
     }
@@ -865,6 +868,11 @@ data.bake-tests {
           c-program-shared-source/shared.c \
           c-program-shared-source/test1.c \
           c-program-shared-source/test2.c \
+          c-program-conditional/expected \
+          c-program-conditional/Recipe \
+          c-program-conditional/test.c \
+          c-program-conditional/test-enabled.c \
+          c-program-conditional/test-disabled.c \
           c-program-library/expected \
           c-program-library/Recipe \
           c-program-library/test.c \
