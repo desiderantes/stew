@@ -182,7 +182,7 @@ public class TaggedEntry
                 if (tag.has_prefix ("if "))
                 {
                     var condition = tag.substring (3);
-                    if (!solve_condition (condition))
+                    if (solve_condition (condition) != "true")
                         return false;
                 }
             }
@@ -191,18 +191,19 @@ public class TaggedEntry
         }
     }
 
-    private bool solve_condition (string condition)
+    private string solve_condition (string condition)
     {
         // FIXME: Support && || ()
         // FIXME: Substitute variables
 
         var tokens = condition.split ("==");
         if (tokens.length != 2)
-            return false;
+            return condition;
 
         var lhs = recipe.substitute_variables (tokens[0]).strip ();
         var rhs = recipe.substitute_variables (tokens[1]).strip ();
-        return lhs == rhs;
+
+        return lhs == rhs ? "true" : "false";
     }
 }
 
