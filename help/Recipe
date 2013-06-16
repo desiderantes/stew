@@ -1,6 +1,7 @@
 data.bake {
   mallard-pages = building.page \
                   cleaning.page \
+                  conditional-inputs.page \
                   config.page \
                   c.page \
                   c++.page \

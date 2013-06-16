@@ -1,0 +1,54 @@
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="conditionals">
+<info>
+    <link type="guide" xref="index#recipes"/>
+</info>
+
+<title>Conditionals</title>
+
+<p>
+Some projects require source files to be only used under certain conditions.
+Bake supports this by allowing a source file to be followed by a conditional tag.
+</p>
+<p>
+The syntax for a conitional is:
+</p>
+<code>
+(if <em>expression</em>)
+</code>
+<p>
+Where <em>expression</em> is a boolean expression.
+Expressions can contain <link xref="variables">variables</link> and the operations <code>==</code> (equality), <code>!=</code> (inequality), <code>&amp;&amp;</code> (logical and), <code>||</code> (logical or).
+Expressions can be grouped with parenthesis.
+Operations result to <code>true</code> or <code>false</code>.
+The source file is used if the expression results to <code>true</code>.
+</p>
+<example>
+<p>
+The following are valid expressions
+</p>
+<code>
+(if true)
+(if $(shape) == triangle)
+(if $(build-foo) || $(build-bar))
+</code>
+</example>
+<example>
+<p>
+The following describes a simple <link xref="c">C program</link> that has a conditional source file:
+</p>
+<code>
+options.use-foo {
+  description = Use foo?
+  default = false
+}
+
+programs.example-program {
+  sources = example-program.c \
+            foo.c (if $(use-foo))
+}
+</code>
+<p>
+When building Bake will compile in foo.c if <code>use-foo</code> was set to <code>true</code> at <link xref="config">configure</link> time.
+</p>
+</example>
+</page>
