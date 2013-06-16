@@ -18,6 +18,7 @@ data.bake {
                   java.page \
                   mallard.page \
                   man.page \
+                  options.page \
                   programs.page \
                   python.page \
                   qt.page \

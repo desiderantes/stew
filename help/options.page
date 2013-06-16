@@ -1,0 +1,102 @@
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="options">
+<info>
+    <link type="guide" xref="index#recipes"/>
+</info>
+
+<title>Options</title>
+
+<p>
+Options allow recipes to behave based on what the user chooses at <link xref="config">configuration time</link>.
+</p>
+<p>
+To specify an option you need to set <code>options.<em>id</em>.*</code> <link xref="variables">variables</link> where <em>id</em> is a unique ID for the option.
+The following variables are allowed:
+</p>
+<table frame="all" shade="rows">
+<thead>
+<tr>
+  <td><p>Name</p></td>
+  <td><p>Description</p></td>
+</tr>
+</thead>
+<tr>
+  <td><p>description</p></td>
+  <td><p>Description for this option (required)</p></td>
+</tr>
+<tr>
+  <td><p>default</p></td>
+  <td><p>Default value for the option. If no default is specified then Bake will not build until this value is set</p></td>
+</tr>
+</table>
+<example>
+<p>
+The following describes a simple option:
+</p>
+<code>
+options.widget-directory {
+  description = Flags to use when compiling
+  default = $(options.data-directory)/widgets
+}
+</code>
+<p>
+This project can then use the variable <code>options.widget-directory</code> which can be specified by running:
+</p>
+<code>
+bake --configure widget-directory=/path/to/widgets
+</code>
+<p>
+If the user does not configure this variable then it will default to <code>/usr/share/widgets</code>.
+</p>
+</example>
+<p>
+The following options are always available to all projects.
+</p>
+<table frame="all" shade="rows">
+<thead>
+<tr>
+  <td><p>Name</p></td>
+  <td><p>Description</p></td>
+</tr>
+</thead>
+<tr>
+  <td><p>options.install-directory</p></td>
+  <td><p>Directory to install files to</p></td>
+</tr>  
+<tr>  
+  <td><p>options.system-config-directory</p></td>
+  <td><p>Directory to install system configuration</p></td>
+</tr>  
+<tr>  
+  <td><p>options.system-binary-directory</p></td>
+  <td><p>Directory to install system binaries</p></td>
+</tr>  
+<tr>  
+  <td><p>options.system-library-directory</p></td>
+  <td><p>Directory to install system libraries</p></td>
+</tr>  
+<tr>  
+  <td><p>options.resource-directory</p></td>
+  <td><p>Directory to install system libraries</p></td>
+</tr>  
+<tr>  
+  <td><p>options.binary-directory</p></td>
+  <td><p>Directory to install binaries</p></td>
+</tr>  
+<tr>  
+  <td><p>options.library-directory</p></td>
+  <td><p>Directory to install libraries</p></td>
+</tr>  
+<tr>  
+  <td><p>options.data-directory</p></td>
+  <td><p>Directory to install data</p></td>
+</tr>  
+<tr>  
+  <td><p>options.include-directory</p></td>
+  <td><p>Directory to install headers</p></td>
+</tr>  
+<tr>  
+  <td><p>options.project-data-directory</p></td>
+  <td><p>Directory to install project files to</p></td>
+</tr>  
+</table>
+</page>
