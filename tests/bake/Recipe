@@ -1235,6 +1235,8 @@ data.bake-tests {
           data-conditional/n06 \
           data-conditional/n07 \
           data-conditional/n08 \
+          data-conditional/n09 \
+          data-conditional/n10 \
           data-conditional/y00 \
           data-conditional/y01 \
           data-conditional/y02 \
@@ -1248,6 +1250,7 @@ data.bake-tests {
           data-conditional/y10 \
           data-conditional/y11 \
           data-conditional/y12 \
+          data-conditional/y13 \
           data-man/expected \
           data-man/Recipe \
           data-man/test.1 \

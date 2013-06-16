@@ -180,25 +180,30 @@ public class TaggedEntry
 
     private string solve_condition (string condition)
     {
-        // FIXME: Support ()
-
-        var tokens = condition.split ("||", 2);
-        if (tokens.length == 2)
+        /* Solve parenthesis first */
+        var start_index = -1;
+        for (var i = 0; condition[i] != '\0'; i++)
         {
-            var lhs = solve_condition (tokens[0]) == "true";
-            var rhs = solve_condition (tokens[1]) == "true";
-            return (lhs || rhs) ? "true" : "false";
+            var c = condition[i];
+
+            /* Skip variables */
+            if (c == '$' && condition[i+1] == '(')
+            {
+                while (condition[i] != ')' && condition[i] != '\0')
+                    i++;
+                continue;
+            }
+            
+            if (c == '(')
+                start_index = i;
+            if (c == ')')
+            {
+                var block = solve_condition (condition.substring (start_index + 1, i - start_index - 1));
+                return solve_condition (condition.substring (0, start_index) + block + condition.substring (i + 1));
+            }
         }
 
-        tokens = condition.split ("&&", 2);
-        if (tokens.length == 2)
-        {
-            var lhs = solve_condition (tokens[0]) == "true";
-            var rhs = solve_condition (tokens[1]) == "true";
-            return (lhs && rhs) ? "true" : "false";
-        }
-
-        tokens = condition.split ("==", 2);
+        var tokens = condition.split ("==", 2);
         if (tokens.length == 2)
         {
             var lhs = solve_condition (tokens[0]);
@@ -212,6 +217,22 @@ public class TaggedEntry
             var lhs = solve_condition (tokens[0]);
             var rhs = solve_condition (tokens[1]);
             return lhs != rhs ? "true" : "false";
+        }
+
+        tokens = condition.split ("||", 2);
+        if (tokens.length == 2)
+        {
+            var lhs = solve_condition (tokens[0]) == "true";
+            var rhs = solve_condition (tokens[1]) == "true";
+            return (lhs || rhs) ? "true" : "false";
+        }
+
+        tokens = condition.split ("&&", 2);
+        if (tokens.length == 2)
+        {
+            var lhs = solve_condition (tokens[0]) == "true";
+            var rhs = solve_condition (tokens[1]) == "true";
+            return (lhs && rhs) ? "true" : "false";
         }
 
         var c = recipe.substitute_variables (condition);

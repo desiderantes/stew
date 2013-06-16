@@ -18,12 +18,18 @@ data.test {
           y05 (if true || false) \
           n03 (if false || false || false) \
           y06 (if false || false || true) \
+          y07 (if (false && true) || true) \
+          n04 (if false && (true || true)) \
           y08 (if false && true || true) \
-          y09 (if $(v0)) \
-          n05 (if $(v1)) \
-          n06 (if $(v2)) \
-          y11 (if $(v2) == red) \
-          n07 (if $(v2) == green) \
-          n08 (if $(v2) != red) \
-          y12 (if $(v2) != green)
+          n05 (if false == false || true) \
+          n06 (if false == (false || true)) \
+          y09 (if (false == false) || true) \
+          y10 (if $(v0)) \
+          n07 (if $(v1)) \
+          n08 (if $(v2)) \
+          y11 (if ($(v1) && $(v0)) || $(v0)) \
+          y12 (if $(v2) == red) \
+          n09 (if $(v2) == green) \
+          n10 (if $(v2) != red) \
+          y13 (if $(v2) != green)
 }
