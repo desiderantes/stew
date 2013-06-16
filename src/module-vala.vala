@@ -216,15 +216,16 @@ public class ValaModule : BuildModule
         }
 
         /* Get dependencies */
-        var packages = compilable.packages;
-        if (packages == null)
-            packages = "";
-        var package_list = split_variable (packages);
         var pkg_config_list = "";
         var have_gobject = false;
         var have_glib = false;
-        foreach (var package in package_list)
+        foreach (var entry in compilable.get_packages ())
         {
+            if (!entry.is_allowed)
+                continue;
+
+            var package = entry.name;
+
             if (pkg_config_list != "")
                 pkg_config_list += " ";
             pkg_config_list += package;

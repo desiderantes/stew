@@ -403,6 +403,9 @@ programs.test-bake {
     c-program-packages {
       args = c-program-packages
     }
+    c-program-package-conditional {
+      args = c-program-package-conditional
+    }
     c-program-package-dependency {
       args = c-program-package-dependency
     }
@@ -883,6 +886,9 @@ data.bake-tests {
           c-program-packages/expected \
           c-program-packages/Recipe \
           c-program-packages/test.c \
+          c-program-package-conditional/expected \
+          c-program-package-conditional/Recipe \
+          c-program-package-conditional/test.c \
           c-program-package-dependency/expected \
           c-program-package-dependency/Recipe \
           c-program-package-dependency/test.c \

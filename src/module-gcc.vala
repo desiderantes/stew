@@ -251,16 +251,15 @@ public class GCCModule : BuildModule
         }
 
         /* Get dependencies */
-        var packages = compilable.packages;
-        if (packages == null)
-            packages = "";
-        var package_list = split_variable (packages);
         var pkg_config_list = "";
-        foreach (var package in package_list)
+        foreach (var entry in compilable.get_packages ())
         {
+            if (!entry.is_allowed)
+                continue;
+
             if (pkg_config_list != "")
                 pkg_config_list += " ";
-            pkg_config_list += package;
+            pkg_config_list += entry.name;
         }
 
         if (pkg_config_list != "")

@@ -228,6 +228,8 @@ public class Compilable : Block
 {
     private List<TaggedEntry> sources;
     private bool have_sources;
+    private List<TaggedEntry> packages;
+    private bool have_packages;
 
     public Compilable (Recipe recipe, string type_name, string id)
     {
@@ -265,7 +267,16 @@ public class Compilable : Block
 
     public string? link_flags { owned get { return get_flags ("link-flags"); } }
 
-    public string? packages { owned get { return get_variable ("packages"); } }
+    public unowned List<TaggedEntry> get_packages () throws Error
+    {
+        if (have_packages)
+            return packages;
+
+        packages = get_tagged_list ("packages");
+        have_packages = true;
+
+        return packages;
+    }
 }
 
 public class Program : Compilable
