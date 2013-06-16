@@ -10,24 +10,24 @@
 
 public class GCCModule : BuildModule
 {
-    public override bool can_generate_program_rules (Program program)
+    public override bool can_generate_program_rules (Program program) throws Error
     {
         return can_generate_rules (program);
     }
 
-    public override void generate_program_rules (Program program)
+    public override void generate_program_rules (Program program) throws Error
     {
         generate_compile_rules (program);
         if (program.install)
             program.recipe.add_install_rule (program.name, program.install_directory);
     }
 
-    public override bool can_generate_library_rules (Library library)
+    public override bool can_generate_library_rules (Library library) throws Error
     {
         return can_generate_rules (library);
     }
 
-    public override void generate_library_rules (Library library)
+    public override void generate_library_rules (Library library) throws Error
     {
         var recipe = library.recipe;
 
@@ -61,11 +61,15 @@ public class GCCModule : BuildModule
 
         /* Install headers */
         var include_directory = library.get_variable ("header-install-directory", recipe.include_directory);
-        var headers = library.get_file_list ("headers");
+        var headers = library.get_tagged_list ("headers");
         if (library.install)
         {
-            foreach (var header in headers)
-                recipe.add_install_rule (header, include_directory);
+            foreach (var entry in headers)
+            {
+                if (!entry.is_allowed)
+                    continue;
+                recipe.add_install_rule (entry.name, include_directory);
+            }
         }
 
         /* Generate introspection */
@@ -84,13 +88,19 @@ public class GCCModule : BuildModule
             var scan_command = "@g-ir-scanner --no-libtool --namespace=%s --nsversion=%s --library=%s --output %s".printf (gir_namespace, gir_namespace_version, library.name, gir_filename);
             // FIXME: Need to sort out inputs correctly
             scan_command += " --include=GObject-2.0";
-            foreach (var source in library.sources)
+            foreach (var entry in library.get_sources ())
             {
-                gir_rule.add_input (source);
-                scan_command += " %s".printf (source);
+                if (!entry.is_allowed)
+                    continue;
+                gir_rule.add_input (entry.name);
+                scan_command += " %s".printf (entry.name);
             }
-            foreach (var header in headers)
+            foreach (var entry in headers)
             {
+                if (!entry.is_allowed)
+                    continue;
+
+                var header = entry.name;
                 gir_rule.add_input (header);
                 scan_command += " %s".printf (header);
             }
@@ -114,7 +124,7 @@ public class GCCModule : BuildModule
         }
     }
 
-    private bool can_generate_rules (Compilable compilable)
+    private bool can_generate_rules (Compilable compilable) throws Error
     {
         if (get_compiler (compilable) == null)
             return false;
@@ -122,11 +132,13 @@ public class GCCModule : BuildModule
         return true;
     }
 
-    private string? get_compiler (Compilable compilable)
+    private string? get_compiler (Compilable compilable) throws Error
     {
         string? compiler = null;
-        foreach (var source in compilable.sources)
+        foreach (var entry in compilable.get_sources ())
         {
+            var source = entry.name;
+
             if (source.has_suffix (".h"))
                 continue;
 
@@ -142,7 +154,7 @@ public class GCCModule : BuildModule
         return compiler;
     }
 
-    private void generate_compile_rules (Compilable compilable)
+    private void generate_compile_rules (Compilable compilable) throws Error
     {
         var recipe = compilable.recipe;
 
@@ -239,16 +251,15 @@ public class GCCModule : BuildModule
         }
 
         /* Get dependencies */
-        var packages = compilable.packages;
-        if (packages == null)
-            packages = "";
-        var package_list = split_variable (packages);
         var pkg_config_list = "";
-        foreach (var package in package_list)
+        foreach (var entry in compilable.get_packages ())
         {
+            if (!entry.is_allowed)
+                continue;
+
             if (pkg_config_list != "")
                 pkg_config_list += " ";
-            pkg_config_list += package;
+            pkg_config_list += entry.name;
         }
 
         if (pkg_config_list != "")
@@ -282,9 +293,14 @@ public class GCCModule : BuildModule
         }
 
         /* Compile */
-        foreach (var source in compilable.sources)
+        foreach (var entry in compilable.get_sources ())
         {
+            var source = entry.name;
+
             if (source.has_suffix (".h") || source.has_suffix (".hpp"))
+                continue;
+
+            if (!entry.is_allowed)
                 continue;
 
             var source_base = Path.get_basename (source);
@@ -349,8 +365,9 @@ public class GCCModule : BuildModule
 
         if (compilable.gettext_domain != null)
         {
-            foreach (var source in compilable.sources)
+            foreach (var entry in compilable.get_sources ())
             {
+                var source = entry.name;
                 var mime_type = get_mime_type (source);
                 if (mime_type != null)
                     GettextModule.add_translatable_file (recipe, compilable.gettext_domain, mime_type, source);

@@ -3,5 +3,8 @@ project {
 }
 
 programs.test {
-  sources = test1.go test2.go test3.go
+  sources = test1.go \
+            test2.go \
+            test3.go \
+            test-disabled.go (if false)
 }

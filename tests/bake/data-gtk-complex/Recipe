@@ -3,7 +3,8 @@ project {
 }
 
 data.test {
-  gtk-ui-files = test.ui
+  gtk-ui-files = test.ui \
+                 test-disabled.ui (if false)
   gettext-domain = test
   install-directory = $(options.project-data-directory)/ui
 }

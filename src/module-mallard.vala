@@ -10,7 +10,7 @@
 
 public class MallardModule : BuildModule
 {
-    public override void generate_data_rules (Data data)
+    public override void generate_data_rules (Data data) throws Error
     {
         var recipe = data.recipe;
 
@@ -25,12 +25,18 @@ public class MallardModule : BuildModule
         if (gettext_domain != null)
             languages = GettextModule.get_languages (recipe, gettext_domain, out template_dir, out translation_dir);
 
-        foreach (var page in data.get_file_list ("mallard-pages"))
+        foreach (var entry in data.get_tagged_list ("mallard-pages"))
         {
-            // FIXME: Should validate page in build rule with xmllint
+            var page = entry.name;
 
             if (gettext_domain != null)
                 GettextModule.add_translatable_file (recipe, gettext_domain, "application/x-mallard+xml", page);
+
+            if (!entry.is_allowed)
+                continue;
+
+            // FIXME: Should validate page in build rule with xmllint
+
             foreach (var language in languages)
             {
                 var translated_page = recipe.get_build_path ("%s.%s".printf (page, language));

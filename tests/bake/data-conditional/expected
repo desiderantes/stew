@@ -1,0 +1,37 @@
+!bake
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/share/test-project
+cp y00 /usr/share/test-project/y00
+cp y01 /usr/share/test-project/y01
+cp y02 /usr/share/test-project/y02
+cp y03 /usr/share/test-project/y03
+cp y04 /usr/share/test-project/y04
+cp y05 /usr/share/test-project/y05
+cp y06 /usr/share/test-project/y06
+cp y07 /usr/share/test-project/y07
+cp y08 /usr/share/test-project/y08
+cp y09 /usr/share/test-project/y09
+cp y10 /usr/share/test-project/y10
+cp y11 /usr/share/test-project/y11
+cp y12 /usr/share/test-project/y12
+cp y13 /usr/share/test-project/y13
+(exit SUCCESS)
+!bake uninstall
+rm -f /usr/share/test-project/y00
+rm -f /usr/share/test-project/y01
+rm -f /usr/share/test-project/y02
+rm -f /usr/share/test-project/y03
+rm -f /usr/share/test-project/y04
+rm -f /usr/share/test-project/y05
+rm -f /usr/share/test-project/y06
+rm -f /usr/share/test-project/y07
+rm -f /usr/share/test-project/y08
+rm -f /usr/share/test-project/y09
+rm -f /usr/share/test-project/y10
+rm -f /usr/share/test-project/y11
+rm -f /usr/share/test-project/y12
+rm -f /usr/share/test-project/y13
+(exit SUCCESS)
+!bake clean
+(exit SUCCESS)

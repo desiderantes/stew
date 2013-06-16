@@ -36,7 +36,6 @@ SOURCES = src/bake.vala \
           src/module-release.vala \
           src/module-rpm.vala \
           src/module-script.vala \
-          src/module-template.vala \
           src/module-vala.vala \
           src/module-xdg.vala \
           src/module-xzip.vala \

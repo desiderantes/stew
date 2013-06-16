@@ -4,7 +4,8 @@ msgfmt fr.po --output-file=.built/fr.mo
 msgfmt it.po --output-file=.built/it.mo
 itstool --output .built/index.page.pot index.page
 itstool --output .built/test.page.pot test.page
-msgcat --force-po --output-file=test.pot .built/index.page.pot .built/test.page.pot
+itstool --output .built/test-disabled.page.pot test-disabled.page
+msgcat --force-po --output-file=test.pot .built/index.page.pot .built/test.page.pot .built/test-disabled.page.pot
 itstool -m .built/fr.mo --output .built/index.page.fr index.page
 itstool -m .built/it.mo --output .built/index.page.it index.page
 itstool -m .built/fr.mo --output .built/test.page.fr test.page

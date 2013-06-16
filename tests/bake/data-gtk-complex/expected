@@ -1,7 +1,8 @@
 !bake
 mkdir -p .built
 bake-gettext --domain test --mime-type application/x-glade --output .built/test.ui.pot test.ui
-msgcat --force-po --output-file=test.pot .built/test.ui.pot
+bake-gettext --domain test --mime-type application/x-glade --output .built/test-disabled.ui.pot test-disabled.ui
+msgcat --force-po --output-file=test.pot .built/test.ui.pot .built/test-disabled.ui.pot
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/share/test-project/ui

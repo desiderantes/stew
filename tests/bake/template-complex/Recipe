@@ -5,7 +5,9 @@ project {
 foo_variable=foo
 
 templates.test {
-  files = test1 test2
+  files = test1 \
+          test2 \
+          test-disabled (if false)
   variables = TEST=test \
               FOO=$(foo_variable)
 }

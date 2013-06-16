@@ -45,7 +45,6 @@ programs {
               module-release.vala \
               module-rpm.vala \
               module-script.vala \
-              module-template.vala \
               module-vala.vala \
               module-xdg.vala \
               module-xzip.vala \

@@ -10,15 +10,15 @@
 
 public class ScriptModule : BuildModule
 {
-    public override bool can_generate_program_rules (Program program)
+    public override bool can_generate_program_rules (Program program) throws Error
     {
-        if (program.sources != null)
+        if (program.get_sources () != null)
             return false;
 
         return true;
     }
 
-    public override void generate_program_rules (Program program)
+    public override void generate_program_rules (Program program) throws Error
     {
         if (program.install)
             program.recipe.add_install_rule (program.name, program.install_directory);

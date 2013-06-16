@@ -1,7 +1,8 @@
 !bake
 mkdir -p .built
 bake-gettext --domain test --mime-type application/x-desktop --output .built/test.desktop.pot test.desktop
-msgcat --force-po --output-file=test.pot .built/test.desktop.pot
+bake-gettext --domain test --mime-type application/x-desktop --output .built/test-disabled.desktop.pot test-disabled.desktop
+msgcat --force-po --output-file=test.pot .built/test.desktop.pot .built/test-disabled.desktop.pot
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/share/applications

@@ -20,29 +20,25 @@ public class BuildModule
     {
     }
 
-    public virtual void generate_rules (Recipe recipe)
-    {
-    }
-
-    public virtual bool can_generate_program_rules (Program program)
+    public virtual bool can_generate_program_rules (Program program) throws Error
     {
         return false;
     }
 
-    public virtual void generate_program_rules (Program program)
+    public virtual void generate_program_rules (Program program) throws Error
     {
     }
 
-    public virtual bool can_generate_library_rules (Library library)
+    public virtual bool can_generate_library_rules (Library library) throws Error
     {
         return false;
     }
 
-    public virtual void generate_library_rules (Library library)
+    public virtual void generate_library_rules (Library library) throws Error
     {
     }
 
-    public virtual void generate_data_rules (Data data)
+    public virtual void generate_data_rules (Data data) throws Error
     {
     }
 
@@ -84,15 +80,6 @@ public class Block
         return recipe.get_boolean_variable ("%s.%s.%s".printf (type_name, id, name), fallback);
     }
 
-    public List<string> get_file_list (string name)
-    {
-        var list = get_variable (name);
-        if (list == null)
-            return new List<string> ();
-
-        return split_variable (list);
-    }
-
     public List<TaggedEntry> get_tagged_list (string name) throws TaggedListError
     {
         var list = new List<TaggedEntry> ();
@@ -118,10 +105,20 @@ public class Block
 
                 /* Tag is surrounded by parenthesis, error if not terminated */
                 start++;
+                var bracket_count = 1;
                 var end = start + 1;
-                while (value[end] != '\0' && value[end] != ')')
-                    end++;
-                if (value[end] != ')')
+                for (; value[end] != '\0'; end++)
+                {
+                    if (value[end] == '(')
+                        bracket_count++;
+                    if (value[end] == ')')
+                    {
+                        bracket_count--;
+                        if (bracket_count == 0)
+                            break;
+                    }
+                }
+                if (bracket_count != 0)
                     throw new TaggedListError.UNTERMINATED_TAG ("Unterminated tag");
                 var text = value.substring (start, end - start);
                 start = end + 1;
@@ -141,7 +138,7 @@ public class Block
                 /* Finish last entry and start a new one */
                 if (entry != null)
                     list.append (entry);
-                entry = new TaggedEntry (text);
+                entry = new TaggedEntry (recipe, text);
             }
         }
         if (entry != null)
@@ -153,13 +150,96 @@ public class Block
 
 public class TaggedEntry
 {
+    public Recipe recipe;
     public string name;
     public List<string> tags;
     
-    public TaggedEntry (string name)
+    public TaggedEntry (Recipe recipe, string name)
     {
+        this.recipe = recipe;
         this.name = name;
         tags = new List<string> ();
+    }
+
+    public bool is_allowed
+    {
+        get {
+            foreach (var tag in tags)
+            {
+                if (tag.has_prefix ("if "))
+                {
+                    var condition = tag.substring (3);
+                    if (solve_condition (condition) != "true")
+                        return false;
+                }
+            }
+
+            return true;
+        }
+    }
+
+    private string solve_condition (string condition)
+    {
+        /* Solve parenthesis first */
+        var start_index = -1;
+        for (var i = 0; condition[i] != '\0'; i++)
+        {
+            var c = condition[i];
+
+            /* Skip variables */
+            if (c == '$' && condition[i+1] == '(')
+            {
+                while (condition[i] != ')' && condition[i] != '\0')
+                    i++;
+                continue;
+            }
+            
+            if (c == '(')
+                start_index = i;
+            if (c == ')')
+            {
+                var block = solve_condition (condition.substring (start_index + 1, i - start_index - 1));
+                return solve_condition (condition.substring (0, start_index) + block + condition.substring (i + 1));
+            }
+        }
+
+        var tokens = condition.split ("==", 2);
+        if (tokens.length == 2)
+        {
+            var lhs = solve_condition (tokens[0]);
+            var rhs = solve_condition (tokens[1]);
+            return lhs == rhs ? "true" : "false";
+        }
+
+        tokens = condition.split ("!=", 2);
+        if (tokens.length == 2)
+        {
+            var lhs = solve_condition (tokens[0]);
+            var rhs = solve_condition (tokens[1]);
+            return lhs != rhs ? "true" : "false";
+        }
+
+        tokens = condition.split ("||", 2);
+        if (tokens.length == 2)
+        {
+            var lhs = solve_condition (tokens[0]) == "true";
+            var rhs = solve_condition (tokens[1]) == "true";
+            return (lhs || rhs) ? "true" : "false";
+        }
+
+        tokens = condition.split ("&&", 2);
+        if (tokens.length == 2)
+        {
+            var lhs = solve_condition (tokens[0]) == "true";
+            var rhs = solve_condition (tokens[1]) == "true";
+            return (lhs && rhs) ? "true" : "false";
+        }
+
+        var c = recipe.substitute_variables (condition);
+        if (c != condition)
+             return solve_condition (c);
+
+        return strip (condition);
     }
 }
 
@@ -185,8 +265,21 @@ public class Option : Block
     }
 }
 
+public class Template : Block
+{
+    public Template (Recipe recipe, string id)
+    {
+        base (recipe, "templates", id);
+    }
+}
+
 public class Compilable : Block
 {
+    private List<TaggedEntry> sources;
+    private bool have_sources;
+    private List<TaggedEntry> packages;
+    private bool have_packages;
+
     public Compilable (Recipe recipe, string type_name, string id)
     {
         base (recipe, type_name, id);
@@ -205,25 +298,34 @@ public class Compilable : Block
         var v = get_variable (name, fallback);
         if (v == null)
             return null;
-        return v.replace("\n", " ");
+        return v.replace ("\n", " ");
     }
 
-    public List<string> sources
+    public unowned List<TaggedEntry> get_sources () throws Error
     {
-        owned get
-        {
-            var source_list = get_variable ("sources");
-            if (source_list == null)
-                return new List<string> ();
-            return split_variable (source_list);
-        }
+        if (have_sources)
+            return sources;
+
+        sources = get_tagged_list ("sources");
+        have_sources = true;
+
+        return sources;
     }
 
     public string? compile_flags { owned get { return get_flags ("compile-flags"); } }
 
     public string? link_flags { owned get { return get_flags ("link-flags"); } }
 
-    public string? packages { owned get { return get_variable ("packages"); } }
+    public unowned List<TaggedEntry> get_packages () throws Error
+    {
+        if (have_packages)
+            return packages;
+
+        packages = get_tagged_list ("packages");
+        have_packages = true;
+
+        return packages;
+    }
 }
 
 public class Program : Compilable
@@ -479,6 +581,7 @@ public class Bake
     public static List<BuildModule> modules;
 
     public static List<Option> options;
+    public static List<Template> templates;
     public static List<Program> programs;
     public static List<Library> libraries;
     public static List<Data> datas;
@@ -580,6 +683,11 @@ public class Bake
             var option = new Option (recipe, id);
             options.append (option);
         }
+        foreach (var id in recipe.get_variable_children ("templates"))
+        {
+            var template = new Template (recipe, id);
+            templates.append (template);
+        }
         foreach (var id in recipe.get_variable_children ("programs"))
         {
             var program = new Program (recipe, id);
@@ -609,7 +717,7 @@ public class Bake
         return null;
     }
 
-    private static void generate_library_rules (Library library)
+    private static void generate_library_rules (Library library) throws Error
     {
         var recipe = library.recipe;
 
@@ -634,7 +742,7 @@ public class Bake
         }
     }
 
-    private static void generate_program_rules (Program program)
+    private static void generate_program_rules (Program program) throws Error
     {
         var recipe = program.recipe;
 
@@ -673,20 +781,35 @@ public class Bake
         }
     }
 
-    private static void generate_data_rules (Data data)
+    private static void generate_data_rules (Data data) throws Error
     {
         foreach (var module in modules)
             module.generate_data_rules (data);
     }
 
-    private static void generate_rules (Recipe recipe)
+    private static void generate_template_rules (Template template) throws Error
     {
-        foreach (var module in modules)
-            module.generate_rules (recipe);
+        var variables = template.get_variable ("variables").replace ("\n", " ");
+        /* FIXME: Validate and expand the variables and escape suitable for command line */
 
-        /* Traverse the recipe tree */
-        foreach (var child in recipe.children)
-            generate_rules (child);
+        foreach (var entry in template.get_tagged_list ("files"))
+        {
+            if (!entry.is_allowed)
+                continue;
+
+            var file = entry.name;
+            var template_file = "%s.template".printf (file);
+            var rule = template.recipe.add_rule ();
+            rule.add_input (template_file);
+            rule.add_output (file);
+            rule.add_status_command ("TEMPLATE %s".printf (file));
+            var command = "@bake-template %s %s".printf (template_file, file);
+            if (variables != null)
+                command += " %s".printf (variables);
+            rule.add_command (command);
+
+            template.recipe.build_rule.add_input (file);
+        }
     }
 
     private static void generate_clean_rules (Recipe recipe)
@@ -774,7 +897,6 @@ public class Bake
         modules.append (new ReleaseModule ());
         modules.append (new RPMModule ());
         modules.append (new ScriptModule ());
-        modules.append (new TemplateModule ());
         modules.append (new ValaModule ());
         modules.append (new XdgModule ());
         modules.append (new XZIPModule ());
@@ -1032,13 +1154,23 @@ public class Bake
             module.generate_toplevel_rules (toplevel);
 
         /* Generate libraries first (as other things may depend on it) then the other rules */
-        foreach (var library in libraries)
-            generate_library_rules (library);
-        foreach (var program in programs)
-            generate_program_rules (program);
-        foreach (var data in datas)
-            generate_data_rules (data);
-        generate_rules (toplevel);
+        try
+        {
+            foreach (var template in templates)
+                generate_template_rules (template);
+            foreach (var library in libraries)
+                generate_library_rules (library);
+            foreach (var program in programs)
+                generate_program_rules (program);
+            foreach (var data in datas)
+                generate_data_rules (data);
+        }
+        catch (Error e)
+        {
+            stdout.printf ("%s\n", format_status ("%s".printf (e.message)));
+            stdout.printf ("%s\n", format_error ("[Build failed]"));
+            return Posix.EXIT_FAILURE;
+        }
 
         /* Generate clean rule */
         generate_clean_rules (toplevel);

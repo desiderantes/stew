@@ -10,12 +10,12 @@
 
 public class ValaModule : BuildModule
 {
-    public override bool can_generate_program_rules (Program program)
+    public override bool can_generate_program_rules (Program program) throws Error
     {
         return can_generate_rules (program);
     }
 
-    public override void generate_program_rules (Program program)
+    public override void generate_program_rules (Program program) throws Error
     {
         generate_compile_rules (program);
         if (program.install)
@@ -24,12 +24,12 @@ public class ValaModule : BuildModule
         generate_gettext_rules (program);
     }
 
-    public override bool can_generate_library_rules (Library library)
+    public override bool can_generate_library_rules (Library library) throws Error
     {
         return can_generate_rules (library);
     }
 
-    public override void generate_library_rules (Library library)
+    public override void generate_library_rules (Library library) throws Error
     {
         var recipe = library.recipe;
 
@@ -110,7 +110,7 @@ public class ValaModule : BuildModule
         generate_gettext_rules (library);
     }
 
-    private void generate_compile_rules (Compilable compilable)
+    private void generate_compile_rules (Compilable compilable) throws Error
     {
         var recipe = compilable.recipe;
 
@@ -216,15 +216,16 @@ public class ValaModule : BuildModule
         }
 
         /* Get dependencies */
-        var packages = compilable.packages;
-        if (packages == null)
-            packages = "";
-        var package_list = split_variable (packages);
         var pkg_config_list = "";
         var have_gobject = false;
         var have_glib = false;
-        foreach (var package in package_list)
+        foreach (var entry in compilable.get_packages ())
         {
+            if (!entry.is_allowed)
+                continue;
+
+            var package = entry.name;
+
             if (pkg_config_list != "")
                 pkg_config_list += " ";
             pkg_config_list += package;
@@ -258,10 +259,13 @@ public class ValaModule : BuildModule
             }
         }
 
-        var vala_packages = compilable.get_variable ("vala-packages", "");
-        var vala_package_list = split_variable (vala_packages);
-        foreach (var package in vala_package_list)
+        foreach (var entry in compilable.get_tagged_list ("vala-packages"))
         {
+            if (!entry.is_allowed)
+                continue;
+
+            var package = entry.name;
+
             /* Look for locally generated libraries */
             var vapi_filename = "%s.vapi".printf (package);
             var library_filename = "lib%s.so".printf (package);
@@ -330,8 +334,13 @@ public class ValaModule : BuildModule
         }
 
         /* Compile the sources */
-        foreach (var source in compilable.sources)
+        foreach (var entry in compilable.get_sources ())
         {
+            if (!entry.is_allowed)
+                continue;
+
+            var source = entry.name;
+
             if (!source.has_suffix (".vala"))
                 continue;
 
@@ -375,8 +384,13 @@ public class ValaModule : BuildModule
             rule.add_output (c_filename);
             rule.add_output (c_stamp_filename);
             var command = valac_command + " --ccode %s".printf (source);
-            foreach (var s in compilable.sources)
+            foreach (var e in compilable.get_sources ())
             {
+                if (!e.is_allowed)
+                    continue;
+
+                var s = e.name;
+
                 if (s == source)
                     continue;
 
@@ -446,11 +460,12 @@ public class ValaModule : BuildModule
         }
     }
     
-    private bool can_generate_rules (Compilable compilable)
+    private bool can_generate_rules (Compilable compilable) throws Error
     {
         var n_sources = 0;
-        foreach (var source in compilable.sources)
+        foreach (var entry in compilable.get_sources ())
         {
+            var source = entry.name;
             if (!(source.has_suffix (".vala") || source.has_suffix (".vapi")))
                 return false;
             n_sources++;
@@ -464,12 +479,12 @@ public class ValaModule : BuildModule
         return true;
     }
 
-    private void generate_gettext_rules (Compilable compilable)
+    private void generate_gettext_rules (Compilable compilable) throws Error
     {
         if (compilable.gettext_domain == null)
             return;
 
-        foreach (var source in compilable.sources)
-            GettextModule.add_translatable_file (compilable.recipe, compilable.gettext_domain, "text/x-vala", source);
+        foreach (var entry in compilable.get_sources ())
+            GettextModule.add_translatable_file (compilable.recipe, compilable.gettext_domain, "text/x-vala", entry.name);
     }
 }

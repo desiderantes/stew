@@ -3,9 +3,13 @@ project {
 }
 
 libraries.test {
-  sources = test1.c test2.c test3.c
+  sources = test1.c \
+            test2.c \
+            test3.c \
+            test-disabled.c (if false)
   so-version = 1.2
-  headers = test.h
+  headers = test.h \
+            test-disabled.h (if false)
   gettext-domain = test
   compile-flags = -DFOO=1
   link-flags = -lm

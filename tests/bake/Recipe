@@ -403,6 +403,9 @@ programs.test-bake {
     c-program-packages {
       args = c-program-packages
     }
+    c-program-package-conditional {
+      args = c-program-package-conditional
+    }
     c-program-package-dependency {
       args = c-program-package-dependency
     }
@@ -694,6 +697,9 @@ programs.test-bake {
     data-no-install {
       args = data-no-install
     }
+    data-conditional {
+      args = data-conditional
+    }
 
     data-man {
       args = data-man
@@ -880,6 +886,9 @@ data.bake-tests {
           c-program-packages/expected \
           c-program-packages/Recipe \
           c-program-packages/test.c \
+          c-program-package-conditional/expected \
+          c-program-package-conditional/Recipe \
+          c-program-package-conditional/test.c \
           c-program-package-dependency/expected \
           c-program-package-dependency/Recipe \
           c-program-package-dependency/test.c \
@@ -1215,6 +1224,33 @@ data.bake-tests {
           data-no-install/expected \
           data-no-install/Recipe \
           data-no-install/test \
+          data-conditional/expected \
+          data-conditional/Recipe \
+          data-conditional/n00 \
+          data-conditional/n01 \
+          data-conditional/n02 \
+          data-conditional/n03 \
+          data-conditional/n04 \
+          data-conditional/n05 \
+          data-conditional/n06 \
+          data-conditional/n07 \
+          data-conditional/n08 \
+          data-conditional/n09 \
+          data-conditional/n10 \
+          data-conditional/y00 \
+          data-conditional/y01 \
+          data-conditional/y02 \
+          data-conditional/y03 \
+          data-conditional/y04 \
+          data-conditional/y05 \
+          data-conditional/y06 \
+          data-conditional/y07 \
+          data-conditional/y08 \
+          data-conditional/y09 \
+          data-conditional/y10 \
+          data-conditional/y11 \
+          data-conditional/y12 \
+          data-conditional/y13 \
           data-man/expected \
           data-man/Recipe \
           data-man/test.1 \

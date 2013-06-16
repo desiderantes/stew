@@ -5,7 +5,8 @@ project {
 programs.Test {
   sources = Test1.cs \
             Test2.cs \
-            Test3.cs
+            Test3.cs \
+            TestDisabled.cs (if false)
   resources = Icon.png \
               Data.xml (id data-id)
   compile-flags = -unsafe
