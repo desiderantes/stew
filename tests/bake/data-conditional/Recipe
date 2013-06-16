@@ -2,11 +2,28 @@ project {
   name = test-project
 }
 
-build-enabled = true
-build-disabled = false
+v0 = true
+v1 = false
+v2 = red
 
 data.test {
-  files = test \
-          test-enabled (if $(build-enabled) == true) \
-          test-disabled (if $(build-disabled) == true)
+  files = y00 \
+          y01 (if true) \
+          n00 (if false) \
+          y02 (if true && true) \
+          n01 (if true && false) \
+          y03 (if true && true && true) \
+          n02 (if true && true && false) \
+          y04 (if true || true) \
+          y05 (if true || false) \
+          n03 (if false || false || false) \
+          y06 (if false || false || true) \
+          y08 (if false && true || true) \
+          y09 (if $(v0)) \
+          n05 (if $(v1)) \
+          n06 (if $(v2)) \
+          y11 (if $(v2) == red) \
+          n07 (if $(v2) == green) \
+          n08 (if $(v2) != red) \
+          y12 (if $(v2) != green)
 }

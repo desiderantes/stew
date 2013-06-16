@@ -180,17 +180,45 @@ public class TaggedEntry
 
     private string solve_condition (string condition)
     {
-        // FIXME: Support && || ()
-        // FIXME: Substitute variables
+        // FIXME: Support ()
 
-        var tokens = condition.split ("==");
-        if (tokens.length != 2)
-            return condition;
+        var tokens = condition.split ("||", 2);
+        if (tokens.length == 2)
+        {
+            var lhs = solve_condition (tokens[0]) == "true";
+            var rhs = solve_condition (tokens[1]) == "true";
+            return (lhs || rhs) ? "true" : "false";
+        }
 
-        var lhs = recipe.substitute_variables (tokens[0]).strip ();
-        var rhs = recipe.substitute_variables (tokens[1]).strip ();
+        tokens = condition.split ("&&", 2);
+        if (tokens.length == 2)
+        {
+            var lhs = solve_condition (tokens[0]) == "true";
+            var rhs = solve_condition (tokens[1]) == "true";
+            return (lhs && rhs) ? "true" : "false";
+        }
 
-        return lhs == rhs ? "true" : "false";
+        tokens = condition.split ("==", 2);
+        if (tokens.length == 2)
+        {
+            var lhs = solve_condition (tokens[0]);
+            var rhs = solve_condition (tokens[1]);
+            return lhs == rhs ? "true" : "false";
+        }
+
+        tokens = condition.split ("!=", 2);
+        if (tokens.length == 2)
+        {
+            var lhs = solve_condition (tokens[0]);
+            var rhs = solve_condition (tokens[1]);
+            return lhs != rhs ? "true" : "false";
+        }
+
+        var c = recipe.substitute_variables (condition);
+        if (c != condition)
+             return solve_condition (c);
+
+        return strip (condition);
     }
 }
 

@@ -2,12 +2,30 @@
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/share/test-project
-cp test /usr/share/test-project/test
-cp test-enabled /usr/share/test-project/test-enabled
+cp y00 /usr/share/test-project/y00
+cp y01 /usr/share/test-project/y01
+cp y02 /usr/share/test-project/y02
+cp y03 /usr/share/test-project/y03
+cp y04 /usr/share/test-project/y04
+cp y05 /usr/share/test-project/y05
+cp y06 /usr/share/test-project/y06
+cp y08 /usr/share/test-project/y08
+cp y09 /usr/share/test-project/y09
+cp y11 /usr/share/test-project/y11
+cp y12 /usr/share/test-project/y12
 (exit SUCCESS)
 !bake uninstall
-rm -f /usr/share/test-project/test
-rm -f /usr/share/test-project/test-enabled
+rm -f /usr/share/test-project/y00
+rm -f /usr/share/test-project/y01
+rm -f /usr/share/test-project/y02
+rm -f /usr/share/test-project/y03
+rm -f /usr/share/test-project/y04
+rm -f /usr/share/test-project/y05
+rm -f /usr/share/test-project/y06
+rm -f /usr/share/test-project/y08
+rm -f /usr/share/test-project/y09
+rm -f /usr/share/test-project/y11
+rm -f /usr/share/test-project/y12
 (exit SUCCESS)
 !bake clean
 (exit SUCCESS)

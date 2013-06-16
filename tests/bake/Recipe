@@ -1226,9 +1226,28 @@ data.bake-tests {
           data-no-install/test \
           data-conditional/expected \
           data-conditional/Recipe \
-          data-conditional/test \
-          data-conditional/test-enabled \
-          data-conditional/test-disabled \
+          data-conditional/n00 \
+          data-conditional/n01 \
+          data-conditional/n02 \
+          data-conditional/n03 \
+          data-conditional/n04 \
+          data-conditional/n05 \
+          data-conditional/n06 \
+          data-conditional/n07 \
+          data-conditional/n08 \
+          data-conditional/y00 \
+          data-conditional/y01 \
+          data-conditional/y02 \
+          data-conditional/y03 \
+          data-conditional/y04 \
+          data-conditional/y05 \
+          data-conditional/y06 \
+          data-conditional/y07 \
+          data-conditional/y08 \
+          data-conditional/y09 \
+          data-conditional/y10 \
+          data-conditional/y11 \
+          data-conditional/y12 \
           data-man/expected \
           data-man/Recipe \
           data-man/test.1 \
