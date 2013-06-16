@@ -259,10 +259,13 @@ public class ValaModule : BuildModule
             }
         }
 
-        var vala_packages = compilable.get_variable ("vala-packages", "");
-        var vala_package_list = split_variable (vala_packages);
-        foreach (var package in vala_package_list)
+        foreach (var entry in compilable.get_tagged_list ("vala-packages"))
         {
+            if (!entry.is_allowed)
+                continue;
+
+            var package = entry.name;
+
             /* Look for locally generated libraries */
             var vapi_filename = "%s.vapi".printf (package);
             var library_filename = "lib%s.so".printf (package);
