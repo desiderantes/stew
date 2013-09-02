@@ -859,6 +859,7 @@ data.bake-tests {
           c-program-complex/test1.c \
           c-program-complex/test2.c \
           c-program-complex/test3.c \
+          c-program-complex/test-disabled.c \
           c-program-relative-directories/expected \
           c-program-relative-directories/Recipe \
           c-program-relative-directories/parent.c \
@@ -932,6 +933,8 @@ data.bake-tests {
           c-library-complex/test1.c \
           c-library-complex/test2.c \
           c-library-complex/test3.c \
+          c-library-complex/test-disabled.c \
+          c-library-complex/test-disabled.h \
           c-library-complex/test.h \
           c-library-relative-directories/expected \
           c-library-relative-directories/Recipe \
@@ -965,6 +968,7 @@ data.bake-tests {
           c++-program-complex/test1.cpp \
           c++-program-complex/test2.cpp \
           c++-program-complex/test3.cpp \
+          c++-program-complex/test-disabled.cpp \
           c++-program-local-library/expected \
           c++-program-local-library/Recipe \
           c++-program-local-library/main.cpp \
@@ -991,6 +995,7 @@ data.bake-tests {
           c++-library-complex/test1.cpp \
           c++-library-complex/test2.cpp \
           c++-library-complex/test3.cpp \
+          c++-library-complex/test-disabled.cpp \
           qt-program-simple/expected \
           qt-program-simple/Recipe \
           qt-program-simple/test.cpp \
@@ -999,6 +1004,7 @@ data.bake-tests {
           qt-program-complex/test1.cpp \
           qt-program-complex/test2.cpp \
           qt-program-complex/test3.cpp \
+          qt-program-complex/test-disabled.cpp \
           qt-library-simple/expected \
           qt-library-simple/Recipe \
           qt-library-simple/test.cpp \
@@ -1008,6 +1014,7 @@ data.bake-tests {
           qt-library-complex/test1.cpp \
           qt-library-complex/test2.cpp \
           qt-library-complex/test3.cpp \
+          qt-library-complex/test-disabled.cpp \
           csharp-program-simple/expected \
           csharp-program-simple/Recipe \
           csharp-program-simple/Test.cs \
@@ -1022,6 +1029,7 @@ data.bake-tests {
           csharp-program-complex/Test1.cs \
           csharp-program-complex/Test2.cs \
           csharp-program-complex/Test3.cs \
+          csharp-program-complex/TestDisabled.cs \
           csharp-program-complex/Icon.png \
           csharp-program-complex/Data.xml \
           csharp-program-resource-missing/expected \
@@ -1048,6 +1056,7 @@ data.bake-tests {
           csharp-library-complex/Test1.cs \
           csharp-library-complex/Test2.cs \
           csharp-library-complex/Test3.cs \
+          csharp-library-complex/TestDisabled.cs \
           vala-program-simple/expected \
           vala-program-simple/Recipe \
           vala-program-simple/test.vala \
@@ -1064,6 +1073,7 @@ data.bake-tests {
           vala-program-complex/test3.vala \
           vala-program-complex/test-c.c \
           vala-program-complex/test-c.h \
+          vala-program-complex/test-disabled.vala \
           vala-program-relative-directories/expected \
           vala-program-relative-directories/Recipe \
           vala-program-relative-directories/parent.vala \
@@ -1106,6 +1116,7 @@ data.bake-tests {
           vala-library-complex/test3.vala \
           vala-library-complex/test-c.c \
           vala-library-complex/test-c.h \
+          vala-library-complex/test-disabled.vala \
           vala-library-relative-directories/expected \
           vala-library-relative-directories/Recipe \
           vala-library-relative-directories/parent.vala \
@@ -1134,12 +1145,14 @@ data.bake-tests {
           java-program-install-directory/Recipe \
           java-program-install-directory/Test.java \
           java-program-complex/expected \
+          java-program-complex/Disabled.png \
           java-program-complex/Recipe \
           java-program-complex/Icon.png \
           java-program-complex/Manifest.txt \
           java-program-complex/com/example/Test1.java \
           java-program-complex/com/example/Test2.java \
           java-program-complex/com/example/Test3.java \
+          java-program-complex/com/example/TestDisabled.java \
           java-program-manifest-missing/expected \
           java-program-manifest-missing/Recipe \
           java-program-manifest-missing/Test.java \
@@ -1160,6 +1173,7 @@ data.bake-tests {
           java-library-complex/com/example/Test1.java \
           java-library-complex/com/example/Test2.java \
           java-library-complex/com/example/Test3.java \
+          java-library-complex/com/example/TestDisabled.java \
           python-program-simple/expected \
           python-program-simple/Recipe \
           python-program-simple/test.py \
@@ -1174,6 +1188,7 @@ data.bake-tests {
           python-program-complex/test1.py \
           python-program-complex/test2.py \
           python-program-complex/test3.py \
+          python-program-complex/test-disabled.py \
           python3-program-simple/expected \
           python3-program-simple/Recipe \
           python3-program-simple/test.py \
@@ -1191,6 +1206,7 @@ data.bake-tests {
           python-library-complex/test1.py \
           python-library-complex/test2.py \
           python-library-complex/test3.py \
+          python-library-complex/test-disabled.py \
           go-program-simple/expected \
           go-program-simple/Recipe \
           go-program-simple/test.go \
@@ -1205,6 +1221,7 @@ data.bake-tests {
           go-program-complex/test1.go \
           go-program-complex/test2.go \
           go-program-complex/test3.go \
+          go-program-complex/test-disabled.go \
           haskell-program-simple/expected \
           haskell-program-simple/Recipe \
           haskell-program-simple/test.hs \
@@ -1219,6 +1236,7 @@ data.bake-tests {
           haskell-program-complex/test1.hs \
           haskell-program-complex/test2.hs \
           haskell-program-complex/test3.hs \
+          haskell-program-complex/test-disabled.hs \
           data-simple/expected \
           data-simple/Recipe data-simple/test \
           data-complex/expected \
@@ -1266,6 +1284,7 @@ data.bake-tests {
           data-mallard-complex/Recipe \
           data-mallard-complex/index.page \
           data-mallard-complex/test.page \
+          data-mallard-complex/test-disabled.page \
           data-mallard-complex/fr.po \
           data-mallard-complex/it.po \
           data-gettext/expected \
@@ -1279,20 +1298,25 @@ data.bake-tests {
           data-gsettings-complex/expected \
           data-gsettings-complex/Recipe \
           data-gsettings-complex/com.example.Test.gschema.xml \
+          data-gsettings-complex/com.example.Disabled.gschema.xml \
           data-gsettings-complex/test.convert \
           data-gsettings-complex/test.override \
+          data-gsettings-complex/test-disabled.convert \
+          data-gsettings-complex/test-disabled.override \
           data-gtk-simple/expected \
           data-gtk-simple/Recipe \
           data-gtk-simple/test.ui \
           data-gtk-complex/expected \
           data-gtk-complex/Recipe \
           data-gtk-complex/test.ui \
+          data-gtk-complex/test-disabled.ui \
           data-xdg-desktop-simple/expected \
           data-xdg-desktop-simple/Recipe \
           data-xdg-desktop-simple/test.desktop \
           data-xdg-desktop-complex/expected \
           data-xdg-desktop-complex/Recipe \
           data-xdg-desktop-complex/test.desktop \
+          data-xdg-desktop-complex/test-disabled.desktop \
           data-xdg-icons-simple/expected \
           data-xdg-icons-simple/Recipe \
           data-xdg-icons-simple/test.png \
