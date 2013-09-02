@@ -1,6 +1,7 @@
 Overview of changes in bake 0.1.31
 
     * Support C source in Vala programs / libraries
+    * Support conditionals
 
 Overview of changes in bake 0.1.30
 
