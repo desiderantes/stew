@@ -1,3 +1,7 @@
+Overview of changes in bake 0.1.32
+
+    * Add missing test files
+
 Overview of changes in bake 0.1.31
 
     * Support C source in Vala programs / libraries
