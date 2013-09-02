@@ -18,12 +18,15 @@ valac --target-glib 2.32 -g --ccode test3.vala --use-fast-vapi=.built/test-test1
 mv test3.c .built/test-test3.c
 touch .built/test-test3.c-stamp
 gcc -w -DFOO=1 -g -Igobject -Iglib -c .built/test-test3.c -o .built/test-test3.o
-gcc -o test .built/test-test1.o .built/test-test2.o .built/test-test3.o -lm -lgobject -lglib
+gcc -DFOO=1 -g -Igobject -Iglib -c test-c.c -o .built/test-test-c.o
+gcc -o test .built/test-test1.o .built/test-test2.o .built/test-test3.o .built/test-test-c.o -lm -lgobject -lglib
 bake-gettext --domain test --mime-type text/x-vala --output .built/test1.vala.pot test1.vala
 bake-gettext --domain test --mime-type text/x-vala --output .built/test2.vala.pot test2.vala
 bake-gettext --domain test --mime-type text/x-vala --output .built/test3.vala.pot test3.vala
+bake-gettext --domain test --mime-type text/x-csrc --output .built/test-c.c.pot test-c.c
+bake-gettext --domain test --mime-type text/x-chdr --output .built/test-c.h.pot test-c.h
 bake-gettext --domain test --mime-type text/x-vala --output .built/test-disabled.vala.pot test-disabled.vala
-msgcat --force-po --output-file=test.pot .built/test1.vala.pot .built/test2.vala.pot .built/test3.vala.pot .built/test-disabled.vala.pot
+msgcat --force-po --output-file=test.pot .built/test1.vala.pot .built/test2.vala.pot .built/test3.vala.pot .built/test-c.c.pot .built/test-c.h.pot .built/test-disabled.vala.pot
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/bin

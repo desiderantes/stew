@@ -1,3 +1,7 @@
+Overview of changes in bake 0.1.31
+
+    * Support C source in Vala programs / libraries
+
 Overview of changes in bake 0.1.30
 
     * Fix regression where requested target was always built in the toplevel

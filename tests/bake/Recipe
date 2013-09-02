@@ -1062,6 +1062,8 @@ data.bake-tests {
           vala-program-complex/test1.vala \
           vala-program-complex/test2.vala \
           vala-program-complex/test3.vala \
+          vala-program-complex/test-c.c \
+          vala-program-complex/test-c.h \
           vala-program-relative-directories/expected \
           vala-program-relative-directories/Recipe \
           vala-program-relative-directories/parent.vala \
@@ -1102,6 +1104,8 @@ data.bake-tests {
           vala-library-complex/test1.vala \
           vala-library-complex/test2.vala \
           vala-library-complex/test3.vala \
+          vala-library-complex/test-c.c \
+          vala-library-complex/test-c.h \
           vala-library-relative-directories/expected \
           vala-library-relative-directories/Recipe \
           vala-library-relative-directories/parent.vala \

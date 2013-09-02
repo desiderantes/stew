@@ -341,90 +341,96 @@ public class ValaModule : BuildModule
 
             var source = entry.name;
 
-            if (!source.has_suffix (".vala"))
+            if (!(source.has_suffix (".vala") || source.has_suffix (".c")))
                 continue;
 
             var source_base = Path.get_basename (source);
-
-            var vapi_filename = recipe.get_build_path ("%s-%s".printf (compilable.id, replace_extension (source_base, "vapi")));
-            var vapi_stamp_filename = "%s-stamp".printf (vapi_filename);
-
-            /* Build a fastvapi file */
-            var rule = recipe.add_rule ();
-            rule.add_input (source);
-            rule.add_input (get_relative_path (recipe.dirname, "%s/".printf (recipe.build_directory)));
-            rule.add_output (vapi_filename);
-            rule.add_output (vapi_stamp_filename);
-            rule.add_status_command ("VALAC-FAST-VAPI %s".printf (source));
-            rule.add_command ("@valac --fast-vapi=%s %s".printf (vapi_filename, source));
-            rule.add_command ("@touch %s".printf (vapi_stamp_filename));
-
-            /* Combine the vapi files into a header */
-            if (compilable is Library)
-            {
-                interface_rule.add_input (vapi_filename);
-                interface_command += " --use-fast-vapi=%s".printf (vapi_filename);
-            }
-
-            var c_filename = recipe.get_build_path (compilable.id + "-" + replace_extension (source_base, "c"));
+            var c_filename = replace_extension (source_base, "c");
             var o_filename = recipe.get_build_path (compilable.id + "-" + replace_extension (source_base, "o"));
-            var c_stamp_filename = "%s-stamp".printf (c_filename);
 
-            /* valac doesn't allow the output file to be configured so we have to work out where it will write to
-             * https://bugzilla.gnome.org/show_bug.cgi?id=638871 */
-            var valac_c_filename = replace_extension (source, "c");
-            if (source.has_prefix (".."))
-                valac_c_filename = replace_extension (Path.get_basename (source), "c");
-
-            /* Build a C file */
-            rule = recipe.add_rule ();
-            rule.add_input (source);
-            foreach (var input in valac_inputs)
-                rule.add_input (input);
-            rule.add_output (c_filename);
-            rule.add_output (c_stamp_filename);
-            var command = valac_command + " --ccode %s".printf (source);
-            foreach (var e in compilable.get_sources ())
+            if (source.has_suffix (".vala"))
             {
-                if (!e.is_allowed)
-                    continue;
+                c_filename = recipe.get_build_path (compilable.id + "-" + c_filename);
+                var vapi_filename = recipe.get_build_path ("%s-%s".printf (compilable.id, replace_extension (source_base, "vapi")));
+                var vapi_stamp_filename = "%s-stamp".printf (vapi_filename);
 
-                var s = e.name;
+                /* Build a fastvapi file */
+                var rule = recipe.add_rule ();
+                rule.add_input (source);
+                rule.add_input (get_relative_path (recipe.dirname, "%s/".printf (recipe.build_directory)));
+                rule.add_output (vapi_filename);
+                rule.add_output (vapi_stamp_filename);
+                rule.add_status_command ("VALAC-FAST-VAPI %s".printf (source));
+                rule.add_command ("@valac --fast-vapi=%s %s".printf (vapi_filename, source));
+                rule.add_command ("@touch %s".printf (vapi_stamp_filename));
 
-                if (s == source)
-                    continue;
-
-                if (s.has_suffix (".vapi"))
+                /* Combine the vapi files into a header */
+                if (compilable is Library)
                 {
-                    command += " %s".printf (s);
-                    rule.add_input (s);
+                    interface_rule.add_input (vapi_filename);
+                    interface_command += " --use-fast-vapi=%s".printf (vapi_filename);
                 }
-                else
-                {
-                    var s_base = Path.get_basename (s);
-                    var other_vapi_filename = recipe.get_build_path ("%s-%s".printf (compilable.id, replace_extension (s_base, "vapi")));
-                    command += " --use-fast-vapi=%s".printf (other_vapi_filename);
-                    rule.add_input (other_vapi_filename);
-                }
-            }
-            foreach (var v in library_vapis)
-            {
-                command += " %s".printf (v);
-                rule.add_input (v);
-            }
 
-            rule.add_status_command ("VALAC %s".printf (source));
-            rule.add_command (command);
-            /* valac doesn't allow the output file to be configured so we have to move them
-             * https://bugzilla.gnome.org/show_bug.cgi?id=638871 */
-            rule.add_command ("@mv %s %s".printf (valac_c_filename, c_filename));
-            rule.add_command ("@touch %s".printf (c_stamp_filename));
+                var c_stamp_filename = "%s-stamp".printf (c_filename);
+
+                /* valac doesn't allow the output file to be configured so we have to work out where it will write to
+                 * https://bugzilla.gnome.org/show_bug.cgi?id=638871 */
+                var valac_c_filename = replace_extension (source, "c");
+                if (source.has_prefix (".."))
+                    valac_c_filename = replace_extension (Path.get_basename (source), "c");
+
+                /* Build a C file */
+                rule = recipe.add_rule ();
+                rule.add_input (source);
+                foreach (var input in valac_inputs)
+                    rule.add_input (input);
+                rule.add_output (c_filename);
+                rule.add_output (c_stamp_filename);
+                var command = valac_command + " --ccode %s".printf (source);
+                foreach (var e in compilable.get_sources ())
+                {
+                    if (!e.is_allowed)
+                        continue;
+
+                    var s = e.name;
+
+                    if (s == source)
+                        continue;
+
+                    if (s.has_suffix (".vapi"))
+                    {
+                        command += " %s".printf (s);
+                        rule.add_input (s);
+                    }
+                    else if (s.has_suffix (".vala"))
+                    {
+                        var s_base = Path.get_basename (s);
+                        var other_vapi_filename = recipe.get_build_path ("%s-%s".printf (compilable.id, replace_extension (s_base, "vapi")));
+                        command += " --use-fast-vapi=%s".printf (other_vapi_filename);
+                        rule.add_input (other_vapi_filename);
+                    }
+                }
+                foreach (var v in library_vapis)
+                {
+                    command += " %s".printf (v);
+                    rule.add_input (v);
+                }
+
+                rule.add_status_command ("VALAC %s".printf (source));
+                rule.add_command (command);
+                /* valac doesn't allow the output file to be configured so we have to move them
+                 * https://bugzilla.gnome.org/show_bug.cgi?id=638871 */
+                rule.add_command ("@mv %s %s".printf (valac_c_filename, c_filename));
+                rule.add_command ("@touch %s".printf (c_stamp_filename));
+            }
 
             /* Compile C code */
-            rule = recipe.add_rule ();
+            var rule = recipe.add_rule ();
             rule.add_input (c_filename);
             rule.add_output (o_filename);
-            command = "@gcc -w";
+            var command = "@gcc";
+            if (source.has_suffix (".vala"))
+                command += " -w";
             if (compilable is Library)
                 command += " -fPIC";
             if (compile_flags != "")
@@ -462,15 +468,19 @@ public class ValaModule : BuildModule
     
     private bool can_generate_rules (Compilable compilable) throws Error
     {
-        var n_sources = 0;
+        var n_vala_sources = 0;
+        var n_c_sources = 0;
         foreach (var entry in compilable.get_sources ())
         {
             var source = entry.name;
-            if (!(source.has_suffix (".vala") || source.has_suffix (".vapi")))
+            if (source.has_suffix (".vala") || source.has_suffix (".vapi"))
+                n_vala_sources++;
+            else if (source.has_suffix (".c") || source.has_suffix (".h"))
+                n_c_sources++;
+            else
                 return false;
-            n_sources++;
         }
-        if (n_sources == 0)
+        if (n_vala_sources == 0)
             return false;
 
         if (Environment.find_program_in_path ("valac") == null || Environment.find_program_in_path ("gcc") == null)
@@ -485,6 +495,14 @@ public class ValaModule : BuildModule
             return;
 
         foreach (var entry in compilable.get_sources ())
-            GettextModule.add_translatable_file (compilable.recipe, compilable.gettext_domain, "text/x-vala", entry.name);
+        {
+            var source = entry.name;
+            if (source.has_suffix (".vala") || source.has_suffix (".vapi"))
+                GettextModule.add_translatable_file (compilable.recipe, compilable.gettext_domain, "text/x-vala", source);
+            else if (source.has_suffix (".c"))
+                GettextModule.add_translatable_file (compilable.recipe, compilable.gettext_domain, "text/x-csrc", source);
+            else if (source.has_suffix (".h"))
+                GettextModule.add_translatable_file (compilable.recipe, compilable.gettext_domain, "text/x-chdr", source);
+        }
     }
 }

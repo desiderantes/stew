@@ -6,6 +6,8 @@ programs.test {
   sources = test1.vala \
             test2.vala \
             test3.vala \
+            test-c.c \
+            test-c.h \
             test-disabled.vala (if false)
   gettext-domain = test
   vala-compile-flags = --target-glib 2.32
