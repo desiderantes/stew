@@ -742,6 +742,12 @@ programs.test-bake {
     data-xdg-icons-complex {
       args = data-xdg-icons-complex
     }
+    data-xdg-appdata-simple {
+      args = data-xdg-appdata-simple
+    }
+    data-xdg-appdata-complex {
+      args = data-xdg-appdata-complex
+    }
 
     # Release tests
     release-gzip {
@@ -1324,6 +1330,13 @@ data.bake-tests {
           data-xdg-icons-complex/Recipe \
           data-xdg-icons-complex/32x32/test.png \
           data-xdg-icons-complex/64x64/test.png \
+          data-xdg-appdata-simple/expected \
+          data-xdg-appdata-simple/Recipe \
+          data-xdg-appdata-simple/test.appdata.xml \
+          data-xdg-appdata-complex/expected \
+          data-xdg-appdata-complex/Recipe \
+          data-xdg-appdata-complex/test.appdata.xml \
+          data-xdg-appdata-complex/test-disabled.appdata.xml \
           release-gzip/expected \
           release-gzip/Recipe \
           release-bzip/expected \

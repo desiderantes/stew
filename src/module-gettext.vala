@@ -44,6 +44,12 @@ public class GettextModule : BuildModule
             var extract_command = "@itstool --output %s %s".printf (translation_file, filename);
             rule.add_command (extract_command);
         }
+        else if (mime_type == "application/x-appdata")
+        {
+            rule.add_status_command ("ITSTOOL %s".printf (filename));
+            var extract_command = "@itstool --output %s %s".printf (translation_file, filename);
+            rule.add_command (extract_command);
+        }
         else
         {
             rule.add_status_command ("GETTEXT %s".printf (filename));

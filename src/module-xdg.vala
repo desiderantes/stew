@@ -40,5 +40,19 @@ public class XdgModule : BuildModule
             var icon_file = entry.name;
             recipe.add_install_rule (icon_file, icon_dir, Path.get_basename (icon_file));
         }
+
+        var appdata_dir = Path.build_filename (recipe.data_directory, "appdata");
+        foreach (var entry in data.get_tagged_list ("xdg-appdata-files"))
+        {
+            var appdata_file = entry.name;
+
+            if (data.gettext_domain != null)
+                GettextModule.add_translatable_file (recipe, data.gettext_domain, "application/x-appdata", appdata_file);
+
+            if (!entry.is_allowed)
+                continue;
+
+            recipe.add_install_rule (appdata_file, appdata_dir);
+        }
     }
 }

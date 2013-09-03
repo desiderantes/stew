@@ -1,0 +1,24 @@
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="xdg-appdata">
+<info>
+    <link type="guide" xref="index#data"/>
+</info>
+
+<title>XDG Application Data Files</title>
+
+<p>
+Applications can install application data to describe information about the application.
+The application data file(s) need to be listed with the <code>data.<em>name</em>.xdg-appdata-files</code> <link xref="variables">variable</link>.
+If present, the files are <link xref="translation">translated</link> using the <code>data.<em>name</em>.gettext-domain</code> gettext domain.
+</p>
+<example>
+<p>
+For example, this <link xref="recipe-files">recipe</link> specifies an application data file to install.
+</p>
+<code>
+data.example {
+  xdg-desktop-files = example.appdata.xml
+  gettext-domain = example
+}
+</code>
+</example>
+</page>
