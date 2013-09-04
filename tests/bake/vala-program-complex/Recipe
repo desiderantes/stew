@@ -5,7 +5,7 @@ project {
 programs.test {
   sources = test1.vala \
             test2.vala \
-            test3.vala \
+            subdir/test2.vala \
             test-c.c \
             test-c.h \
             test-disabled.vala (if false)

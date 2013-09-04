@@ -1076,7 +1076,7 @@ data.bake-tests {
           vala-program-complex/Recipe \
           vala-program-complex/test1.vala \
           vala-program-complex/test2.vala \
-          vala-program-complex/test3.vala \
+          vala-program-complex/subdir/test2.vala \
           vala-program-complex/test-c.c \
           vala-program-complex/test-c.h \
           vala-program-complex/test-disabled.vala \

@@ -333,6 +333,24 @@ public class ValaModule : BuildModule
             }
         }
 
+        var intermediate_names = new HashTable<string, string> (str_hash, str_equal);
+        var used_names = new HashTable<string, bool> (str_hash, str_equal);
+        foreach (var entry in compilable.get_sources ())
+        {
+            var base_name = compilable.id + "-" + Path.get_basename (remove_extension (entry.name));
+            var intermediate_name = base_name;
+            for (var i = 0; ; i++)
+            {
+                if (!used_names.lookup (intermediate_name))
+                {
+                    intermediate_names.insert (entry.name, intermediate_name);
+                    used_names.insert (intermediate_name, true);
+                    break;
+                }
+                intermediate_name = "%s~%d".printf (base_name, i + 1);
+            }
+        }
+
         /* Compile the sources */
         foreach (var entry in compilable.get_sources ())
         {
@@ -344,14 +362,13 @@ public class ValaModule : BuildModule
             if (!(source.has_suffix (".vala") || source.has_suffix (".c")))
                 continue;
 
-            var source_base = Path.get_basename (source);
-            var c_filename = replace_extension (source_base, "c");
-            var o_filename = recipe.get_build_path (compilable.id + "-" + replace_extension (source_base, "o"));
+            var o_filename = recipe.get_build_path (intermediate_names.lookup (source) + ".o");
 
+            string c_filename;
             if (source.has_suffix (".vala"))
             {
-                c_filename = recipe.get_build_path (compilable.id + "-" + c_filename);
-                var vapi_filename = recipe.get_build_path ("%s-%s".printf (compilable.id, replace_extension (source_base, "vapi")));
+                c_filename = replace_extension (o_filename, "c");
+                var vapi_filename = replace_extension (o_filename, "vapi");
                 var vapi_stamp_filename = "%s-stamp".printf (vapi_filename);
 
                 /* Build a fastvapi file */
@@ -404,8 +421,7 @@ public class ValaModule : BuildModule
                     }
                     else if (s.has_suffix (".vala"))
                     {
-                        var s_base = Path.get_basename (s);
-                        var other_vapi_filename = recipe.get_build_path ("%s-%s".printf (compilable.id, replace_extension (s_base, "vapi")));
+                        var other_vapi_filename = recipe.get_build_path (replace_extension (intermediate_names.lookup (s), "vapi"));
                         command += " --use-fast-vapi=%s".printf (other_vapi_filename);
                         rule.add_input (other_vapi_filename);
                     }
@@ -423,6 +439,8 @@ public class ValaModule : BuildModule
                 rule.add_command ("@mv %s %s".printf (valac_c_filename, c_filename));
                 rule.add_command ("@touch %s".printf (c_stamp_filename));
             }
+            else
+                c_filename = source;
 
             /* Compile C code */
             var rule = recipe.add_rule ();
