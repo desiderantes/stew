@@ -546,6 +546,7 @@ public class Bake
     private static bool do_configure = false;
     private static bool do_unconfigure = false;
     private static bool do_parallel = false;
+    private static bool do_list_targets = false;
     private static bool do_expand = false;
     private static string color_mode = "auto";
     private static const OptionEntry[] command_line_options =
@@ -562,6 +563,9 @@ public class Bake
         { "parallel", 0, 0, OptionArg.NONE, ref do_parallel,
           /* Help string for command line --parallel flag */
           N_("Run commands in parallel"), null},
+        { "list-targets", 0, 0, OptionArg.NONE, ref do_list_targets,
+          /* Help string for command line --list-targets flag */
+          N_("List available targets"), null},
         { "expand", 0, 0, OptionArg.NONE, ref do_expand,
           /* Help string for command line --expand flag */
           N_("Expand current recipe and print to stdout"), null},
@@ -1192,6 +1196,29 @@ public class Bake
         if (do_expand)
         {
             stdout.printf (recipe.to_string ());
+            return Posix.EXIT_SUCCESS;
+        }
+
+        if (do_list_targets)
+        {
+            var targets = new List<string> ();
+            var build_dir = "%s/".printf (get_relative_path (recipe.dirname, recipe.build_directory));
+            foreach (var rule in recipe.rules)
+            {
+                foreach (var output in rule.outputs)
+                {
+                    /* Hide intermediate targets */
+                    if (output.has_prefix (build_dir))
+                        continue;
+
+                    targets.append (output);
+                }
+            }
+
+            targets.sort (strcmp);
+            foreach (var target in targets)
+                stdout.printf ("%s\n", target);
+
             return Posix.EXIT_SUCCESS;
         }
 

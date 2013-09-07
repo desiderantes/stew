@@ -60,7 +60,7 @@ public class Builder
                 return false;
 
             /* If doesn't exist then we can't continue */
-            errors.append ("File '%s' does not exist and no rule to build it".printf (get_relative_path (original_dir, target)));
+            errors.append ("File '%s' does not exist and no rule to build it.\nRun bake --list-targets to see which targets can be built.".printf (get_relative_path (original_dir, target)));
             return false;
         }
 
