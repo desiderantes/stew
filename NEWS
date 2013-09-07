@@ -1,3 +1,12 @@
+Overview of changes in bake 0.1.33
+
+    * Add basic support for clang
+    * Make able to explicitly choose compiler with programs.*.compiler or
+      libraries.*.compiler
+    * Add bake --list-targets
+    * Support re-using the same name for Vala sources
+    * Support appdata
+
 Overview of changes in bake 0.1.32
 
     * Add missing test files
