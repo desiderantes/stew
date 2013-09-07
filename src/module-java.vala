@@ -55,6 +55,9 @@ public class JavaModule : BuildModule
 
     private bool can_generate_rules (Compilable compilable) throws Error
     {
+        if (compilable.compiler != null)
+            return compilable.compiler == "java";
+
         if (Environment.find_program_in_path ("javac") == null || Environment.find_program_in_path ("jar") == null)
             return false;
 

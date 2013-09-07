@@ -12,6 +12,9 @@ public class ScriptModule : BuildModule
 {
     public override bool can_generate_program_rules (Program program) throws Error
     {
+        if (program.compiler != null)
+            return program.compiler == "script";
+
         if (program.get_sources () != null)
             return false;
 

@@ -71,6 +71,9 @@ public class PythonModule : BuildModule
 
     private bool can_generate_rules (Compilable compilable) throws Error
     {
+        if (compilable.compiler != null)
+            return compilable.compiler == "python";
+
         var count = 0;
         foreach (var entry in compilable.get_sources ())
         {

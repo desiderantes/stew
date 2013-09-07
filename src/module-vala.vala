@@ -486,6 +486,9 @@ public class ValaModule : BuildModule
     
     private bool can_generate_rules (Compilable compilable) throws Error
     {
+        if (compilable.compiler != null)
+            return compilable.compiler == "vala";
+
         var n_vala_sources = 0;
         var n_c_sources = 0;
         foreach (var entry in compilable.get_sources ())

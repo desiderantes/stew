@@ -36,6 +36,9 @@ public class MonoModule : BuildModule
 
     private bool can_generate_rules (Compilable compilable) throws Error
     {
+        if (compilable.compiler != null)
+            return compilable.compiler == "mono";
+
         var count = 0;
         foreach (var entry in compilable.get_sources ())
         {

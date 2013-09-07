@@ -12,6 +12,9 @@ public class GHCModule : BuildModule
 {
     public override bool can_generate_program_rules (Program program) throws Error
     {
+        if (program.compiler != null)
+            return program.compiler == "ghc";
+
         var count = 0;
         foreach (var entry in program.get_sources ())
         {
