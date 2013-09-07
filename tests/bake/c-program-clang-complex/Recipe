@@ -1,0 +1,17 @@
+project {
+  name = test-project
+}
+
+programs.test {
+  compiler = clang
+  sources = test1.c \
+            test2.c \
+            test3.c \
+            test-disabled.c (if false)
+  gettext-domain = test
+  compile-flags = -DFOO=1 \
+                  -DBAR=2
+  link-flags = -lm \
+               -lz
+  debug = true
+}

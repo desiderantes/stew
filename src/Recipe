@@ -26,6 +26,7 @@ programs {
               fixes.vapi \
               module-bzip.vala \
               module-bzr.vala \
+              module-clang.vala \
               module-data.vala \
               module-dpkg.vala \
               module-gcc.vala \

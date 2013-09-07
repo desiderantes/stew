@@ -24,6 +24,10 @@ The following variables are allowed:
   <td><p>The name of this program (optional, defaults to the ID)</p></td>
 </tr>
 <tr>
+  <td><p>compiler</p></td>
+  <td><p>Compiler to compile with (optional, defaults to automatic detection)</p></td>
+</tr>
+<tr>
   <td><p>sources</p></td>
   <td><p>The files that make up this program</p></td>
 </tr>

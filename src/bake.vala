@@ -285,6 +285,8 @@ public class Compilable : Block
         base (recipe, type_name, id);
     }
 
+    public string? compiler { owned get { return get_variable ("compiler"); } }
+
     public string name { owned get { return get_variable ("name", id); } }
 
     public string? gettext_domain { owned get { return get_variable ("gettext-domain"); } }
@@ -881,6 +883,7 @@ public class Bake
         modules.append (new DataModule ());
         modules.append (new DpkgModule ());
         modules.append (new GCCModule ());
+        modules.append (new ClangModule ());
         modules.append (new GettextModule ());
         modules.append (new GHCModule ());
         modules.append (new GITModule ());

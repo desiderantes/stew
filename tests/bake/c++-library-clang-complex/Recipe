@@ -1,0 +1,15 @@
+project {
+  name = test-project
+}
+
+libraries.test {
+  compiler = clang
+  sources = test1.cpp \
+            test2.cpp \
+            test3.cpp \
+            test-disabled.cpp (if false)
+  so-version = 1.2
+  headers = test.h
+  gettext-domain = test
+  debug = true
+}

@@ -8,7 +8,7 @@
  * license.
  */
 
-public class GCCModule : BuildModule
+public class ClangModule : BuildModule
 {
     public override bool can_generate_program_rules (Program program) throws Error
     {
@@ -71,65 +71,18 @@ public class GCCModule : BuildModule
                 recipe.add_install_rule (entry.name, include_directory);
             }
         }
-
-        /* Generate introspection */
-        var gir_namespace = library.get_variable ("gir-namespace");
-        if (gir_namespace != null)
-        {
-            var gir_namespace_version = library.get_variable ("gir-namespace-version", "0");
-
-            /* Generate a .gir from the sources */
-            var gir_filename = "%s-%s.gir".printf (gir_namespace, gir_namespace_version);
-            recipe.build_rule.add_input (gir_filename);
-            var gir_rule = recipe.add_rule ();
-            gir_rule.add_input ("lib%s.so".printf (library.name));
-            gir_rule.add_output (gir_filename);
-            gir_rule.add_status_command ("G-IR-SCANNER %s".printf (gir_filename));
-            var scan_command = "@g-ir-scanner --no-libtool --namespace=%s --nsversion=%s --library=%s --output %s".printf (gir_namespace, gir_namespace_version, library.name, gir_filename);
-            // FIXME: Need to sort out inputs correctly
-            scan_command += " --include=GObject-2.0";
-            foreach (var entry in library.get_sources ())
-            {
-                if (!entry.is_allowed)
-                    continue;
-                gir_rule.add_input (entry.name);
-                scan_command += " %s".printf (entry.name);
-            }
-            foreach (var entry in headers)
-            {
-                if (!entry.is_allowed)
-                    continue;
-
-                var header = entry.name;
-                gir_rule.add_input (header);
-                scan_command += " %s".printf (header);
-            }
-            gir_rule.add_command (scan_command);
-            var gir_directory = Path.build_filename (recipe.data_directory, "gir-1.0");
-            if (library.install)
-                recipe.add_install_rule (gir_filename, gir_directory);
-
-            /* Compile the .gir into a typelib */
-            var typelib_filename = "%s-%s.typelib".printf (gir_namespace, gir_namespace_version);
-            recipe.build_rule.add_input (typelib_filename);
-            var typelib_rule = recipe.add_rule ();
-            typelib_rule.add_input (gir_filename);
-            typelib_rule.add_input ("lib%s.so".printf (library.name));
-            typelib_rule.add_output (typelib_filename);
-            typelib_rule.add_status_command ("G-IR-COMPILER %s".printf (typelib_filename));
-            typelib_rule.add_command ("@g-ir-compiler --shared-library=%s %s -o %s".printf (library.name, gir_filename, typelib_filename));
-            var typelib_directory = Path.build_filename (library.install_directory, "girepository-1.0");
-            if (library.install)
-                recipe.add_install_rule (typelib_filename, typelib_directory);
-        }
     }
 
     private bool can_generate_rules (Compilable compilable) throws Error
     {
         if (compilable.compiler != null)
-            return compilable.compiler == "gcc";
+            return compilable.compiler == "clang";
 
-        if (get_compiler (compilable) == null)
+        var compiler = get_compiler (compilable);
+        if (compiler == null)
+            return false;
+
+        if (Environment.find_program_in_path ("compiler") == null)
             return false;
 
         return true;
@@ -137,33 +90,40 @@ public class GCCModule : BuildModule
 
     private string? get_compiler (Compilable compilable) throws Error
     {
-        string? compiler = null;
+        var compiler = "clang";
+        var n_sources = 0;
         foreach (var entry in compilable.get_sources ())
         {
             var source = entry.name;
 
-            if (source.has_suffix (".h"))
-                continue;
-
-            var c = get_compiler_for_source_file (source);
-            if (c == null || Environment.find_program_in_path (c) == null)
+            switch (get_mime_type (source))
+            {
+            case "text/x-csrc":
+                n_sources++;
+                break;
+            case "text/x-chdr":
+                break;
+            case "text/x-c++src":
+                n_sources++;
+                compiler = "clang++";
+                break;
+            default:
                 return null;
-
-            if (compiler != null && c != compiler)
-                return null;
-            compiler = c;
+            }
         }
+
+        if (n_sources == 0)
+            return null;
 
         return compiler;
     }
+
 
     private void generate_compile_rules (Compilable compilable) throws Error
     {
         var recipe = compilable.recipe;
 
         var compiler = get_compiler (compilable);
-
-        var is_qt = compilable.get_boolean_variable ("qt");
 
         var binary_name = compilable.name;
         if (compilable is Library)
@@ -310,39 +270,17 @@ public class GCCModule : BuildModule
 
             var input = source;
             var output = recipe.get_build_path (compilable.id + "-" + replace_extension (source_base, "o"));
-            var deps_file = recipe.get_build_path (compilable.id + "-" + replace_extension (source_base, "d"));
-            var moc_file = replace_extension (source, "moc");
 
             var rule = recipe.add_rule ();
             rule.add_input (input);
-            if (compiler == "gcc" || compiler == "g++")
-            {
-                var includes = get_includes (deps_file);
-                foreach (var include in includes)
-                    rule.add_input (include);
-            }
-            if (is_qt && input.has_suffix (".cpp"))
-            {
-                rule.add_input (moc_file);
-                var moc_rule = recipe.add_rule ();
-                moc_rule.add_input (input);
-                moc_rule.add_output (moc_file);
-                moc_rule.add_status_command ("MOC %s".printf (input));
-                moc_rule.add_command ("@moc -o %s %s".printf (moc_file, input));
-            }
             rule.add_output (output);
             var command = "@%s".printf (compiler);
             if (compilable is Library)
                 command += " -fPIC";
             if (compile_flags != "")
                 command += " " + compile_flags;
-            if (compiler == "gcc" || compiler == "g++")
-            {
-                command += " -MMD -MF %s".printf (deps_file);
-                rule.add_output (deps_file);
-            }
             command += " -c %s -o %s".printf (input, output);
-            rule.add_status_command ("GCC %s".printf (input));
+            rule.add_status_command ("CLANG %s".printf (input));
             rule.add_command (command);
 
             link_rule.add_input (output);
@@ -355,7 +293,7 @@ public class GCCModule : BuildModule
             }
         }
 
-        link_rule.add_status_command ("GCC-LINK %s".printf (binary_name));
+        link_rule.add_status_command ("CLANG-LINK %s".printf (binary_name));
         if (link_flags != null)
             link_command += " " + link_flags;
         link_rule.add_command (link_command);
@@ -376,67 +314,6 @@ public class GCCModule : BuildModule
                     GettextModule.add_translatable_file (recipe, compilable.gettext_domain, mime_type, source);
             }
         }
-    }
-
-    private List<string> get_includes (string filename)
-    {
-        List<string> includes = null;
-
-        /* Get dependencies for this file, it will not exist if the file hasn't built (but then we don't need it) */
-        string data;
-        try
-        {
-            FileUtils.get_contents (filename, out data);
-        }
-        catch (FileError e)
-        {
-            return includes;
-        }
-        data = strip (data);
-
-        /* Line is in the form "output: input1 input2", skip the first two as we know output and the primary input */
-        data = data.replace ("\\\n", " ");
-        var tokens = data.split (" ");
-        for (var i = 2; i < tokens.length; i++)
-        {
-            if (tokens[i] != "")
-                includes.append (tokens[i]);
-        }
-
-        return includes;
-    }
-
-    private string? get_compiler_for_source_file (string source)
-    {
-        /* C */
-        if (source.has_suffix (".c"))
-            return "gcc";
-        /* C++ */
-        else if (source.has_suffix (".cpp") ||
-                 source.has_suffix (".C") ||
-                 source.has_suffix (".cc") ||
-                 source.has_suffix (".CPP") ||
-                 source.has_suffix (".c++") ||
-                 source.has_suffix (".cp") ||
-                 source.has_suffix (".cxx"))
-            return "g++";
-        /* Objective C */
-        else if (source.has_suffix (".m"))
-            return "gcc";
-        /* Go */
-        else if (source.has_suffix (".go"))
-            return "gccgo";
-        /* Fortran */
-        else if (source.has_suffix (".f") ||
-                 source.has_suffix (".for") ||
-                 source.has_suffix (".ftn") ||
-                 source.has_suffix (".f90") ||
-                 source.has_suffix (".f95") ||
-                 source.has_suffix (".f03") ||
-                 source.has_suffix (".f08"))
-            return "gfortran";
-        else
-            return null;   
     }
 
     private string? get_mime_type (string source)

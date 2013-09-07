@@ -19,6 +19,20 @@ programs.cat {
   install = false
 }
 
+programs.clang {
+  sources = clang.vala status.vala
+  vala-packages = posix gio-2.0 gio-unix-2.0
+  packages = gio-2.0 gio-unix-2.0
+  install = false
+}
+
+programs.clang++ {
+  sources = clang++.vala status.vala
+  vala-packages = posix gio-2.0 gio-unix-2.0
+  packages = gio-2.0 gio-unix-2.0
+  install = false
+}
+
 programs.cp {
   sources = cp.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
@@ -493,6 +507,32 @@ programs.test-bake {
       args = c++-library-complex
     }
 
+    # Clang tests
+    c-program-clang-simple {
+      args = c-program-clang-simple
+    }
+    c-program-clang-complex {
+      args = c-program-clang-complex
+    }
+    c-library-clang-simple {
+      args = c-library-clang-simple
+    }
+    c-library-clang-complex {
+      args = c-library-clang-complex
+    }
+    c++-program-clang-simple {
+      args = c++-program-clang-simple
+    }
+    c++-program-clang-complex {
+      args = c++-program-clang-complex
+    }
+    c++-library-clang-simple {
+      args = c++-library-clang-simple
+    }
+    c++-library-clang-complex {
+      args = c++-library-clang-complex
+    }
+
     # Qt tests
     qt-program-simple {
       args = qt-program-simple
@@ -851,21 +891,27 @@ data.bake-tests {
           tests-complex-failure/expected \
           tests-complex-failure/Recipe \
           tests-complex-failure/test \
-          c-program-simple/expected \
-          c-program-simple/Recipe \
-          c-program-simple/test.c \
-          c-program-no-install/expected \
-          c-program-no-install/Recipe \
-          c-program-no-install/test.c \
-          c-program-install-directory/expected \
-          c-program-install-directory/Recipe \
-          c-program-install-directory/test.c \
+          c-program-clang-complex/expected \
+          c-program-clang-complex/Recipe \
+          c-program-clang-complex/test1.c \
+          c-program-clang-complex/test2.c \
+          c-program-clang-complex/test3.c \
+          c-program-clang-complex/test-disabled.c \
+          c-program-clang-simple/expected \
+          c-program-clang-simple/Recipe \
+          c-program-clang-simple/test.c \
           c-program-complex/expected \
           c-program-complex/Recipe \
           c-program-complex/test1.c \
           c-program-complex/test2.c \
           c-program-complex/test3.c \
           c-program-complex/test-disabled.c \
+          c-program-no-install/expected \
+          c-program-no-install/Recipe \
+          c-program-no-install/test.c \
+          c-program-install-directory/expected \
+          c-program-install-directory/Recipe \
+          c-program-install-directory/test.c \
           c-program-relative-directories/expected \
           c-program-relative-directories/Recipe \
           c-program-relative-directories/parent.c \
@@ -878,6 +924,9 @@ data.bake-tests {
           c-program-shared-source/shared.c \
           c-program-shared-source/test1.c \
           c-program-shared-source/test2.c \
+          c-program-simple/expected \
+          c-program-simple/Recipe \
+          c-program-simple/test.c \
           c-program-library/expected \
           c-program-library/Recipe \
           c-program-library/test.c \
@@ -925,15 +974,17 @@ data.bake-tests {
           c-program-local-library-missing/expected \
           c-program-local-library-missing/Recipe \
           c-program-local-library-missing/main.c \
-          c-library-simple/expected \
-          c-library-simple/Recipe \
-          c-library-simple/test.c \
-          c-library-no-install/expected \
-          c-library-no-install/Recipe \
-          c-library-no-install/test.c \
-          c-library-install-directory/expected \
-          c-library-install-directory/Recipe \
-          c-library-install-directory/test.c \
+          c-library-clang-simple/expected \
+          c-library-clang-simple/Recipe \
+          c-library-clang-simple/test.c \
+          c-library-clang-complex/expected \
+          c-library-clang-complex/Recipe \
+          c-library-clang-complex/test1.c \
+          c-library-clang-complex/test2.c \
+          c-library-clang-complex/test3.c \
+          c-library-clang-complex/test-disabled.c \
+          c-library-clang-complex/test-disabled.h \
+          c-library-clang-complex/test.h \
           c-library-complex/expected \
           c-library-complex/Recipe \
           c-library-complex/test1.c \
@@ -942,6 +993,12 @@ data.bake-tests {
           c-library-complex/test-disabled.c \
           c-library-complex/test-disabled.h \
           c-library-complex/test.h \
+          c-library-no-install/expected \
+          c-library-no-install/Recipe \
+          c-library-no-install/test.c \
+          c-library-install-directory/expected \
+          c-library-install-directory/Recipe \
+          c-library-install-directory/test.c \
           c-library-relative-directories/expected \
           c-library-relative-directories/Recipe \
           c-library-relative-directories/parent.c \
@@ -954,27 +1011,36 @@ data.bake-tests {
           c-library-shared-source/shared.c \
           c-library-shared-source/test1.c \
           c-library-shared-source/test2.c \
+          c-library-simple/expected \
+          c-library-simple/Recipe \
+          c-library-simple/test.c \
           c-library-gir-simple/expected \
           c-library-gir-simple/Recipe \
           c-library-gir-simple/test.c \
           c-library-gir-complex/expected \
           c-library-gir-complex/Recipe \
           c-library-gir-complex/test.c \
-          c++-program-simple/expected \
-          c++-program-simple/Recipe \
-          c++-program-simple/test.cpp \
-          c++-program-no-install/expected \
-          c++-program-no-install/Recipe \
-          c++-program-no-install/test.cpp \
-          c++-program-install-directory/expected \
-          c++-program-install-directory/Recipe \
-          c++-program-install-directory/test.cpp \
+          c++-program-clang-simple/expected \
+          c++-program-clang-simple/Recipe \
+          c++-program-clang-simple/test.cpp \
+          c++-program-clang-complex/expected \
+          c++-program-clang-complex/Recipe \
+          c++-program-clang-complex/test1.cpp \
+          c++-program-clang-complex/test2.cpp \
+          c++-program-clang-complex/test3.cpp \
+          c++-program-clang-complex/test-disabled.cpp \
           c++-program-complex/expected \
           c++-program-complex/Recipe \
           c++-program-complex/test1.cpp \
           c++-program-complex/test2.cpp \
           c++-program-complex/test3.cpp \
           c++-program-complex/test-disabled.cpp \
+          c++-program-no-install/expected \
+          c++-program-no-install/Recipe \
+          c++-program-no-install/test.cpp \
+          c++-program-install-directory/expected \
+          c++-program-install-directory/Recipe \
+          c++-program-install-directory/test.cpp \
           c++-program-local-library/expected \
           c++-program-local-library/Recipe \
           c++-program-local-library/main.cpp \
@@ -986,15 +1052,19 @@ data.bake-tests {
           c++-program-local-library-missing/expected \
           c++-program-local-library-missing/Recipe \
           c++-program-local-library-missing/main.cpp \
-          c++-library-simple/expected \
-          c++-library-simple/Recipe \
-          c++-library-simple/test.cpp \
-          c++-library-no-install/expected \
-          c++-library-no-install/Recipe \
-          c++-library-no-install/test.cpp \
-          c++-library-install-directory/expected \
-          c++-library-install-directory/Recipe \
-          c++-library-install-directory/test.cpp \
+          c++-program-simple/expected \
+          c++-program-simple/Recipe \
+          c++-program-simple/test.cpp \
+          c++-library-clang-simple/expected \
+          c++-library-clang-simple/Recipe \
+          c++-library-clang-simple/test.cpp \
+          c++-library-clang-complex/expected \
+          c++-library-clang-complex/Recipe \
+          c++-library-clang-complex/test.h \
+          c++-library-clang-complex/test1.cpp \
+          c++-library-clang-complex/test2.cpp \
+          c++-library-clang-complex/test3.cpp \
+          c++-library-clang-complex/test-disabled.cpp \
           c++-library-complex/expected \
           c++-library-complex/Recipe \
           c++-library-complex/test.h \
@@ -1002,6 +1072,15 @@ data.bake-tests {
           c++-library-complex/test2.cpp \
           c++-library-complex/test3.cpp \
           c++-library-complex/test-disabled.cpp \
+          c++-library-no-install/expected \
+          c++-library-no-install/Recipe \
+          c++-library-no-install/test.cpp \
+          c++-library-install-directory/expected \
+          c++-library-install-directory/Recipe \
+          c++-library-install-directory/test.cpp \
+          c++-library-simple/expected \
+          c++-library-simple/Recipe \
+          c++-library-simple/test.cpp \
           qt-program-simple/expected \
           qt-program-simple/Recipe \
           qt-program-simple/test.cpp \

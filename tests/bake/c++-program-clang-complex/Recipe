@@ -1,0 +1,13 @@
+project {
+  name = test-project
+}
+
+programs.test {
+  compiler = clang
+  sources = test1.cpp \
+            test2.cpp \
+            test3.cpp \
+            test-disabled.cpp (if false)
+  gettext-domain = test
+  debug = true
+}

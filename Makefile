@@ -17,6 +17,7 @@ SOURCES = src/bake.vala \
           src/fixes.vapi \
           src/module-bzip.vala \
           src/module-bzr.vala \
+          src/module-clang.vala \
           src/module-data.vala \
           src/module-dpkg.vala \
           src/module-gcc.vala \
