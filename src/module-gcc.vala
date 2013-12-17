@@ -392,7 +392,7 @@ public class GCCModule : BuildModule
         {
             return includes;
         }
-        data = strip (data);
+        data = data.strip ();
 
         /* Line is in the form "output: input1 input2", skip the first two as we know output and the primary input */
         data = data.replace ("\\\n", " ");

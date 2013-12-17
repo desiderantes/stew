@@ -198,7 +198,7 @@ public class Recipe
         {
             line_number++;
 
-            line = chomp (line);
+            line = line.chomp ();
             if (line.has_suffix ("\\"))
             {
                 continued_line += line.substring (0, line.length - 1) + "\n";
@@ -238,7 +238,7 @@ public class Recipe
             var index = statement.index_of ("{");
             if (index >= 0)
             {
-                var name = strip (statement.substring (0, index));
+                var name = statement.substring (0, index).strip ();
                 if (variable_stack == null)
                     variable_stack.prepend (new VariableBlock (line_number, name));
                 else
@@ -263,10 +263,10 @@ public class Recipe
             index = statement.index_of ("=");
             if (index > 0)
             {
-                var name = strip (statement.substring (0, index));
+                var name = statement.substring (0, index).strip ();
                 if (variable_stack != null)
                     name = "%s.%s".printf (variable_stack.nth_data (0).name, name);
-                var value = strip (statement.substring (index + 1));
+                var value = statement.substring (index + 1).strip ();
 
                 set_variable (name, value);
                 continue;
@@ -278,11 +278,11 @@ public class Recipe
             {
                 var rule = add_rule ();
 
-                var input_list = chomp (statement.substring (0, index));
+                var input_list = statement.substring (0, index).chomp ();
                 foreach (var output in split_variable (input_list))
                     rule.add_output (output);
 
-                var output_list = strip (statement.substring (index + 1));
+                var output_list = statement.substring (index + 1).strip ();
                 foreach (var input in split_variable (output_list))
                     rule.add_input (input);
 

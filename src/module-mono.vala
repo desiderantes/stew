@@ -141,7 +141,7 @@ public class MonoModule : BuildModule
             foreach (var tag in resource.tags)
             {
                 if (tag.has_prefix ("id "))
-                    id = strip (tag.substring (3));
+                    id = tag.substring (3).strip ();
                 else
                     compile_errors.append ("Unknown tag (%s) for resource %s".printf (tag, resource.name));
             }

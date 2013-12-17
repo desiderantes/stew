@@ -239,7 +239,7 @@ public class TaggedEntry
         if (c != condition)
              return solve_condition (c);
 
-        return strip (condition);
+        return condition.strip ();
     }
 }
 
@@ -392,41 +392,6 @@ public class Data : Block
             return dir;
         }
     }
-}
-
-/* This is a replacement for string.strip since it generates annoying warnings about const pointers.
- * See https://bugzilla.gnome.org/show_bug.cgi?id=686130 for more information */
-public static string strip (string value)
-{
-    var i = 0;
-    while (value[i].isspace ())
-        i++;
-    var start = i;
-    var last_non_space = i - 1;
-    while (value[i] != '\0')
-    {
-       if (!value[i].isspace ())
-           last_non_space = i;
-       i++;
-    }
-    return value.slice (start, last_non_space + 1);
-}
-
-/* This is a replacement for string.chomp since it generates annoying warnings about const pointers.
- * See https://bugzilla.gnome.org/show_bug.cgi?id=686130 for more information */
-public static string chomp (string value)
-{
-    var i = 0;
-    while (value[i].isspace ())
-        i++;
-    var last_non_space = i - 1;
-    while (value[i] != '\0')
-    {
-       if (!value[i].isspace ())
-           last_non_space = i;
-       i++;
-    }
-    return value.slice (0, last_non_space + 1);
 }
 
 public List<string> split_variable (string value)
@@ -1054,8 +1019,8 @@ public class Bake
                     var id = "", value = "";
                     if (index >= 0)
                     {
-                        id = strip (arg.substring (0, index));
-                        value = strip (arg.substring (index + 1));
+                        id = arg.substring (0, index).strip ();
+                        value = arg.substring (index + 1).strip ();
                     }
                     if (id == "" || value == "")
                     {

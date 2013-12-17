@@ -86,7 +86,7 @@ public class PkgConfigFile
 
         foreach (var line in data.split ("\n"))
         {
-            line = strip (line);
+            line = line.strip ();
             if (line == "")
                 continue;
 
@@ -97,13 +97,13 @@ public class PkgConfigFile
             if (line[index] == '=')
             {
                 var variable_name = line.substring (0, index);
-                var value = strip (line.substring (index + 1));
+                var value = line.substring (index + 1).strip ();
                 variables.insert (variable_name, value);
             }
             else if (line[index] == ':')
             {
                 var keyword_name = line.substring (0, index);
-                var value = strip (line.substring (index + 1));
+                var value = line.substring (index + 1).strip ();
                 keywords.insert (keyword_name, value);
             }
             else
