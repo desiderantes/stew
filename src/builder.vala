@@ -15,14 +15,27 @@ public errordomain BuildError
 
 public class Builder
 {
+    public signal void report (string text);
+    public signal void report_status (string text);
+    public signal void report_output (string text);
+    public signal void report_debug (string text);
+
     private HashTable<Rule, RuleBuilder> builders;
     private bool parallel = false;
     private List<string> errors;
+    private bool pretty_print;
+    private bool debug_enabled;
+    public string base_directory;
+    private string last_logged_directory;
 
-    public Builder (bool parallel = false)
+    public Builder (bool parallel = false, bool pretty_print = false, bool debug_enabled = false, string base_directory)
     {
         builders = new HashTable<Rule, RuleBuilder> (direct_hash, direct_equal);
         this.parallel = parallel;
+        this.pretty_print = pretty_print;
+        this.debug_enabled = debug_enabled;
+        this.base_directory = base_directory;
+        last_logged_directory = Environment.get_current_dir ();
     }
 
     public async bool build_target (Recipe recipe, string target) throws BuildError
@@ -39,16 +52,14 @@ public class Builder
     private async bool build_target_recursive (Recipe recipe, string target, List<Rule> used_rules)
     {
         if (debug_enabled)
-            stderr.printf ("Considering target %s\n", get_relative_path (original_dir, target));
+            report ("Considering target %s".printf (get_relative_path (base_directory, target)));
 
         /* Find the rule */
         var rule = recipe.get_rule_with_target (target);
         if (rule != null && rule.recipe != recipe)
         {
             if (debug_enabled)
-                stderr.printf ("Target %s defined in recipe %s\n",
-                               get_relative_path (original_dir, target),
-                               get_relative_path (original_dir, rule.recipe.filename));
+                report ("Target %s defined in recipe %s".printf (get_relative_path (base_directory, target), get_relative_path (base_directory, rule.recipe.filename)));
 
             return yield build_target_recursive (rule.recipe, target, used_rules);
         }
@@ -60,7 +71,7 @@ public class Builder
                 return false;
 
             /* If doesn't exist then we can't continue */
-            errors.append ("File '%s' does not exist and no rule to build it.\nRun bake --list-targets to see which targets can be built.".printf (get_relative_path (original_dir, target)));
+            errors.append ("File '%s' does not exist and no rule to build it.\nRun bake --list-targets to see which targets can be built.".printf (get_relative_path (base_directory, target)));
             return false;
         }
 
@@ -79,7 +90,7 @@ public class Builder
 
         /* Don't bother if it's already up to date */
         Environment.set_current_dir (recipe.dirname);
-        if (!force_build && !rule.needs_build ())
+        if (!force_build && !rule.needs_build (this))
             return false;
 
         /* If we're about to do something then note which directory we are in and what we're building */
@@ -88,7 +99,7 @@ public class Builder
             var dir = Environment.get_current_dir ();
             if (last_logged_directory != dir)
             {
-                stdout.printf ("%s\n", format_status ("[Entering directory %s]".printf (get_relative_path (original_dir, dir))));
+                report_status ("[Entering directory %s]".printf (get_relative_path (base_directory, dir)));
                 last_logged_directory = dir;
             }
         }
@@ -138,7 +149,7 @@ public class Builder
         if (builder != null)
             return;
 
-        builder = new RuleBuilder (rule);
+        builder = new RuleBuilder (this, rule, pretty_print);
         builders.insert (rule, builder);
         yield builder.build ();
         if (builder.error != null)
@@ -146,14 +157,18 @@ public class Builder
     }
 }
 
-public class RuleBuilder
+private class RuleBuilder
 {
+    public unowned Builder builder;
     public Rule rule;
     public string? error = null;
+    private bool pretty_print;
 
-    public RuleBuilder (Rule rule)
+    public RuleBuilder (Builder builder, Rule rule, bool pretty_print)
     {
+        this.builder = builder;
         this.rule = rule;
+        this.pretty_print = pretty_print;
     }
 
     public async bool build ()
@@ -171,7 +186,7 @@ public class RuleBuilder
             c = rule.recipe.substitute_variables (c);
 
             if (show_output)
-                stdout.printf ("%s\n", c);
+                builder.report (c);
 
             string output;
             var exit_status = yield run_command (c, out output);
@@ -182,21 +197,21 @@ public class RuleBuilder
             if (Process.if_signaled (exit_status))
             {
                 if (!show_output)
-                    stdout.printf ("%s\n", format_status (c));
-                stdout.printf ("%s", output);
+                    builder.report_status (c);
+                builder.report_output (output);
                 error = "Caught signal %d".printf (Process.term_sig (exit_status));
                 return false;
             }
             else if (Process.if_exited (exit_status) && Process.exit_status (exit_status) != 0)
             {
                 if (!show_output)
-                    stdout.printf ("%s\n", format_status (c));
-                stdout.printf ("%s", output);
+                    builder.report_status (c);
+                builder.report_output (output);
                 error = "Command exited with return value %d".printf (Process.exit_status (exit_status));
                 return false;
             }
             else
-                stdout.printf ("%s", output);
+                builder.report_output (output);
         }
 
         foreach (var output in rule.outputs)

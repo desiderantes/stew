@@ -35,7 +35,7 @@ public class BZRModule : BuildModule
         {
             contents = "";
         }
-        contents = strip (contents);
+        contents = contents.strip ();
 
         List<string> matches = null;
         foreach (var match in contents.split_set (" \t\n\r"))

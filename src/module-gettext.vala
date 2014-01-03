@@ -10,9 +10,9 @@
 
 private class PotRule : Rule
 {
-    public PotRule (Recipe recipe, string pot_filename)
+    public PotRule (Recipe recipe, string pot_filename, bool pretty_print)
     {
-        base (recipe);
+        base (recipe, pretty_print);
         add_output (pot_filename);
     }
 
@@ -67,7 +67,7 @@ public class GettextModule : BuildModule
         var pot_rule = r.find_rule (pot_file);
         if (pot_rule == null)
         {
-            pot_rule = new PotRule (r, pot_file);
+            pot_rule = new PotRule (r, pot_file, r.pretty_print);
             r.rules.append (pot_rule);
             r.build_rule.add_input (pot_file);            
         }

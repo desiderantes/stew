@@ -12,508 +12,8 @@ private bool pretty_print = true;
 private bool show_color = true;
 private bool debug_enabled = false;
 private string original_dir;
-private static string last_logged_directory;
 
-public class BuildModule
-{
-    public virtual void generate_toplevel_rules (Recipe toplevel)
-    {
-    }
-
-    public virtual bool can_generate_program_rules (Program program) throws Error
-    {
-        return false;
-    }
-
-    public virtual void generate_program_rules (Program program) throws Error
-    {
-    }
-
-    public virtual bool can_generate_library_rules (Library library) throws Error
-    {
-        return false;
-    }
-
-    public virtual void generate_library_rules (Library library) throws Error
-    {
-    }
-
-    public virtual void generate_data_rules (Data data) throws Error
-    {
-    }
-
-    public virtual void recipe_complete (Recipe recipe)
-    {
-    }
-
-    public virtual void rules_complete (Recipe toplevel)
-    {
-    }
-}
-
-public errordomain TaggedListError
-{
-    TAG_BEFORE_ENTRY,
-    UNTERMINATED_TAG
-}
-
-public class Block
-{
-    public Recipe recipe;
-    private string type_name;
-    public string id;
-
-    public Block (Recipe recipe, string type_name, string id)
-    {
-        this.recipe = recipe;
-        this.type_name = type_name;
-        this.id = id;
-    }
-
-    public string? get_variable (string name, string? fallback = null)
-    {
-        return recipe.get_variable ("%s.%s.%s".printf (type_name, id, name), fallback);
-    }
-
-    public bool get_boolean_variable (string name, bool? fallback = false)
-    {
-        return recipe.get_boolean_variable ("%s.%s.%s".printf (type_name, id, name), fallback);
-    }
-
-    public List<TaggedEntry> get_tagged_list (string name) throws TaggedListError
-    {
-        var list = new List<TaggedEntry> ();
-
-        var value = get_variable (name);
-        if (value == null)
-            return list;
-
-        var start = 0;
-        TaggedEntry? entry = null;
-        while (true)
-        {
-            while (value[start].isspace ())
-                start++;
-            if (value[start] == '\0')
-                break;
-
-            if (value[start] == '(')
-            {
-                /* Error if no current entry */
-                if (entry == null)
-                    throw new TaggedListError.TAG_BEFORE_ENTRY ("List starts with tag - tags must follow entries");
-
-                /* Tag is surrounded by parenthesis, error if not terminated */
-                start++;
-                var bracket_count = 1;
-                var end = start + 1;
-                for (; value[end] != '\0'; end++)
-                {
-                    if (value[end] == '(')
-                        bracket_count++;
-                    if (value[end] == ')')
-                    {
-                        bracket_count--;
-                        if (bracket_count == 0)
-                            break;
-                    }
-                }
-                if (bracket_count != 0)
-                    throw new TaggedListError.UNTERMINATED_TAG ("Unterminated tag");
-                var text = value.substring (start, end - start);
-                start = end + 1;
-
-                /* Add tag to current entry */
-                entry.tags.append (text);
-            }
-            else
-            {
-                /* Entry is terminated by whitespace */
-                var end = start + 1;
-                while (value[end] != '\0' && !value[end].isspace ())
-                    end++;
-                var text = value.substring (start, end - start);
-                start = end;
-
-                /* Finish last entry and start a new one */
-                if (entry != null)
-                    list.append (entry);
-                entry = new TaggedEntry (recipe, text);
-            }
-        }
-        if (entry != null)
-            list.append (entry);
-
-        return list;
-    }
-}
-
-public class TaggedEntry
-{
-    public Recipe recipe;
-    public string name;
-    public List<string> tags;
-    
-    public TaggedEntry (Recipe recipe, string name)
-    {
-        this.recipe = recipe;
-        this.name = name;
-        tags = new List<string> ();
-    }
-
-    public bool is_allowed
-    {
-        get {
-            foreach (var tag in tags)
-            {
-                if (tag.has_prefix ("if "))
-                {
-                    var condition = tag.substring (3);
-                    if (solve_condition (condition) != "true")
-                        return false;
-                }
-            }
-
-            return true;
-        }
-    }
-
-    private string solve_condition (string condition)
-    {
-        /* Solve parenthesis first */
-        var start_index = -1;
-        for (var i = 0; condition[i] != '\0'; i++)
-        {
-            var c = condition[i];
-
-            /* Skip variables */
-            if (c == '$' && condition[i+1] == '(')
-            {
-                while (condition[i] != ')' && condition[i] != '\0')
-                    i++;
-                continue;
-            }
-            
-            if (c == '(')
-                start_index = i;
-            if (c == ')')
-            {
-                var block = solve_condition (condition.substring (start_index + 1, i - start_index - 1));
-                return solve_condition (condition.substring (0, start_index) + block + condition.substring (i + 1));
-            }
-        }
-
-        var tokens = condition.split ("==", 2);
-        if (tokens.length == 2)
-        {
-            var lhs = solve_condition (tokens[0]);
-            var rhs = solve_condition (tokens[1]);
-            return lhs == rhs ? "true" : "false";
-        }
-
-        tokens = condition.split ("!=", 2);
-        if (tokens.length == 2)
-        {
-            var lhs = solve_condition (tokens[0]);
-            var rhs = solve_condition (tokens[1]);
-            return lhs != rhs ? "true" : "false";
-        }
-
-        tokens = condition.split ("||", 2);
-        if (tokens.length == 2)
-        {
-            var lhs = solve_condition (tokens[0]) == "true";
-            var rhs = solve_condition (tokens[1]) == "true";
-            return (lhs || rhs) ? "true" : "false";
-        }
-
-        tokens = condition.split ("&&", 2);
-        if (tokens.length == 2)
-        {
-            var lhs = solve_condition (tokens[0]) == "true";
-            var rhs = solve_condition (tokens[1]) == "true";
-            return (lhs && rhs) ? "true" : "false";
-        }
-
-        var c = recipe.substitute_variables (condition);
-        if (c != condition)
-             return solve_condition (c);
-
-        return strip (condition);
-    }
-}
-
-public class Option : Block
-{
-    public Option (Recipe recipe, string id)
-    {
-        base (recipe, "options", id);
-    }
-
-    public string description { owned get { return get_variable ("description"); } }
-    public string default { owned get { return get_variable ("default"); } }
-    public string? value
-    {
-        owned get
-        {
-            return recipe.get_variable ("options.%s".printf (id));
-        }
-        set
-        {
-            recipe.set_variable ("options.%s".printf (id), value);
-        }
-    }
-}
-
-public class Template : Block
-{
-    public Template (Recipe recipe, string id)
-    {
-        base (recipe, "templates", id);
-    }
-}
-
-public class Compilable : Block
-{
-    private List<TaggedEntry> sources;
-    private bool have_sources;
-    private List<TaggedEntry> packages;
-    private bool have_packages;
-
-    public Compilable (Recipe recipe, string type_name, string id)
-    {
-        base (recipe, type_name, id);
-    }
-
-    public string? compiler { owned get { return get_variable ("compiler"); } }
-
-    public string name { owned get { return get_variable ("name", id); } }
-
-    public string? gettext_domain { owned get { return get_variable ("gettext-domain"); } }
-
-    public bool install { owned get { return get_boolean_variable ("install", true); } }
-
-    public bool debug { owned get { return get_boolean_variable ("debug", false); } }
-
-    public string? get_flags (string name, string? fallback = null)
-    {
-        var v = get_variable (name, fallback);
-        if (v == null)
-            return null;
-        return v.replace ("\n", " ");
-    }
-
-    public unowned List<TaggedEntry> get_sources () throws Error
-    {
-        if (have_sources)
-            return sources;
-
-        sources = get_tagged_list ("sources");
-        have_sources = true;
-
-        return sources;
-    }
-
-    public string? compile_flags { owned get { return get_flags ("compile-flags"); } }
-
-    public string? link_flags { owned get { return get_flags ("link-flags"); } }
-
-    public unowned List<TaggedEntry> get_packages () throws Error
-    {
-        if (have_packages)
-            return packages;
-
-        packages = get_tagged_list ("packages");
-        have_packages = true;
-
-        return packages;
-    }
-}
-
-public class Program : Compilable
-{
-    public Program (Recipe recipe, string id)
-    {
-        base (recipe, "programs", id);
-    }
-
-    public string install_directory
-    {
-        owned get
-        {
-            var dir = get_variable ("install-directory");
-            if (dir == null)
-                dir = recipe.binary_directory;
-
-            return dir;
-        }
-    }
-}
-
-public class Library : Compilable
-{
-    public Library (Recipe recipe, string id)
-    {
-        base (recipe, "libraries", id);
-    }
-
-    public string install_directory
-    {
-        owned get
-        {
-            var dir = get_variable ("install-directory");
-            if (dir == null)
-                dir = recipe.library_directory;
-
-            return dir;
-        }
-    }
-}
-
-public class Data : Block
-{
-    public Data (Recipe recipe, string id)
-    {
-        base (recipe, "data", id);
-    }
-
-    public string? gettext_domain { owned get { return get_variable ("gettext-domain"); } }
-
-    public bool install { owned get { return get_boolean_variable ("install", true); } }
-
-    public string install_directory
-    {
-        owned get
-        {
-            var dir = get_variable ("install-directory");
-            if (dir == null)
-                dir = recipe.project_data_directory;
-
-            return dir;
-        }
-    }
-}
-
-/* This is a replacement for string.strip since it generates annoying warnings about const pointers.
- * See https://bugzilla.gnome.org/show_bug.cgi?id=686130 for more information */
-public static string strip (string value)
-{
-    var i = 0;
-    while (value[i].isspace ())
-        i++;
-    var start = i;
-    var last_non_space = i - 1;
-    while (value[i] != '\0')
-    {
-       if (!value[i].isspace ())
-           last_non_space = i;
-       i++;
-    }
-    return value.slice (start, last_non_space + 1);
-}
-
-/* This is a replacement for string.chomp since it generates annoying warnings about const pointers.
- * See https://bugzilla.gnome.org/show_bug.cgi?id=686130 for more information */
-public static string chomp (string value)
-{
-    var i = 0;
-    while (value[i].isspace ())
-        i++;
-    var last_non_space = i - 1;
-    while (value[i] != '\0')
-    {
-       if (!value[i].isspace ())
-           last_non_space = i;
-       i++;
-    }
-    return value.slice (0, last_non_space + 1);
-}
-
-public List<string> split_variable (string value)
-{
-    List<string> values = null;
-
-    var start = 0;
-    while (true)
-    {
-        while (value[start].isspace ())
-            start++;
-        if (value[start] == '\0')
-            return values;
-
-        var end = start + 1;
-        while (value[end] != '\0' && !value[end].isspace ())
-            end++;
-
-        values.append (value.substring (start, end - start));
-        start = end;
-    }
-}
-
-public string get_relative_path (string source_path, string target_path)
-{
-    /* Already relative */
-    if (!Path.is_absolute (target_path))
-        return target_path;
-
-    /* It is the current directory */
-    if (target_path == source_path)
-        return ".";
-
-    var source_tokens = source_path.split ("/");
-    var target_tokens = target_path.split ("/");
-
-    /* Skip common parts */
-    var offset = 0;
-    for (; offset < source_tokens.length && offset < target_tokens.length; offset++)
-    {
-        if (source_tokens[offset] != target_tokens[offset])
-            break;
-    }
-
-    var path = "";
-    for (var i = offset; i < source_tokens.length; i++)
-        path += "../";
-    for (var i = offset; i < target_tokens.length - 1; i++)
-        path += target_tokens[i] + "/";
-    path += target_tokens[target_tokens.length - 1];
-
-    return path;
-}
-
-public string join_relative_dir (string base_dir, string relative_dir)
-{
-    if (Path.is_absolute (relative_dir))
-        return relative_dir;
-
-    var b = base_dir;
-    var r = relative_dir;
-    while (r.has_prefix ("../") && b != "")
-    {
-        b = Path.get_dirname (b);
-        r = r.substring (3);
-    }
-
-    return Path.build_filename (b, r);
-}
-
-public string remove_extension (string filename)
-{
-    var i = filename.last_index_of_char ('.');
-    if (i < 0)
-        return filename;
-    return filename.substring (0, i);
-}
-
-public string replace_extension (string filename, string extension)
-{
-    var i = filename.last_index_of_char ('.');
-    if (i < 0)
-        return "%s.%s".printf (filename, extension);
-
-    return "%.*s.%s".printf (i, filename, extension);
-}
-
+// FIXME: Move into bake
 public string format_status (string message)
 {
     if (show_color)
@@ -522,6 +22,7 @@ public string format_status (string message)
         return message;
 }
 
+// FIXME: Move into bake
 public string format_error (string message)
 {
     if (show_color)
@@ -530,7 +31,7 @@ public string format_error (string message)
         return message;
 }
 
-public string format_success (string message)
+private string format_success (string message)
 {
     if (show_color)
         return "\x1B[1m\x1B[32m" + message + "\x1B[0m";
@@ -597,7 +98,7 @@ public class Bake
         if (debug_enabled)
             stderr.printf ("Loading %s\n", get_relative_path (original_dir, filename));
 
-        var f = new Recipe.from_file (filename);
+        var f = new Recipe.from_file (filename, pretty_print);
 
         /* Children can't be new toplevel recipes */
         if (!is_toplevel && f.project_name != null)
@@ -917,7 +418,7 @@ public class Bake
             var filename = Path.build_filename (toplevel_dir, "Recipe");
             try
             {
-                toplevel = new Recipe.from_file (filename);
+                toplevel = new Recipe.from_file (filename, pretty_print);
                 if (toplevel.project_name != null)
                     break;
             }
@@ -964,14 +465,14 @@ public class Bake
         Recipe conf_file = null;
         try
         {
-            conf_file = new Recipe.from_file (Path.build_filename (toplevel_dir, "Recipe.conf"), false);
+            conf_file = new Recipe.from_file (Path.build_filename (toplevel_dir, "Recipe.conf"), pretty_print, false);
         }
         catch (Error e)
         {
             if (e is FileError.NOENT)
             {
                 need_configure = true;
-                conf_file = new Recipe ();
+                conf_file = new Recipe (pretty_print);
             }
             else
             {
@@ -1054,8 +555,8 @@ public class Bake
                     var id = "", value = "";
                     if (index >= 0)
                     {
-                        id = strip (arg.substring (0, index));
-                        value = strip (arg.substring (index + 1));
+                        id = arg.substring (0, index).strip ();
+                        value = arg.substring (index + 1).strip ();
                     }
                     if (id == "" || value == "")
                     {
@@ -1236,8 +737,11 @@ public class Bake
         if (!target.has_prefix ("%") && recipe.get_rule_with_target (Path.build_filename (recipe.dirname, "%" + target)) != null)
             target = "%" + target;
 
-        last_logged_directory = Environment.get_current_dir ();
-        var builder = new Builder (do_parallel);
+        var builder = new Builder (do_parallel, pretty_print, debug_enabled, original_dir);
+        builder.report.connect ((text) => { stdout.printf ("%s\n", text); });
+        builder.report_status.connect ((text) => { stdout.printf ("%s\n", format_status (text)); });
+        builder.report_output.connect ((text) => { stdout.printf ("%s", text); });
+        builder.report_debug.connect ((text) => { if (debug_enabled) stderr.printf ("%s", text); });
         var exit_code = Posix.EXIT_SUCCESS;
         builder.build_target.begin (recipe, join_relative_dir (recipe.dirname, target), (o, x) =>
         {

@@ -27,6 +27,7 @@ public class Recipe
     public CleanRule clean_rule;
     public Rule test_rule;
     public HashTable<string, Rule> targets;
+    public bool pretty_print;
 
     public string dirname { owned get { return Path.get_dirname (filename); } }
 
@@ -39,7 +40,7 @@ public class Recipe
             var dir = get_variable ("options.install-directory");
             if (Path.is_absolute (dir))
                 return dir;
-            return Path.build_filename (original_dir, dir);
+            return Path.build_filename (toplevel.dirname, dir);
         }
     }
 
@@ -68,15 +69,16 @@ public class Recipe
         owned get { return toplevel.get_build_path (release_name); }
     }
 
-    public Recipe ()
+    public Recipe (bool pretty_print)
     {
+        this.pretty_print = pretty_print;
         variable_names = new List<string> ();
         variables = new HashTable<string, string> (str_hash, str_equal);
     }
 
-    public Recipe.from_file (string filename, bool allow_rules = true) throws FileError, RecipeError
+    public Recipe.from_file (string filename, bool pretty_print, bool allow_rules = true) throws FileError, RecipeError
     {
-        this ();
+        this (pretty_print);
 
         this.filename = filename;
 
@@ -105,7 +107,7 @@ public class Recipe
             uninstall_rule.add_output ("%uninstall");
         }
 
-        clean_rule = new CleanRule (this);
+        clean_rule = new CleanRule (this, pretty_print);
         rules.append (clean_rule);
         clean_rule.add_output ("%clean");
         var manual_clean_rule = find_rule ("%clean");
@@ -198,7 +200,7 @@ public class Recipe
         {
             line_number++;
 
-            line = chomp (line);
+            line = line.chomp ();
             if (line.has_suffix ("\\"))
             {
                 continued_line += line.substring (0, line.length - 1) + "\n";
@@ -238,7 +240,7 @@ public class Recipe
             var index = statement.index_of ("{");
             if (index >= 0)
             {
-                var name = strip (statement.substring (0, index));
+                var name = statement.substring (0, index).strip ();
                 if (variable_stack == null)
                     variable_stack.prepend (new VariableBlock (line_number, name));
                 else
@@ -263,10 +265,10 @@ public class Recipe
             index = statement.index_of ("=");
             if (index > 0)
             {
-                var name = strip (statement.substring (0, index));
+                var name = statement.substring (0, index).strip ();
                 if (variable_stack != null)
                     name = "%s.%s".printf (variable_stack.nth_data (0).name, name);
-                var value = strip (statement.substring (index + 1));
+                var value = statement.substring (index + 1).strip ();
 
                 set_variable (name, value);
                 continue;
@@ -278,11 +280,11 @@ public class Recipe
             {
                 var rule = add_rule ();
 
-                var input_list = chomp (statement.substring (0, index));
+                var input_list = statement.substring (0, index).chomp ();
                 foreach (var output in split_variable (input_list))
                     rule.add_output (output);
 
-                var output_list = strip (statement.substring (index + 1));
+                var output_list = statement.substring (index + 1).strip ();
                 foreach (var input in split_variable (output_list))
                     rule.add_input (input);
 
@@ -302,7 +304,7 @@ public class Recipe
 
     public Rule add_rule ()
     {
-        var rule = new Rule (this);
+        var rule = new Rule (this, pretty_print);
         rules.append (rule);
         return rule;
     }
@@ -481,5 +483,369 @@ private class VariableBlock
     {
         this.line_number = line_number;
         this.name = name;
+    }
+}
+
+public errordomain TaggedListError
+{
+    TAG_BEFORE_ENTRY,
+    UNTERMINATED_TAG
+}
+
+public class Block
+{
+    public Recipe recipe;
+    private string type_name;
+    public string id;
+
+    public Block (Recipe recipe, string type_name, string id)
+    {
+        this.recipe = recipe;
+        this.type_name = type_name;
+        this.id = id;
+    }
+
+    public string? get_variable (string name, string? fallback = null)
+    {
+        return recipe.get_variable ("%s.%s.%s".printf (type_name, id, name), fallback);
+    }
+
+    public bool get_boolean_variable (string name, bool? fallback = false)
+    {
+        return recipe.get_boolean_variable ("%s.%s.%s".printf (type_name, id, name), fallback);
+    }
+
+    public List<TaggedEntry> get_tagged_list (string name) throws TaggedListError
+    {
+        var list = new List<TaggedEntry> ();
+
+        var value = get_variable (name);
+        if (value == null)
+            return list;
+
+        var start = 0;
+        TaggedEntry? entry = null;
+        while (true)
+        {
+            while (value[start].isspace ())
+                start++;
+            if (value[start] == '\0')
+                break;
+
+            if (value[start] == '(')
+            {
+                /* Error if no current entry */
+                if (entry == null)
+                    throw new TaggedListError.TAG_BEFORE_ENTRY ("List starts with tag - tags must follow entries");
+
+                /* Tag is surrounded by parenthesis, error if not terminated */
+                start++;
+                var bracket_count = 1;
+                var end = start + 1;
+                for (; value[end] != '\0'; end++)
+                {
+                    if (value[end] == '(')
+                        bracket_count++;
+                    if (value[end] == ')')
+                    {
+                        bracket_count--;
+                        if (bracket_count == 0)
+                            break;
+                    }
+                }
+                if (bracket_count != 0)
+                    throw new TaggedListError.UNTERMINATED_TAG ("Unterminated tag");
+                var text = value.substring (start, end - start);
+                start = end + 1;
+
+                /* Add tag to current entry */
+                entry.tags.append (text);
+            }
+            else
+            {
+                /* Entry is terminated by whitespace */
+                var end = start + 1;
+                while (value[end] != '\0' && !value[end].isspace ())
+                    end++;
+                var text = value.substring (start, end - start);
+                start = end;
+
+                /* Finish last entry and start a new one */
+                if (entry != null)
+                    list.append (entry);
+                entry = new TaggedEntry (recipe, text);
+            }
+        }
+        if (entry != null)
+            list.append (entry);
+
+        return list;
+    }
+}
+
+public class TaggedEntry
+{
+    public Recipe recipe;
+    public string name;
+    public List<string> tags;
+    
+    public TaggedEntry (Recipe recipe, string name)
+    {
+        this.recipe = recipe;
+        this.name = name;
+        tags = new List<string> ();
+    }
+
+    public bool is_allowed
+    {
+        get {
+            foreach (var tag in tags)
+            {
+                if (tag.has_prefix ("if "))
+                {
+                    var condition = tag.substring (3);
+                    if (solve_condition (condition) != "true")
+                        return false;
+                }
+            }
+
+            return true;
+        }
+    }
+
+    private string solve_condition (string condition)
+    {
+        /* Solve parenthesis first */
+        var start_index = -1;
+        for (var i = 0; condition[i] != '\0'; i++)
+        {
+            var c = condition[i];
+
+            /* Skip variables */
+            if (c == '$' && condition[i+1] == '(')
+            {
+                while (condition[i] != ')' && condition[i] != '\0')
+                    i++;
+                continue;
+            }
+            
+            if (c == '(')
+                start_index = i;
+            if (c == ')')
+            {
+                var block = solve_condition (condition.substring (start_index + 1, i - start_index - 1));
+                return solve_condition (condition.substring (0, start_index) + block + condition.substring (i + 1));
+            }
+        }
+
+        var tokens = condition.split ("==", 2);
+        if (tokens.length == 2)
+        {
+            var lhs = solve_condition (tokens[0]);
+            var rhs = solve_condition (tokens[1]);
+            return lhs == rhs ? "true" : "false";
+        }
+
+        tokens = condition.split ("!=", 2);
+        if (tokens.length == 2)
+        {
+            var lhs = solve_condition (tokens[0]);
+            var rhs = solve_condition (tokens[1]);
+            return lhs != rhs ? "true" : "false";
+        }
+
+        tokens = condition.split ("||", 2);
+        if (tokens.length == 2)
+        {
+            var lhs = solve_condition (tokens[0]) == "true";
+            var rhs = solve_condition (tokens[1]) == "true";
+            return (lhs || rhs) ? "true" : "false";
+        }
+
+        tokens = condition.split ("&&", 2);
+        if (tokens.length == 2)
+        {
+            var lhs = solve_condition (tokens[0]) == "true";
+            var rhs = solve_condition (tokens[1]) == "true";
+            return (lhs && rhs) ? "true" : "false";
+        }
+
+        var c = recipe.substitute_variables (condition);
+        if (c != condition)
+             return solve_condition (c);
+
+        return condition.strip ();
+    }
+}
+
+public class Option : Block
+{
+    public Option (Recipe recipe, string id)
+    {
+        base (recipe, "options", id);
+    }
+
+    public string description { owned get { return get_variable ("description"); } }
+    public string default { owned get { return get_variable ("default"); } }
+    public string? value
+    {
+        owned get
+        {
+            return recipe.get_variable ("options.%s".printf (id));
+        }
+        set
+        {
+            recipe.set_variable ("options.%s".printf (id), value);
+        }
+    }
+}
+
+public class Template : Block
+{
+    public Template (Recipe recipe, string id)
+    {
+        base (recipe, "templates", id);
+    }
+}
+
+public class Compilable : Block
+{
+    private List<TaggedEntry> sources;
+    private bool have_sources;
+    private List<TaggedEntry> packages;
+    private bool have_packages;
+
+    public Compilable (Recipe recipe, string type_name, string id)
+    {
+        base (recipe, type_name, id);
+    }
+
+    public string? compiler { owned get { return get_variable ("compiler"); } }
+
+    public string name { owned get { return get_variable ("name", id); } }
+
+    public string? gettext_domain { owned get { return get_variable ("gettext-domain"); } }
+
+    public bool install { owned get { return get_boolean_variable ("install", true); } }
+
+    public bool debug { owned get { return get_boolean_variable ("debug", false); } }
+
+    public string? get_flags (string name, string? fallback = null)
+    {
+        var v = get_variable (name, fallback);
+        if (v == null)
+            return null;
+        return v.replace ("\n", " ");
+    }
+
+    public unowned List<TaggedEntry> get_sources () throws Error
+    {
+        if (have_sources)
+            return sources;
+
+        sources = get_tagged_list ("sources");
+        have_sources = true;
+
+        return sources;
+    }
+
+    public string? compile_flags { owned get { return get_flags ("compile-flags"); } }
+
+    public string? link_flags { owned get { return get_flags ("link-flags"); } }
+
+    public unowned List<TaggedEntry> get_packages () throws Error
+    {
+        if (have_packages)
+            return packages;
+
+        packages = get_tagged_list ("packages");
+        have_packages = true;
+
+        return packages;
+    }
+}
+
+public class Program : Compilable
+{
+    public Program (Recipe recipe, string id)
+    {
+        base (recipe, "programs", id);
+    }
+
+    public string install_directory
+    {
+        owned get
+        {
+            var dir = get_variable ("install-directory");
+            if (dir == null)
+                dir = recipe.binary_directory;
+
+            return dir;
+        }
+    }
+}
+
+public class Library : Compilable
+{
+    public Library (Recipe recipe, string id)
+    {
+        base (recipe, "libraries", id);
+    }
+
+    public string install_directory
+    {
+        owned get
+        {
+            var dir = get_variable ("install-directory");
+            if (dir == null)
+                dir = recipe.library_directory;
+
+            return dir;
+        }
+    }
+}
+
+public class Data : Block
+{
+    public Data (Recipe recipe, string id)
+    {
+        base (recipe, "data", id);
+    }
+
+    public string? gettext_domain { owned get { return get_variable ("gettext-domain"); } }
+
+    public bool install { owned get { return get_boolean_variable ("install", true); } }
+
+    public string install_directory
+    {
+        owned get
+        {
+            var dir = get_variable ("install-directory");
+            if (dir == null)
+                dir = recipe.project_data_directory;
+
+            return dir;
+        }
+    }
+}
+
+public List<string> split_variable (string value)
+{
+    List<string> values = null;
+
+    var start = 0;
+    while (true)
+    {
+        while (value[start].isspace ())
+            start++;
+        if (value[start] == '\0')
+            return values;
+
+        var end = start + 1;
+        while (value[end] != '\0' && !value[end].isspace ())
+            end++;
+
+        values.append (value.substring (start, end - start));
+        start = end;
     }
 }

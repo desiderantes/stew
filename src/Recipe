@@ -3,27 +3,12 @@ templates.config {
   variables = %VERSION%=$(project.version) %LIBRARY_DIRECTORY%=$(options.library-directory)
 }
 
-programs {
-  bake-template {
-    sources = bake-template.vala
-    vala-packages = posix
-  }
-
-  bake-gettext {
-    sources = bake-gettext.vala
-    vala-packages = posix
-  }
-
-  bake-test {
-    sources = bake-test.vala
-    vala-packages = posix
-  }
-
+libraries {
   bake {
-    sources = bake.vala \
-              builder.vala \
+    sources = builder.vala \
               config.vala \
               fixes.vapi \
+              module.vala \
               module-bzip.vala \
               module-bzr.vala \
               module-clang.vala \
@@ -51,10 +36,37 @@ programs {
               module-xzip.vala \
               pkg-config.vala \
               recipe.vala \
-              rule.vala
-     vala-packages = posix gio-2.0
-     packages = gio-2.0
-     compile-flags = -DGETTEXT_PACKAGE=\"bake\"
+              rule.vala \
+              tools.vala
+    vala-packages = posix gio-2.0
+    packages = gio-2.0
+    compile-flags = -DGETTEXT_PACKAGE=\"bake\"
+    so-version = 0
+  }
+}
+
+programs {
+  bake-template {
+    sources = bake-template.vala
+    vala-packages = posix
+  }
+
+  bake-gettext {
+    sources = bake-gettext.vala
+    vala-packages = posix
+  }
+
+  bake-test {
+    sources = bake-test.vala
+    vala-packages = posix
+  }
+
+  bake {
+    sources = bake.vala
+    vala-packages = posix gio-2.0
+    packages = gio-2.0
+    libraries = bake (local)
+    compile-flags = -DGETTEXT_PACKAGE=\"bake\"
    }
 }
 

@@ -173,7 +173,7 @@ public class PythonModule : BuildModule
         if (exit_status != 0)
             return null;
 
-        version_string = strip (version_string);
+        version_string = version_string.strip ();
         var tokens = version_string.split (" ", 2);
         if (tokens.length != 2)
             return null;

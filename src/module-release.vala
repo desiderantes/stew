@@ -13,9 +13,9 @@ private class ReleaseRule : Rule
     public HashTable<string, bool> file_table;
     public HashTable<string, bool> directory_table;
 
-    public ReleaseRule (Recipe recipe)
+    public ReleaseRule (Recipe recipe, bool pretty_print)
     {
-        base (recipe);
+        base (recipe, pretty_print);
         file_table = new HashTable<string, bool> (str_hash, str_equal);
         directory_table = new HashTable<string, bool> (str_hash, str_equal);
     }
@@ -44,7 +44,7 @@ public class ReleaseModule : BuildModule
 {
     public override void generate_toplevel_rules (Recipe recipe)
     {
-        var rule = new ReleaseRule (recipe);
+        var rule = new ReleaseRule (recipe, recipe.pretty_print);
         recipe.rules.append (rule);
         rule.add_output (recipe.release_directory);
     }
