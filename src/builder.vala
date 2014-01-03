@@ -90,7 +90,7 @@ public class Builder
 
         /* Don't bother if it's already up to date */
         Environment.set_current_dir (recipe.dirname);
-        if (!force_build && !rule.needs_build (this))
+        if (!force_build && !needs_build (rule))
             return false;
 
         /* If we're about to do something then note which directory we are in and what we're building */
@@ -108,6 +108,79 @@ public class Builder
         yield build_rule (rule);
 
         return true;
+    }
+
+    private bool needs_build (Rule rule)
+    {
+        /* Find the most recently changed input */
+        Posix.timespec max_input_time = { 0, 0 };
+        string? youngest_input = null;
+        foreach (var input in rule.inputs)
+        {
+            Stat file_info;
+            var e = stat (input, out file_info);
+            if (e == 0)
+            {
+                if (Posix.S_ISREG (file_info.st_mode) && timespec_cmp (file_info.st_mtim, max_input_time) > 0)
+                {
+                    max_input_time = file_info.st_mtim;
+                    youngest_input = input;
+                }
+            }
+            else
+            {
+                if (errno == Posix.ENOENT)
+                    report_debug ("Input %s is missing".printf (get_relative_path (base_directory, Path.build_filename (rule.recipe.dirname, input))));
+                else
+                    warning ("Unable to access input file %s: %s", input, strerror (errno));
+                /* Something has gone wrong, run the rule anyway and it should fail */
+                return true;
+            }
+        }
+
+        /* Rebuild if any of the outputs are missing */
+        Posix.timespec max_output_time = { 0, 0 };
+        string? youngest_output = null;
+        foreach (var output in rule.outputs)
+        {
+            /* Always rebuild if doesn't produce output */
+            if (output.has_prefix ("%"))
+                return true;
+
+            Stat file_info;
+            var e = stat (output, out file_info);
+            if (e == 0)
+            {
+                if (Posix.S_ISREG (file_info.st_mode) && timespec_cmp (file_info.st_mtim, max_output_time) > 0)
+                {
+                    max_output_time = file_info.st_mtim;
+                    youngest_output = output;
+                }
+            }
+            else
+            {
+                if (errno == Posix.ENOENT)
+                    report_debug ("Output %s is missing".printf (get_relative_path (base_directory, Path.build_filename (rule.recipe.dirname, output))));
+
+                return true;
+            }
+        }
+
+        if (timespec_cmp (max_input_time, max_output_time) > 0)
+        {
+            report_debug ("Rebuilding %s as %s is newer".printf (get_relative_path (base_directory, Path.build_filename (rule.recipe.dirname, youngest_output)), get_relative_path (base_directory, Path.build_filename (rule.recipe.dirname, youngest_input))));
+            return true;
+        }
+
+        return false;
+    }
+
+    private static int timespec_cmp (Posix.timespec a, Posix.timespec b)
+    {
+        if (a.tv_sec == b.tv_sec)
+            return (int) (a.tv_nsec - b.tv_nsec);
+        else
+            return (int) (a.tv_sec - b.tv_sec);
     }
 
     private async bool build_inputs (Recipe recipe, Rule rule, List<Rule> used_rules)
