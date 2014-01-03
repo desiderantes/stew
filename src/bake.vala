@@ -13,8 +13,7 @@ private bool show_color = true;
 private bool debug_enabled = false;
 private string original_dir;
 
-// FIXME: Move into bake
-public string format_status (string message)
+private string format_status (string message)
 {
     if (show_color)
         return "\x1B[1m" + message + "\x1B[0m";
@@ -22,8 +21,7 @@ public string format_status (string message)
         return message;
 }
 
-// FIXME: Move into bake
-public string format_error (string message)
+private string format_error (string message)
 {
     if (show_color)
         return "\x1B[1m\x1B[31m" + message + "\x1B[0m";
