@@ -15,6 +15,7 @@ SOURCES = src/bake.vala \
           src/builder.vala \
           src/config-bootstrap.vala \
           src/fixes.vapi \
+          src/module.vala \
           src/module-bzip.vala \
           src/module-bzr.vala \
           src/module-clang.vala \
@@ -42,7 +43,8 @@ SOURCES = src/bake.vala \
           src/module-xzip.vala \
           src/pkg-config.vala \
           src/recipe.vala \
-          src/rule.vala
+          src/rule.vala \
+          src/tools.vala
 
 bake-template: src/bake-template.vala
 	valac -o bake-template --pkg=posix src/bake-template.vala
