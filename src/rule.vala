@@ -14,91 +14,14 @@ public class Rule
     public List<string> inputs;
     public List<string> outputs;
     protected List<string> static_commands;
+    public bool pretty_print;
     
-    public Rule (Recipe recipe)
+    public Rule (Recipe recipe, bool pretty_print)
     {
         this.recipe = recipe;
+        this.pretty_print = pretty_print;
     }
     
-    private static int timespec_cmp (Posix.timespec a, Posix.timespec b)
-    {
-        if (a.tv_sec == b.tv_sec)
-            return (int) (a.tv_nsec - b.tv_nsec);
-        else
-            return (int) (a.tv_sec - b.tv_sec);
-    }
-
-    public bool needs_build ()
-    {
-        /* Find the most recently changed input */
-        Posix.timespec max_input_time = { 0, 0 };
-        string? youngest_input = null;
-        foreach (var input in inputs)
-        {
-            Stat file_info;
-            var e = stat (input, out file_info);
-            if (e == 0)
-            {
-                if (Posix.S_ISREG (file_info.st_mode) && timespec_cmp (file_info.st_mtim, max_input_time) > 0)
-                {
-                    max_input_time = file_info.st_mtim;
-                    youngest_input = input;
-                }
-            }
-            else
-            {
-                if (errno == Posix.ENOENT)
-                {
-                    if (debug_enabled)
-                        stderr.printf ("Input %s is missing\n", get_relative_path (original_dir, Path.build_filename (recipe.dirname, input)));
-                }
-                else
-                    warning ("Unable to access input file %s: %s", input, strerror (errno));
-                /* Something has gone wrong, run the rule anyway and it should fail */
-                return true;
-            }
-        }
-
-        /* Rebuild if any of the outputs are missing */
-        Posix.timespec max_output_time = { 0, 0 };
-        string? youngest_output = null;
-        foreach (var output in outputs)
-        {
-            /* Always rebuild if doesn't produce output */
-            if (output.has_prefix ("%"))
-                return true;
-
-            Stat file_info;
-            var e = stat (output, out file_info);
-            if (e == 0)
-            {
-                if (Posix.S_ISREG (file_info.st_mode) && timespec_cmp (file_info.st_mtim, max_output_time) > 0)
-                {
-                    max_output_time = file_info.st_mtim;
-                    youngest_output = output;
-                }
-            }
-            else
-            {
-                if (debug_enabled && errno == Posix.ENOENT)
-                    stderr.printf ("Output %s is missing\n", get_relative_path (original_dir, Path.build_filename (recipe.dirname, output)));
-
-                return true;
-            }
-        }
-
-        if (timespec_cmp (max_input_time, max_output_time) > 0)
-        {
-            if (debug_enabled)
-                stderr.printf ("Rebuilding %s as %s is newer\n",
-                               get_relative_path (original_dir, Path.build_filename (recipe.dirname, youngest_output)),
-                               get_relative_path (original_dir, Path.build_filename (recipe.dirname, youngest_input)));
-            return true;
-        }
-
-        return false;
-    }
-
     public void add_input (string input)
     {
         inputs.append (input);    
@@ -147,7 +70,7 @@ public class Rule
 
     public void add_error_command (string status)
     {
-        add_command ("@echo '%s'".printf (format_error (status)));
+        add_command ("!error %s".printf (status));
     }
     
     protected string make_status_command (string status)
@@ -192,9 +115,9 @@ public class CleanRule : Rule
 {
     protected List<string> clean_files;
 
-    public CleanRule (Recipe recipe)
+    public CleanRule (Recipe recipe, bool pretty_print)
     {
-        base (recipe);
+        base (recipe, pretty_print);
     }
 
     public void add_clean_file (string file)
