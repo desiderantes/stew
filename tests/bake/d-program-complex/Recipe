@@ -1,0 +1,10 @@
+project {
+  name = test-project
+}
+
+programs.test {
+  sources = test1.d \
+            test2.d \
+            test3.d \
+            test-disabled.d (if false)
+}

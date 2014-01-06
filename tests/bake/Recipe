@@ -112,6 +112,13 @@ programs.gccgo {
   install = false
 }
 
+programs.gdc {
+  sources = gdc.vala status.vala
+  vala-packages = posix gio-2.0 gio-unix-2.0
+  packages = gio-2.0 gio-unix-2.0
+  install = false
+}
+
 programs.valac {
   sources = valac.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
@@ -727,6 +734,20 @@ programs.test-bake {
       args = haskell-program-complex
     }
 
+    # D tests
+    d-program-simple {
+      args = d-program-simple
+    }
+    d-program-no-install {
+      args = d-program-no-install
+    }
+    d-program-install-directory {
+      args = d-program-install-directory
+    }
+    d-program-complex {
+      args = d-program-complex
+    }
+
     # Data tests
     data-simple {
       args = data-simple
@@ -1322,6 +1343,21 @@ data.bake-tests {
           haskell-program-complex/test2.hs \
           haskell-program-complex/test3.hs \
           haskell-program-complex/test-disabled.hs \
+          d-program-simple/expected \
+          d-program-simple/Recipe \
+          d-program-simple/test.d \
+          d-program-no-install/expected \
+          d-program-no-install/Recipe \
+          d-program-no-install/test.d \
+          d-program-install-directory/expected \
+          d-program-install-directory/Recipe \
+          d-program-install-directory/test.d \
+          d-program-complex/expected \
+          d-program-complex/Recipe \
+          d-program-complex/test1.d \
+          d-program-complex/test2.d \
+          d-program-complex/test3.d \
+          d-program-complex/test-disabled.d \
           data-simple/expected \
           data-simple/Recipe data-simple/test \
           data-complex/expected \

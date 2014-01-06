@@ -426,6 +426,9 @@ public class GCCModule : BuildModule
         /* Go */
         else if (source.has_suffix (".go"))
             return "gccgo";
+        /* D */
+        if (source.has_suffix (".d"))
+            return "gdc";
         /* Fortran */
         else if (source.has_suffix (".f") ||
                  source.has_suffix (".for") ||

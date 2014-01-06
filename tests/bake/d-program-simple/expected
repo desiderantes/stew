@@ -1,0 +1,16 @@
+!bake
+mkdir -p .built
+gdc -c test.d -o .built/test-test.o
+gdc -o test .built/test-test.o
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/bin
+cp test /usr/bin/test
+(exit SUCCESS)
+!bake uninstall
+rm -f /usr/bin/test
+(exit SUCCESS)
+!bake clean
+rm -rf .built/
+rm -f test
+(exit SUCCESS)

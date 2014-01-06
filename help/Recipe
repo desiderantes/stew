@@ -6,6 +6,7 @@ data.bake {
                   c.page \
                   c++.page \
                   csharp.page \
+                  d.page \
                   data.page \
                   example.page \
                   go.page \

@@ -1,0 +1,9 @@
+project {
+  name = test-project
+}
+
+programs.test {
+  sources = test.d
+  install-directory = $(options.binary-directory)/test
+}
+

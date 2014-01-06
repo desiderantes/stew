@@ -12,6 +12,7 @@ src/bake-template
 src/bake-test
 src/config.vala
 src/libbake.so
+src/libbake.so.0
 src/libbake.a
 tests/bake/test-bake
 tests/bake/ar
@@ -29,6 +30,7 @@ tests/bake/touch
 tests/bake/cat
 tests/bake/valac
 tests/bake/g++
+tests/bake/gdc
 tests/bake/gccgo
 tests/bake/ghc
 tests/bake/moc
@@ -64,4 +66,4 @@ bake_0.1.33+bzr-0_amd64.deb
 bake-0.1.33+bzr.tar.gz
 bake-0.1.33+bzr-1.x86_64.rpm
 bake-0.1.33+bzr.tar.xz
-src/libbake.so.0
+d-test/d-test
