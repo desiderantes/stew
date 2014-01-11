@@ -139,7 +139,7 @@ public class ClangModule : BuildModule
         link_rule.add_output (binary_name);
         var link_command = "@%s -o %s".printf (compiler, binary_name);
         if (compilable is Library)
-            link_command += " -shared";
+            link_command += " -shared -Wl,-soname,%s".printf (binary_name);
         recipe.build_rule.add_input (binary_name);
 
         var archive_name = "lib%s.a".printf (compilable.name);

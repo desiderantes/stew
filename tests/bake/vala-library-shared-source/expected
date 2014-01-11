@@ -12,7 +12,7 @@ valac --ccode shared.vala --use-fast-vapi=.built/test1-test1.vapi
 mv shared.c .built/test1-shared.c
 touch .built/test1-shared.c-stamp
 gcc -w -fPIC -Igobject -Iglib -c .built/test1-shared.c -o .built/test1-shared.o
-gcc -o libtest1.so -shared .built/test1-test1.o .built/test1-shared.o -lgobject -lglib
+gcc -o libtest1.so -shared -Wl,-soname,libtest1.so .built/test1-test1.o .built/test1-shared.o -lgobject -lglib
 ar -cq libtest1.a .built/test1-test1.o .built/test1-shared.o
 valac --ccode --header=test1.h --vapi=test1.vapi --library=test1 --use-fast-vapi=.built/test1-test1.vapi --use-fast-vapi=.built/test1-shared.vapi
 valac --fast-vapi=.built/test2-shared.vapi shared.vala
@@ -27,7 +27,7 @@ valac --ccode shared.vala --use-fast-vapi=.built/test2-test2.vapi
 mv shared.c .built/test2-shared.c
 touch .built/test2-shared.c-stamp
 gcc -w -fPIC -Igobject -Iglib -c .built/test2-shared.c -o .built/test2-shared.o
-gcc -o libtest2.so -shared .built/test2-test2.o .built/test2-shared.o -lgobject -lglib
+gcc -o libtest2.so -shared -Wl,-soname,libtest2.so .built/test2-test2.o .built/test2-shared.o -lgobject -lglib
 ar -cq libtest2.a .built/test2-test2.o .built/test2-shared.o
 valac --ccode --header=test2.h --vapi=test2.vapi --library=test2 --use-fast-vapi=.built/test2-test2.vapi --use-fast-vapi=.built/test2-shared.vapi
 (exit SUCCESS)

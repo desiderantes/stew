@@ -138,7 +138,7 @@ public class ValaModule : BuildModule
         link_rule.add_output (binary_name);
         var link_command = "@gcc -o %s".printf (binary_name);
         if (compilable is Library)
-            link_command += " -shared";
+            link_command += " -shared -Wl,-soname,%s".printf (binary_name);
         recipe.build_rule.add_input (binary_name);
 
         if (compilable.debug)

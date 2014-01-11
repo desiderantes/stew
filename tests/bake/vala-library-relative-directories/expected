@@ -25,7 +25,7 @@ valac --ccode ../uncle/uncle.vala --use-fast-vapi=.built/test-test.vapi --use-fa
 mv uncle.c .built/test-uncle.c
 touch .built/test-uncle.c-stamp
 gcc -w -fPIC -Igobject -Iglib -c .built/test-uncle.c -o .built/test-uncle.o
-gcc -o libtest.so -shared .built/test-test.o .built/test-child.o .built/test-parent.o .built/test-uncle.o -lgobject -lglib
+gcc -o libtest.so -shared -Wl,-soname,libtest.so .built/test-test.o .built/test-child.o .built/test-parent.o .built/test-uncle.o -lgobject -lglib
 ar -cq libtest.a .built/test-test.o .built/test-child.o .built/test-parent.o .built/test-uncle.o
 valac --ccode --header=test.h --vapi=test.vapi --library=test --use-fast-vapi=.built/test-test.vapi --use-fast-vapi=.built/test-child.vapi --use-fast-vapi=.built/test-parent.vapi --use-fast-vapi=.built/test-uncle.vapi
 (exit SUCCESS)

@@ -3,7 +3,7 @@ mkdir -p .built
 clang++ -fPIC -g -c test1.cpp -o .built/test-test1.o
 clang++ -fPIC -g -c test2.cpp -o .built/test-test2.o
 clang++ -fPIC -g -c test3.cpp -o .built/test-test3.o
-clang++ -o libtest.so.1.2 -shared .built/test-test1.o .built/test-test2.o .built/test-test3.o
+clang++ -o libtest.so.1.2 -shared -Wl,-soname,libtest.so.1.2 .built/test-test1.o .built/test-test2.o .built/test-test3.o
 ar -cq libtest.a .built/test-test1.o .built/test-test2.o .built/test-test3.o
 bake-gettext --domain test --mime-type text/x-c++src --output .built/test1.cpp.pot test1.cpp
 bake-gettext --domain test --mime-type text/x-c++src --output .built/test2.cpp.pot test2.cpp

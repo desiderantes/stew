@@ -4,7 +4,7 @@ valac --ccode test.vala
 mv test.c .built/testlib-test.c
 touch .built/testlib-test.c-stamp
 gcc -w -fPIC -Igobject -Iglib -c .built/testlib-test.c -o .built/testlib-test.o
-gcc -o libtestlib.so -shared .built/testlib-test.o -lgobject -lglib
+gcc -o libtestlib.so -shared -Wl,-soname,libtestlib.so .built/testlib-test.o -lgobject -lglib
 ar -cq libtestlib.a .built/testlib-test.o
 valac --fast-vapi=.built/testlib-test.vapi test.vala
 touch .built/testlib-test.vapi-stamp

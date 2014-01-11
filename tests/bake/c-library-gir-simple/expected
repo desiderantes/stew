@@ -1,7 +1,7 @@
 !bake
 mkdir -p .built
 gcc -fPIC -MMD -MF .built/test-test.d -c test.c -o .built/test-test.o
-gcc -o libtest.so -shared .built/test-test.o
+gcc -o libtest.so -shared -Wl,-soname,libtest.so .built/test-test.o
 ar -cq libtest.a .built/test-test.o
 g-ir-scanner --no-libtool --namespace=Test --nsversion=0 --library=test --output Test-0.gir --include=GObject-2.0 test.c
 g-ir-compiler --shared-library=test Test-0.gir -o Test-0.typelib
