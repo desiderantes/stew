@@ -1,3 +1,11 @@
+Overview of changes in bake 0.1.35
+
+    * Set library path when running tests
+    * Set soname when linking libraries
+    * Fix install of library links
+    * Make libbake objects extend GLib.Object
+    * Namespace libbake
+
 Overview of changes in bake 0.1.34
 
     * Split out libbake so other apps can access bake information

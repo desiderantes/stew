@@ -33,6 +33,7 @@ tests/bake/g++
 tests/bake/gdc
 tests/bake/gccgo
 tests/bake/ghc
+tests/bake/ln
 tests/bake/moc
 tests/bake/python
 tests/bake/python2.7
