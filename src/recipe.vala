@@ -356,14 +356,7 @@ public class Recipe
             target_filename = filename;
         var install_path = get_install_path (Path.build_filename (install_dir, target_filename));
 
-        /* Create directory if not already in install rule */
-        var dirname = Path.get_dirname (install_path);
-        var install_command = "@mkdir -p %s".printf (dirname);
-        if (!install_rule.has_command (install_command))
-        {
-            install_rule.add_status_command ("MKDIR %s".printf (dirname));
-            install_rule.add_command (install_command);
-        }
+        make_directory (Path.get_dirname (install_path));
 
         /* Copy file across */
         install_rule.add_status_command ("CP %s %s".printf (filename, install_path));
@@ -372,6 +365,31 @@ public class Recipe
         /* Delete on uninstall */
         uninstall_rule.add_status_command ("RM %s".printf (install_path));
         uninstall_rule.add_command ("@rm -f %s".printf (install_path));
+    }
+
+    public void add_install_link_rule (string filename, string install_dir, string target)
+    {
+        var install_path = get_install_path (Path.build_filename (install_dir, filename));
+        make_directory (Path.get_dirname (install_path));
+
+        /* Make link */
+        install_rule.add_status_command ("LINK %s %s".printf (target, install_path));
+        install_rule.add_command ("@ln -s %s %s".printf (target, install_path));
+
+        /* Delete on uninstall */
+        uninstall_rule.add_status_command ("RM %s".printf (install_path));
+        uninstall_rule.add_command ("@rm -f %s".printf (install_path));
+    }
+
+    private void make_directory (string path)
+    {
+        /* Create directory if not already in install rule */
+        var install_command = "@mkdir -p %s".printf (path);
+        if (install_rule.has_command (install_command))
+            return;
+
+        install_rule.add_status_command ("MKDIR %s".printf (path));
+        install_rule.add_command (install_command);
     }
 
     public void generate_clean_rule ()

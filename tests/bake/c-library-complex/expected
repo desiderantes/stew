@@ -10,11 +10,12 @@ bake-gettext --domain test --mime-type text/x-csrc --output .built/test2.c.pot t
 bake-gettext --domain test --mime-type text/x-csrc --output .built/test3.c.pot test3.c
 bake-gettext --domain test --mime-type text/x-csrc --output .built/test-disabled.c.pot test-disabled.c
 msgcat --force-po --output-file=test.pot .built/test1.c.pot .built/test2.c.pot .built/test3.c.pot .built/test-disabled.c.pot
+ln -s libtest.so.1.2 libtest.so
 (exit SUCCESS)
 !bake install
 mkdir -p /usr/lib
 cp libtest.so.1.2 /usr/lib/libtest.so.1.2
-cp libtest.so /usr/lib/libtest.so
+ln -s libtest.so.1.2 /usr/lib/libtest.so
 cp libtest.a /usr/lib/libtest.a
 mkdir -p /usr/include
 cp test.h /usr/include/test.h

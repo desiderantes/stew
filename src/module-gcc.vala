@@ -55,7 +55,7 @@ public class GCCModule : BuildModule
         {
             recipe.add_install_rule (binary_name, library.install_directory);
             if (so_version != null)
-                recipe.add_install_rule (unversioned_binary_name, library.install_directory);
+                recipe.add_install_link_rule (unversioned_binary_name, library.install_directory, binary_name);
             recipe.add_install_rule (archive_name, library.install_directory);
         }
 
