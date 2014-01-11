@@ -7,13 +7,15 @@
  * version. See http://www.gnu.org/copyleft/gpl.html the full text of the
  * license.
  */
+
+namespace Bake {
  
 public errordomain BuildError
 {
     ERROR
 }
 
-public class Builder
+public class Builder : Object
 {
     public signal void report (string text);
     public signal void report_status (string text);
@@ -230,7 +232,7 @@ public class Builder
     }
 }
 
-private class RuleBuilder
+private class RuleBuilder : Object
 {
     public unowned Builder builder;
     public Rule rule;
@@ -375,4 +377,6 @@ private class RuleBuilder
         output = text;
         return exit_status;
     }
+}
+
 }

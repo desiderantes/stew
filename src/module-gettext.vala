@@ -8,6 +8,8 @@
  * license.
  */
 
+namespace Bake {
+
 private class PotRule : Rule
 {
     public PotRule (Recipe recipe, string pot_filename, bool pretty_print)
@@ -163,4 +165,6 @@ public class GettextModule : BuildModule
                 recipe.add_install_rule (mo_file, target_dir, target_mo_file);
         }
     }
+}
+
 }

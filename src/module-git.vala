@@ -8,6 +8,8 @@
  * license.
  */
 
+namespace Bake {
+
 public class GITModule : BuildModule
 {
     public override void generate_toplevel_rules (Recipe recipe)
@@ -93,4 +95,6 @@ public class GITModule : BuildModule
                 return true;
         return false;
     }
+}
+
 }

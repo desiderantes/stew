@@ -8,6 +8,8 @@
  * license.
  */
 
+namespace Bake {
+
 private class ReleaseRule : Rule
 {
     public HashTable<string, bool> file_table;
@@ -95,4 +97,6 @@ public class ReleaseModule : BuildModule
             }
         }
     }
+}
+
 }

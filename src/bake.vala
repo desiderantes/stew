@@ -37,7 +37,7 @@ private string format_success (string message)
         return message;
 }
 
-public class Bake
+public class BakeApp
 {
     private static bool show_version = false;
     private static bool show_verbose = false;
@@ -83,20 +83,20 @@ public class Bake
         { null }
     };
 
-    public static List<BuildModule> modules;
+    public static List<Bake.BuildModule> modules;
 
-    public static List<Option> options;
-    public static List<Template> templates;
-    public static List<Program> programs;
-    public static List<Library> libraries;
-    public static List<Data> datas;
+    public static List<Bake.Option> options;
+    public static List<Bake.Template> templates;
+    public static List<Bake.Program> programs;
+    public static List<Bake.Library> libraries;
+    public static List<Bake.Data> datas;
 
-    public static Recipe? load_recipes (string filename, bool is_toplevel = true) throws Error
+    public static Bake.Recipe? load_recipes (string filename, bool is_toplevel = true) throws Error
     {
         if (debug_enabled)
-            stderr.printf ("Loading %s\n", get_relative_path (original_dir, filename));
+            stderr.printf ("Loading %s\n", Bake.get_relative_path (original_dir, filename));
 
-        var f = new Recipe.from_file (filename, pretty_print);
+        var f = new Bake.Recipe.from_file (filename, pretty_print);
 
         /* Children can't be new toplevel recipes */
         if (!is_toplevel && f.project_name != null)
@@ -139,7 +139,7 @@ public class Bake
         return f;
     }
 
-    public static void recipe_complete (Recipe recipe)
+    public static void recipe_complete (Bake.Recipe recipe)
     {
         foreach (var module in modules)
             module.recipe_complete (recipe);
@@ -148,7 +148,7 @@ public class Bake
             recipe_complete (child);
     }
 
-    private static bool optimise (HashTable<string, Rule> targets, Recipe recipe)
+    private static bool optimise (HashTable<string, Bake.Rule> targets, Bake.Recipe recipe)
     {
         var result = true;
 
@@ -158,7 +158,7 @@ public class Bake
                 var path = Path.build_filename (recipe.dirname, output);
                 if (targets.lookup (path) != null)
                 {
-                    stdout.printf ("%s\n", format_status ("Output %s is defined in multiple locations".printf (get_relative_path (original_dir, path))));
+                    stdout.printf ("%s\n", format_status ("Output %s is defined in multiple locations".printf (Bake.get_relative_path (original_dir, path))));
                     result = false;
                 }
                 targets.insert (path, rule);
@@ -171,41 +171,41 @@ public class Bake
         return result;
     }
 
-    private static Option make_built_in_option (Recipe conf_file, string id, string description, string default)
+    private static Bake.Option make_built_in_option (Bake.Recipe conf_file, string id, string description, string default)
     {
         conf_file.set_variable ("options.%s.description".printf (id), description);
         conf_file.set_variable ("options.%s.default".printf (id), default);
-        var option = new Option (conf_file, id);
+        var option = new Bake.Option (conf_file, id);
         options.append (option);
 
         return option;
     }
 
-    private static void find_objects (Recipe recipe)
+    private static void find_objects (Bake.Recipe recipe)
     {
         foreach (var id in recipe.get_variable_children ("options"))
         {
-            var option = new Option (recipe, id);
+            var option = new Bake.Option (recipe, id);
             options.append (option);
         }
         foreach (var id in recipe.get_variable_children ("templates"))
         {
-            var template = new Template (recipe, id);
+            var template = new Bake.Template (recipe, id);
             templates.append (template);
         }
         foreach (var id in recipe.get_variable_children ("programs"))
         {
-            var program = new Program (recipe, id);
+            var program = new Bake.Program (recipe, id);
             programs.append (program);
         }
         foreach (var id in recipe.get_variable_children ("libraries"))
         {
-            var library = new Library (recipe, id);
+            var library = new Bake.Library (recipe, id);
             libraries.append (library);
         }
         foreach (var id in recipe.get_variable_children ("data"))
         {
-            var data = new Data (recipe, id);
+            var data = new Bake.Data (recipe, id);
             datas.append (data);
         }
 
@@ -213,7 +213,7 @@ public class Bake
             find_objects (child);
     }
 
-    private static Option? get_option (string id)
+    private static Bake.Option? get_option (string id)
     {
         foreach (var option in options)
             if (option.id == id)
@@ -222,11 +222,11 @@ public class Bake
         return null;
     }
 
-    private static void generate_library_rules (Library library) throws Error
+    private static void generate_library_rules (Bake.Library library) throws Error
     {
         var recipe = library.recipe;
 
-        var buildable_modules = new List<BuildModule> ();
+        var buildable_modules = new List<Bake.BuildModule> ();
         foreach (var module in modules)
         {
             if (module.can_generate_library_rules (library))
@@ -247,11 +247,11 @@ public class Bake
         }
     }
 
-    private static void generate_program_rules (Program program) throws Error
+    private static void generate_program_rules (Bake.Program program) throws Error
     {
         var recipe = program.recipe;
 
-        var buildable_modules = new List<BuildModule> ();
+        var buildable_modules = new List<Bake.BuildModule> ();
         foreach (var module in modules)
         {
             if (module.can_generate_program_rules (program))
@@ -286,13 +286,13 @@ public class Bake
         }
     }
 
-    private static void generate_data_rules (Data data) throws Error
+    private static void generate_data_rules (Bake.Data data) throws Error
     {
         foreach (var module in modules)
             module.generate_data_rules (data);
     }
 
-    private static void generate_template_rules (Template template) throws Error
+    private static void generate_template_rules (Bake.Template template) throws Error
     {
         var variables = template.get_variable ("variables").replace ("\n", " ");
         /* FIXME: Validate and expand the variables and escape suitable for command line */
@@ -317,26 +317,26 @@ public class Bake
         }
     }
 
-    private static void generate_clean_rules (Recipe recipe)
+    private static void generate_clean_rules (Bake.Recipe recipe)
     {
         recipe.generate_clean_rule ();
         foreach (var child in recipe.children)
             generate_clean_rules (child);
     }
 
-    private static void generate_test_rule (Recipe recipe)
+    private static void generate_test_rule (Bake.Recipe recipe)
     {
         var targets = new List<string> ();
         get_test_targets (recipe, ref targets);
 
         var command = "@bake-test check";
         foreach (var t in targets)
-            command += " " + get_relative_path (recipe.dirname, t);
+            command += " " + Bake.get_relative_path (recipe.dirname, t);
 
         recipe.test_rule.add_command (command);
     }
 
-    private static void get_test_targets (Recipe recipe, ref List<string> targets)
+    private static void get_test_targets (Bake.Recipe recipe, ref List<string> targets)
     {
         foreach (var input in recipe.test_rule.outputs)
             if (input != "%test")
@@ -381,42 +381,42 @@ public class Bake
         else
             show_color = Posix.isatty (Posix.STDOUT_FILENO);
 
-        modules.append (new BZIPModule ());
-        modules.append (new BZRModule ());
-        modules.append (new DataModule ());
-        modules.append (new DpkgModule ());
-        modules.append (new GCCModule ());
-        modules.append (new ClangModule ());
-        modules.append (new GettextModule ());
-        modules.append (new GHCModule ());
-        modules.append (new GITModule ());
-        modules.append (new GNOMEModule ());
-        modules.append (new GSettingsModule ());
-        modules.append (new GTKModule ());
-        modules.append (new GZIPModule ());
-        modules.append (new JavaModule ());
-        modules.append (new LaunchpadModule ());
-        modules.append (new MallardModule ());
-        modules.append (new ManModule ());
-        modules.append (new MonoModule ());
-        modules.append (new PythonModule ());
-        modules.append (new ReleaseModule ());
-        modules.append (new RPMModule ());
-        modules.append (new ScriptModule ());
-        modules.append (new ValaModule ());
-        modules.append (new XdgModule ());
-        modules.append (new XZIPModule ());
+        modules.append (new Bake.BZIPModule ());
+        modules.append (new Bake.BZRModule ());
+        modules.append (new Bake.DataModule ());
+        modules.append (new Bake.DpkgModule ());
+        modules.append (new Bake.GCCModule ());
+        modules.append (new Bake.ClangModule ());
+        modules.append (new Bake.GettextModule ());
+        modules.append (new Bake.GHCModule ());
+        modules.append (new Bake.GITModule ());
+        modules.append (new Bake.GNOMEModule ());
+        modules.append (new Bake.GSettingsModule ());
+        modules.append (new Bake.GTKModule ());
+        modules.append (new Bake.GZIPModule ());
+        modules.append (new Bake.JavaModule ());
+        modules.append (new Bake.LaunchpadModule ());
+        modules.append (new Bake.MallardModule ());
+        modules.append (new Bake.ManModule ());
+        modules.append (new Bake.MonoModule ());
+        modules.append (new Bake.PythonModule ());
+        modules.append (new Bake.ReleaseModule ());
+        modules.append (new Bake.RPMModule ());
+        modules.append (new Bake.ScriptModule ());
+        modules.append (new Bake.ValaModule ());
+        modules.append (new Bake.XdgModule ());
+        modules.append (new Bake.XZIPModule ());
 
         /* Find the toplevel */
         var toplevel_dir = original_dir;
         var have_recipe = false;
-        Recipe? toplevel = null;
+        Bake.Recipe? toplevel = null;
         while (true)
         {
             var filename = Path.build_filename (toplevel_dir, "Recipe");
             try
             {
-                toplevel = new Recipe.from_file (filename, pretty_print);
+                toplevel = new Bake.Recipe.from_file (filename, pretty_print);
                 if (toplevel.project_name != null)
                     break;
             }
@@ -426,16 +426,16 @@ public class Bake
                 {
                     if (have_recipe)
                     {
-                        stdout.printf ("%s\n", format_status ("No toplevel recipe found.\nThe toplevel recipe file must specify the project name.\nThe last file checked was '%s'.".printf (get_relative_path (original_dir, filename))));
+                        stdout.printf ("%s\n", format_status ("No toplevel recipe found.\nThe toplevel recipe file must specify the project name.\nThe last file checked was '%s'.".printf (Bake.get_relative_path (original_dir, filename))));
                     }
                     else
                     {
                         stdout.printf ("%s\n", format_status ("No recipe found.\nTo build a project Bake requires a file called 'Recipe' in the current directory."));
                     }
                 }
-                else if (e is RecipeError)
+                else if (e is Bake.RecipeError)
                 {
-                    stdout.printf ("%s\n", format_status ("Recipe file '%s' is invalid.\n%s".printf (get_relative_path (original_dir, filename), e.message)));
+                    stdout.printf ("%s\n", format_status ("Recipe file '%s' is invalid.\n%s".printf (Bake.get_relative_path (original_dir, filename), e.message)));
                 }
                 stdout.printf ("%s\n", format_error ("[Build failed]"));
                 return Posix.EXIT_FAILURE;
@@ -445,7 +445,7 @@ public class Bake
         }
 
         var minimum_bake_version = toplevel.get_variable ("project.minimum-bake-version");
-        if (minimum_bake_version != null && pkg_compare_version (VERSION, minimum_bake_version) < 0)
+        if (minimum_bake_version != null && Bake.pkg_compare_version (VERSION, minimum_bake_version) < 0)
         {
             stdout.printf ("%s\n", format_status ("This version of Bake is too old for this project.\nVersion %s or greater is required.\nThis is Bake %s.".printf (minimum_bake_version, VERSION)));
             stdout.printf ("%s\n", format_error ("[Build failed]"));
@@ -460,17 +460,17 @@ public class Bake
 
         /* Load configuration */
         var need_configure = false;
-        Recipe conf_file = null;
+        Bake.Recipe conf_file = null;
         try
         {
-            conf_file = new Recipe.from_file (Path.build_filename (toplevel_dir, "Recipe.conf"), pretty_print, false);
+            conf_file = new Bake.Recipe.from_file (Path.build_filename (toplevel_dir, "Recipe.conf"), pretty_print, false);
         }
         catch (Error e)
         {
             if (e is FileError.NOENT)
             {
                 need_configure = true;
-                conf_file = new Recipe (pretty_print);
+                conf_file = new Bake.Recipe (pretty_print);
             }
             else
             {
@@ -685,7 +685,7 @@ public class Bake
         generate_test_rule (recipe);
 
         /* Optimise */
-        toplevel.targets = new HashTable<string, Rule> (str_hash, str_equal);
+        toplevel.targets = new HashTable<string, Bake.Rule> (str_hash, str_equal);
         var optimise_result = optimise (toplevel.targets, toplevel);
 
         recipe_complete (toplevel);
@@ -701,7 +701,7 @@ public class Bake
         if (do_list_targets)
         {
             var targets = new List<string> ();
-            var build_dir = "%s/".printf (get_relative_path (recipe.dirname, recipe.build_directory));
+            var build_dir = "%s/".printf (Bake.get_relative_path (recipe.dirname, recipe.build_directory));
             foreach (var rule in recipe.rules)
             {
                 foreach (var output in rule.outputs)
@@ -735,20 +735,20 @@ public class Bake
         if (!target.has_prefix ("%") && recipe.get_rule_with_target (Path.build_filename (recipe.dirname, "%" + target)) != null)
             target = "%" + target;
 
-        var builder = new Builder (do_parallel, pretty_print, debug_enabled, original_dir);
+        var builder = new Bake.Builder (do_parallel, pretty_print, debug_enabled, original_dir);
         builder.report.connect ((text) => { stdout.printf ("%s\n", text); });
         builder.report_status.connect ((text) => { stdout.printf ("%s\n", format_status (text)); });
         builder.report_output.connect ((text) => { stdout.printf ("%s", text); });
         builder.report_debug.connect ((text) => { if (debug_enabled) stderr.printf ("%s", text); });
         var exit_code = Posix.EXIT_SUCCESS;
-        builder.build_target.begin (recipe, join_relative_dir (recipe.dirname, target), (o, x) =>
+        builder.build_target.begin (recipe, Bake.join_relative_dir (recipe.dirname, target), (o, x) =>
         {
             try
             {
                 builder.build_target.end (x);
                 stdout.printf ("%s\n", format_success ("[Build complete]"));
             }
-            catch (BuildError e)
+            catch (Bake.BuildError e)
             {
                 stdout.printf ("%s\n", format_status ("%s".printf (e.message)));
                 stdout.printf ("%s\n", format_error ("[Build failed]"));

@@ -8,7 +8,9 @@
  * license.
  */
 
-public class Rule
+namespace Bake {
+
+public class Rule : Object
 {
     public Recipe recipe;
     public List<string> inputs;
@@ -158,4 +160,6 @@ public class CleanRule : Rule
 
         return dynamic_commands;
     }
+}
+
 }

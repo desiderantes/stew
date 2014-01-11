@@ -8,6 +8,8 @@
  * license.
  */
 
+namespace Bake {
+
 public class GHCModule : BuildModule
 {
     public override bool can_generate_program_rules (Program program) throws Error
@@ -69,4 +71,6 @@ public class GHCModule : BuildModule
         if (program.install)
             recipe.add_install_rule (binary_name, program.install_directory);
     }
+}
+
 }

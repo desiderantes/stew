@@ -8,12 +8,14 @@
  * license.
  */
 
+namespace Bake {
+
 public errordomain RecipeError
 {
     INVALID
 }
 
-public class Recipe
+public class Recipe : Object
 {
     public string filename;
     public Recipe? parent = null;
@@ -510,7 +512,7 @@ public errordomain TaggedListError
     UNTERMINATED_TAG
 }
 
-public class Block
+public class Block// : Object // FIXME: Causes valac to crash for some reason
 {
     public Recipe recipe;
     private string type_name;
@@ -601,7 +603,7 @@ public class Block
     }
 }
 
-public class TaggedEntry
+public class TaggedEntry : Object
 {
     public Recipe recipe;
     public string name;
@@ -866,4 +868,6 @@ public List<string> split_variable (string value)
         values.append (value.substring (start, end - start));
         start = end;
     }
+}
+
 }

@@ -8,6 +8,8 @@
  * license.
  */
 
+namespace Bake {
+
 public class PythonModule : BuildModule
 {
     public override bool can_generate_program_rules (Program program) throws Error
@@ -180,4 +182,6 @@ public class PythonModule : BuildModule
 
         return tokens[1];
     }
+}
+
 }

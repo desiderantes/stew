@@ -8,6 +8,8 @@
  * license.
  */
 
+namespace Bake {
+
 public class DataModule : BuildModule
 {
     public override void generate_data_rules (Data data) throws Error
@@ -23,4 +25,6 @@ public class DataModule : BuildModule
                 recipe.add_install_rule (entry.name, data.install_directory);
         }
     }
+}
+
 }

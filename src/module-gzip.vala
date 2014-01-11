@@ -8,6 +8,8 @@
  * license.
  */
 
+namespace Bake {
+
 public class GZIPModule : BuildModule
 {
     public override void generate_toplevel_rules (Recipe recipe)
@@ -25,4 +27,6 @@ public class GZIPModule : BuildModule
         rule.add_output ("%release-gzip");
         rule.add_input (filename);
     }
+}
+
 }

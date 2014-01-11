@@ -8,6 +8,8 @@
  * license.
  */
 
+namespace Bake {
+
 public class BZIPModule : BuildModule
 {
     public override void generate_toplevel_rules (Recipe recipe)
@@ -25,4 +27,6 @@ public class BZIPModule : BuildModule
         rule.add_output ("%release-bzip");
         rule.add_input (filename);
     }
+}
+
 }

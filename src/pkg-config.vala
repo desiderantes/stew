@@ -7,6 +7,8 @@
  * version. See http://www.gnu.org/copyleft/gpl.html the full text of the
  * license.
  */
+ 
+namespace Bake { 
 
 public int pkg_compare_version (string v0, string v1)
 {
@@ -30,7 +32,7 @@ public int pkg_compare_version (string v0, string v1)
     return 0;
 }
 
-public class PkgConfigFile
+public class PkgConfigFile : Object
 {
     public string id;
     public string? error;
@@ -343,7 +345,7 @@ public class PkgConfigFile
     private HashTable<string, string> keywords;
 }
 
-public class RequireEntry
+public class RequireEntry : Object
 {
     public string name;
     public string? condition = null;
@@ -372,4 +374,6 @@ public class RequireEntry
             return false;
         }
     }
+}
+
 }

@@ -8,6 +8,8 @@
  * license.
  */
 
+namespace Bake {
+
 public class ValaModule : BuildModule
 {
     public override bool can_generate_program_rules (Program program) throws Error
@@ -526,4 +528,6 @@ public class ValaModule : BuildModule
                 GettextModule.add_translatable_file (compilable.recipe, compilable.gettext_domain, "text/x-chdr", source);
         }
     }
+}
+
 }

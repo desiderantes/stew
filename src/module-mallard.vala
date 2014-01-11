@@ -8,6 +8,8 @@
  * license.
  */
 
+namespace Bake {
+
 public class MallardModule : BuildModule
 {
     public override void generate_data_rules (Data data) throws Error
@@ -58,4 +60,6 @@ public class MallardModule : BuildModule
             recipe.add_install_rule (page, dir);
         }
     }
+}
+
 }

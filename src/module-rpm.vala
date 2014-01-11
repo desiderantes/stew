@@ -8,6 +8,8 @@
  * license.
  */
 
+namespace Bake {
+
 public class RPMModule : BuildModule
 {
     public override void generate_toplevel_rules (Recipe recipe)
@@ -93,5 +95,7 @@ public class RPMModule : BuildModule
         rule = recipe.add_rule ();
         rule.add_input (rpm_file);
         rule.add_output ("%release-rpm");
-   }
+    }
+}
+
 }

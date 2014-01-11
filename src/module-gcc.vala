@@ -8,6 +8,8 @@
  * license.
  */
 
+namespace Bake {
+
 public class GCCModule : BuildModule
 {
     public override bool can_generate_program_rules (Program program) throws Error
@@ -459,4 +461,6 @@ public class GCCModule : BuildModule
         else
             return null;
     }
+}
+
 }

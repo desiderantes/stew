@@ -8,6 +8,8 @@
  * license.
  */
 
+namespace Bake {
+
 public string get_relative_path (string source_path, string target_path)
 {
     /* Already relative */
@@ -70,4 +72,6 @@ public string replace_extension (string filename, string extension)
         return "%s.%s".printf (filename, extension);
 
     return "%.*s.%s".printf (i, filename, extension);
+}
+
 }

@@ -8,7 +8,9 @@
  * license.
  */
 
-public class BuildModule
+namespace Bake {
+
+public class BuildModule : Object
 {
     public virtual void generate_toplevel_rules (Recipe toplevel)
     {
@@ -43,4 +45,6 @@ public class BuildModule
     public virtual void rules_complete (Recipe toplevel)
     {
     }
+}
+
 }

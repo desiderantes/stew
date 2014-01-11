@@ -8,6 +8,8 @@
  * license.
  */
 
+namespace Bake {
+
 public class XZIPModule : BuildModule
 {
     public override void generate_toplevel_rules (Recipe recipe)
@@ -25,4 +27,6 @@ public class XZIPModule : BuildModule
         rule.add_output ("%release-xzip");
         rule.add_input (filename);
     }
+}
+
 }

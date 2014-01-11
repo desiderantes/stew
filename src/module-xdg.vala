@@ -8,6 +8,8 @@
  * license.
  */
 
+namespace Bake {
+
 public class XdgModule : BuildModule
 {
     public override void generate_data_rules (Data data) throws Error
@@ -55,4 +57,6 @@ public class XdgModule : BuildModule
             recipe.add_install_rule (appdata_file, appdata_dir);
         }
     }
+}
+
 }

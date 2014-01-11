@@ -8,6 +8,8 @@
  * license.
  */
 
+namespace Bake {
+
 public class ManModule : BuildModule
 {
     public override void generate_data_rules (Data data) throws Error
@@ -33,4 +35,6 @@ public class ManModule : BuildModule
             recipe.add_install_rule (page, dir);
         }
     }
+}
+
 }
