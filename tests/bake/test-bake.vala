@@ -268,6 +268,7 @@ public class TestRunner
 
         /* Only run our special versions of the tools */
         Environment.set_variable ("PATH", "%s:%s/../../src:%s".printf (Environment.get_current_dir (), Environment.get_current_dir (), Environment.get_variable ("PATH")), true);
+        Environment.set_variable ("LD_LIBRARY_PATH", "%s/../../src".printf (Environment.get_current_dir ()), true);
         Environment.set_variable ("BAKE_TEST_STATUS_SOCKET", status_socket_name, true);
         Environment.set_variable ("PKG_CONFIG_PATH", Path.build_filename (Environment.get_current_dir (), "pkg-config"), true);
 
