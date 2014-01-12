@@ -512,7 +512,7 @@ public errordomain TaggedListError
     UNTERMINATED_TAG
 }
 
-public class Block// : Object // FIXME: Causes valac to crash for some reason
+public class Block : Object
 {
     public Recipe recipe;
     private string type_name;
@@ -746,9 +746,9 @@ public class Compilable : Block
 
     public string? gettext_domain { owned get { return get_variable ("gettext-domain"); } }
 
-    public bool install { owned get { return get_boolean_variable ("install", true); } }
+    public bool install { get { return get_boolean_variable ("install", true); } }
 
-    public bool debug { owned get { return get_boolean_variable ("debug", false); } }
+    public bool debug { get { return get_boolean_variable ("debug", false); } }
 
     public string? get_flags (string name, string? fallback = null)
     {
@@ -834,7 +834,7 @@ public class Data : Block
 
     public string? gettext_domain { owned get { return get_variable ("gettext-domain"); } }
 
-    public bool install { owned get { return get_boolean_variable ("install", true); } }
+    public bool install { get { return get_boolean_variable ("install", true); } }
 
     public string install_directory
     {
