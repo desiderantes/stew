@@ -1425,7 +1425,7 @@ data.bake-tests {
           data-pkg-config-simple/expected \
           data-pkg-config-simple/Recipe \
           data-pkg-config-simple/test.pc \
-          data-pkg-config-simple/expected \
+          data-pkg-config-complex/expected \
           data-pkg-config-complex/Recipe \
           data-pkg-config-complex/test.pc \
           data-pkg-config-complex/test-disabled.pc \
