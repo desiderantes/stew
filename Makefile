@@ -34,6 +34,7 @@ SOURCES = src/bake.vala \
           src/module-mallard.vala \
           src/module-man.vala \
           src/module-mono.vala \
+          src/module-pkg-config.vala \
           src/module-python.vala \
           src/module-release.vala \
           src/module-rpm.vala \

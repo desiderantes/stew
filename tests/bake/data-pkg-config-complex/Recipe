@@ -1,0 +1,9 @@
+project {
+  name = test-project
+}
+
+data.test {
+  pkg-config-files = test.pc \
+                     test-disabled.pc (if false)
+  install-directory = $(options.data-directory)/pkg-config                     
+}

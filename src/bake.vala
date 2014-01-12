@@ -399,6 +399,7 @@ public class BakeApp
         modules.append (new Bake.MallardModule ());
         modules.append (new Bake.ManModule ());
         modules.append (new Bake.MonoModule ());
+        modules.append (new Bake.PkgConfigModule ());
         modules.append (new Bake.PythonModule ());
         modules.append (new Bake.ReleaseModule ());
         modules.append (new Bake.RPMModule ());

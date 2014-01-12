@@ -1,0 +1,7 @@
+project {
+  name = test-project
+}
+
+data.test {
+  pkg-config-files = test.pc
+}

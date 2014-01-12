@@ -1,0 +1,11 @@
+!bake
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/lib/pkg-config
+cp test.pc /usr/lib/pkg-config/test.pc
+(exit SUCCESS)
+!bake uninstall
+rm -f /usr/lib/pkg-config/test.pc
+(exit SUCCESS)
+!bake clean
+(exit SUCCESS)

@@ -1,0 +1,20 @@
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="pkg-config">
+<info>
+    <link type="guide" xref="index#data"/>
+</info>
+
+<title>pkg-config Files</title>
+
+<p>
+Projects that use pkg-config files for libraries can specify them so that they can be easily installed.
+The pkg-config files need to be listed using the <code>data.<em>name</em>.pkg-config-files</code> <link xref="variables">variable</link>.
+</p>
+<example>
+<p>
+For example, this <link xref="recipe-files">recipe</link> specifies one pkg-config to be installed:
+</p>
+<code>
+data.example.pkg-config-files = example.pc
+</code>
+</example>
+</page>

@@ -784,6 +784,13 @@ programs.test-bake {
       args = data-gettext
     }
 
+    data-pkg-config-simple {
+      args = data-pkg-config-simple
+    }
+    data-pkg-config-complex {
+      args = data-pkg-config-complex
+    }
+
     data-gsettings-simple {
       args = data-gsettings-simple
     }
@@ -1415,6 +1422,13 @@ data.bake-tests {
           data-mallard-complex/test-disabled.page \
           data-mallard-complex/fr.po \
           data-mallard-complex/it.po \
+          data-pkg-config-simple/expected \
+          data-pkg-config-simple/Recipe \
+          data-pkg-config-simple/test.pc \
+          data-pkg-config-simple/expected \
+          data-pkg-config-complex/Recipe \
+          data-pkg-config-complex/test.pc \
+          data-pkg-config-complex/test-disabled.pc \
           data-gettext/expected \
           data-gettext/Recipe \
           data-gettext/de.po \

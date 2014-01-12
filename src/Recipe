@@ -27,6 +27,7 @@ libraries {
               module-mallard.vala \
               module-man.vala \
               module-mono.vala \
+              module-pkg-config.vala \
               module-python.vala \
               module-release.vala \
               module-rpm.vala \

@@ -20,6 +20,7 @@ data.bake {
                   mallard.page \
                   man.page \
                   options.page \
+                  pkg-config.page \
                   programs.page \
                   python.page \
                   qt.page \
