@@ -18,7 +18,7 @@ public class PkgConfigModule : BuildModule
 
         var install_directory = data.get_variable ("install-directory");
         if (install_directory == null)
-            install_directory = Path.build_filename (recipe.library_directory, "pkg-config");
+            install_directory = Path.build_filename (recipe.library_directory, "pkgconfig");
         foreach (var entry in data.get_tagged_list ("pkg-config-files"))
         {
             if (!entry.is_allowed)

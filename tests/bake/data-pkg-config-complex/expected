@@ -1,11 +1,11 @@
 !bake
 (exit SUCCESS)
 !bake install
-mkdir -p /usr/share/pkg-config
-cp test.pc /usr/share/pkg-config/test.pc
+mkdir -p /usr/share/pkgconfig
+cp test.pc /usr/share/pkgconfig/test.pc
 (exit SUCCESS)
 !bake uninstall
-rm -f /usr/share/pkg-config/test.pc
+rm -f /usr/share/pkgconfig/test.pc
 (exit SUCCESS)
 !bake clean
 (exit SUCCESS)
