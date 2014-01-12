@@ -11,6 +11,7 @@ src/bake-gettext
 src/bake-template
 src/bake-test
 src/config.vala
+src/libbake.pc
 src/libbake.so
 src/libbake.so.0
 src/libbake.a

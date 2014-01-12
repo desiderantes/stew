@@ -3,6 +3,15 @@ templates.config {
   variables = %VERSION%=$(project.version) %LIBRARY_DIRECTORY%=$(options.library-directory)
 }
 
+templates.pkg-config {
+  files = libbake.pc
+  variables = %VERSION%=$(project.version) %LIBRARY_DIRECTORY%=$(options.library-directory) %RESOURCE_DIRECTORY%=$(options.resource-directory)
+}
+
+data.pkg-config {
+  pkg-config-files = libbake.pc
+}
+
 libraries {
   bake {
     sources = builder.vala \
