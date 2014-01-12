@@ -1,3 +1,8 @@
+Overview of changes in bake 0.1.36
+
+    * Add support for pkg-config files
+    * Make a pkg-config file for libbake
+
 Overview of changes in bake 0.1.35
 
     * Set library path when running tests
