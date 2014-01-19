@@ -23,6 +23,10 @@ Vala programs and libraries can set the following program <link xref="variables"
   <td><p>Shared object version for library (libraries only, optional)</p></td>
 </tr>
 <tr>
+  <td><p>symbol-filter</p></td>
+  <td><p>Regular expression to filter which symbols are exported (libraries only, optional)</p></td>
+</tr>
+<tr>
   <td><p>vala-compile-flags</p></td>
   <td><p>Additional command line flags passed to Vala compiler</p></td>
 </tr>

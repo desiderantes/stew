@@ -28,6 +28,10 @@ C++ programs and libraries can set the following program <link xref="variables">
   <td><p>Shared object version for library (libraries only, optional)</p></td>
 </tr>
 <tr>
+  <td><p>symbol-filter</p></td>
+  <td><p>Regular expression to filter which symbols are exported (libraries only, optional)</p></td>
+</tr>
+<tr>
   <td><p>headers</p></td>
   <td><p>Header files that specify the library interface (libraries only)</p></td>
 </tr>

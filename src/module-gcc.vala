@@ -184,6 +184,20 @@ public class GCCModule : BuildModule
             link_command += " -shared -Wl,-soname,%s".printf (binary_name);
         recipe.build_rule.add_input (binary_name);
 
+        var filter = compilable.get_variable ("symbol-filter");
+        Rule? symbol_rule = null;
+        var symbol_command = "bake-library";
+        if (filter != null)
+        {
+            symbol_rule = recipe.add_rule ();
+            var filename = recipe.get_build_path (compilable.id + ".ver");
+            symbol_rule.add_output (filename);
+            symbol_command += " --output %s --filter '%s'".printf (filename, filter);
+
+            link_rule.add_input (filename);
+            link_command += " -Wl,-version-script,%s".printf (filename);
+        }
+
         var archive_name = "lib%s.a".printf (compilable.name);
         Rule? archive_rule = null;
         var archive_command = "";
@@ -315,6 +329,12 @@ public class GCCModule : BuildModule
             var deps_file = recipe.get_build_path (compilable.id + "-" + replace_extension (source_base, "d"));
             var moc_file = replace_extension (source, "moc");
 
+            if (symbol_rule != null)
+            {
+                symbol_rule.add_input (output);
+                symbol_command += " " + output;
+            }
+
             var rule = recipe.add_rule ();
             rule.add_input (input);
             if (compiler == "gcc" || compiler == "g++")
@@ -361,6 +381,9 @@ public class GCCModule : BuildModule
         if (link_flags != null)
             link_command += " " + link_flags;
         link_rule.add_command (link_command);
+
+        if (symbol_rule != null)
+            symbol_rule.add_command (symbol_command);
 
         if (compilable is Library)
         {

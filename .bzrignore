@@ -8,6 +8,7 @@ src/bake
 src/bake.h
 src/bake.vapi
 src/bake-gettext
+src/bake-library
 src/bake-template
 src/bake-test
 src/config.vala
@@ -18,6 +19,7 @@ src/libbake.a
 tests/bake/test-bake
 tests/bake/ar
 tests/bake/bake-gettext
+tests/bake/bake-library
 tests/bake/bake-template
 tests/bake/bake-test
 tests/bake/clang

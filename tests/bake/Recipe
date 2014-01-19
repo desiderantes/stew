@@ -217,6 +217,13 @@ programs.bake-gettext {
   install = false
 }
 
+programs.bake-library {
+  sources = bake-library.vala status.vala
+  vala-packages = posix gio-2.0 gio-unix-2.0
+  packages = gio-2.0 gio-unix-2.0
+  install = false
+}
+
 programs.bake-template {
   sources = bake-template.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0

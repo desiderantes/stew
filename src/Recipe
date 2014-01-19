@@ -71,6 +71,11 @@ programs {
     vala-packages = posix
   }
 
+  bake-library {
+    sources = bake-library.vala
+    vala-packages = posix
+  }
+
   bake {
     sources = bake.vala
     vala-packages = posix gio-2.0
