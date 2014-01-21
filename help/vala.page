@@ -24,7 +24,7 @@ Vala programs and libraries can set the following program <link xref="variables"
 </tr>
 <tr>
   <td><p>symbol-filter</p></td>
-  <td><p>Regular expression to filter which symbols are exported (libraries only, optional)</p></td>
+  <td><p>Symbols that will be exported (libraries only, optional)</p></td>
 </tr>
 <tr>
   <td><p>vala-compile-flags</p></td>
@@ -106,6 +106,35 @@ programs.example-program {
 
 libraries.example-library {
   sources = module.vala
+}
+</code>
+</example>
+<p>
+The symbols exported into a library can be limited by using a symbol filter.
+A symbol filter contains one or more symbols that should be exported.
+If a symbol should be hidden (not exported) follow it with <code>(hide)</code>.
+Symbols can be specified using a regular expression.
+</p>
+<example>
+<p>
+This library exports only the symbols for the <code>foo()</code> and <code>bar()</code> functions:
+</p>
+<code>
+libraries.example-library {
+  sources = module.vala
+  symbol-filter = foo bar
+}
+</code>
+</example>
+<example>
+<p>
+This library exports all symbols with the prefix <code>test_</code> but not the prefix <code>test_priv_</code>
+</p>
+<code>
+libraries.example-library {
+  sources = module.vala
+  symbol-filter = test_priv_.* (hide) \
+                  test_.*
 }
 </code>
 </example>

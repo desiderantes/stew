@@ -11,7 +11,9 @@ libraries.test {
   headers = test.h \
             test-disabled.h (if false)
   gettext-domain = test
-  symbol-filter = ^test_
+  symbol-filter = hidden (hide) \
+                  test_.* \
+                  x (if false)
   compile-flags = -DFOO=1
   link-flags = -lm
   debug = true

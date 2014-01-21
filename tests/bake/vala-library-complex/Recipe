@@ -13,7 +13,9 @@ libraries.test {
   gettext-domain = test
   vala-compile-flags = --target-glib 2.32 \
                        --define=TEST
-  symbol-filter = ^test_
+  symbol-filter = hidden (hide) \
+                  test_.* \
+                  x (if false)
   compile-flags = -DFOO=1
   link-flags = -lm
   debug = true

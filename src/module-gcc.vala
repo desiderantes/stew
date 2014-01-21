@@ -184,15 +184,31 @@ public class GCCModule : BuildModule
             link_command += " -shared -Wl,-soname,%s".printf (binary_name);
         recipe.build_rule.add_input (binary_name);
 
-        var filter = compilable.get_variable ("symbol-filter");
+        var filters = compilable.get_tagged_list ("symbol-filter");
         Rule? symbol_rule = null;
         var symbol_command = "bake-get-symbols";
-        if (filter != null)
+        if (filters != null)
         {
             symbol_rule = recipe.add_rule ();
             var filename = recipe.get_build_path (compilable.id + ".ver");
             symbol_rule.add_output (filename);
-            symbol_command += " --output %s --global '%s'".printf (filename, filter);
+            symbol_command += " --output %s".printf (filename);
+            foreach (var f in filters)
+            {
+                if (!f.is_allowed)
+                    continue;
+
+                var regex = f.name;
+                if (!regex.has_prefix ("^"))
+                    regex = "^" + regex;
+                if (!regex.has_suffix ("$"))
+                    regex = regex + "$";
+
+                if (f.has_tag ("hide"))
+                    symbol_command += " --local '%s'".printf (regex);
+                else
+                    symbol_command += " --global '%s'".printf (regex);
+            }
 
             link_rule.add_input (filename);
             link_command += " -Wl,-version-script,%s".printf (filename);

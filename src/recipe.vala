@@ -633,6 +633,14 @@ public class TaggedEntry : Object
         }
     }
 
+    public bool has_tag (string name)
+    {
+        foreach (var tag in tags)
+            if (tag == name)
+                return true;
+        return false;
+    }
+
     private string solve_condition (string condition)
     {
         /* Solve parenthesis first */
