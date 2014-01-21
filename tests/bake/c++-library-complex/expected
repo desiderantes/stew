@@ -3,7 +3,7 @@ mkdir -p .built
 g++ -fPIC -DFOO=1 -g -MMD -MF .built/test-test1.d -c test1.cpp -o .built/test-test1.o
 g++ -fPIC -DFOO=1 -g -MMD -MF .built/test-test2.d -c test2.cpp -o .built/test-test2.o
 g++ -fPIC -DFOO=1 -g -MMD -MF .built/test-test3.d -c test3.cpp -o .built/test-test3.o
-bake-get-symbols --output .built/test.ver --filter ^test_ .built/test-test1.o .built/test-test2.o .built/test-test3.o
+bake-get-symbols --output .built/test.ver --global ^test_ .built/test-test1.o .built/test-test2.o .built/test-test3.o
 g++ -o libtest.so.1.2 -shared -Wl,-soname,libtest.so.1.2 -Wl,-version-script,.built/test.ver .built/test-test1.o .built/test-test2.o .built/test-test3.o -lm
 ar -cq libtest.a .built/test-test1.o .built/test-test2.o .built/test-test3.o
 bake-gettext --domain test --mime-type text/x-c++src --output .built/test1.cpp.pot test1.cpp

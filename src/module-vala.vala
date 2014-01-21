@@ -160,7 +160,7 @@ public class ValaModule : BuildModule
             symbol_rule = recipe.add_rule ();
             var filename = recipe.get_build_path (compilable.id + ".ver");
             symbol_rule.add_output (filename);
-            symbol_command += " --output %s --filter '%s'".printf (filename, filter);
+            symbol_command += " --output %s --global '%s'".printf (filename, filter);
 
             link_rule.add_input (filename);
             link_command += " -Wl,-version-script,%s".printf (filename);

@@ -19,7 +19,7 @@ mv test3.c .built/test-test3.c
 touch .built/test-test3.c-stamp
 gcc -w -fPIC -DFOO=1 -g -Igobject -Iglib -c .built/test-test3.c -o .built/test-test3.o
 gcc -fPIC -DFOO=1 -g -Igobject -Iglib -c test-c.c -o .built/test-test-c.o
-bake-get-symbols --output .built/test.ver --filter ^test_ .built/test-test1.o .built/test-test2.o .built/test-test3.o .built/test-test-c.o
+bake-get-symbols --output .built/test.ver --global ^test_ .built/test-test1.o .built/test-test2.o .built/test-test3.o .built/test-test-c.o
 gcc -o libtest.so.1.2 -shared -Wl,-soname,libtest.so.1.2 -Wl,-version-script,.built/test.ver .built/test-test1.o .built/test-test2.o .built/test-test3.o .built/test-test-c.o -lm -lgobject -lglib
 ar -cq libtest.a .built/test-test1.o .built/test-test2.o .built/test-test3.o .built/test-test-c.o
 ln -s libtest.so.1.2 libtest.so

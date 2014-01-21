@@ -11,9 +11,9 @@
 public static int main (string[] args)
 {
     var output_filename = "";
-    var filter = ".*";
     var valid_args = true;
     var files = new List<string> ();
+    var filters = new List<Filter> ();
     for (var i = 1; i < args.length; i++)
     {
         if (args[i] == "-o" || args[i] == "--output")
@@ -26,11 +26,21 @@ public static int main (string[] args)
             else
                 valid_args = false;
         }
-        else if (args[i] == "--filter")
+        else if (args[i] == "--global")
         {
             if (i < args.length)
             {
-                filter = args[i + 1];
+                filters.append (make_filter (args[i + 1], true));
+                i++;
+            }
+            else
+                valid_args = false;
+        }
+        else if (args[i] == "--local")
+        {
+            if (i < args.length)
+            {
+                filters.append (make_filter (args[i + 1], false));
                 i++;
             }
             else
@@ -41,10 +51,10 @@ public static int main (string[] args)
         else
             files.append (args[i]);
     }
-
+    
     if (!valid_args || files.length () == 0)
     {
-        stderr.printf ("Usage: %s [--output output-file] [--filter regex] file...\n", args[0]);
+        stderr.printf ("Usage: %s [--output output-file] [--global regex]... [--local regex]... file...\n", args[0]);
         return Posix.EXIT_FAILURE;
     }
 
@@ -59,17 +69,6 @@ public static int main (string[] args)
             return Posix.EXIT_FAILURE;
         }
         output = output_file;
-    }
-
-    Regex regex;
-    try
-    {
-        regex = new Regex (filter);
-    }
-    catch (Error e)
-    {
-        stderr.printf ("Invalid symbol filter '%s': %s\n", filter, e.message);
-        return Posix.EXIT_FAILURE;
     }
 
     string result;
@@ -104,13 +103,52 @@ public static int main (string[] args)
         if (type != 'A' && type != 'B' && type != 'C' && type != 'D' && type != 'G' && type != 'I' && type != 'R' && type != 'S' && type != 'T' && type != 'W')
             continue;
 
-        if (!regex.match (name))
-            continue;
+        var use = true;
+        if (filters != null)
+        {
+            use = false;
+            foreach (var f in filters)
+            {
+                if (f.regex.match (name))
+                {
+                    use = f.global;
+                    break;
+                }
+            }
+        }
 
-        output.printf ("    %s;\n", name);
+        if (use)
+            output.printf ("    %s;\n", name);
     }
     output.printf ("  local: *;\n");
     output.printf ("}\n");
 
     return Posix.EXIT_SUCCESS;
+}
+
+private class Filter
+{
+    public bool global;
+    public Regex regex;
+
+    public Filter (string pattern, bool global) throws Error
+    {
+        this.global = global;
+        regex = new Regex (pattern);
+    }
+}
+
+private static Filter? make_filter (string pattern, bool global)
+{
+    try
+    {
+        var filter = new Filter (pattern, global);
+        return filter;
+    }
+    catch (Error e)
+    {
+        stderr.printf ("Invalid symbol filter '%s': %s\n", pattern, e.message);
+        Posix.exit (Posix.EXIT_FAILURE);
+        return null;
+    }
 }
