@@ -67,6 +67,7 @@ public class TestBakeGetSymbols
 
         if (output != expected_output)
         {
+            stderr.printf ("Command ran: %s\n", command);
             stderr.printf ("-------got------\n");
             stderr.printf (output);
             stderr.printf ("----expected----\n");

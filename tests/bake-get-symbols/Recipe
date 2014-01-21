@@ -13,6 +13,9 @@ programs.test-bake-get-symbols {
     multiple-files {
       args = multiple-files
     }
+    filter {
+      args = filter
+    }
   }
 }
 
@@ -33,5 +36,8 @@ data.bake-get-symbols-tests {
           multiple-files/expected \
           multiple-files/a.o \
           multiple-files/b.o \
-          multiple-files/test.conf
+          multiple-files/test.conf \
+          filter/expected \
+          filter/source.o \
+          filter/test.conf
 }
