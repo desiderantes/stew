@@ -13,14 +13,14 @@ programs.test-bake-get-symbols {
     multiple-files {
       args = multiple-files
     }
-    filter {
-      args = filter
-    }
-    filter-exclude {
-      args = filter-exclude
+    filter-whitelist {
+      args = filter-whitelist
     }
     filter-blacklist {
       args = filter-blacklist
+    }
+    filter-private {
+      args = filter-private
     }
   }
 }
@@ -43,13 +43,13 @@ data.bake-get-symbols-tests {
           multiple-files/a.o \
           multiple-files/b.o \
           multiple-files/test.conf \
-          filter/expected \
-          filter/source.o \
-          filter/test.conf \
-          filter-exclude/expected \
-          filter-exclude/source.o \
-          filter-exclude/test.conf \
+          filter-whitelist/expected \
+          filter-whitelist/source.o \
+          filter-whitelist/test.conf \
           filter-blacklist/expected \
           filter-blacklist/source.o \
-          filter-blacklist/test.conf
+          filter-blacklist/test.conf \
+          filter-private/expected \
+          filter-private/source.o \
+          filter-private/test.conf
 }
