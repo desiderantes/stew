@@ -10,6 +10,9 @@ programs.test-bake-get-symbols {
     symbol-types {
       args = symbol-types
     }
+    multiple-files {
+      args = multiple-files
+    }
   }
 }
 
@@ -26,5 +29,9 @@ data.bake-get-symbols-tests {
           empty/test.conf \
           symbol-types/expected \
           symbol-types/source.o \
-          symbol-types/test.conf
+          symbol-types/test.conf \
+          multiple-files/expected \
+          multiple-files/a.o \
+          multiple-files/b.o \
+          multiple-files/test.conf
 }

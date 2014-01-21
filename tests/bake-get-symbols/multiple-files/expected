@@ -1,0 +1,6 @@
+{
+  global:
+    a_symbol;
+    b_symbol;
+  local: *;
+}
