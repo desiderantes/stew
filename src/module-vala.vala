@@ -154,7 +154,7 @@ public class ValaModule : BuildModule
 
         var filter = compilable.get_variable ("symbol-filter");
         Rule? symbol_rule = null;
-        var symbol_command = "bake-library";
+        var symbol_command = "bake-get-symbols";
         if (filter != null)
         {
             symbol_rule = recipe.add_rule ();

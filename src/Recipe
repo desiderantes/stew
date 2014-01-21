@@ -71,8 +71,8 @@ programs {
     vala-packages = posix
   }
 
-  bake-library {
-    sources = bake-library.vala
+  bake-get-symbols {
+    sources = bake-get-symbols.vala
     vala-packages = posix
   }
 

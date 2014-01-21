@@ -1,4 +1,4 @@
-public class BakeGettext
+public class BakeGetSymbols
 {
     public static int main (string[] args)
     {
