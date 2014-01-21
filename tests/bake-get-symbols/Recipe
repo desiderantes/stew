@@ -1,0 +1,24 @@
+programs.test-bake-get-symbols {
+  sources = test-bake-get-symbols.vala
+  vala-packages = posix
+  install = false
+
+  tests {
+    empty {
+      args = empty
+    }
+  }
+}
+
+programs.nm {
+  sources = nm.vala
+  vala-packages = posix
+  install = false
+}
+
+data.bake-get-symbols-tests {
+  install = false
+  files = empty/expected \
+          empty/source.o \
+          empty/test.conf
+}

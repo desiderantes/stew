@@ -70,3 +70,5 @@ bake_0.1.36+bzr-0_amd64.deb
 bake-0.1.36+bzr.tar.gz
 bake-0.1.36+bzr-1.x86_64.rpm
 bake-0.1.36+bzr.tar.xz
+tests/bake-get-symbols/test-bake-get-symbols
+tests/bake-get-symbols/nm
