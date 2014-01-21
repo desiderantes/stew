@@ -19,6 +19,9 @@ programs.test-bake-get-symbols {
     filter-exclude {
       args = filter-exclude
     }
+    filter-blacklist {
+      args = filter-blacklist
+    }
   }
 }
 
@@ -45,5 +48,8 @@ data.bake-get-symbols-tests {
           filter/test.conf \
           filter-exclude/expected \
           filter-exclude/source.o \
-          filter-exclude/test.conf
+          filter-exclude/test.conf \
+          filter-blacklist/expected \
+          filter-blacklist/source.o \
+          filter-blacklist/test.conf
 }
