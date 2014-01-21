@@ -1,0 +1,14 @@
+{
+  global:
+    A_symbol;
+    B_symbol;
+    C_symbol;
+    D_symbol;
+    G_symbol;
+    I_symbol;
+    R_symbol;
+    S_symbol;
+    T_symbol;
+    W_symbol;
+  local: *;
+}

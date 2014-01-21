@@ -7,6 +7,9 @@ programs.test-bake-get-symbols {
     empty {
       args = empty
     }
+    symbol-types {
+      args = symbol-types
+    }
   }
 }
 
@@ -20,5 +23,8 @@ data.bake-get-symbols-tests {
   install = false
   files = empty/expected \
           empty/source.o \
-          empty/test.conf
+          empty/test.conf \
+          symbol-types/expected \
+          symbol-types/source.o \
+          symbol-types/test.conf
 }
