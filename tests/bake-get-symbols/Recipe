@@ -16,6 +16,9 @@ programs.test-bake-get-symbols {
     filter {
       args = filter
     }
+    filter-exclude {
+      args = filter-exclude
+    }
   }
 }
 
@@ -39,5 +42,8 @@ data.bake-get-symbols-tests {
           multiple-files/test.conf \
           filter/expected \
           filter/source.o \
-          filter/test.conf
+          filter/test.conf \
+          filter-exclude/expected \
+          filter-exclude/source.o \
+          filter-exclude/test.conf
 }
