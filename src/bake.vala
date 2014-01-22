@@ -246,28 +246,10 @@ public class BakeApp
             }
         }
 
-        /* Set defaults */
-        cookbook.set_defaults ();
-
-        /* Find the recipe in the current directory */
-        var recipe = toplevel;
-        while (recipe.dirname != original_dir)
-        {
-            foreach (var c in recipe.children)
-            {
-                var dir = original_dir + "/";
-                if (dir.has_prefix (c.dirname + "/"))
-                {
-                    recipe = c;
-                    break;
-                }
-            }
-        }
-
         bool optimise_result;
         try
         {
-            optimise_result = cookbook.complete (toplevel, recipe);
+            optimise_result = cookbook.complete (toplevel);
         }
         catch (Error e)
         {
@@ -278,15 +260,15 @@ public class BakeApp
 
         if (do_expand)
         {
-            stdout.printf (recipe.to_string ());
+            stdout.printf (cookbook.current_recipe.to_string ());
             return Posix.EXIT_SUCCESS;
         }
 
         if (do_list_targets)
         {
             var targets = new List<string> ();
-            var build_dir = "%s/".printf (Bake.get_relative_path (recipe.dirname, recipe.build_directory));
-            foreach (var rule in recipe.rules)
+            var build_dir = "%s/".printf (Bake.get_relative_path (cookbook.current_recipe.dirname, cookbook.current_recipe.build_directory));
+            foreach (var rule in cookbook.current_recipe.rules)
             {
                 foreach (var output in rule.outputs)
                 {
@@ -316,7 +298,7 @@ public class BakeApp
             target = args[1];
 
         /* Build virtual targets */
-        if (!target.has_prefix ("%") && recipe.get_rule_with_target (Path.build_filename (recipe.dirname, "%" + target)) != null)
+        if (!target.has_prefix ("%") && cookbook.current_recipe.get_rule_with_target (Path.build_filename (cookbook.current_recipe.dirname, "%" + target)) != null)
             target = "%" + target;
 
         var builder = new Bake.Builder (do_parallel, pretty_print, debug_enabled, original_dir);
@@ -325,7 +307,7 @@ public class BakeApp
         builder.report_output.connect ((text) => { stdout.printf ("%s", text); });
         builder.report_debug.connect ((text) => { if (debug_enabled) stderr.printf ("%s", text); });
         var exit_code = Posix.EXIT_SUCCESS;
-        builder.build_target.begin (recipe, Bake.join_relative_dir (recipe.dirname, target), (o, x) =>
+        builder.build_target.begin (cookbook.current_recipe, Bake.join_relative_dir (cookbook.current_recipe.dirname, target), (o, x) =>
         {
             try
             {

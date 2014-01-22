@@ -32,6 +32,7 @@ public class Cookbook
     private string original_dir;
     public string toplevel_dir;
     private List<BuildModule> modules;
+    public Recipe current_recipe;
     public List<Option> options;
     private List<Template> templates;
     private List<Program> programs;
@@ -239,15 +240,27 @@ public class Cookbook
         toplevel.parent = conf_file;
     }
 
-    public void set_defaults ()
+    public bool complete (Recipe toplevel) throws Error
     {
         foreach (var option in options)
             if (option.value == null && option.default != null)
                 option.value = option.default;
-    }
 
-    public bool complete (Recipe toplevel, Recipe recipe) throws Error
-    {
+        /* Find the recipe in the current directory */
+        current_recipe = toplevel;
+        while (current_recipe.dirname != original_dir)
+        {
+            foreach (var c in current_recipe.children)
+            {
+                var dir = original_dir + "/";
+                if (dir.has_prefix (c.dirname + "/"))
+                {
+                    current_recipe = c;
+                    break;
+                }
+            }
+        }
+
         /* Generate implicit rules */
         generate_toplevel_rules (toplevel);
 
@@ -265,7 +278,7 @@ public class Cookbook
         generate_clean_rules (toplevel);
 
         /* Generate test rule */
-        generate_test_rule (recipe);
+        generate_test_rule ();
 
         /* Optimise */
         toplevel.targets = new HashTable<string, Rule> (str_hash, str_equal);
@@ -395,16 +408,16 @@ public class Cookbook
             generate_clean_rules (child);
     }
 
-    private void generate_test_rule (Recipe recipe)
+    private void generate_test_rule ()
     {
         var targets = new List<string> ();
-        get_test_targets (recipe, ref targets);
+        get_test_targets (current_recipe, ref targets);
 
         var command = "@bake-test check";
         foreach (var t in targets)
-            command += " " + get_relative_path (recipe.dirname, t);
+            command += " " + get_relative_path (current_recipe.dirname, t);
 
-        recipe.test_rule.add_command (command);
+        current_recipe.test_rule.add_command (command);
     }
 
     private void get_test_targets (Recipe recipe, ref List<string> targets)
