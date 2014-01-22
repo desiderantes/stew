@@ -14,6 +14,7 @@ PACKAGES = --pkg=glib-2.0 \
 SOURCES = src/bake.vala \
           src/builder.vala \
           src/config-bootstrap.vala \
+          src/cookbook.vala \
           src/fixes.vapi \
           src/module.vala \
           src/module-bzip.vala \

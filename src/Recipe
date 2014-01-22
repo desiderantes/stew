@@ -16,6 +16,7 @@ libraries {
   bake {
     sources = builder.vala \
               config.vala \
+              cookbook.vala \
               fixes.vapi \
               module.vala \
               module-bzip.vala \
