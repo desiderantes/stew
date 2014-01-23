@@ -193,7 +193,7 @@ public class Cookbook : Object
         programs = new List<Program> ();
         libraries = new List<Library> ();
         datas = new List<Data> ();
-        find_objects (conf_file);
+        find_objects_recursive (conf_file);
     }
 
     public bool generate_rules () throws Error
@@ -218,7 +218,8 @@ public class Cookbook : Object
         }
 
         /* Generate implicit rules */
-        generate_toplevel_rules (toplevel);
+        foreach (var module in modules)
+            module.generate_toplevel_rules (toplevel);
 
         /* Generate libraries first (as other things may depend on it) then the other rules */
         foreach (var template in templates)
@@ -228,19 +229,20 @@ public class Cookbook : Object
         foreach (var program in programs)
             generate_program_rules (program);
         foreach (var data in datas)
-            generate_data_rules (data);
+            foreach (var module in modules)
+                module.generate_data_rules (data);
 
         /* Generate clean rule */
-        generate_clean_rules (toplevel);
+        generate_clean_rules_recursive (toplevel);
 
         /* Generate test rule */
         generate_test_rule ();
 
         /* Optimise */
         toplevel.targets = new HashTable<string, Rule> (str_hash, str_equal);
-        var optimise_result = optimise (toplevel.targets, toplevel);
+        var optimise_result = optimise_recursive (toplevel.targets, toplevel);
 
-        recipe_complete (toplevel);
+        recipe_complete_recursive (toplevel);
         foreach (var module in modules)
             module.rules_complete (toplevel);
             
@@ -359,12 +361,6 @@ public class Cookbook : Object
         return null;
     }
 
-    private void generate_toplevel_rules (Recipe recipe)
-    {
-        foreach (var module in modules)
-            module.generate_toplevel_rules (recipe);
-    }
-
     private void generate_template_rules (Template template) throws Error
     {
         var variables = template.get_variable ("variables").replace ("\n", " ");
@@ -454,23 +450,17 @@ public class Cookbook : Object
         }
     }
 
-    private void generate_data_rules (Data data) throws Error
-    {
-        foreach (var module in modules)
-            module.generate_data_rules (data);
-    }
-
-    private void generate_clean_rules (Recipe recipe)
+    private void generate_clean_rules_recursive (Recipe recipe)
     {
         recipe.generate_clean_rule ();
         foreach (var child in recipe.children)
-            generate_clean_rules (child);
+            generate_clean_rules_recursive (child);
     }
 
     private void generate_test_rule ()
     {
         var targets = new List<string> ();
-        get_test_targets (current_recipe, ref targets);
+        get_test_targets_recursive (current_recipe, ref targets);
         if (targets == null)
             return;
 
@@ -481,16 +471,16 @@ public class Cookbook : Object
         current_recipe.test_rule.add_command (command);
     }
 
-    private void get_test_targets (Recipe recipe, ref List<string> targets)
+    private void get_test_targets_recursive (Recipe recipe, ref List<string> targets)
     {
         foreach (var input in recipe.test_rule.outputs)
             if (input != "%test")
                 targets.append (Path.build_filename (recipe.dirname, input));
         foreach (var child in recipe.children)
-            get_test_targets (child, ref targets);
+            get_test_targets_recursive (child, ref targets);
     }
 
-    private bool optimise (HashTable<string, Rule> targets, Recipe recipe)
+    private bool optimise_recursive (HashTable<string, Rule> targets, Recipe recipe)
     {
         var result = true;
 
@@ -507,13 +497,13 @@ public class Cookbook : Object
             }
 
         foreach (var r in recipe.children)
-            if (!optimise (targets, r))
+            if (!optimise_recursive (targets, r))
                 result = false;
 
         return result;
     }
 
-    private void find_objects (Recipe recipe)
+    private void find_objects_recursive (Recipe recipe)
     {
         foreach (var id in recipe.get_variable_children ("options"))
         {
@@ -542,7 +532,7 @@ public class Cookbook : Object
         }
 
         foreach (var child in recipe.children)
-            find_objects (child);
+            find_objects_recursive (child);
     }
 
     private Option make_built_in_option (Recipe conf_file, string id, string description, string default)
@@ -554,13 +544,13 @@ public class Cookbook : Object
         return option;
     }
 
-    private void recipe_complete (Recipe recipe)
+    private void recipe_complete_recursive (Recipe recipe)
     {
         foreach (var module in modules)
             module.recipe_complete (recipe);
 
         foreach (var child in recipe.children)
-            recipe_complete (child);
+            recipe_complete_recursive (child);
     }
 }
 
