@@ -1,6 +1,6 @@
 project {
   name = bake
-  version = 0.1.37+bzr
+  version = 0.1.38
   ppa = lp:~bake-team/releases
 }
 
