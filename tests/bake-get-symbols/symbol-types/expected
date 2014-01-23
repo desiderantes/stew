@@ -11,4 +11,4 @@
     T_symbol;
     W_symbol;
   local: *;
-}
+};

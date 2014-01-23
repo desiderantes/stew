@@ -3,4 +3,4 @@
     a_symbol1;
     a_symbol2;
   local: *;
-}
+};

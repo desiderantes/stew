@@ -3,4 +3,4 @@
     bar_symbol1;
     bar_symbol2;
   local: *;
-}
+};

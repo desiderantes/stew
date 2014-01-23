@@ -121,7 +121,7 @@ public static int main (string[] args)
             output.printf ("    %s;\n", name);
     }
     output.printf ("  local: *;\n");
-    output.printf ("}\n");
+    output.printf ("};\n");
 
     return Posix.EXIT_SUCCESS;
 }
