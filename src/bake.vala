@@ -96,10 +96,9 @@ public class BakeApp
         cookbook.report_status.connect ((text) => { stdout.printf ("%s\n", format_status (text)); });
         cookbook.report_debug.connect ((text) => { if (debug_enabled) stderr.printf ("%s", text); });
 
-        Bake.Recipe? toplevel;
         try
         {
-            toplevel = cookbook.find_toplevel (original_dir, pretty_print);
+            cookbook.find_toplevel (original_dir, pretty_print);
         }
         catch (Bake.CookbookError e)
         {
@@ -114,41 +113,16 @@ public class BakeApp
             return Posix.EXIT_SUCCESS;
         }
 
-        /* Load configuration */
-        var need_configure = false;
-        Bake.Recipe conf_file = null;
         try
         {
-            conf_file = new Bake.Recipe.from_file (Path.build_filename (cookbook.toplevel_dir, "Recipe.conf"), pretty_print, false);
+            cookbook.setup (pretty_print);
         }
         catch (Error e)
         {
-            if (e is FileError.NOENT)
-            {
-                need_configure = true;
-                conf_file = new Bake.Recipe (pretty_print);
-            }
-            else
-            {
-                printerr ("Failed to load configuration: %s\n", e.message);
-                return Posix.EXIT_FAILURE;
-            }
-        }
-
-        /* Load the recipe tree */
-        var filename = Path.build_filename (cookbook.toplevel_dir, "Recipe");
-        try
-        {
-            toplevel = cookbook.load_recipes (filename, pretty_print);
-        }
-        catch (Error e)
-        {
-            stdout.printf ("%s\n", format_status ("%s".printf (e.message)));
+            stdout.printf ("%s\n", format_status (e.message));
             stdout.printf ("%s\n", format_error ("[Build failed]"));
             return Posix.EXIT_FAILURE;
         }
-
-        cookbook.setup (conf_file, toplevel);
 
         var max_option_name_length = 0;
         foreach (var option in cookbook.options)
@@ -172,7 +146,7 @@ public class BakeApp
             return Posix.EXIT_SUCCESS;
         }
 
-       if (do_configure || need_configure || cookbook.needs_configure)
+       if (do_configure || cookbook.needs_configure)
        {
             stdout.printf ("%s\n", format_status ("[Configuring]"));
             
@@ -184,7 +158,7 @@ public class BakeApp
                     conf_args[i - 1] = args[i];
                 try
                 {
-                    cookbook.configure (conf_args, conf_file);
+                    cookbook.configure (conf_args);
                 }
                 catch (Bake.ConfigureError e)
                 {
@@ -241,7 +215,7 @@ public class BakeApp
         bool optimise_result;
         try
         {
-            optimise_result = cookbook.complete (toplevel);
+            optimise_result = cookbook.complete ();
         }
         catch (Error e)
         {
