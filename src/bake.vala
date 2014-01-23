@@ -92,30 +92,18 @@ public class BakeApp
         else
             show_color = Posix.isatty (Posix.STDOUT_FILENO);
 
-        var cookbook = new Bake.Cookbook (original_dir);
+        var cookbook = new Bake.Cookbook (original_dir, pretty_print);
         cookbook.report_status.connect ((text) => { stdout.printf ("%s\n", format_status (text)); });
         cookbook.report_debug.connect ((text) => { if (debug_enabled) stderr.printf ("%s", text); });
 
         try
         {
-            cookbook.find_toplevel (original_dir, pretty_print);
-        }
-        catch (Bake.CookbookError e)
-        {
-            stdout.printf ("%s\n", format_status (e.message));
-            stdout.printf ("%s\n", format_error ("[Build failed]"));
-            return Posix.EXIT_FAILURE;
-        }
-
-        if (do_unconfigure)
-        {
-            cookbook.unconfigure ();
-            return Posix.EXIT_SUCCESS;
-        }
-
-        try
-        {
-            cookbook.setup (pretty_print);
+            if (do_unconfigure)
+            {
+                cookbook.unconfigure ();
+                return Posix.EXIT_SUCCESS;
+            }
+            cookbook.load ();
         }
         catch (Error e)
         {
@@ -215,7 +203,7 @@ public class BakeApp
         bool optimise_result;
         try
         {
-            optimise_result = cookbook.complete ();
+            optimise_result = cookbook.generate_rules ();
         }
         catch (Error e)
         {
