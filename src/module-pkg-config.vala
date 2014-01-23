@@ -8,9 +8,9 @@
  * license.
  */
 
-namespace Bake.Modules {
+using Bake;
 
-public class PkgConfigModule : BuildModule
+class PkgConfigModule : BuildModule
 {
     public override void generate_data_rules (Data data) throws Error
     {
@@ -28,6 +28,4 @@ public class PkgConfigModule : BuildModule
                 recipe.add_install_rule (entry.name, install_directory);
         }
     }
-}
-
 }

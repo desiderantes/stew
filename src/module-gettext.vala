@@ -8,11 +8,11 @@
  * license.
  */
 
-namespace Bake.Modules {
+using Bake;
 
-private class PotRule : Rule
+private class PotRule : Bake.Rule
 {
-    public PotRule (Recipe recipe, string pot_filename, bool pretty_print)
+    public PotRule (Bake.Recipe recipe, string pot_filename, bool pretty_print)
     {
         base (recipe, pretty_print);
         add_output (pot_filename);
@@ -31,7 +31,7 @@ private class PotRule : Rule
     }
 }
 
-public class GettextModule : BuildModule
+class GettextModule : BuildModule
 {
     public static void add_translatable_file (Recipe recipe, string gettext_domain, string mime_type, string filename)
     {
@@ -165,6 +165,4 @@ public class GettextModule : BuildModule
                 recipe.add_install_rule (mo_file, target_dir, target_mo_file);
         }
     }
-}
-
 }

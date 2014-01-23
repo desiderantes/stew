@@ -8,9 +8,9 @@
  * license.
  */
 
-namespace Bake.Modules {
+using Bake;
 
-public class GTKModule : BuildModule
+class GTKModule : BuildModule
 {
     public override void generate_data_rules (Data data) throws Error
     {
@@ -28,6 +28,4 @@ public class GTKModule : BuildModule
                 recipe.add_install_rule (file, install_directory);
         }
     }
-}
-
 }

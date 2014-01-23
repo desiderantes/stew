@@ -53,8 +53,7 @@ libraries {
     packages = gio-2.0
     compile-flags = -DGETTEXT_PACKAGE=\"bake\"
     so-version = 0
-    #symbol-filter = bake_modules_.* (hide) \
-    #                bake_.*
+    symbol-filter = bake_.*
   }
 }
 

@@ -8,9 +8,9 @@
  * license.
  */
 
-namespace Bake.Modules {
+using Bake;
 
-public class DpkgModule : BuildModule
+class DpkgModule : BuildModule
 {
     public override void generate_toplevel_rules (Recipe recipe)
     {
@@ -162,6 +162,4 @@ public class DpkgModule : BuildModule
             rule.add_command ("dput ppa:%s %s".printf (ppa_name, changes_file));
         }
     }
-}
-
 }

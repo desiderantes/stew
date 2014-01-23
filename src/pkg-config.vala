@@ -8,9 +8,7 @@
  * license.
  */
  
-namespace Bake { 
-
-public int pkg_compare_version (string v0, string v1)
+int pkg_compare_version (string v0, string v1)
 {
     var digits0 = v0.split (".");
     var digits1 = v1.split (".");
@@ -32,7 +30,7 @@ public int pkg_compare_version (string v0, string v1)
     return 0;
 }
 
-public class PkgConfigFile : Object
+class PkgConfigFile : Object
 {
     public string id;
     public string? error;
@@ -374,6 +372,4 @@ public class RequireEntry : Object
             return false;
         }
     }
-}
-
 }

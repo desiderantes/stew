@@ -8,9 +8,9 @@
  * license.
  */
 
-namespace Bake.Modules {
+using Bake;
 
-public class GSettingsModule : BuildModule
+class GSettingsModule : BuildModule
 {
     public override void generate_data_rules (Data data) throws Error
     {
@@ -61,6 +61,4 @@ public class GSettingsModule : BuildModule
             recipe.add_install_rule (convert, dir);
         }
     }
-}
-
 }

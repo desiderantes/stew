@@ -8,9 +8,9 @@
  * license.
  */
 
-namespace Bake.Modules {
+using Bake;
 
-public class BZRModule : BuildModule
+class BZRModule : BuildModule
 {
     public override void generate_toplevel_rules (Recipe recipe)
     {
@@ -95,6 +95,4 @@ public class BZRModule : BuildModule
                 return true;
         return false;
     }
-}
-
 }

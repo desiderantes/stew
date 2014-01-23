@@ -8,9 +8,9 @@
  * license.
  */
 
-namespace Bake.Modules {
+using Bake;
 
-public class XZIPModule : BuildModule
+class XZIPModule : BuildModule
 {
     public override void generate_toplevel_rules (Recipe recipe)
     {
@@ -29,4 +29,3 @@ public class XZIPModule : BuildModule
     }
 }
 
-}

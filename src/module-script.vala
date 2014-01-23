@@ -8,9 +8,9 @@
  * license.
  */
 
-namespace Bake.Modules {
+using Bake;
 
-public class ScriptModule : BuildModule
+class ScriptModule : BuildModule
 {
     public override bool can_generate_program_rules (Program program) throws Error
     {
@@ -28,6 +28,4 @@ public class ScriptModule : BuildModule
         if (program.install)
             program.recipe.add_install_rule (program.name, program.install_directory);
     }
-}
-
 }

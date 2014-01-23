@@ -8,9 +8,9 @@
  * license.
  */
 
-namespace Bake.Modules {
+using Bake;
 
-public class MonoModule : BuildModule
+class MonoModule : BuildModule
 {
     public override bool can_generate_program_rules (Program program) throws Error
     {
@@ -182,6 +182,4 @@ public class MonoModule : BuildModule
 
         return binary_name;
     }
-}
-
 }

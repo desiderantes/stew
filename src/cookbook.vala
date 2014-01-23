@@ -46,32 +46,32 @@ public class Cookbook : Object
         this.pretty_print = pretty_print;
 
         modules = new List<BuildModule> ();
-        modules.append (new Modules.BZIPModule ());
-        modules.append (new Modules.BZRModule ());
-        modules.append (new Modules.DataModule ());
-        modules.append (new Modules.DpkgModule ());
-        modules.append (new Modules.GCCModule ());
-        modules.append (new Modules.ClangModule ());
-        modules.append (new Modules.GettextModule ());
-        modules.append (new Modules.GHCModule ());
-        modules.append (new Modules.GITModule ());
-        modules.append (new Modules.GNOMEModule ());
-        modules.append (new Modules.GSettingsModule ());
-        modules.append (new Modules.GTKModule ());
-        modules.append (new Modules.GZIPModule ());
-        modules.append (new Modules.JavaModule ());
-        modules.append (new Modules.LaunchpadModule ());
-        modules.append (new Modules.MallardModule ());
-        modules.append (new Modules.ManModule ());
-        modules.append (new Modules.MonoModule ());
-        modules.append (new Modules.PkgConfigModule ());
-        modules.append (new Modules.PythonModule ());
-        modules.append (new Modules.ReleaseModule ());
-        modules.append (new Modules.RPMModule ());
-        modules.append (new Modules.ScriptModule ());
-        modules.append (new Modules.ValaModule ());
-        modules.append (new Modules.XdgModule ());
-        modules.append (new Modules.XZIPModule ());
+        modules.append (new BZIPModule ());
+        modules.append (new BZRModule ());
+        modules.append (new DataModule ());
+        modules.append (new DpkgModule ());
+        modules.append (new GCCModule ());
+        modules.append (new ClangModule ());
+        modules.append (new GettextModule ());
+        modules.append (new GHCModule ());
+        modules.append (new GITModule ());
+        modules.append (new GNOMEModule ());
+        modules.append (new GSettingsModule ());
+        modules.append (new GTKModule ());
+        modules.append (new GZIPModule ());
+        modules.append (new JavaModule ());
+        modules.append (new LaunchpadModule ());
+        modules.append (new MallardModule ());
+        modules.append (new ManModule ());
+        modules.append (new MonoModule ());
+        modules.append (new PkgConfigModule ());
+        modules.append (new PythonModule ());
+        modules.append (new ReleaseModule ());
+        modules.append (new RPMModule ());
+        modules.append (new ScriptModule ());
+        modules.append (new ValaModule ());
+        modules.append (new XdgModule ());
+        modules.append (new XZIPModule ());
     }
 
     private bool _needs_configure = true;
@@ -284,7 +284,7 @@ public class Cookbook : Object
         }
 
         var minimum_bake_version = t.get_variable ("project.minimum-bake-version");
-        if (minimum_bake_version != null && Bake.pkg_compare_version (VERSION, minimum_bake_version) < 0)
+        if (minimum_bake_version != null && pkg_compare_version (VERSION, minimum_bake_version) < 0)
             throw new CookbookError.TOO_OLD ("This version of Bake is too old for this project.\nVersion %s or greater is required.\nThis is Bake %s.".printf (minimum_bake_version, VERSION));
 
         toplevel = t;

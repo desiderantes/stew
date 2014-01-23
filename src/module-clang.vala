@@ -8,9 +8,9 @@
  * license.
  */
 
-namespace Bake.Modules {
+using Bake;
 
-public class ClangModule : BuildModule
+class ClangModule : BuildModule
 {
     public override bool can_generate_program_rules (Program program) throws Error
     {
@@ -335,6 +335,4 @@ public class ClangModule : BuildModule
         else
             return null;
     }
-}
-
 }

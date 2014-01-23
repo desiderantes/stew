@@ -8,7 +8,7 @@
  * license.
  */
 
-namespace Bake.Modules {
+using Bake;
 
 private class ReleaseRule : Rule
 {
@@ -42,7 +42,7 @@ private class ReleaseRule : Rule
     }
 }
 
-public class ReleaseModule : BuildModule
+class ReleaseModule : BuildModule
 {
     public override void generate_toplevel_rules (Recipe recipe)
     {
@@ -97,6 +97,4 @@ public class ReleaseModule : BuildModule
             }
         }
     }
-}
-
 }

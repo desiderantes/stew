@@ -8,9 +8,9 @@
  * license.
  */
 
-namespace Bake.Modules {
+using Bake;
 
-public class LaunchpadModule : BuildModule
+class LaunchpadModule : BuildModule
 {
     public override void generate_toplevel_rules (Recipe recipe)
     {
@@ -25,6 +25,4 @@ public class LaunchpadModule : BuildModule
             rule.add_command ("lp-project-upload %s %s %s.tar.gz".printf (recipe.project_name, recipe.project_version, recipe.release_name));
         }
     }
-}
-
 }

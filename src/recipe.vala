@@ -857,6 +857,8 @@ public class Data : Block
     }
 }
 
+}
+
 public List<string> split_variable (string value)
 {
     List<string> values = null;
@@ -876,6 +878,4 @@ public List<string> split_variable (string value)
         values.append (value.substring (start, end - start));
         start = end;
     }
-}
-
 }
