@@ -8,7 +8,7 @@
  * license.
  */
 
-namespace Bake {
+namespace Bake.Modules {
 
 public class GSettingsModule : BuildModule
 {

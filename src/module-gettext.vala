@@ -8,7 +8,7 @@
  * license.
  */
 
-namespace Bake {
+namespace Bake.Modules {
 
 private class PotRule : Rule
 {
