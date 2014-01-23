@@ -154,12 +154,13 @@ public class ValaModule : BuildModule
 
         var filters = compilable.get_tagged_list ("symbol-filter");
         Rule? symbol_rule = null;
-        var symbol_command = "bake-get-symbols";
+        var symbol_command = "@bake-get-symbols";
         if (filters != null)
         {
             symbol_rule = recipe.add_rule ();
             var filename = recipe.get_build_path (compilable.id + ".ver");
             symbol_rule.add_output (filename);
+            symbol_rule.add_status_command ("BAKE-GET-SYMBOLS %s".printf (binary_name));
             symbol_command += " --output %s".printf (filename);
             foreach (var f in filters)
             {
