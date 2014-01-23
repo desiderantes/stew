@@ -108,14 +108,6 @@ public class BakeApp
             return Posix.EXIT_FAILURE;
         }
 
-        var minimum_bake_version = toplevel.get_variable ("project.minimum-bake-version");
-        if (minimum_bake_version != null && Bake.pkg_compare_version (VERSION, minimum_bake_version) < 0)
-        {
-            stdout.printf ("%s\n", format_status ("This version of Bake is too old for this project.\nVersion %s or greater is required.\nThis is Bake %s.".printf (minimum_bake_version, VERSION)));
-            stdout.printf ("%s\n", format_error ("[Build failed]"));
-            return Posix.EXIT_FAILURE;
-        }
-
         if (do_unconfigure)
         {
             cookbook.unconfigure ();

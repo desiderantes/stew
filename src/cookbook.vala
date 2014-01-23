@@ -15,6 +15,7 @@ public errordomain CookbookError
     NO_RECIPE,
     NO_TOPLEVEL,
     INVALID_RECIPE,
+    TOO_OLD,
 }
 
 public errordomain ConfigureError
@@ -102,6 +103,10 @@ public class Cookbook
             toplevel_dir = Path.get_dirname (toplevel_dir);
             have_recipe = true;
         }
+
+        var minimum_bake_version = toplevel.get_variable ("project.minimum-bake-version");
+        if (minimum_bake_version != null && Bake.pkg_compare_version (VERSION, minimum_bake_version) < 0)
+            throw new CookbookError.TOO_OLD ("This version of Bake is too old for this project.\nVersion %s or greater is required.\nThis is Bake %s.".printf (minimum_bake_version, VERSION));
 
         return toplevel;
     }
