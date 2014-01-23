@@ -22,7 +22,7 @@ public errordomain CookbookError
     UNKNOWN_OPTIONS,
 }
 
-public class Cookbook
+public class Cookbook : Object
 {
     public signal void report_status (string text);
     public signal void report_debug (string text);
