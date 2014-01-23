@@ -171,8 +171,6 @@ public class Cookbook : Object
         /* Load the recipe tree */
         var filename = Path.build_filename (toplevel_dir, "Recipe");
         toplevel = load_recipes (filename);
-        
-        find_objects (toplevel);
 
         /* Load options */
         make_built_in_option (conf_file, "install-directory", "Directory to install files to", "/");
@@ -189,6 +187,13 @@ public class Cookbook : Object
         /* Make the configuration the toplevel file so everything inherits from it */
         conf_file.children.append (toplevel);
         toplevel.parent = conf_file;
+
+        options = new List<Option> ();
+        templates = new List<Template> ();
+        programs = new List<Program> ();
+        libraries = new List<Library> ();
+        datas = new List<Data> ();
+        find_objects (conf_file);
     }
 
     public bool generate_rules () throws Error
@@ -466,6 +471,8 @@ public class Cookbook : Object
     {
         var targets = new List<string> ();
         get_test_targets (current_recipe, ref targets);
+        if (targets == null)
+            return;
 
         var command = "@bake-test check";
         foreach (var t in targets)
@@ -508,31 +515,26 @@ public class Cookbook : Object
 
     private void find_objects (Recipe recipe)
     {
-        options = new List<Option> ();
         foreach (var id in recipe.get_variable_children ("options"))
         {
             var option = new Option (recipe, id);
             options.append (option);
         }
-        templates = new List<Template> ();
         foreach (var id in recipe.get_variable_children ("templates"))
         {
             var template = new Template (recipe, id);
             templates.append (template);
         }
-        programs = new List<Program> ();
         foreach (var id in recipe.get_variable_children ("programs"))
         {
             var program = new Program (recipe, id);
             programs.append (program);
         }
-        libraries = new List<Library> ();
         foreach (var id in recipe.get_variable_children ("libraries"))
         {
             var library = new Library (recipe, id);
             libraries.append (library);
         }
-        datas = new List<Data> ();
         foreach (var id in recipe.get_variable_children ("data"))
         {
             var data = new Data (recipe, id);
@@ -548,7 +550,6 @@ public class Cookbook : Object
         conf_file.set_variable ("options.%s.description".printf (id), description);
         conf_file.set_variable ("options.%s.default".printf (id), default);
         var option = new Option (conf_file, id);
-        options.append (option);
 
         return option;
     }
