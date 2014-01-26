@@ -1,0 +1,15 @@
+project {
+  name = test-project
+}
+
+programs.test1 {
+  sources = test.c
+  packages = baketest-dependency \
+             baketest-library
+}
+
+programs.test2 {
+  sources = test.c
+  packages = baketest-library \
+             baketest-dependency
+}

@@ -7,7 +7,7 @@
  * version. See http://www.gnu.org/copyleft/gpl.html the full text of the
  * license.
  */
- 
+
 int pkg_compare_version (string v0, string v1)
 {
     var digits0 = v0.split (".");
@@ -30,10 +30,9 @@ int pkg_compare_version (string v0, string v1)
     return 0;
 }
 
-class PkgConfigFile : Object
+class PkgConfigFile
 {
     public string id;
-    public string? error;
 
     private PkgConfigFile (string id)
     {
@@ -271,79 +270,97 @@ class PkgConfigFile : Object
 
     public List<string> generate_flags (out string cflags, out string libs)
     {
-        var resolved_modules = new HashTable<string, PkgConfigFile> (str_hash, str_equal);
+        var dep_list = new List<Dependency> ();
         var errors = new List<string> ();
+        make_dep_list (ref dep_list, ref errors);
         cflags = "";
         libs = "";
-        resolve_requires (ref resolved_modules, ref errors, ref cflags, ref libs);
+        foreach (var d in dep_list)
+        {
+            var x = d.file.expand (d.file.cflags);
+            if (x != "")
+            {
+                if (cflags != "")
+                    cflags += " ";
+                cflags += x;
+            }
+
+            if (!d.is_private)
+            {
+                x = d.file.expand (d.file.libs);
+                if (libs != "")
+                    libs += " ";
+                libs += x;
+            }
+        }
         return errors;
     }
 
-    private void resolve_requires (ref HashTable<string, PkgConfigFile> resolved_modules,
-                                   ref List<string> errors,
-                                   ref string combined_cflags, ref string combined_libs, bool is_private = false)
+    private void make_dep_list (ref List<Dependency> dep_list, ref List<string> errors, bool is_private = false)
     {
-        resolved_modules.insert (id, this);
+        /* Go before all our dependencies */
+        var requires = get_requires ();
+        var index = -1;
+        foreach (var r in requires)
+            if (find_dependency (ref dep_list, r.name, out index) != null)
+                break;
 
-        combined_cflags = merge_flags (combined_cflags, expand (cflags));
-        if (!is_private)
-            combined_libs = merge_flags (combined_libs, expand (libs));
+        var d = new Dependency ();
+        d.file = this;
+        d.is_private = is_private;
+        dep_list.insert (d, index);
 
-        foreach (var entry in get_requires ())
+        /* Add our dependencies */
+        foreach (var r in requires)
         {
-            var child = resolved_modules.lookup (entry.name);
-            try
+            d = find_dependency (ref dep_list, r.name, out index);
+            if (d == null)
             {
-                if (child == null)
+                try
                 {
-                    child = new PkgConfigFile.from_id (entry.name);
-                    child.resolve_requires (ref resolved_modules, ref errors, ref combined_cflags, ref combined_libs, is_private || entry.is_private);
+                    d = new Dependency ();
+                    d.file = new PkgConfigFile.from_id (r.name);
+                    d.is_private = is_private || r.is_private;
+                    d.file.make_dep_list (ref dep_list, ref errors, is_private || r.is_private);
+                }
+                catch (FileError e)
+                {
+                    if (e is FileError.NOENT)
+                        errors.append ("Package %s not installed".printf (r.name)); // FIXME: Append .pc name if not the toplevel
+                    else
+                        errors.append ("Package %s not loadable: %s".printf (r.name, e.message));
+                    continue;
                 }
             }
-            catch (FileError e)
-            {
-                if (e is FileError.NOENT)
-                    errors.append ("Package %s not installed".printf (entry.name)); // FIXME: Append .pc name if not the toplevel
-                else
-                    errors.append ("Package %s not loadable: %s".printf (entry.name, e.message));
-                continue;
-            }
+            if (!is_private)
+                d.is_private = false;
 
-            if (!entry.check_version (child.version))
-                errors.append ("Package %s version %s is not %s %s".printf (child.name, child.version, entry.condition, entry.version));
+            if (!r.check_version (d.file.version))
+                errors.append ("Package %s version %s is not %s %s".printf (d.file.id, d.file.version, r.condition, r.version));
         }
     }
 
-    private string merge_flags (string flags0, string flags1)
+    private Dependency? find_dependency (ref List<Dependency> dep_list, string id, out int index)
     {
-        var flags = flags0;
-
-        var flag_list0 = flags0.split (" ");
-        foreach (var flag in flags1.split (" "))
+        var i = 0;
+        foreach (var d in dep_list)
         {
-            if (has_flag (flag_list0, flag))
-                continue;
-            if (flags != "")
-                flags += " ";
-            flags += flag;
+            if (d.file.id == id)
+            {
+                index = i;
+                return d;
+            }
+            i++;
         }
-
-        return flags;
-    }
-
-    private bool has_flag (string[] flags, string flag)
-    {
-        foreach (var f in flags)
-             if (f == flag)
-                 return true;
-        return false;
+        index = -1;
+        return null;
     }
 
     private HashTable<string, string> variables;
     private HashTable<string, string> keywords;
 }
 
-public class RequireEntry : Object
+public class RequireEntry
 {
     public string name;
     public string? condition = null;
@@ -372,4 +389,10 @@ public class RequireEntry : Object
             return false;
         }
     }
+}
+
+class Dependency
+{
+    public PkgConfigFile file;
+    public bool is_private;
 }

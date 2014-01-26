@@ -447,6 +447,9 @@ programs.test-bake {
     c-program-package-variable-dependency {
       args = c-program-package-variable-dependency
     }
+    c-program-package-redundant-dependency {
+      args = c-program-package-redundant-dependency
+    }
     c-program-package-version {
       args = c-program-package-version
     }
@@ -990,6 +993,9 @@ data.bake-tests {
           c-program-package-dependency/expected \
           c-program-package-dependency/Recipe \
           c-program-package-dependency/test.c \
+          c-program-package-redundant-dependency/expected \
+          c-program-package-redundant-dependency/Recipe \
+          c-program-package-redundant-dependency/test.c \
           c-program-package-variable-dependency/expected \
           c-program-package-variable-dependency/Recipe \
           c-program-package-variable-dependency/test.c \
