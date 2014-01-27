@@ -1,3 +1,7 @@
+Overview of changes in bake 0.1.42
+
+    * Compile bake-get-symbols for bootstrap
+
 Overview of changes in bake 0.1.41
 
     * Use correct Bake version in bake-bootstrap
