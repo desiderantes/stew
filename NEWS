@@ -1,3 +1,7 @@
+Overview of changes in bake 0.1.41
+
+    * Use correct Bake version in bake-bootstrap
+
 Overview of changes in bake 0.1.40
 
     * Fix error text broken in 0.1.34
