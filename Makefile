@@ -54,6 +54,9 @@ bake-template: src/bake-template.vala
 bake-test: src/bake-test.vala
 	valac -o bake-test --pkg=posix src/bake-test.vala
 
+src/config-bootstrap.vala: Recipe
+	v=`sed -n 's/^\W*version\W*=\W*\(.*\)/\1/p' Recipe` ; sed "s/@VERSION@/$$v/g" src/config-bootstrap.vala.in > src/config-bootstrap.vala
+
 bake-bootstrap: $(SOURCES) bake-template bake-test
 	valac -o bake-bootstrap $(PACKAGES) --Xcc='-DGETTEXT_PACKAGE="C"' --Xcc='-DLIBRARY_DIRECTORY="$(LIBRARY_DIRECTORY)"' $(SOURCES)
 
@@ -73,5 +76,5 @@ release: bake-bootstrap
 	PATH=`pwd`:$$PATH ./bake-bootstrap release
 
 clean:
-	if [ -e bake-bootstrap ] ; then PATH=`pwd`:$$PATH ./bake-bootstrap clean ; rm -f bake-bootstrap bake-template bake-test ; fi
+	if [ -e bake-bootstrap ] ; then PATH=`pwd`:$$PATH ./bake-bootstrap clean ; rm -f bake-bootstrap bake-template bake-test src/config-bootstrap.vala ; fi
 
