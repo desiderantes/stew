@@ -1,6 +1,6 @@
 project {
   name = bake
-  version = 0.1.39+bzr
+  version = 0.1.40
   ppa = lp:~bake-team/releases
   minimum-bake-version = 0.1.39
 }

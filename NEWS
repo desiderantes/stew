@@ -1,3 +1,9 @@
+Overview of changes in bake 0.1.40
+
+    * Fix error text broken in 0.1.34
+    * Fix ordering of pkg-config flags
+    * Hide private symbols in libbake
+
 Overview of changes in bake 0.1.39
 
     * Fix object finding broken in 0.1.38
