@@ -16,7 +16,7 @@ public class Rule : Object
     public List<string> inputs;
     public List<string> outputs;
     protected List<string> static_commands;
-    public bool pretty_print;
+    protected bool pretty_print;
     
     public Rule (Recipe recipe, bool pretty_print)
     {
