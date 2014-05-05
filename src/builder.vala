@@ -15,6 +15,13 @@ public errordomain BuildError
     ERROR
 }
 
+public enum BuilderFlags
+{
+    PRETTY_PRINT = 0x1,
+    DEBUG        = 0x2,
+    PARALLEL     = 0x4,
+}
+
 public class Builder : Object
 {
     public signal void report (string text);
@@ -23,20 +30,16 @@ public class Builder : Object
     public signal void report_debug (string text);
 
     private HashTable<Rule, RuleBuilder> builders;
-    private bool parallel = false;
+    private BuilderFlags flags;
     private List<string> errors;
-    private bool pretty_print;
-    private bool debug_enabled;
     public string base_directory;
     private string last_logged_directory;
 
-    public Builder (bool parallel = false, bool pretty_print = false, bool debug_enabled = false, string base_directory)
+    public Builder (string base_directory, BuilderFlags flags = 0)
     {
         builders = new HashTable<Rule, RuleBuilder> (direct_hash, direct_equal);
-        this.parallel = parallel;
-        this.pretty_print = pretty_print;
-        this.debug_enabled = debug_enabled;
         this.base_directory = base_directory;
+        this.flags = flags;
         last_logged_directory = Environment.get_current_dir ();
     }
 
@@ -53,14 +56,14 @@ public class Builder : Object
 
     private async bool build_target_recursive (Recipe recipe, string target, List<Rule> used_rules)
     {
-        if (debug_enabled)
+        if ((flags & BuilderFlags.DEBUG) != 0)
             report ("Considering target %s".printf (get_relative_path (base_directory, target)));
 
         /* Find the rule */
         var rule = recipe.get_rule_with_target (target);
         if (rule != null && rule.recipe != recipe)
         {
-            if (debug_enabled)
+            if ((flags & BuilderFlags.DEBUG) != 0)
                 report ("Target %s defined in recipe %s".printf (get_relative_path (base_directory, target), get_relative_path (base_directory, rule.recipe.filename)));
 
             return yield build_target_recursive (rule.recipe, target, used_rules);
@@ -207,12 +210,12 @@ public class Builder : Object
             });
 
             /* Wait for each result if not running in parallel mode */
-            if (!parallel)
+            if ((flags & BuilderFlags.PARALLEL) == 0)
                 yield;
         }
 
         /* Wait for all inputs to complete in parallel mode */
-        if (parallel && n_building > 0)
+        if ((flags & BuilderFlags.PARALLEL) != 0 && n_building > 0)
             yield;
 
         return force_build;
@@ -224,7 +227,7 @@ public class Builder : Object
         if (builder != null)
             return;
 
-        builder = new RuleBuilder (this, rule, pretty_print);
+        builder = new RuleBuilder (this, rule, (flags & BuilderFlags.PRETTY_PRINT) != 0);
         builders.insert (rule, builder);
         yield builder.build ();
         if (builder.error != null)
