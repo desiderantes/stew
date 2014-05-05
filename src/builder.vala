@@ -43,6 +43,36 @@ public class Builder : Object
         last_logged_directory = Environment.get_current_dir ();
     }
 
+    public async bool build (Recipe recipe) throws BuildError
+    {
+        return yield build_target (recipe, "./%build");
+    }
+
+    public async bool test (Recipe recipe) throws BuildError
+    {
+        return yield build_target (recipe, "./%test");
+    }
+
+    public async bool install (Recipe recipe) throws BuildError
+    {
+        return yield build_target (recipe, "./%install");
+    }
+
+    public async bool release (Recipe recipe) throws BuildError
+    {
+        return yield build_target (recipe, "./%release");
+    }
+
+    public async bool uninstall (Recipe recipe) throws BuildError
+    {
+        return yield build_target (recipe, "./%uninstall");
+    }
+
+    public async bool clean (Recipe recipe) throws BuildError
+    {
+        return yield build_target (recipe, "./%clean");
+    }
+
     public async bool build_target (Recipe recipe, string target) throws BuildError
     {
         var used_rules = new List<Rule> ();
