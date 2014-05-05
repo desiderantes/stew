@@ -306,20 +306,20 @@ private class RuleBuilder : Object
             {
                 if (!show_output)
                     builder.report_status (c);
-                builder.report_output (output);
                 error = "Caught signal %d".printf (Process.term_sig (exit_status));
-                return false;
             }
             else if (Process.if_exited (exit_status) && Process.exit_status (exit_status) != 0)
             {
                 if (!show_output)
                     builder.report_status (c);
-                builder.report_output (output);
                 error = "Command exited with return value %d".printf (Process.exit_status (exit_status));
-                return false;
             }
-            else
+
+            if (output != "")
                 builder.report_output (output);
+
+            if (error != null)
+                return false;
         }
 
         foreach (var output in rule.outputs)
