@@ -255,7 +255,14 @@ public class BakeApp
         if (!target.has_prefix ("%") && cookbook.current_recipe.get_rule_with_target (Path.build_filename (cookbook.current_recipe.dirname, "%" + target)) != null)
             target = "%" + target;
 
-        var builder = new Bake.Builder (do_parallel, pretty_print, debug_enabled, original_dir);
+        Bake.BuilderFlags flags = 0;
+        if (pretty_print)
+            flags |= Bake.BuilderFlags.PRETTY_PRINT;
+        if (debug_enabled)
+            flags |= Bake.BuilderFlags.DEBUG;
+        if (do_parallel)
+            flags |= Bake.BuilderFlags.PARALLEL;
+        var builder = new Bake.Builder (original_dir, flags);
         builder.report.connect ((text) => { stdout.printf ("%s\n", text); });
         builder.report_status.connect ((text) => { stdout.printf ("%s\n", format_status (text)); });
         builder.report_output.connect ((text) => { stdout.printf ("%s", text); });
