@@ -86,8 +86,3 @@ programs {
     compile-flags = -DGETTEXT_PACKAGE=\"bake\"
    }
 }
-
-data.bootstrap {
-  files = config-bootstrap.vala
-  install = false
-}
