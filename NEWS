@@ -1,3 +1,7 @@
+Overview of changes in bake 0.1.44
+
+    * Distribute src/config-bootstrap.vala.in
+
 Overview of changes in bake 0.1.43
 
     * libbake API tidy-ups
