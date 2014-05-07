@@ -1,3 +1,7 @@
+Overview of changes in bake 0.1.43
+
+    * libbake API tidy-ups
+
 Overview of changes in bake 0.1.42
 
     * Compile bake-get-symbols for bootstrap
