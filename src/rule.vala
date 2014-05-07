@@ -73,14 +73,13 @@ public class Rule : Object
     public void add_error_command (string status)
     {
         // FIXME: Escape if necessary
-        var colored_status = "\x1B[1m\x1B[31m" + status + "\x1B[0m";
-        add_command ("@echo '%s'".printf (colored_status));
+        add_command ("!error %s".printf (status));
     }
-    
+
     protected string make_status_command (string status)
     {
         // FIXME: Escape if necessary
-        return "@echo '%s'".printf (status);
+        return "!status %s".printf (status);
     }
 
     public virtual List<string> get_commands ()

@@ -328,7 +328,6 @@ class ValaModule : BuildModule
                 link_rule.add_error_command ("Unable to compile program %s:".printf (compilable.name));
             foreach (var e in link_errors)
                 link_rule.add_error_command (" - %s".printf (e));
-            link_rule.add_command ("@false");
             return;
         }
 

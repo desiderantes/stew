@@ -24,7 +24,7 @@ public enum BuilderFlags
 
 public class Builder : Object
 {
-    public signal void report (string text);
+    public signal void report_command (string text);
     public signal void report_status (string text);
     public signal void report_output (string text);
     public signal void report_debug (string text);
@@ -87,14 +87,14 @@ public class Builder : Object
     private async bool build_target_recursive (Recipe recipe, string target, List<Rule> used_rules)
     {
         if ((flags & BuilderFlags.DEBUG) != 0)
-            report ("Considering target %s".printf (get_relative_path (base_directory, target)));
+            report_debug ("Considering target %s".printf (get_relative_path (base_directory, target)));
 
         /* Find the rule */
         var rule = recipe.get_rule_with_target (target);
         if (rule != null && rule.recipe != recipe)
         {
             if ((flags & BuilderFlags.DEBUG) != 0)
-                report ("Target %s defined in recipe %s".printf (get_relative_path (base_directory, target), get_relative_path (base_directory, rule.recipe.filename)));
+                report_debug ("Target %s defined in recipe %s".printf (get_relative_path (base_directory, target), get_relative_path (base_directory, rule.recipe.filename)));
 
             return yield build_target_recursive (rule.recipe, target, used_rules);
         }
@@ -282,8 +282,42 @@ private class RuleBuilder : Object
     public async bool build ()
     {
         var commands = rule.get_commands ();
+        var in_error = false;
         foreach (var c in commands)
         {
+            if (c.has_prefix ("!"))
+            {
+                var i = 1;
+                while (c[i] != '\0' && !c[i].isspace ())
+                    i++;
+                var bake_command = c.substring (1, i - 1);
+                var arg = c[i] == '\0' ? "" : c.substring (i + 1);
+
+                if (in_error && bake_command != "error")
+                    return false;
+
+                switch (bake_command)
+                {
+                case "status":
+                    builder.report_status (arg);
+                    break;
+                case "error":
+                    in_error = true;
+                    if (error == null)
+                        error = arg;
+                    else
+                        error += "\n" + arg;
+                    break;
+                default:
+                    error = "Unknown command %s".printf (bake_command);
+                    return false;
+                }
+                continue;
+            }
+
+            if (in_error)
+                return false;
+
             var show_output = true;
             if (c.has_prefix ("@"))
             {
@@ -294,7 +328,7 @@ private class RuleBuilder : Object
             c = rule.recipe.substitute_variables (c);
 
             if (show_output)
-                builder.report (c);
+                builder.report_command (c);
 
             string output;
             var exit_status = yield run_command (c, out output);
@@ -321,6 +355,9 @@ private class RuleBuilder : Object
             if (error != null)
                 return false;
         }
+
+        if (in_error)
+            return false;
 
         foreach (var output in rule.outputs)
         {

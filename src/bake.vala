@@ -107,7 +107,7 @@ public class BakeApp
         }
         catch (Error e)
         {
-            stdout.printf ("%s\n", format_status (e.message));
+            stdout.printf ("%s\n", format_error (e.message));
             stdout.printf ("%s\n", format_error ("[Build failed]"));
             return Posix.EXIT_FAILURE;
         }
@@ -150,7 +150,7 @@ public class BakeApp
                 }
                 catch (Bake.CookbookError e)
                 {
-                    stdout.printf ("%s\n", e.message);
+                    stdout.printf ("%s\n", format_error (e.message));
                     stdout.printf ("%s\n", format_error ("[Configure Failed]"));
                     return Posix.EXIT_FAILURE;
                 }
@@ -207,7 +207,7 @@ public class BakeApp
         }
         catch (Error e)
         {
-            stdout.printf ("%s\n", format_status ("%s".printf (e.message)));
+            stdout.printf ("%s\n", format_error ("%s".printf (e.message)));
             stdout.printf ("%s\n", format_error ("[Build failed]"));
             return Posix.EXIT_FAILURE;
         }
@@ -263,7 +263,7 @@ public class BakeApp
         if (do_parallel)
             flags |= Bake.BuilderFlags.PARALLEL;
         var builder = new Bake.Builder (original_dir, flags);
-        builder.report.connect ((text) => { stdout.printf ("%s\n", text); });
+        builder.report_command.connect ((text) => { stdout.printf ("%s\n", text); });
         builder.report_status.connect ((text) => { stdout.printf ("%s\n", format_status (text)); });
         builder.report_output.connect ((text) => { stdout.printf ("%s", text); });
         builder.report_debug.connect ((text) => { if (debug_enabled) stderr.printf ("%s", text); });
@@ -277,7 +277,7 @@ public class BakeApp
             }
             catch (Bake.BuildError e)
             {
-                stdout.printf ("%s\n", format_status ("%s".printf (e.message)));
+                stdout.printf ("%s\n", format_error ("%s".printf (e.message)));
                 stdout.printf ("%s\n", format_error ("[Build failed]"));
                 exit_code = Posix.EXIT_FAILURE;
             }

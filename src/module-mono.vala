@@ -162,7 +162,6 @@ class MonoModule : BuildModule
                 rule.add_error_command ("Unable to compile program %s:".printf (compilable.id));
             foreach (var e in compile_errors)
                 rule.add_error_command (" - %s".printf (e));
-            rule.add_command ("@false");
             return binary_name;
         }
 
