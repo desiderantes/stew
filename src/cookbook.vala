@@ -403,9 +403,8 @@ public class Cookbook : Object
         {
             var rule = recipe.add_rule ();
             rule.add_output (library.name);
-            rule.add_command ("@echo 'Unable to compile library %s:'".printf (library.id));
-            rule.add_command ("@echo ' - No compiler found that matches source files'");
-            rule.add_command ("@false");
+            rule.add_error_command ("Unable to compile library %s:".printf (library.id));
+            rule.add_error_command (" - No compiler found that matches source files");
             recipe.build_rule.add_input (library.name);
             recipe.add_install_rule (library.id, library.install_directory);
         }
@@ -442,9 +441,8 @@ public class Cookbook : Object
         {
             var rule = recipe.add_rule ();
             rule.add_output (program.name);
-            rule.add_command ("@echo 'Unable to compile program %s:'".printf (program.id));
-            rule.add_command ("@echo ' - No compiler found that matches source files'");
-            rule.add_command ("@false");
+            rule.add_error_command ("Unable to compile program %s:".printf (program.id));
+            rule.add_error_command (" - No compiler found that matches source files");
             recipe.build_rule.add_input (program.name);
             recipe.add_install_rule (program.name, program.install_directory);
         }
