@@ -84,5 +84,10 @@ programs {
     packages = gio-2.0
     libraries = bake (local)
     compile-flags = -DGETTEXT_PACKAGE=\"bake\"
-   }
+  }
+}
+
+data.bootstrap {
+  files = config-bootstrap.vala.in
+  install = false
 }
