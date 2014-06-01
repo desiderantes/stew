@@ -139,22 +139,24 @@ public class BakeApp
             stdout.printf ("%s\n", format_status ("[Configuring]"));
 
             /* Load args from the command line */
+            var conf_args = new string[0];
             if (do_configure)
             {
-                var conf_args = new string[args.length - 1];
+                conf_args = new string[args.length - 1];
                 for (var i = 1; i < args.length; i++)
                     conf_args[i - 1] = args[i];
-                try
-                {
-                    cookbook.configure (conf_args);
-                }
-                catch (Bake.CookbookError e)
-                {
-                    stdout.printf ("%s\n", format_error (e.message));
-                    stdout.printf ("%s\n", format_error ("[Configure Failed]"));
-                    return Posix.EXIT_FAILURE;
-                }
             }
+
+            try
+            {
+                cookbook.configure (conf_args);
+            }
+            catch (Bake.CookbookError e)
+            {
+                stdout.printf ("%s\n", format_error (e.message));
+                stdout.printf ("%s\n", format_error ("[Configure Failed]"));
+                return Posix.EXIT_FAILURE;
+            }            
 
             /* Print summary of configuration options */
             foreach (var option in cookbook.options)

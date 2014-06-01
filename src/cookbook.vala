@@ -130,7 +130,7 @@ public class Cookbook : Object
                 throw new CookbookError.UNKNOWN_OPTIONS ("%s", text);
             }
         }
-    
+
         /* Write configuration */
         try
         {
@@ -138,7 +138,7 @@ public class Cookbook : Object
         }
         catch (Error e)
         {
-            throw new CookbookError.INVALID_CONFIG ("Failed to read back configuration: %s", e.message);
+            throw new CookbookError.INVALID_CONFIG ("Failed to write configuration: %s", e.message);
         }
 
         _needs_configure = false;
