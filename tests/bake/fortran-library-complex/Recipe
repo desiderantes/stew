@@ -1,0 +1,18 @@
+project {
+  name = test-project
+}
+
+libraries.test {
+  sources = test1.f \
+            test2.f \
+            test3.f \
+            test-disabled.f (if false)
+  so-version = 1.2
+  gettext-domain = test
+  symbol-filter = hidden (hide) \
+                  test_.* \
+                  x (if false)
+  compile-flags = -DFOO=1
+  link-flags = -lm
+  debug = true
+}

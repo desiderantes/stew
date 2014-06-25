@@ -1,0 +1,18 @@
+!bake
+mkdir -p .built
+gfortran -DFOO=1 -DBAR=2 -g -c test1.f -o .built/test-test1.o
+gfortran -DFOO=1 -DBAR=2 -g -c test2.f -o .built/test-test2.o
+gfortran -DFOO=1 -DBAR=2 -g -c test3.f -o .built/test-test3.o
+gfortran -o test .built/test-test1.o .built/test-test2.o .built/test-test3.o -lm -lz
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/bin
+cp test /usr/bin/test
+(exit SUCCESS)
+!bake uninstall
+rm -f /usr/bin/test
+(exit SUCCESS)
+!bake clean
+rm -rf .built/
+rm -f test
+(exit SUCCESS)

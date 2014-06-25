@@ -35,6 +35,7 @@ tests/bake/valac
 tests/bake/g++
 tests/bake/gdc
 tests/bake/gccgo
+tests/bake/gfortran
 tests/bake/ghc
 tests/bake/ln
 tests/bake/moc

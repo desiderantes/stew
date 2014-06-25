@@ -1,0 +1,20 @@
+!bake
+mkdir -p .built
+gfortran -fPIC -c test.f -o .built/test-test.o
+gfortran -o libtest.so -shared -Wl,-soname,libtest.so .built/test-test.o
+ar -cq libtest.a .built/test-test.o
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/lib
+cp libtest.so /usr/lib/libtest.so
+cp libtest.a /usr/lib/libtest.a
+(exit SUCCESS)
+!bake uninstall
+rm -f /usr/lib/libtest.so
+rm -f /usr/lib/libtest.a
+(exit SUCCESS)
+!bake clean
+rm -rf .built/
+rm -f libtest.so
+rm -f libtest.a
+(exit SUCCESS)

@@ -9,6 +9,7 @@ data.bake {
                   d.page \
                   data.page \
                   example.page \
+                  fortran.page \
                   go.page \
                   gsettings.page \
                   gtk-ui.page \

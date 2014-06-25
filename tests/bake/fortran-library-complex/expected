@@ -1,0 +1,27 @@
+!bake
+mkdir -p .built
+gfortran -fPIC -DFOO=1 -g -c test1.f -o .built/test-test1.o
+gfortran -fPIC -DFOO=1 -g -c test2.f -o .built/test-test2.o
+gfortran -fPIC -DFOO=1 -g -c test3.f -o .built/test-test3.o
+bake-get-symbols --output .built/test.ver --local ^hidden$ --global ^test_.*$ .built/test-test1.o .built/test-test2.o .built/test-test3.o
+gfortran -o libtest.so.1.2 -shared -Wl,-soname,libtest.so.1.2 -Wl,-version-script,.built/test.ver .built/test-test1.o .built/test-test2.o .built/test-test3.o -lm
+ar -cq libtest.a .built/test-test1.o .built/test-test2.o .built/test-test3.o
+ln -s libtest.so.1.2 libtest.so
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/lib
+cp libtest.so.1.2 /usr/lib/libtest.so.1.2
+ln -s libtest.so.1.2 /usr/lib/libtest.so
+cp libtest.a /usr/lib/libtest.a
+(exit SUCCESS)
+!bake uninstall
+rm -f /usr/lib/libtest.so.1.2
+rm -f /usr/lib/libtest.so
+rm -f /usr/lib/libtest.a
+(exit SUCCESS)
+!bake clean
+rm -rf .built/
+rm -f libtest.so.1.2
+rm -f libtest.a
+rm -f libtest.so
+(exit SUCCESS)

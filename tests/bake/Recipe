@@ -126,6 +126,13 @@ programs.gdc {
   install = false
 }
 
+programs.gfortran {
+  sources = gfortran.vala status.vala
+  vala-packages = posix gio-2.0 gio-unix-2.0
+  packages = gio-2.0 gio-unix-2.0
+  install = false
+}
+
 programs.valac {
   sources = valac.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
@@ -779,6 +786,20 @@ programs.test-bake {
       args = d-program-complex
     }
 
+    # Fortran tests
+    fortran-program-simple {
+      args = fortran-program-simple
+    }
+    fortran-program-complex {
+      args = fortran-program-complex
+    }
+    fortran-library-simple {
+      args = fortran-library-simple
+    }
+    fortran-library-complex {
+      args = fortran-library-complex
+    }
+
     # Data tests
     data-simple {
       args = data-simple
@@ -1408,6 +1429,24 @@ data.bake-tests {
           d-program-complex/test2.d \
           d-program-complex/test3.d \
           d-program-complex/test-disabled.d \
+          fortran-program-simple/expected \
+          fortran-program-simple/Recipe \
+          fortran-program-simple/test.f \
+          fortran-program-complex/expected \
+          fortran-program-complex/Recipe \
+          fortran-program-complex/test1.f \
+          fortran-program-complex/test2.f \
+          fortran-program-complex/test3.f \
+          fortran-program-complex/test-disabled.f \
+          fortran-library-simple/expected \
+          fortran-library-simple/Recipe \
+          fortran-library-simple/test.f \
+          fortran-library-complex/expected \
+          fortran-library-complex/Recipe \
+          fortran-library-complex/test1.f \
+          fortran-library-complex/test2.f \
+          fortran-library-complex/test3.f \
+          fortran-library-complex/test-disabled.f \
           data-simple/expected \
           data-simple/Recipe data-simple/test \
           data-complex/expected \

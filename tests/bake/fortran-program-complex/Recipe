@@ -1,0 +1,16 @@
+project {
+  name = test-project
+}
+
+programs.test {
+  sources = test1.f \
+            test2.f \
+            test3.f \
+            test-disabled.f (if false)
+  gettext-domain = test
+  compile-flags = -DFOO=1 \
+                  -DBAR=2
+  link-flags = -lm \
+               -lz
+  debug = true
+}
