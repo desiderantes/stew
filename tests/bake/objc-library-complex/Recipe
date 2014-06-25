@@ -1,0 +1,22 @@
+project {
+  name = test-project
+}
+
+libraries.test {
+  sources = test1.m \
+            test2.m \
+            test3.m \
+            test-disabled.m (if false)
+  headers = test.h \
+            test-disabled.h (if false)
+  so-version = 1.2
+  headers = test.h \
+            test-disabled.h (if false)
+  gettext-domain = test
+  symbol-filter = hidden (hide) \
+                  test_.* \
+                  x (if false)
+  compile-flags = -DFOO=1
+  link-flags = -lm
+  debug = true
+}

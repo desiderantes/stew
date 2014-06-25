@@ -1,0 +1,7 @@
+project {
+  name = test-project
+}
+
+libraries.test {
+  sources = test.m
+}

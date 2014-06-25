@@ -19,6 +19,7 @@ data.bake {
                   java.page \
                   mallard.page \
                   man.page \
+                  objc.page \
                   options.page \
                   pkg-config.page \
                   programs.page \

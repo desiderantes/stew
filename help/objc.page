@@ -1,0 +1,21 @@
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="objc">
+<info>
+    <link type="guide" xref="index#programs-and-libraries"/>
+</info>
+
+<title>Objective C Language Support</title>
+
+<p>
+Bake supports <link xref="programs">programs</link> and <link xref="libraries">libraries</link> written in the Objective C language.
+</p>
+<example>
+<p>
+The following shows a recipe for a two file Objective C program:
+</p>
+<code>
+programs.example-program {
+  sources = main.m module.m
+}
+</code>
+</example>
+</page>

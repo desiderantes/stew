@@ -751,6 +751,20 @@ programs.test-bake {
       args = haskell-program-complex
     }
 
+    # Objective C tests
+    objc-program-simple {
+      args = objc-program-simple
+    }
+    objc-program-complex {
+      args = objc-program-complex
+    }
+    objc-library-simple {
+      args = objc-library-simple
+    }
+    objc-library-complex {
+      args = objc-library-complex
+    }
+
     # D tests
     d-program-simple {
       args = d-program-simple
@@ -1370,6 +1384,15 @@ data.bake-tests {
           haskell-program-complex/test2.hs \
           haskell-program-complex/test3.hs \
           haskell-program-complex/test-disabled.hs \
+          objc-program-simple/expected \
+          objc-program-simple/Recipe \
+          objc-program-simple/test.m \
+          objc-program-complex/expected \
+          objc-program-complex/Recipe \
+          objc-program-complex/test1.m \
+          objc-program-complex/test2.m \
+          objc-program-complex/test3.m \
+          objc-program-complex/test-disabled.m \
           d-program-simple/expected \
           d-program-simple/Recipe \
           d-program-simple/test.d \
