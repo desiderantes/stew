@@ -247,11 +247,6 @@ public class Recipe : Object
                     variable_stack.prepend (new VariableBlock (line_number, name));
                 else
                     variable_stack.prepend (new VariableBlock (line_number, "%s.%s".printf (variable_stack.nth_data (0).name, name)));
-
-                /* Set variable so can allow empty blocks */
-                if (variables.lookup (name) == null)
-                    set_variable (name, "");
-
                 continue;
             }
 
