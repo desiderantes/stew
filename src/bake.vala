@@ -94,7 +94,7 @@ public class BakeApp
 
         var cookbook = new Bake.Cookbook (original_dir, pretty_print);
         cookbook.report_status.connect ((text) => { stdout.printf ("%s\n", format_status (text)); });
-        cookbook.report_debug.connect ((text) => { if (debug_enabled) stderr.printf ("%s", text); });
+        cookbook.report_debug.connect ((text) => { if (debug_enabled) stderr.printf ("%s\n", text); });
 
         try
         {
