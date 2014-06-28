@@ -299,7 +299,7 @@ public class Cookbook : Object
         {
             f = new Recipe.from_file (filename, pretty_print);
         }
-        catch (FileError e)
+        catch (Error e)
         {
             throw new CookbookError.INVALID_RECIPE ("Recipe file '%s' is invalid: %s".printf (get_relative_path (original_dir, filename), e.message));
         }
