@@ -17,9 +17,10 @@ public errordomain RecipeError
 
 public enum RecipeLoadFlags
 {
-    NONE           = 0x0,
-    PRETTY_PRINT   = 0x1,
-    DISALLOW_RULES = 0x2
+    NONE             = 0x0,
+    PRETTY_PRINT     = 0x1,
+    DISALLOW_RULES   = 0x2,
+    STOP_IF_TOPLEVEL = 0x4,
 }
 
 public class Recipe : Object
@@ -88,7 +89,6 @@ public class Recipe : Object
     public Recipe.from_file (string filename, RecipeLoadFlags flags = RecipeLoadFlags.NONE) throws FileError, RecipeError
     {
         var pretty_print = (flags & RecipeLoadFlags.PRETTY_PRINT) != 0;
-        var allow_rules = (flags & RecipeLoadFlags.DISALLOW_RULES) == 0;
 
         this (pretty_print);
 
@@ -96,7 +96,7 @@ public class Recipe : Object
 
         string contents;
         FileUtils.get_contents (filename, out contents);
-        parse (filename, contents, allow_rules);
+        parse (filename, contents, flags);
 
         build_rule = find_rule ("%build");
         if (build_rule == null)
@@ -200,7 +200,7 @@ public class Recipe : Object
         }
     }
 
-    private void parse (string filename, string contents, bool allow_rules) throws RecipeError
+    private void parse (string filename, string contents, RecipeLoadFlags flags) throws RecipeError
     {
         var lines = contents.split ("\n");
         var line_number = 0;
@@ -278,12 +278,16 @@ public class Recipe : Object
                 var value = statement.substring (index + 1).strip ();
 
                 set_variable (name, value);
+
+                if (name == "project.name" && (flags & RecipeLoadFlags.STOP_IF_TOPLEVEL) != 0)
+                    return;
+
                 continue;
             }
 
             /* Load explicit rules */
             index = statement.index_of (":");
-            if (index > 0 && allow_rules)
+            if (index > 0 && (flags & RecipeLoadFlags.DISALLOW_RULES) == 0)
             {
                 var rule = add_rule ();
 

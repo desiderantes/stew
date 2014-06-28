@@ -306,6 +306,8 @@ public class Cookbook : Object
             var flags = RecipeLoadFlags.NONE;
             if (pretty_print)
                 flags |= RecipeLoadFlags.PRETTY_PRINT;
+            if (!is_toplevel)
+                flags |= RecipeLoadFlags.STOP_IF_TOPLEVEL;
             f = new Recipe.from_file (filename, flags);
         }
         catch (Error e)
