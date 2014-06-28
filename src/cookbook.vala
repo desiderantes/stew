@@ -157,7 +157,10 @@ public class Cookbook : Object
         /* Load configuration */
         try
         {
-            conf_file = new Recipe.from_file (Path.build_filename (toplevel_dir, "Recipe.conf"), pretty_print, false);
+            var flags = RecipeLoadFlags.DISALLOW_RULES;
+            if (pretty_print)
+                flags |= RecipeLoadFlags.PRETTY_PRINT;
+            conf_file = new Recipe.from_file (Path.build_filename (toplevel_dir, "Recipe.conf"), flags);
             _needs_configure = false;
         }
         catch (Error e)
@@ -263,7 +266,10 @@ public class Cookbook : Object
             var filename = Path.build_filename (toplevel_dir, "Recipe");
             try
             {
-                t = new Recipe.from_file (filename, pretty_print);
+                var flags = RecipeLoadFlags.NONE;
+                if (pretty_print)
+                    flags |= RecipeLoadFlags.PRETTY_PRINT;
+                t = new Recipe.from_file (filename, flags);
                 if (t.project_name != null)
                     break;
             }
@@ -297,7 +303,10 @@ public class Cookbook : Object
         Recipe f;
         try
         {
-            f = new Recipe.from_file (filename, pretty_print);
+            var flags = RecipeLoadFlags.NONE;
+            if (pretty_print)
+                flags |= RecipeLoadFlags.PRETTY_PRINT;
+            f = new Recipe.from_file (filename, flags);
         }
         catch (Error e)
         {

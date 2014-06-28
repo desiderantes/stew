@@ -15,6 +15,13 @@ public errordomain RecipeError
     INVALID
 }
 
+public enum RecipeLoadFlags
+{
+    NONE           = 0x0,
+    PRETTY_PRINT   = 0x1,
+    DISALLOW_RULES = 0x2
+}
+
 public class Recipe : Object
 {
     public string filename;
@@ -78,8 +85,11 @@ public class Recipe : Object
         variables = new HashTable<string, string> (str_hash, str_equal);
     }
 
-    public Recipe.from_file (string filename, bool pretty_print, bool allow_rules = true) throws FileError, RecipeError
+    public Recipe.from_file (string filename, RecipeLoadFlags flags = RecipeLoadFlags.NONE) throws FileError, RecipeError
     {
+        var pretty_print = (flags & RecipeLoadFlags.PRETTY_PRINT) != 0;
+        var allow_rules = (flags & RecipeLoadFlags.DISALLOW_RULES) == 0;
+
         this (pretty_print);
 
         this.filename = filename;
