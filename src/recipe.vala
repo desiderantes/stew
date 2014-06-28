@@ -29,7 +29,7 @@ public class Recipe : Object
     public Recipe? parent = null;
     public List<Recipe> children;
     public List<string> variable_names;
-    private HashTable<string, string> variables;
+    private HashTable<string, Variable> variables;
     public List<Rule> rules;
     public Rule build_rule;
     public Rule install_rule;
@@ -83,7 +83,7 @@ public class Recipe : Object
     {
         this.pretty_print = pretty_print;
         variable_names = new List<string> ();
-        variables = new HashTable<string, string> (str_hash, str_equal);
+        variables = new HashTable<string, Variable> (str_hash, str_equal);
     }
 
     public Recipe.from_file (string filename, RecipeLoadFlags flags = RecipeLoadFlags.NONE) throws FileError, RecipeError
@@ -142,12 +142,13 @@ public class Recipe : Object
 
     public string? get_variable (string name, string? fallback = null, bool recurse = true)
     {
-        var value = variables.lookup (name);
-        if (recurse && value == null && parent != null)
+        var variable = variables.lookup (name);
+        if (recurse && variable == null && parent != null)
             return parent.get_variable (name, fallback);
-        if (value == null)
-            value = fallback;
-        return value;
+        if (variable == null)
+            return fallback;
+        else
+            return variable.value;
     }
 
     public bool get_boolean_variable (string name, bool fallback = false)
@@ -185,19 +186,11 @@ public class Recipe : Object
         return false;
     }
 
-    public void set_variable (string name, string? value)
+    public void set_variable (string name, string? value, int line_number = -1)
     {
+        var variable = new Variable (line_number, value);
         variable_names.append (name);
-        variables.insert (name, value);
-
-        /* Set parents of this variable */
-        var i = name.last_index_of (".");
-        if (i > 0)
-        {
-            var n = name.substring (0, i);
-            if (variables.lookup (n) == null)
-                set_variable (n, null);
-        }
+        variables.insert (name, variable);
     }
 
     private void parse (string filename, string contents, RecipeLoadFlags flags) throws RecipeError
@@ -277,7 +270,11 @@ public class Recipe : Object
                     name = "%s.%s".printf (variable_stack.nth_data (0).name, name);
                 var value = statement.substring (index + 1).strip ();
 
-                set_variable (name, value);
+                var variable = variables.lookup (name);
+                if (variable != null)
+                    throw new RecipeError.INVALID ("Variable %s on line %d is already defined on line %d", name, line_number, variable.line_number);
+
+                set_variable (name, value, line_number);
 
                 if (name == "project.name" && (flags & RecipeLoadFlags.STOP_IF_TOPLEVEL) != 0)
                     return;
@@ -500,6 +497,18 @@ public class Recipe : Object
         }
 
         return text;
+    }
+}
+
+private class Variable
+{
+    public int line_number;
+    public string? value;
+
+    public Variable (int line_number, string? value)
+    {
+        this.line_number = line_number;
+        this.value = value;
     }
 }
 

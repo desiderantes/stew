@@ -304,6 +304,11 @@ programs.test-bake {
   install = false
 
   tests {
+    # Variable tests
+    duplicate-variable {
+      args = duplicate-variable
+    }
+
     # Rule tests
     rule-simple {
       args = rule-simple
@@ -899,7 +904,9 @@ programs.test-bake {
 
 data.bake-tests {
   install = false
-  files = rule-build/expected \
+  files = duplicate-variable/expected \
+          duplicate-variable/Recipe \
+          rule-build/expected \
           rule-build/Recipe \
           rule-chain/expected \
           rule-chain/Recipe \

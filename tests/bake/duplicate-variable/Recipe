@@ -1,0 +1,6 @@
+project {
+  name = test-project
+}
+
+test = red
+test = blue
