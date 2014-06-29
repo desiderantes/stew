@@ -1,3 +1,20 @@
+Overview of changes in bake 0.1.45
+
+    * Fix configure stage being run on subsequent builds
+    * Fix options defaulting to empty string when in form:
+      options.name
+      {
+        default = blah
+      }
+    * Treat variable redefinition as an error
+    * Treat empty blocks as an error
+    * Show recipe name when child recipes fail to parse
+    * Support compiling multiple targets from the command line,
+      e.g. "bake test release"
+    * Fix missing newlines from debugging output
+    * Add tests/documentation for Objective C, Fortran
+    * Stop reading child recipies as soon as we know they're not toplevel files
+
 Overview of changes in bake 0.1.44
 
     * Distribute src/config-bootstrap.vala.in
