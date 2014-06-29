@@ -1,3 +1,7 @@
+Overview of changes in bake 0.1.46
+
+    * Add missing test files
+
 Overview of changes in bake 0.1.45
 
     * Fix configure stage being run on subsequent builds

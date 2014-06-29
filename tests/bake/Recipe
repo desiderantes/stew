@@ -1431,6 +1431,17 @@ data.bake-tests {
           objc-program-complex/test2.m \
           objc-program-complex/test3.m \
           objc-program-complex/test-disabled.m \
+          objc-library-simple/expected \
+          objc-library-simple/Recipe \
+          objc-library-simple/test.m \
+          objc-library-complex/expected \
+          objc-library-complex/Recipe \
+          objc-library-complex/test1.m \
+          objc-library-complex/test2.m \
+          objc-library-complex/test3.m \
+          objc-library-complex/test-disabled.m \
+          objc-library-complex/test.h \
+          objc-library-complex/test-disabled.h \
           d-program-simple/expected \
           d-program-simple/Recipe \
           d-program-simple/test.d \
