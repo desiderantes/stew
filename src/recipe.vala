@@ -257,7 +257,15 @@ public class Recipe : Object
             {
                 if (variable_stack == null)
                     throw new RecipeError.INVALID ("End of variable group when none expected in line %d:\n%s", line_number, line);
+                var block = variable_stack.nth_data (0);
+                if (block.n_variables == 0)
+                    throw new RecipeError.INVALID ("Empty variable group in line %d:\n%s", line_number, line);
                 variable_stack.remove_link (variable_stack.nth (0));
+                if (variable_stack != null)
+                {
+                    var b = variable_stack.nth_data (0);
+                    b.n_variables += block.n_variables;
+                }
                 continue;
             }
 
@@ -267,7 +275,11 @@ public class Recipe : Object
             {
                 var name = statement.substring (0, index).strip ();
                 if (variable_stack != null)
-                    name = "%s.%s".printf (variable_stack.nth_data (0).name, name);
+                {
+                    var block = variable_stack.nth_data (0);
+                    block.n_variables++;
+                    name = "%s.%s".printf (block.name, name);
+                }
                 var value = statement.substring (index + 1).strip ();
 
                 var variable = variables.lookup (name);
@@ -516,6 +528,7 @@ private class VariableBlock
 {
     public int line_number;
     public string name;
+    public int n_variables;
 
     public VariableBlock (int line_number, string name)
     {
