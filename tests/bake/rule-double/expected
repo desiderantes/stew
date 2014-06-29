@@ -1,0 +1,5 @@
+# Check both rules are run
+!bake a b
+touch a
+touch b
+(exit SUCCESS)

@@ -316,6 +316,9 @@ programs.test-bake {
     rule-simple {
       args = rule-simple
     }
+    rule-double {
+      args = rule-double
+    }
     rule-multiple-inputs {
       args = rule-multiple-inputs
     }
@@ -917,6 +920,8 @@ data.bake-tests {
           rule-chain/Recipe \
           rule-clean/expected \
           rule-clean/Recipe \
+          rule-double/expected \
+          rule-double/Recipe \
           rule-duplicate-output/expected \
           rule-duplicate-output/Recipe \
           rule-loop-1/expected \

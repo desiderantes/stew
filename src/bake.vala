@@ -249,43 +249,54 @@ public class BakeApp
             return Posix.EXIT_FAILURE;
         }
 
-        var target = "%build";
-        if (args.length >= 2)
-            target = args[1];
+        var targets = new List<string> ();
+        for (var i = 1; i < args.length; i++)
+            targets.append (args[i]);
+        if (targets == null)
+            targets.append ("%build");
 
-        /* Build virtual targets */
-        if (!target.has_prefix ("%") && cookbook.current_recipe.get_rule_with_target (Path.build_filename (cookbook.current_recipe.dirname, "%" + target)) != null)
-            target = "%" + target;
-
-        Bake.BuilderFlags flags = 0;
-        if (pretty_print)
-            flags |= Bake.BuilderFlags.PRETTY_PRINT;
-        if (debug_enabled)
-            flags |= Bake.BuilderFlags.DEBUG;
-        if (do_parallel)
-            flags |= Bake.BuilderFlags.PARALLEL;
-        var builder = new Bake.Builder (original_dir, flags);
-        builder.report_command.connect ((text) => { stdout.printf ("%s\n", text); });
-        builder.report_status.connect ((text) => { stdout.printf ("%s\n", format_status (text)); });
-        builder.report_output.connect ((text) => { stdout.printf ("%s", text); });
-        builder.report_debug.connect ((text) => { if (debug_enabled) stderr.printf ("%s", text); });
+        // FIXME: We should build these targets in parallel if requested
+        var n_remaining = targets.length ();
         var exit_code = Posix.EXIT_SUCCESS;
-        builder.build_target.begin (cookbook.current_recipe, Bake.join_relative_dir (cookbook.current_recipe.dirname, target), (o, x) =>
+        foreach (var target in targets)
         {
-            try
-            {
-                builder.build_target.end (x);
-                stdout.printf ("%s\n", format_success ("[Build complete]"));
-            }
-            catch (Bake.BuildError e)
-            {
-                stdout.printf ("%s\n", format_error ("%s".printf (e.message)));
-                stdout.printf ("%s\n", format_error ("[Build failed]"));
-                exit_code = Posix.EXIT_FAILURE;
-            }
+           /* Build virtual targets */
+           if (!target.has_prefix ("%") && cookbook.current_recipe.get_rule_with_target (Path.build_filename (cookbook.current_recipe.dirname, "%" + target)) != null)
+               target = "%" + target;
 
-            loop.quit ();
-        });
+           Bake.BuilderFlags flags = 0;
+           if (pretty_print)
+               flags |= Bake.BuilderFlags.PRETTY_PRINT;
+           if (debug_enabled)
+               flags |= Bake.BuilderFlags.DEBUG;
+           if (do_parallel)
+               flags |= Bake.BuilderFlags.PARALLEL;
+           var builder = new Bake.Builder (original_dir, flags);
+           builder.report_command.connect ((text) => { stdout.printf ("%s\n", text); });
+           builder.report_status.connect ((text) => { stdout.printf ("%s\n", format_status (text)); });
+           builder.report_output.connect ((text) => { stdout.printf ("%s", text); });
+           builder.report_debug.connect ((text) => { if (debug_enabled) stderr.printf ("%s", text); });
+           builder.build_target.begin (cookbook.current_recipe, Bake.join_relative_dir (cookbook.current_recipe.dirname, target), (o, x) =>
+           {
+               n_remaining--;
+               try
+               {
+                   builder.build_target.end (x);
+                   if (n_remaining == 0)
+                   {
+                       stdout.printf ("%s\n", format_success ("[Build complete]"));
+                       loop.quit ();
+                   }
+               }
+               catch (Bake.BuildError e)
+               {
+                   stdout.printf ("%s\n", format_error ("%s".printf (e.message)));
+                   stdout.printf ("%s\n", format_error ("[Build failed]"));
+                   exit_code = Posix.EXIT_FAILURE;
+                   loop.quit ();
+               }
+           });
+        }
 
         loop.run ();
 
