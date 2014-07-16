@@ -546,6 +546,9 @@ programs.test-bake {
     c++-program-local-library-missing {
       args = c++-program-local-library-missing
     }
+    c++-program-glib-resources {
+      args = c++-program-glib-resources
+    }
     c++-library-simple {
       args = c++-library-simple
     }
@@ -1170,6 +1173,11 @@ data.bake-tests {
           c++-program-local-library-missing/expected \
           c++-program-local-library-missing/Recipe \
           c++-program-local-library-missing/main.cpp \
+          c++-program-glib-resources/expected \
+          c++-program-glib-resources/Recipe \
+          c++-program-glib-resources/test.cpp \
+          c++-program-glib-resources/resources.xml \
+          c++-program-glib-resources/test.png \
           c++-program-simple/expected \
           c++-program-simple/Recipe \
           c++-program-simple/test.cpp \

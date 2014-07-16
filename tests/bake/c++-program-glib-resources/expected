@@ -1,0 +1,18 @@
+!bake
+mkdir -p .built
+glib-compile-resources --generate --target=.built/test.glib-resources.c resources.xml
+g++ -Iglib -MMD -MF .built/test-test.glib-resources.d -c .built/test.glib-resources.c -o .built/test-test.glib-resources.o
+g++ -Iglib -MMD -MF .built/test-test.d -c test.cpp -o .built/test-test.o
+g++ -o test .built/test-test.glib-resources.o .built/test-test.o -lglib
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/bin
+cp test /usr/bin/test
+(exit SUCCESS)
+!bake uninstall
+rm -f /usr/bin/test
+(exit SUCCESS)
+!bake clean
+rm -rf .built/
+rm -f test
+(exit SUCCESS)
