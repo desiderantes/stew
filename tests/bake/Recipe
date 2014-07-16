@@ -287,6 +287,13 @@ programs.itstool {
   install = false
 }
 
+programs.glib-compile-resources {
+  sources = glib-compile-resources.vala status.vala
+  vala-packages = posix gio-2.0 gio-unix-2.0
+  packages = gio-2.0 gio-unix-2.0
+  install = false
+}
+
 data.pkg-config {
   files = pkg-config/baketest-dependency.pc \
           pkg-config/baketest-library.pc \
@@ -489,6 +496,9 @@ programs.test-bake {
     c-program-local-library-missing {
       args = c-program-local-library-missing
     }
+    c-program-glib-resources {
+      args = c-program-glib-resources
+    }
     c-library-simple {
       args = c-library-simple
     }
@@ -651,6 +661,9 @@ programs.test-bake {
     }
     vala-program-local-library-missing {
       args = vala-program-local-library-missing
+    }
+    vala-program-glib-resources {
+      args = vala-program-glib-resources
     }
     vala-library-simple {
       args = vala-library-simple
@@ -1003,6 +1016,11 @@ data.bake-tests {
           c-program-complex/test2.c \
           c-program-complex/test3.c \
           c-program-complex/test-disabled.c \
+          c-program-glib-resources/expected \
+          c-program-glib-resources/Recipe \
+          c-program-glib-resources/test.c \
+          c-program-glib-resources/resources.xml \
+          c-program-glib-resources/test.png \
           c-program-no-install/expected \
           c-program-no-install/Recipe \
           c-program-no-install/test.c \
@@ -1259,6 +1277,11 @@ data.bake-tests {
           vala-program-complex/test-c.c \
           vala-program-complex/test-c.h \
           vala-program-complex/test-disabled.vala \
+          vala-program-glib-resources/expected \
+          vala-program-glib-resources/Recipe \
+          vala-program-glib-resources/resources.xml \
+          vala-program-glib-resources/test.png \
+          vala-program-glib-resources/test.vala \
           vala-program-relative-directories/expected \
           vala-program-relative-directories/Recipe \
           vala-program-relative-directories/parent.vala \

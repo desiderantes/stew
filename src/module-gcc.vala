@@ -327,8 +327,29 @@ class GCCModule : BuildModule
             return;
         }
 
-        /* Compile */
+        var sources = new List<TaggedEntry> ();
+
+        /* GLib resources */
+        var glib_resources_file = compilable.get_variable ("glib-resources");
+        if (glib_resources_file != null)
+        {
+            var rule = recipe.add_rule ();
+            rule.add_input (glib_resources_file);
+            // FIXME: Dependencies
+            var output = recipe.get_build_path (compilable.id + ".glib-resources.c");
+            rule.add_output (output);
+            rule.add_status_command ("GLIB-COMPILE-RESOURCES %s".printf (glib_resources_file));
+            // FIXME: Should check if glib-compile-resources is installed
+            rule.add_command ("@glib-compile-resources --generate --target=%s %s".printf (output, glib_resources_file));
+            sources.append (new TaggedEntry (recipe, output));
+        }
+
+        /* User provided sources */
         foreach (var entry in compilable.get_sources ())
+            sources.append (entry);
+
+        /* Compile */
+        foreach (var entry in sources)
         {
             var source = entry.name;
 

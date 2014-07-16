@@ -44,6 +44,7 @@ tests/bake/python2.7
 tests/bake/python3.2
 tests/bake/javac
 tests/bake/jar
+tests/bake/glib-compile-resources
 tests/bake/gmcs
 tests/bake/tar
 tests/bake/dpkg-architecture
