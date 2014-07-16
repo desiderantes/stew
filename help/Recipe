@@ -10,6 +10,7 @@ data.bake {
                   data.page \
                   example.page \
                   fortran.page \
+                  glib-resources.page \
                   go.page \
                   gsettings.page \
                   gtk-ui.page \

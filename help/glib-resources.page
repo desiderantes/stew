@@ -1,0 +1,40 @@
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="glib-resources">
+<info>
+    <link type="guide" xref="index#data"/>
+</info>
+
+<title>GLib Resources</title>
+
+<p>
+<link xref="c">C</link>, <link xref="c++">C++</link> and <link xref="vala">Vala</link> programs using GLib can embed data files using <em>GLib resources</em>.
+</p>
+<p>
+A program can set the resource description using the <code>programs.<em>name</em>.glib-resources</code> variable.
+The files listed in the resource description will be compiled into the program and are accessible using the GResource API.
+</p>
+<example>
+<p>
+For example, a program can embed an image with:
+</p>
+<code>
+programs.test {
+  sources = test.c
+  glib-resources = resources.xml
+}
+</code>
+<p>
+resources.xml:
+</p>
+<code><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/com/example">
+    <file>test.png</file>
+  </gresource>
+</gresources>
+]]></code>
+<p>
+When running the build rule Bake will embed test.png into the program <em>test</em>.
+</p>
+</example>
+</page>
