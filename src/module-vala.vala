@@ -267,8 +267,7 @@ class ValaModule : BuildModule
 
         /* Get dependencies */
         var pkg_config_list = "";
-        var have_gobject = false;
-        var have_glib = false;
+        var used_packages = new HashTable <string, bool> (str_hash, str_equal);
         foreach (var entry in compilable.get_packages ())
         {
             if (!entry.is_allowed)
@@ -279,17 +278,76 @@ class ValaModule : BuildModule
             if (pkg_config_list != "")
                 pkg_config_list += " ";
             pkg_config_list += package;
-
-            /* Make sure we have standard Vala dependencies */
-            if (package == "gobject-2.0")
-                have_gobject = true;
-            if (package == "glib-2.0")
-                have_glib = true;
+            used_packages.insert (package, true);
         }
-        if (!have_gobject)
-            pkg_config_list += " gobject-2.0";
-        if (!have_glib)
-            pkg_config_list += " glib-2.0";
+
+        /* Make sure we have standard Vala dependencies */
+        const string[] required_packages = { "gobject-2.0", "glib-2.0" };
+        foreach (var package in required_packages)
+        {
+            if (!used_packages.lookup (package))
+            {
+                pkg_config_list += " " + package;
+                used_packages.insert (package, true);
+            }
+        }
+
+        foreach (var entry in compilable.get_tagged_list ("vala-packages"))
+        {
+            if (!entry.is_allowed)
+                continue;
+
+            var package = entry.name;
+
+            /* Look for locally generated libraries */
+            if (entry.has_tag ("local"))
+            {
+                var vapi_filename = "%s.vapi".printf (package);
+                var library_filename = "lib%s.so".printf (package);
+                var library_rule = recipe.toplevel.find_rule_recursive (vapi_filename);
+                if (library_rule != null)
+                {
+                    var rel_dir = get_relative_path (recipe.dirname, library_rule.recipe.dirname);
+                    valac_command += " --vapidir=%s --pkg=%s".printf (rel_dir, package);
+                    valac_inputs.append (Path.build_filename (rel_dir, vapi_filename));
+                    // FIXME: Actually use the .pc file
+                    compile_flags += " -I%s".printf (rel_dir);
+                    link_rule.add_input (Path.build_filename (rel_dir, library_filename));
+                    // FIXME: Use --libs-only-l
+                    link_flags += " -L%s -l%s".printf (rel_dir, package);
+                }
+                else
+                    link_errors.append ("Unable to find local package %s".printf (package));
+            }
+            else
+            {
+                /* Find if this is an installed .vapi */
+                var path = find_vapi (package);
+                if (path != null)
+                {
+                    /* .vapi files use the pkg-config file of the same name */
+                    valac_command += " --pkg=%s".printf (package);
+                    if (!used_packages.lookup (package))
+                    {
+                        pkg_config_list += " " + package;
+                        used_packages.insert (package, true);
+                    }
+                }
+                else
+                {
+                    path = find_gir (package);
+                    if (path != null)
+                    {
+                        /* .gir files contain the packages they depend on */
+                        valac_command += " --pkg=%s".printf (package);
+                        // FIXME: Look for the <package> tag to find what pkg-config file to use
+                        // FIXME: For now we'll just rely on the user to set it in the packages variable
+                    }
+                    else
+                        link_errors.append ("Unable to find package %s".printf (package));
+                }
+            }
+        }
 
         if (pkg_config_list != "")
         {
@@ -307,34 +365,6 @@ class ValaModule : BuildModule
                 foreach (var e in errors)
                     link_errors.append (e);
             }
-        }
-
-        foreach (var entry in compilable.get_tagged_list ("vala-packages"))
-        {
-            if (!entry.is_allowed)
-                continue;
-
-            var package = entry.name;
-
-            /* Look for locally generated libraries */
-            var vapi_filename = "%s.vapi".printf (package);
-            var library_filename = "lib%s.so".printf (package);
-            var library_rule = recipe.toplevel.find_rule_recursive (vapi_filename);
-            if (library_rule != null)
-            {
-                var rel_dir = get_relative_path (recipe.dirname, library_rule.recipe.dirname);
-                valac_command += " --vapidir=%s --pkg=%s".printf (rel_dir, package);
-                valac_inputs.append (Path.build_filename (rel_dir, vapi_filename));
-                // FIXME: Actually use the .pc file
-                compile_flags += " -I%s".printf (rel_dir);
-                link_rule.add_input (Path.build_filename (rel_dir, library_filename));
-                // FIXME: Use --libs-only-l
-                link_flags += " -L%s -l%s".printf (rel_dir, package);
-                continue;
-            }
-
-            /* Otherwise look for it externally */
-            valac_command += " --pkg=%s".printf (package);
         }
 
         if (link_errors.length () != 0)
@@ -613,6 +643,37 @@ class ValaModule : BuildModule
         }
 
         return 0;
+    }
+
+    private string? find_vapi (string package)
+    {
+        var api_version = get_api_version ();
+
+        foreach (var dir in Environment.get_system_data_dirs ())
+        {
+            if (api_version != null)
+            {
+                var path = Path.build_filename (dir, "vala-%s".printf (api_version), "vapi", package + ".vapi");
+                if (FileUtils.test (path, FileTest.EXISTS))
+                    return path;
+            }
+
+            var path = Path.build_filename (dir, "vala", "vapi", package + ".vapi");
+            if (FileUtils.test (path, FileTest.EXISTS))
+                return path;
+        }
+        return null;
+    }
+
+    private string? find_gir (string package)
+    {
+        foreach (var dir in Environment.get_system_data_dirs ())
+        {
+            var path = Path.build_filename (dir, "gir-1.0", package + ".vapi");
+            if (FileUtils.test (path, FileTest.EXISTS))
+                return path;
+        }
+        return null;
     }
     
     private bool can_generate_rules (Compilable compilable) throws Error
