@@ -12,6 +12,9 @@ using Bake;
 
 class ValaModule : BuildModule
 {
+    private static bool checked_api_version = false;
+    private static string? api_version = null;
+
     public override bool can_generate_program_rules (Program program) throws Error
     {
         return can_generate_rules (program);
@@ -195,6 +198,20 @@ class ValaModule : BuildModule
         }
 
         var link_errors = new List<string> ();
+
+        /* Check we have a new enough version of Vala */
+        var required_api_version = compilable.get_variable ("vala-api-version");
+        if (required_api_version != null)
+        {
+            var current_api_version = get_api_version ();
+            if (current_api_version != null)
+            {
+                if (compare_api_version (current_api_version, required_api_version) < 0)
+                    link_errors.append ("Vala compiler is API version %s, %s is required".printf (current_api_version, required_api_version));
+            }
+            else
+                link_errors.append ("Unable to determine Vala API version, %s is required".printf (required_api_version));
+        }
 
         /* Link against libraries */
         var libraries = new List<TaggedEntry> ();
@@ -550,6 +567,52 @@ class ValaModule : BuildModule
             archive_rule.add_status_command ("AR %s".printf (archive_name));
             archive_rule.add_command (archive_command);
         }
+    }
+
+    private string? get_api_version ()
+    {
+        if (checked_api_version)
+            return api_version;
+
+        checked_api_version = true;
+        string stdout_text;
+        int exit_status;
+        try
+        {
+            Process.spawn_command_line_sync ("valac --api-version", out stdout_text, null, out exit_status);
+        }
+        catch (SpawnError e)
+        {
+            // FIXME: Show some sort of error/warning?
+            return null;
+        }
+
+        if (Process.if_exited (exit_status) && Process.exit_status (exit_status) == 0)
+            api_version = stdout_text.strip ();
+
+        return api_version;
+    }
+
+    private int compare_api_version (string v0, string v1)
+    {
+        var digits0 = v0.split (".");
+        var digits1 = v1.split (".");
+    
+        for (var i = 0; i < digits0.length || i < digits1.length; i++)
+        {
+            var d0 = 0;
+            if (i < digits0.length)
+                d0 = int.parse (digits0[i]);
+            var d1 = 0;
+            if (i < digits1.length)
+                d1 = int.parse (digits1[i]);
+
+            var difference = d0 - d1;
+            if (difference != 0)
+                return difference;
+        }
+
+        return 0;
     }
     
     private bool can_generate_rules (Compilable compilable) throws Error

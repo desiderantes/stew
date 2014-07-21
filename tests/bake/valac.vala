@@ -7,7 +7,12 @@ public class Valac
         var generate_ccode = false;
         for (var i = 1; i < args.length; i++)
         {
-            if (args[i] == "--ccode")
+            if (args[i] == "--api-version")
+            {
+                stdout.printf ("1.0");
+                return Posix.EXIT_SUCCESS;
+            }
+            else if (args[i] == "--ccode")
                 generate_ccode = true;
             else if (args[i].has_prefix ("--fast-vapi="))
             {

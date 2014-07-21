@@ -1,0 +1,8 @@
+project {
+  name = test-project
+}
+
+programs.test {
+  sources = test.vala
+  vala-api-version = 0.8
+}
