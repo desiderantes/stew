@@ -294,13 +294,16 @@ programs.glib-compile-resources {
   install = false
 }
 
-data.pkg-config {
-  files = pkg-config/baketest-dependency.pc \
-          pkg-config/baketest-library.pc \
-          pkg-config/baketest-library2.pc \
-          pkg-config/baketest-variable-dependency.pc \
-          pkg-config/glib-2.0.pc \
-          pkg-config/gobject-2.0.pc
+data.data {
+  files = data/pkg-config/baketest-dependency.pc \
+          data/pkg-config/baketest-library.pc \
+          data/pkg-config/baketest-library2.pc \
+          data/pkg-config/baketest-variable-dependency.pc \
+          data/pkg-config/baketest-builtin.pc \
+          data/pkg-config/glib-2.0.pc \
+          data/pkg-config/gobject-2.0.pc \
+          data/vala/vapi/baketest-library.vapi \
+          data/vala-1.0/vapi/baketest-builtin.vapi
   install = false;
 }
 
@@ -664,6 +667,18 @@ programs.test-bake {
     }
     vala-program-shared-source {
       args = vala-program-shared-source
+    }
+    vala-program-package {
+      args = vala-program-package
+    }
+    vala-program-package-builtin {
+      args = vala-program-package-builtin
+    }
+    vala-program-package-duplicates {
+      args = vala-program-package-duplicates
+    }
+    vala-program-package-missing {
+      args = vala-program-package-missing
     }
     vala-program-local-library {
       args = vala-program-local-library
@@ -1320,6 +1335,18 @@ data.bake-tests {
           vala-program-shared-source/shared.vala \
           vala-program-shared-source/test1.vala \
           vala-program-shared-source/test2.vala \
+          vala-program-package/expected \
+          vala-program-package/Recipe \
+          vala-program-package/test.vala \
+          vala-program-package-builtin/expected \
+          vala-program-package-builtin/Recipe \
+          vala-program-package-builtin/test.vala \
+          vala-program-package-duplicates/expected \
+          vala-program-package-duplicates/Recipe \
+          vala-program-package-duplicates/test.vala \
+          vala-program-package-missing/expected \
+          vala-program-package-missing/Recipe \
+          vala-program-package-missing/test.vala \
           vala-program-local-library/expected \
           vala-program-local-library/Recipe \
           vala-program-local-library/main.vala \

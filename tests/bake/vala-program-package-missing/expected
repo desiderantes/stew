@@ -1,0 +1,13 @@
+!bake
+valac --api-version
+(exit FAILURE)
+!bake install
+valac --api-version
+(exit FAILURE)
+!bake uninstall
+valac --api-version
+rm -f /usr/bin/test
+(exit SUCCESS)
+!bake clean
+valac --api-version
+(exit SUCCESS)
