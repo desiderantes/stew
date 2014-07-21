@@ -638,6 +638,15 @@ programs.test-bake {
     }
 
     # Vala tests
+    vala-api-older {
+      args = vala-api-older
+    }
+    vala-api-same {
+      args = vala-api-same
+    }
+    vala-api-newer {
+      args = vala-api-newer
+    }
     vala-program-simple {
       args = vala-program-simple
     }
@@ -1268,6 +1277,15 @@ data.bake-tests {
           csharp-library-complex/Test2.cs \
           csharp-library-complex/Test3.cs \
           csharp-library-complex/TestDisabled.cs \
+          vala-api-older/expected \
+          vala-api-older/Recipe \
+          vala-api-older/test.vala \
+          vala-api-same/expected \
+          vala-api-same/Recipe \
+          vala-api-same/test.vala \
+          vala-api-newer/expected \
+          vala-api-newer/Recipe \
+          vala-api-newer/test.vala \
           vala-program-simple/expected \
           vala-program-simple/Recipe \
           vala-program-simple/test.vala \
