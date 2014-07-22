@@ -282,7 +282,7 @@ class ValaModule : BuildModule
         }
 
         /* Make sure we have standard Vala dependencies */
-        const string[] required_packages = { "gobject-2.0", "glib-2.0" };
+        string[] required_packages = { "gobject-2.0", "glib-2.0" };
         foreach (var package in required_packages)
         {
             if (!used_packages.lookup (package))
