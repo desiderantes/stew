@@ -1,3 +1,9 @@
+Overview of changes in bake 0.1.48
+
+    * Automatically work out packages required by vala-packages
+    * Add vala-api-version option
+    * Add GLib resources help
+
 Overview of changes in bake 0.1.47
 
     * Support GLib resources
