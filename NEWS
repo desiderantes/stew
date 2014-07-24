@@ -1,3 +1,12 @@
+Overview of changes in bake 0.1.49
+
+    * Support valac < 0.20 which doesn't have --api-version
+    * Don't look for a .pc file for the posix Vala package
+    * Make it clear in error messages when we haven't found Vala packages, not
+      pkg-config packages
+    * Remove unnecessary packages fields from the Bake recipes
+    * Add resources file as dependency of valac rules
+
 Overview of changes in bake 0.1.48
 
     * Automatically work out packages required by vala-packages
