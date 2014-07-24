@@ -622,8 +622,41 @@ class ValaModule : BuildModule
 
         if (Process.if_exited (exit_status) && Process.exit_status (exit_status) == 0)
             api_version = stdout_text.strip ();
+        else
+        {
+            /* valac < 0.20.0 doesn't have --api-version, use --version instead */
+            var version = get_version ();
+            var tokens = version.split (".");
+            if (tokens.length >= 2)
+                api_version = tokens[0] + "." + tokens[1];
+        }
 
         return api_version;
+    }
+
+    private string? get_version ()
+    {
+        string stdout_text;
+        int exit_status;
+        try
+        {
+            Process.spawn_command_line_sync ("valac --version", out stdout_text, null, out exit_status);
+        }
+        catch (SpawnError e)
+        {
+            // FIXME: Show some sort of error/warning?
+            return null;
+        }
+
+        if (Process.if_exited (exit_status) && Process.exit_status (exit_status) == 0)
+        {
+            var i = stdout_text.index_of_char (' ');
+            if (i < 0)
+                return null;
+            return stdout_text.substring (i + 1).strip ();
+        }
+
+        return null;
     }
 
     private int compare_api_version (string v0, string v1)
