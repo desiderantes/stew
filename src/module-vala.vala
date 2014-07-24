@@ -326,8 +326,9 @@ class ValaModule : BuildModule
                 if (path != null)
                 {
                     /* .vapi files use the pkg-config file of the same name */
+                    /* posix is a special .vapi file that doesn't have an associated .pc file */
                     valac_command += " --pkg=%s".printf (package);
-                    if (!used_packages.lookup (package))
+                    if (package != "posix" && !used_packages.lookup (package))
                     {
                         pkg_config_list += " " + package;
                         used_packages.insert (package, true);
