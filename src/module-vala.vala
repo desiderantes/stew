@@ -317,7 +317,7 @@ class ValaModule : BuildModule
                     link_flags += " -L%s -l%s".printf (rel_dir, package);
                 }
                 else
-                    link_errors.append ("Unable to find local package %s".printf (package));
+                    link_errors.append ("Unable to find local Vala package %s".printf (package));
             }
             else
             {
@@ -344,7 +344,7 @@ class ValaModule : BuildModule
                         // FIXME: For now we'll just rely on the user to set it in the packages variable
                     }
                     else
-                        link_errors.append ("Unable to find package %s".printf (package));
+                        link_errors.append ("Unable to find Vala package %s".printf (package));
                 }
             }
         }
