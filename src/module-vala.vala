@@ -508,7 +508,10 @@ class ValaModule : BuildModule
 
                 /* Use Glib resources */
                 if (glib_resources_file != null)
+                {
+                    rule.add_input (glib_resources_file);
                     command += " --gresources=%s".printf (glib_resources_file);
+                }
 
                 foreach (var e in compilable.get_sources ())
                 {
