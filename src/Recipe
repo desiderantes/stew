@@ -50,7 +50,6 @@ libraries {
               rule.vala \
               tools.vala
     vala-packages = posix gio-2.0
-    packages = gio-2.0
     compile-flags = -DGETTEXT_PACKAGE=\"bake\"
     so-version = 0
     symbol-filter = bake_.*
@@ -81,7 +80,6 @@ programs {
   bake {
     sources = bake.vala
     vala-packages = posix gio-2.0
-    packages = gio-2.0
     libraries = bake (local)
     compile-flags = -DGETTEXT_PACKAGE=\"bake\"
   }

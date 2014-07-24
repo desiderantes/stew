@@ -2,7 +2,7 @@ project {
   name = bake
   version = 0.1.48+bzr
   ppa = lp:~bake-team/releases
-  minimum-bake-version = 0.1.39
+  minimum-bake-version = 0.1.48
 }
 
 data.meta {
