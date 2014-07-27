@@ -436,15 +436,15 @@ public class Cookbook : Object
         {
             buildable_modules.nth_data (0).generate_program_rules (program);
 
-            foreach (var test_id in recipe.get_variable_children ("programs.%s.tests".printf (program.id)))
+            foreach (var test in program.test_names)
             {
                 var command = "./%s".printf (program.name); // FIXME: Might not be called this for some compilers
-                var args = recipe.get_variable ("programs.%s.tests.%s.args".printf (program.id, test_id));
+                var args = test.get_variable ("args");
                 if (args != null)
                     command += " " + args;
-                var results_filename = recipe.get_build_path ("%s.%s.test-results".printf (program.id, test_id));
+                var results_filename = recipe.get_build_path ("%s.%s.test-results".printf (program.id, test.id));
                 recipe.test_rule.add_output (results_filename);
-                recipe.test_rule.add_status_command ("TEST %s.%s".printf (program.id, test_id));
+                recipe.test_rule.add_status_command ("TEST %s.%s".printf (program.id, test.id));
                 recipe.test_rule.add_command ("@bake-test run %s %s".printf (results_filename, command));
             }
         }
@@ -514,31 +514,16 @@ public class Cookbook : Object
 
     private void find_objects_recursive (Recipe recipe)
     {
-        foreach (var id in recipe.get_variable_children ("options"))
-        {
-            var option = new Option (recipe, id);
+        foreach (var option in recipe.option_names)
             options.append (option);
-        }
-        foreach (var id in recipe.get_variable_children ("templates"))
-        {
-            var template = new Template (recipe, id);
+        foreach (var template in recipe.template_names)
             templates.append (template);
-        }
-        foreach (var id in recipe.get_variable_children ("programs"))
-        {
-            var program = new Program (recipe, id);
+        foreach (var program in recipe.program_names)
             programs.append (program);
-        }
-        foreach (var id in recipe.get_variable_children ("libraries"))
-        {
-            var library = new Library (recipe, id);
+        foreach (var library in recipe.library_names)
             libraries.append (library);
-        }
-        foreach (var id in recipe.get_variable_children ("data"))
-        {
-            var data = new Data (recipe, id);
+        foreach (var data in recipe.data_names)
             datas.append (data);
-        }
 
         foreach (var child in recipe.children)
             find_objects_recursive (child);
