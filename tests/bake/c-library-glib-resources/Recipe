@@ -1,0 +1,9 @@
+project {
+  name = test-project
+}
+
+libraries.test {
+  sources = test.c
+  glib-resources = resources.xml
+  packages = glib-2.0
+}

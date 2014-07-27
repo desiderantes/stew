@@ -1,0 +1,22 @@
+!bake
+mkdir -p .built
+glib-compile-resources --generate --target=.built/test.glib-resources.c resources.xml
+gcc -fPIC -Iglib -MMD -MF .built/test-test.glib-resources.d -c .built/test.glib-resources.c -o .built/test-test.glib-resources.o
+gcc -fPIC -Iglib -MMD -MF .built/test-test.d -c test.c -o .built/test-test.o
+gcc -o libtest.so -shared -Wl,-soname,libtest.so .built/test-test.glib-resources.o .built/test-test.o -lglib
+ar -cq libtest.a .built/test-test.glib-resources.o .built/test-test.o
+(exit SUCCESS)
+!bake install
+mkdir -p /usr/lib
+cp libtest.so /usr/lib/libtest.so
+cp libtest.a /usr/lib/libtest.a
+(exit SUCCESS)
+!bake uninstall
+rm -f /usr/lib/libtest.so
+rm -f /usr/lib/libtest.a
+(exit SUCCESS)
+!bake clean
+rm -rf .built/
+rm -f libtest.so
+rm -f libtest.a
+(exit SUCCESS)
