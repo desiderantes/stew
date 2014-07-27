@@ -483,6 +483,9 @@ programs.test-bake {
     c-library-gir-complex {
       args = c-library-gir-complex
     }
+    c-library-glib-resources {
+      args = c-library-glib-resources
+    }
 
     # C++ tests
     c++-program-simple {
@@ -520,6 +523,9 @@ programs.test-bake {
     }
     c++-library-complex {
       args = c++-library-complex
+    }
+    c++-library-glib-resources {
+      args = c++-library-glib-resources
     }
 
     # Clang tests
@@ -675,6 +681,9 @@ programs.test-bake {
     }
     vala-library-gir-complex {
       args = vala-library-gir-complex
+    }
+    vala-library-glib-resources {
+      args = vala-library-glib-resources
     }
 
     # Java tests
@@ -1095,6 +1104,11 @@ data.bake-tests {
           c-library-complex/test-disabled.c \
           c-library-complex/test-disabled.h \
           c-library-complex/test.h \
+          c-library-glib-resources/expected \
+          c-library-glib-resources/Recipe \
+          c-library-glib-resources/test.c \
+          c-library-glib-resources/resources.xml \
+          c-library-glib-resources/test.png \
           c-library-no-install/expected \
           c-library-no-install/Recipe \
           c-library-no-install/test.c \
@@ -1179,6 +1193,11 @@ data.bake-tests {
           c++-library-complex/test2.cpp \
           c++-library-complex/test3.cpp \
           c++-library-complex/test-disabled.cpp \
+          c++-library-glib-resources/expected \
+          c++-library-glib-resources/Recipe \
+          c++-library-glib-resources/test.cpp \
+          c++-library-glib-resources/resources.xml \
+          c++-library-glib-resources/test.png \
           c++-library-no-install/expected \
           c++-library-no-install/Recipe \
           c++-library-no-install/test.cpp \
@@ -1334,6 +1353,11 @@ data.bake-tests {
           vala-library-complex/test3.vala \
           vala-library-complex/test-c.c \
           vala-library-complex/test-c.h \
+          vala-library-glib-resources/expected \
+          vala-library-glib-resources/Recipe \
+          vala-library-glib-resources/resources.xml \
+          vala-library-glib-resources/test.png \
+          vala-library-glib-resources/test.vala \
           vala-library-complex/test-disabled.vala \
           vala-library-relative-directories/expected \
           vala-library-relative-directories/Recipe \

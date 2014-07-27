@@ -1,0 +1,8 @@
+project {
+  name = test-project
+}
+
+libraries.test {
+  sources = test.vala
+  glib-resources = resources.xml
+}
