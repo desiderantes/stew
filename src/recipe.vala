@@ -37,6 +37,16 @@ public class Recipe : Object
     public CleanRule clean_rule;
     public Rule test_rule;
     public HashTable<string, Rule> targets;
+    public List<Option> option_names;
+    private HashTable<string, Option> options;
+    public List<Template> template_names;
+    private HashTable<string, Template> templates;
+    public List<Program> program_names;
+    private HashTable<string, Program> programs;
+    public List<Library> library_names;
+    private HashTable<string, Library> libraries;
+    public List<Data> data_names;
+    private HashTable<string, Data> datas;
     public bool pretty_print;
 
     public string dirname { owned get { return Path.get_dirname (filename); } }
@@ -84,6 +94,11 @@ public class Recipe : Object
         this.pretty_print = pretty_print;
         variable_names = new List<string> ();
         variables = new HashTable<string, Variable> (str_hash, str_equal);
+        options = new HashTable<string, Option> (str_hash, str_equal);
+        templates = new HashTable<string, Template> (str_hash, str_equal);
+        programs = new HashTable<string, Program> (str_hash, str_equal);
+        libraries = new HashTable<string, Library> (str_hash, str_equal);
+        datas = new HashTable<string, Data> (str_hash, str_equal);
     }
 
     public Recipe.from_file (string filename, RecipeLoadFlags flags = RecipeLoadFlags.NONE) throws FileError, RecipeError
@@ -156,41 +171,91 @@ public class Recipe : Object
         return get_variable (name, fallback ? "true" : "false") == "true";
     }
 
-    public List<string> get_variable_children (string name)
-    {
-        var children = new List<string> ();
-        var prefix = name + ".";
-        foreach (var n in variable_names)
-        {
-            if (!n.has_prefix (prefix))
-                continue;
-
-            var length = 0;
-            while (n[prefix.length + 1 + length] != '.' && n[prefix.length + 1 + length] != '\0')
-                length++;
-            var child_name = n.substring (prefix.length, length + 1);
-            if (has_value (children, child_name))
-                continue;
-
-            children.append (child_name);
-        }
-
-        return children;
-    }
-
-    private bool has_value (List<string> list, string value)
-    {
-        foreach (var v in list)
-            if (v == value)
-                return true;
-        return false;
-    }
-
     public void set_variable (string name, string? value, int line_number = -1)
     {
         var variable = new Variable (line_number, value);
         variable_names.append (name);
         variables.insert (name, variable);
+
+        if (name.has_prefix ("options."))
+        {
+            var id = get_id (name);
+            if (options.lookup (id) == null)
+            {
+                var option = new Option (this, id);
+                options.insert (id, option);
+                option_names.append (option);
+            }
+        }
+        else if (name.has_prefix ("templates."))
+        {
+            var id = get_id (name);
+            if (templates.lookup (id) == null)
+            {
+                var template = new Template (this, id);
+                templates.insert (id, template);
+                template_names.append (template);
+            }
+        }
+        else if (name.has_prefix ("programs."))
+        {
+            var id = get_id (name);
+            var program = programs.lookup (id);
+            if (program == null)
+            {
+                program = new Program (this, id);
+                programs.insert (id, program);
+                program_names.append (program);
+            }
+            if (name.has_prefix ("programs.%s.tests.".printf (id)))
+            {
+                var test_id = get_id (name, 3);
+                var test = program.tests.lookup (test_id);
+                if (test == null)
+                {
+                    test = new Test (this, id, test_id);
+                    program.tests.insert (test_id, test);
+                    program.test_names.append (test);
+                }
+            }
+        }
+        else if (name.has_prefix ("libraries."))
+        {
+            var id = get_id (name);
+            if (libraries.lookup (id) == null)
+            {
+                var library = new Library (this, id);
+                libraries.insert (id, library);
+                library_names.append (library);
+            }
+        }
+        else if (name.has_prefix ("data."))
+        {
+            var id = get_id (name);
+            if (datas.lookup (id) == null)
+            {
+                var data = new Data (this, id);
+                datas.insert (id, data);
+                data_names.append (data);
+            }
+        }
+    }
+
+    private string? get_id (string name, int id_index = 1)
+    {
+        var start = 0;
+        for (var i = id_index; i > 0; i--)
+        {
+            start = name.index_of_char ('.', start);
+            if (start < 0)
+                return null;
+            start++;
+        }
+        var end = name.index_of_char ('.', start);
+        if (end < 0)
+            return name.substring (start);
+        else
+            return name.substring (start, end - start);
     }
 
     private void parse (string filename, string contents, RecipeLoadFlags flags) throws RecipeError
@@ -826,9 +891,13 @@ public class Compilable : Block
 
 public class Program : Compilable
 {
+    public List<Test> test_names;
+    public HashTable<string, Test> tests;
+
     public Program (Recipe recipe, string id)
     {
         base (recipe, "programs", id);
+        tests = new HashTable<string, Test> (str_hash, str_equal);
     }
 
     public string install_directory
@@ -841,6 +910,14 @@ public class Program : Compilable
 
             return dir;
         }
+    }
+}
+
+public class Test : Block
+{
+    public Test (Recipe recipe, string program_id, string id)
+    {
+        base (recipe, "programs.%s".printf (program_id), id);
     }
 }
 

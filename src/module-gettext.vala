@@ -105,10 +105,9 @@ class GettextModule : BuildModule
 
     private static Recipe? find_gettext_recipe (Recipe recipe, string gettext_domain, out string translation_list)
     {
-        var data = recipe.get_variable_children ("data");
-        foreach (var data_type in data)
+        foreach (var data in recipe.data_names)
         {
-            translation_list = recipe.get_variable ("data.%s.gettext-translations".printf (data_type));
+            translation_list = data.get_variable ("gettext-translations");
             if (translation_list != null)
                 return recipe;
         }
