@@ -917,7 +917,7 @@ public class Test : Block
 {
     public Test (Recipe recipe, string program_id, string id)
     {
-        base (recipe, "programs.%s".printf (program_id), id);
+        base (recipe, "programs.%s.tests".printf (program_id), id);
     }
 }
 
