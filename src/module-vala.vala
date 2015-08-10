@@ -706,7 +706,7 @@ class ValaModule : BuildModule
     {
         foreach (var dir in Environment.get_system_data_dirs ())
         {
-            var path = Path.build_filename (dir, "gir-1.0", package + ".vapi");
+            var path = Path.build_filename (dir, "gir-1.0", package + ".gir");
             if (FileUtils.test (path, FileTest.EXISTS))
                 return path;
         }
