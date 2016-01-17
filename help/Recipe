@@ -33,6 +33,7 @@ data.bake {
                   release-upload.page \
                   releasing.page \
                   rules.page \
+                  rust.page \
                   scripts.page \
                   templates.page \
                   testing.page \

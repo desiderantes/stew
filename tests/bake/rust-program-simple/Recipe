@@ -1,0 +1,7 @@
+project {
+  name = test-project
+}
+
+programs.test {
+  sources = test.rs
+}

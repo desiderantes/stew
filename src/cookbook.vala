@@ -68,6 +68,7 @@ public class Cookbook : Object
         modules.append (new PythonModule ());
         modules.append (new ReleaseModule ());
         modules.append (new RPMModule ());
+        modules.append (new RustModule ());
         modules.append (new ScriptModule ());
         modules.append (new ValaModule ());
         modules.append (new XdgModule ());

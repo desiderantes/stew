@@ -41,6 +41,7 @@ libraries {
               module-python.vala \
               module-release.vala \
               module-rpm.vala \
+              module-rust.vala \
               module-script.vala \
               module-vala.vala \
               module-xdg.vala \

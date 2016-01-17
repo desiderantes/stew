@@ -1,0 +1,10 @@
+!bake
+rustc -o test test.rs
+(exit SUCCESS)
+!bake install
+(exit SUCCESS)
+!bake uninstall
+(exit SUCCESS)
+!bake clean
+rm -f test
+(exit SUCCESS)

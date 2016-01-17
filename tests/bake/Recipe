@@ -114,6 +114,12 @@ programs.gfortran {
   install = false
 }
 
+programs.rustc {
+  sources = rustc.vala status.vala
+  vala-packages = posix gio-2.0 gio-unix-2.0
+  install = false
+}
+
 programs.valac {
   sources = valac.vala status.vala
   vala-packages = posix gio-2.0 gio-unix-2.0
@@ -815,6 +821,20 @@ programs.test-bake {
     }
     fortran-library-complex {
       args = fortran-library-complex
+    }
+
+    # Rust tests
+    rust-program-simple {
+      args = rust-program-simple
+    }
+    rust-program-no-install {
+      args = rust-program-no-install
+    }
+    rust-program-install-directory {
+      args = rust-program-install-directory
+    }
+    rust-program-complex {
+      args = rust-program-complex
     }
 
     # Data tests
@@ -1648,5 +1668,20 @@ data.bake-tests {
           release-ppa/expected \
           release-ppa/Recipe \
           release-gnome/expected \
-          release-gnome/Recipe
+          release-gnome/Recipe \
+          rust-program-simple/expected \
+          rust-program-simple/Recipe \
+          rust-program-simple/test.rs \
+          rust-program-no-install/expected \
+          rust-program-no-install/Recipe \
+          rust-program-no-install/test.rs \
+          rust-program-install-directory/expected \
+          rust-program-install-directory/Recipe \
+          rust-program-install-directory/test.rs \
+          rust-program-complex/expected \
+          rust-program-complex/Recipe \
+          rust-program-complex/test1.rs \
+          rust-program-complex/test2.rs \
+          rust-program-complex/test3.rs \
+          rust-program-complex/test-disabled.rs
 }

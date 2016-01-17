@@ -1,0 +1,8 @@
+project {
+  name = test-project
+}
+
+programs.test {
+  sources = test.rs
+  install-directory = $(options.binary-directory)/test
+}

@@ -1,0 +1,11 @@
+project {
+  name = test-project
+}
+
+programs.test {
+  sources = test1.rs \
+            test2.rs \
+            test3.rs \
+            test-disabled.rs (if false)
+  debug = true
+}

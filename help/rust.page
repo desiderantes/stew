@@ -1,0 +1,21 @@
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="rust">
+<info>
+    <link type="guide" xref="index#programs-and-libraries"/>
+</info>
+
+<title>Rust Language Support</title>
+
+<p>
+Bake supports <link xref="programs">programs</link> written in the Rust language.
+</p>
+<example>
+<p>
+The following shows a recipe for a two file Rust program:
+</p>
+<code>
+programs.example-program {
+  sources = main.rs module.rs
+}
+</code>
+</example>
+</page>
