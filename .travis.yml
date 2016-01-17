@@ -1,0 +1,23 @@
+language: c
+compiler:
+  - gcc
+
+addons:
+  apt:
+    sources:
+    - vala-team
+    packages:
+    - valac
+    - itstool
+    - libglib2.0-dev
+    - debhelper
+    - pkg-config
+
+sudo: required
+dist: trusty
+
+script:
+  - make
+  
+after_success:
+ - echo "Nice"
