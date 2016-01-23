@@ -2,16 +2,10 @@ language: c
 compiler:
   - gcc
 
-addons:
-  apt:
-    sources:
-    - vala-team
-    packages:
-    - valac
-    - itstool
-    - libglib2.0-dev
-    - debhelper
-    - pkg-config
+before_install:
+  - sudo apt-add-repository -y ppa:vala-team/ppa
+  - sudo apt-get update -qq > /dev/null
+  - sudo apt-get install -qq valac libglib2.0-dev itstool debhelper pkg-config > /dev/null
 
 sudo: required
 dist: trusty
