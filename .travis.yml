@@ -3,15 +3,16 @@ compiler:
   - gcc
 
 before_install:
-  - sudo apt-add-repository -y ppa:vala-team/ppa
+  - sudo add-apt-repository -y ppa:vala-team/ppa
+  - sudo add-apt-repository -y ppa:bake-team/releases
   - sudo apt-get update -qq > /dev/null
-  - sudo apt-get install -qq valac libglib2.0-dev itstool debhelper pkg-config > /dev/null
+  - sudo apt-get install -qq valac libglib2.0-dev itstool debhelper pkg-config bake > /dev/null
 
 sudo: required
 dist: trusty
 
 script:
-  - make
+  - bake
   
 after_success:
  - echo "Nice"
