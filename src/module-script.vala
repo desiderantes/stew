@@ -10,22 +10,22 @@
 
 using Bake;
 
-class ScriptModule : BuildModule
-{
-    public override bool can_generate_program_rules (Program program) throws Error
-    {
-        if (program.compiler != null)
-            return program.compiler == "script";
+class ScriptModule : BuildModule {
+	public override bool can_generate_program_rules (Program program) throws Error {
+		if (program.compiler != null) {
+			return program.compiler == "script";
+		}
 
-        if (program.get_sources () != null)
-            return false;
+		if (program.get_sources () != null) {
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    public override void generate_program_rules (Program program) throws Error
-    {
-        if (program.install)
-            program.recipe.add_install_rule (program.name, program.install_directory);
-    }
+	public override void generate_program_rules (Program program) throws Error  {
+		if (program.install) {
+			program.recipe.add_install_rule (program.name, program.install_directory);
+		}
+	}
 }

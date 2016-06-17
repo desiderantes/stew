@@ -125,7 +125,7 @@ public class BakeApp {
 		}
 
 		if (do_configure || cookbook.needs_configure) {
-			stdout.printf ("%s\n", format_status ("[Configuring]"));
+			stdout.printf ("%s\n", format_status (_("[Configuring]"));
 
 			/* Load args from the command line */
 			var conf_args = new string[0];
@@ -140,7 +140,7 @@ public class BakeApp {
 				cookbook.configure (conf_args);
 			} catch (Bake.CookbookError e) {
 				stdout.printf ("%s\n", format_error (e.message));
-				stdout.printf ("%s\n", format_error ("[Configure Failed]"));
+				stdout.printf ("%s\n", format_error (_("[Configure Failed]"));
 				return Posix.EXIT_FAILURE;
 			}            
 
@@ -167,7 +167,7 @@ public class BakeApp {
 
 			/* Stop if only configure stage requested */
 			if (do_configure) {
-				stdout.printf ("%s\n", format_success ("[Configure complete]"));
+				stdout.printf ("%s\n", format_success (_("[Configure complete]")));
 				return Posix.EXIT_SUCCESS;
 			}
 
@@ -180,7 +180,7 @@ public class BakeApp {
 				}
 			}
 			if (n_missing_options > 0) {
-				stdout.printf ("%s\n", format_error ("[Configure failed]"));
+				stdout.printf ("%s\n", format_error (_("[Configure failed]")));
 				return Posix.EXIT_FAILURE;
 			}
 		}
@@ -189,8 +189,8 @@ public class BakeApp {
 		try {
 			optimise_result = cookbook.generate_rules ();
 		} catch (Error e) {
-			stdout.printf ("%s\n", format_error ("%s".printf (e.message)));
-			stdout.printf ("%s\n", format_error ("[Build failed]"));
+			stdout.printf ("%s\n", format_error (e.message.to_string()));
+			stdout.printf ("%s\n", format_error (_("[Build failed]")));
 			return Posix.EXIT_FAILURE;
 		}
 
@@ -222,7 +222,7 @@ public class BakeApp {
 		}
 
 		if (!optimise_result) {
-			stdout.printf ("%s\n", format_error ("[Build failed]"));
+			stdout.printf ("%s\n", format_error (_("[Build failed]")));
 			return Posix.EXIT_FAILURE;
 		}
 
@@ -264,12 +264,12 @@ public class BakeApp {
 					try {
 						builder.build_target.end (x);
 						if (n_remaining == 0) {
-							stdout.printf ("%s\n", format_success ("[Build complete]"));
+							stdout.printf ("%s\n", format_success (_("[Build complete]")));
 							loop.quit ();
 						}
 					} catch (Bake.BuildError e) {
-						stdout.printf ("%s\n", format_error ("%s".printf (e.message)));
-						stdout.printf ("%s\n", format_error ("[Build failed]"));
+						stdout.printf ("%s\n", format_error (e.message.to_string()));
+						stdout.printf ("%s\n", format_error (_("[Build failed]")));
 						exit_code = Posix.EXIT_FAILURE;
 						loop.quit ();
 					}

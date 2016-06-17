@@ -10,22 +10,22 @@
 
 using Bake;
 
-class PkgConfigModule : BuildModule
-{
-    public override void generate_data_rules (Data data) throws Error
-    {
-        var recipe = data.recipe;
+class PkgConfigModule : BuildModule {
+	public override void generate_data_rules (Data data) throws Error {
+		var recipe = data.recipe;
 
-        var install_directory = data.get_variable ("install-directory");
-        if (install_directory == null)
-            install_directory = Path.build_filename (recipe.library_directory, "pkgconfig");
-        foreach (var entry in data.get_tagged_list ("pkg-config-files"))
-        {
-            if (!entry.is_allowed)
-                continue;
+		var install_directory = data.get_variable ("install-directory");
+		if (install_directory == null) {
+			install_directory = Path.build_filename (recipe.library_directory, "pkgconfig");
+		}
+		foreach (var entry in data.get_tagged_list ("pkg-config-files")) {
+			if (!entry.is_allowed) {
+				continue;
+			}
 
-            if (data.install)
-                recipe.add_install_rule (entry.name, install_directory);
-        }
-    }
+			if (data.install) {
+				recipe.add_install_rule (entry.name, install_directory);
+			}
+		}
+	}
 }

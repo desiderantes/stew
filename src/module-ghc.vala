@@ -10,65 +10,66 @@
 
 using Bake;
 
-class GHCModule : BuildModule
-{
-    public override bool can_generate_program_rules (Program program) throws Error
-    {
-        if (program.compiler != null)
-            return program.compiler == "ghc";
+class GHCModule : BuildModule {
+	public override bool can_generate_program_rules (Program program) throws Error {
+		if (program.compiler != null) {
+			return program.compiler == "ghc";
+		}
 
-        var count = 0;
-        foreach (var entry in program.get_sources ())
-        {
-            if (!entry.name.has_suffix (".hs"))
-                return false;
-            count++;
-        }
-        if (count == 0)
-            return false;
+		var count = 0;
+		foreach (var entry in program.get_sources ()) {
+			if (!entry.name.has_suffix (".hs")) {
+				return false;
+			}
+			count++;
+		}
+		if (count == 0) {
+			return false;
+		}
 
-        if (Environment.find_program_in_path ("ghc") == null)
-            return false;
+		if (Environment.find_program_in_path ("ghc") == null) {
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    public override void generate_program_rules (Program program) throws Error
-    {
-        var recipe = program.recipe;
+	public override void generate_program_rules (Program program) throws Error {
+		var recipe = program.recipe;
 
-        var binary_name = program.name;
+		var binary_name = program.name;
 
-        var link_rule = recipe.add_rule ();
-        link_rule.add_output (binary_name);
-        var link_pretty_command = "LINK";
-        var link_command = "@ghc -o %s".printf (binary_name);
-        foreach (var entry in program.get_sources ())
-        {
-            var source = entry.name;
-            var output = recipe.get_build_path (replace_extension (source, "o"));
-            var interface_file = recipe.get_build_path (replace_extension (source, "hi"));
+		var link_rule = recipe.add_rule ();
+		link_rule.add_output (binary_name);
+		var link_pretty_command = "LINK";
+		var link_command = "@ghc -o %s".printf (binary_name);
+		foreach (var entry in program.get_sources ()) {
+			var source = entry.name;
+			var output = recipe.get_build_path (replace_extension (source, "o"));
+			var interface_file = recipe.get_build_path (replace_extension (source, "hi"));
 
-            if (!entry.is_allowed)
-                continue;
+			if (!entry.is_allowed) {
+				continue;
+			}
 
-            var rule = recipe.add_rule ();
-            rule.add_input (source);
-            rule.add_output (output);
-            rule.add_output (interface_file);
-            rule.add_status_command ("HC %s".printf (source));
-            rule.add_command ("@ghc -c %s -ohi %s -o %s".printf (source, interface_file, output));
+			var rule = recipe.add_rule ();
+			rule.add_input (source);
+			rule.add_output (output);
+			rule.add_output (interface_file);
+			rule.add_status_command ("HC %s".printf (source));
+			rule.add_command ("@ghc -c %s -ohi %s -o %s".printf (source, interface_file, output));
 
-            link_rule.add_input (output);
-            link_pretty_command += " %s".printf (output);
-            link_command += " %s".printf (output);
-        }
+			link_rule.add_input (output);
+			link_pretty_command += " %s".printf (output);
+			link_command += " %s".printf (output);
+		}
 
-        recipe.build_rule.add_input (binary_name);
-        link_rule.add_status_command (link_pretty_command);
-        link_rule.add_command (link_command);
+		recipe.build_rule.add_input (binary_name);
+		link_rule.add_status_command (link_pretty_command);
+		link_rule.add_command (link_command);
 
-        if (program.install)
-            recipe.add_install_rule (binary_name, program.install_directory);
-    }
+		if (program.install) {
+			recipe.add_install_rule (binary_name, program.install_directory);
+		}
+	}
 }

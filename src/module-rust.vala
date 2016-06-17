@@ -10,65 +10,65 @@
 
 using Bake;
 
-class RustModule : BuildModule
-{
-    public override bool can_generate_program_rules (Program program) throws Error
-    {
-        return can_generate_rules (program);
-    }
+class RustModule : BuildModule {
+	public override bool can_generate_program_rules (Program program) throws Error {
+		return can_generate_rules (program);
+	}
 
-    public override void generate_program_rules (Program program) throws Error
-    {
-        var recipe = program.recipe;
-        var binary_name = program.name;
+	public override void generate_program_rules (Program program) throws Error {
+		var recipe = program.recipe;
+		var binary_name = program.name;
 
-        var command = "@rustc";
-        if (program.debug)
-            command += " -g";
-        command += " -o %s".printf (binary_name);
-        recipe.build_rule.add_input (binary_name);
+		var command = "@rustc";
+		if (program.debug) {
+			command += " -g";
+		}
+		command += " -o %s".printf (binary_name);
+		recipe.build_rule.add_input (binary_name);
 
-        var rule = recipe.add_rule ();
-        rule.add_output (binary_name);
-        foreach (var entry in program.get_sources ())
-        {
-            if (!entry.is_allowed)
-                continue;
+		var rule = recipe.add_rule ();
+		rule.add_output (binary_name);
+		foreach (var entry in program.get_sources ()) {
+			if (!entry.is_allowed) {
+				continue;
+			}
 
-            var source = entry.name;
-            rule.add_input (source);
-            command += " " + source;
-        }
-        rule.add_status_command ("RUSTC %s".printf (binary_name));
-        rule.add_command (command);
+			var source = entry.name;
+			rule.add_input (source);
+			command += " " + source;
+		}
+		rule.add_status_command ("RUSTC %s".printf (binary_name));
+		rule.add_command (command);
 
-        if (program.install)
-            recipe.add_install_rule (binary_name, program.install_directory);
-    }
+		if (program.install) {
+			recipe.add_install_rule (binary_name, program.install_directory);
+		}
+	}
 
-    public override bool can_generate_library_rules (Library library) throws Error
-    {
-        return false;
-    }
+	public override bool can_generate_library_rules (Library library) throws Error {
+		return false;
+	}
 
-    private bool can_generate_rules (Compilable compilable) throws Error
-    {
-        if (compilable.compiler != null)
-            return compilable.compiler == "rust";
+	private bool can_generate_rules (Compilable compilable) throws Error {
+		if (compilable.compiler != null) {
+			return compilable.compiler == "rust";
+		}
 
-        if (Environment.find_program_in_path ("rustc") == null)
-            return false;
+		if (Environment.find_program_in_path ("rustc") == null) {
+			return false;
+		}
 
-        var count = 0;
-        foreach (var entry in compilable.get_sources ())
-        {
-            if (!entry.name.has_suffix (".rs"))
-                return false;
-            count++;
-        }
-        if (count == 0)
-            return false;
+		var count = 0;
+		foreach (var entry in compilable.get_sources ()) {
+			if (!entry.name.has_suffix (".rs")) {
+				return false;
+			}
+			count++;
+		}
+		if (count == 0) {
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 }

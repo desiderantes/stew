@@ -10,41 +10,32 @@
 
 namespace Bake {
 
-public class BuildModule : Object
-{
-    public virtual void generate_toplevel_rules (Recipe toplevel)
-    {
-    }
+	public class BuildModule : Object {
+		public virtual void generate_toplevel_rules (Recipe toplevel) {
+		}
 
-    public virtual bool can_generate_program_rules (Program program) throws Error
-    {
-        return false;
-    }
+		public virtual bool can_generate_program_rules (Program program) throws Error {
+			return false;
+		}
 
-    public virtual void generate_program_rules (Program program) throws Error
-    {
-    }
+		public virtual void generate_program_rules (Program program) throws Error {
+		}
 
-    public virtual bool can_generate_library_rules (Library library) throws Error
-    {
-        return false;
-    }
+		public virtual bool can_generate_library_rules (Library library) throws Error {
+			return false;
+		}
 
-    public virtual void generate_library_rules (Library library) throws Error
-    {
-    }
+		public virtual void generate_library_rules (Library library) throws Error {
+		}
 
-    public virtual void generate_data_rules (Data data) throws Error
-    {
-    }
+		public virtual void generate_data_rules (Data data) throws Error {
+		}
 
-    public virtual void recipe_complete (Recipe recipe)
-    {
-    }
+		public virtual void recipe_complete (Recipe recipe) {
+		}
 
-    public virtual void rules_complete (Recipe toplevel)
-    {
-    }
-}
+		public virtual void rules_complete (Recipe toplevel) {
+		}
+	}
 
 }

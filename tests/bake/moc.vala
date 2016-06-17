@@ -1,26 +1,20 @@
-public class Moc
-{
-    public static int main (string[] args)
-    {
-        report_status (args);
+public class Moc {
+	public static int main (string[] args) {
+		report_status (args);
 
-        for (var i = 1; i < args.length; i++)
-        {
-            if (args[i] == "-o")
-                create_file (args[i+1]);
-        }
+		for (var i = 1; i < args.length; i++) {
+			if (args[i] == "-o") {
+				create_file (args[i+1]);
+			}
+		}
 
-        return Posix.EXIT_SUCCESS;
-    }
+		return Posix.EXIT_SUCCESS;
+	}
 
-    private static void create_file (string filename)
-    {
-         try
-         {
-             FileUtils.set_contents (filename, "");
-         }
-         catch (FileError e)
-         {
-         }
-    }
+	private static void create_file (string filename) {
+		try {
+			FileUtils.set_contents (filename, "");
+		} catch (FileError e) {
+		}
+	}
 }

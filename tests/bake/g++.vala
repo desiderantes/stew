@@ -1,34 +1,25 @@
-public class GCC
-{
-    public static int main (string[] args)
-    {
-        report_status (args);
+public class GCC {
+	public static int main (string[] args) {
+		report_status (args);
 
-        for (var i = 1; i < args.length; i++)
-        {
-             if (args[i] == "-o")
-             {
-                 create_file (args[i + 1]);
-                 i++;
-             }
-             if (args[i] == "-MF")
-             {
-                 create_file (args[i + 1]);
-                 i++;
-             }
-        }
+		for (var i = 1; i < args.length; i++) {
+			if (args[i] == "-o") {
+				create_file (args[i + 1]);
+				i++;
+			}
+			if (args[i] == "-MF") {
+				create_file (args[i + 1]);
+				i++;
+			}
+		}
 
-        return Posix.EXIT_SUCCESS;
-    }
+		return Posix.EXIT_SUCCESS;
+	}
 
-    private static void create_file (string filename)
-    {
-         try
-         {
-             FileUtils.set_contents (filename, "");
-         }
-         catch (FileError e)
-         {
-         }
-    }
+	private static void create_file (string filename) {
+		try {
+			FileUtils.set_contents (filename, "");
+		} catch (FileError e) {
+		}
+	}
 }

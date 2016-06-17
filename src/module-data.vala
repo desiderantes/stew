@@ -10,19 +10,18 @@
 
 using Bake;
 
-class DataModule : BuildModule
-{
-    public override void generate_data_rules (Data data) throws Error
-    {
-        var recipe = data.recipe;
-        foreach (var entry in data.get_tagged_list ("files"))
-        {
-            if (!entry.is_allowed)
-                continue;
+class DataModule : BuildModule {
+	public override void generate_data_rules (Data data) throws Error {
+		var recipe = data.recipe;
+		foreach (var entry in data.get_tagged_list ("files")) {
+			if (!entry.is_allowed) {
+				continue;
+			}
 
-            recipe.build_rule.add_input (entry.name);
-            if (data.install)
-                recipe.add_install_rule (entry.name, data.install_directory);
-        }
-    }
+			recipe.build_rule.add_input (entry.name);
+			if (data.install) {
+				recipe.add_install_rule (entry.name, data.install_directory);
+			}
+		}
+	}
 }

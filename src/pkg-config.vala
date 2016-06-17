@@ -87,12 +87,12 @@ class PkgConfigFile {
 
 			if (line[index] == '=') {
 				var variable_name = line.substring (0, index);
-				var value = line.substring (index + 1).strip ();
-				variables.insert (variable_name, value);
+				var val = line.substring (index + 1).strip ();
+				variables.insert (variable_name, val);
 			} else if (line[index] == ':') {
 				var keyword_name = line.substring (0, index);
-				var value = line.substring (index + 1).strip ();
-				keywords.insert (keyword_name, value);
+				var val = line.substring (index + 1).strip ();
+				keywords.insert (keyword_name, val);
 			} else
 				debug("Wrong line buddy"); /* FIXME: Unknown line */
 		}
@@ -117,27 +117,27 @@ class PkgConfigFile {
 	}
 
 	private void get_requires_by_name (ref List<RequireEntry> requires, string name, bool is_private) {
-		var value = get_keyword (name);
-		if (value == null) {
+		var val = get_keyword (name);
+		if (val == null) {
 			return;
 		}
 
 		var index = 0;
 		while (true) {
 			/* Skip leading whitespace */
-			while (value[index].isspace () || value[index] == ',') {
+			while (val[index].isspace () || val[index] == ',') {
 				index++;
 			}
-			if (value[index] == '\0') {
+			if (val[index] == '\0') {
 				break;
 			}
 
 			/* Get the name terminated by end of string, whitespace, comma or condition */
 			var start_index = index;
-			while (value[index] != '\0' && !value[index].isspace () && value[index] != ',' && value[index] != '=' && value[index] != '<' && value[index] != '>') {
+			while (val[index] != '\0' && !val[index].isspace () && val[index] != ',' && val[index] != '=' && val[index] != '<' && val[index] != '>') {
 				index++;
 			}
-			var n = value.substring (start_index, index - start_index);
+			var n = val.substring (start_index, index - start_index);
 
 			var entry = new RequireEntry ();
 			entry.name = n;
@@ -145,27 +145,27 @@ class PkgConfigFile {
 			requires.append (entry);
 
 			/* Get condition (=, >, >=, < or <=) */
-			while (value[index].isspace ()) {
+			while (val[index].isspace ()) {
 				index++;
 			}
-			if (value[index] == '=' || value[index] == '<' || value[index] == '>') {
+			if (val[index] == '=' || val[index] == '<' || val[index] == '>') {
 				start_index = index;
 				index++;
 				/* Support <= and >= */
-				if (value[index] == '=') {
+				if (val[index] == '=') {
 					index++;
 				}
-				entry.condition = value.substring (start_index, index - start_index );
+				entry.condition = val.substring (start_index, index - start_index );
 
 				/* Get version */
-				while (value[index].isspace ()) {
+				while (val[index].isspace ()) {
 					index++;
 				}
 				start_index = index;
-				while (value[index] != '\0' && !value[index].isspace () && value[index] != ',') {
+				while (val[index] != '\0' && !val[index].isspace () && val[index] != ',') {
 					index++;
 				}
-				entry.version = value.substring (start_index, index - start_index);
+				entry.version = val.substring (start_index, index - start_index);
 			}
 		}
 	}
@@ -203,48 +203,48 @@ class PkgConfigFile {
 			var variable = new_line.substring (start + 2, end - start - 2);
 			var suffix = new_line.substring (end + 1);
 
-			var value = get_variable (variable);
-			if (value == null) {
-				value = ""; // FIXME: Throw error instead?
+			var val = get_variable (variable);
+			if (val == null) {
+				val = ""; // FIXME: Throw error instead?
 			}
 
-			new_line = prefix + value + suffix;
+			new_line = prefix + val + suffix;
 		}
 
 		return new_line;
 	}
 
-	public string expand (string value) {
+	public string expand (string val) {
 		var s_value = "";
 
 		var index = 0;
 		var last_index = 0;
 		while (true) {
-			index = value.index_of ("${", index);
+			index = val.index_of ("${", index);
 			if (index < 0) {
-				s_value += value.substring (last_index);
+				s_value += val.substring (last_index);
 				return s_value;
 			}
-			s_value += value.substring (last_index, index - last_index);
+			s_value += val.substring (last_index, index - last_index);
 
 			/* $${ == literal ${ */
-			if (index > 1 && value[index - 2] == '$') {
+			if (index > 1 && val[index - 2] == '$') {
 				s_value += "${";
 				index = index + 2;
 			} else {
 				/* Look for end of ${name} */
-				var end_index = value.index_of ("}", index);
+				var end_index = val.index_of ("}", index);
 				if (end_index < 0) {
-					s_value += value.substring (index);
+					s_value += val.substring (index);
 					return s_value;
 				}
 
-				var name = value.substring (index + 2, end_index - index - 2);
+				var name = val.substring (index + 2, end_index - index - 2);
 				var variable = get_variable (name);
 				if (variable != null) {
 					s_value += expand (variable); /* FIXME: Need to check for loops */
 				} else {
-					s_value += value.substring (index, end_index - index);
+					s_value += val.substring (index, end_index - index);
 				}
 				index = end_index + 1;
 			}

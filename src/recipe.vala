@@ -885,24 +885,24 @@ namespace Bake {
 	}
 }
 
-public List<string> split_variable (string value) {
+public List<string> split_variable (string val) {
 	List<string> values = null;
 
 	var start = 0;
 	while (true) {
-		while (value[start].isspace ()) {
+		while (val[start].isspace ()) {
 			start++;
 		}
-		if (value[start] == '\0') {
+		if (val[start] == '\0') {
 			return values;
 		}
 
 		var end = start + 1;
-		while (value[end] != '\0' && !value[end].isspace ()) {
+		while (val[end] != '\0' && !val[end].isspace ()) {
 			end++;
 		}
 
-		values.append (value.substring (start, end - start));
+		values.append (val.substring (start, end - start));
 		start = end;
 	}
 }

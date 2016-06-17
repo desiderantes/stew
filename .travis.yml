@@ -12,6 +12,7 @@ sudo: required
 dist: trusty
 
 script:
+  - make LIBRARY_DIRECTORY=/usr/lib/x86_64-linux-gnu/
   - bake
   
 after_success:
