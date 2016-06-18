@@ -125,7 +125,7 @@ public class BakeApp {
 		}
 
 		if (do_configure || cookbook.needs_configure) {
-			stdout.printf ("%s\n", format_status (_("[Configuring]"));
+			stdout.printf ("%s\n", format_status (_("[Configuring]")));
 
 			/* Load args from the command line */
 			var conf_args = new string[0];

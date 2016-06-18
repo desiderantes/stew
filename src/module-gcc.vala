@@ -500,7 +500,7 @@ class GCCModule : BuildModule {
 		else if (source.has_suffix (".h")){
 			return "text/x-chdr";
 		} else if (source.has_suffix (".hpp")) {
-			return "text/x-c++hdr"
+			return "text/x-c++hdr";
 		} else {
 			return null;
 		}

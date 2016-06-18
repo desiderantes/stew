@@ -98,7 +98,7 @@ class ClangModule : BuildModule {
 					n_sources++;
 					break;
 				case "text/x-chdr":
-				case "text/x-c++hdr"
+				case "text/x-c++hdr":
 					break;
 				case "text/x-c++src":
 					n_sources++;
