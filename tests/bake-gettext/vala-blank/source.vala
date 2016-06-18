@@ -1,6 +1,5 @@
-public static int main (string[] args)
-{
-    var x = _("");
+public static int main (string[] args) {
+	var x = _("");
 
-    return 0;
+	return 0;
 }
