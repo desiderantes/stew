@@ -140,7 +140,7 @@ public class BakeApp {
 				cookbook.configure (conf_args);
 			} catch (Bake.CookbookError e) {
 				stdout.printf ("%s\n", format_error (e.message));
-				stdout.printf ("%s\n", format_error (_("[Configure Failed]"));
+				stdout.printf ("%s\n", format_error (_("[Configure Failed]")));
 				return Posix.EXIT_FAILURE;
 			}            
 

@@ -235,7 +235,7 @@ public class TestRunner {
 			stderr.printf ("Failed to open status socket: %s\n", e.message);
 			return Posix.EXIT_FAILURE;
 		}
-		var status_source = socket.create_source (IOCondition.IN);
+		var status_source = (SocketSource) socket.create_source (IOCondition.IN);
 		status_source.set_callback (read_cb);
 		status_source.attach (null);
 
