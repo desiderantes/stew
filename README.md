@@ -4,7 +4,7 @@ An easy to use build system. Designed to be make/autotools for the 21st century.
 ## Installation
 If you got bake already, just run `bake` on the project folder. Else, you can run:
 
-      make
+      make LIBRARY_DIRECTORY=/usr/lib/x86_64-linux-gnu/
       make install
 
 ## Usage
