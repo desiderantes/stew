@@ -138,8 +138,8 @@ namespace Bake {
 			Posix.timespec max_input_time = { 0, 0 };
 			string? youngest_input = null;
 			foreach (var input in rule.inputs) {
-				Stat file_info;
-				var e = stat (input, out file_info);
+				Posix.Stat file_info;
+				var e = Posix.stat (input, out file_info);
 				if (e == 0) {
 					if (Posix.S_ISREG (file_info.st_mode) && timespec_cmp (file_info.st_mtim, max_input_time) > 0) {
 						max_input_time = file_info.st_mtim;
@@ -165,8 +165,8 @@ namespace Bake {
 					return true;
 				}
 
-				Stat file_info;
-				var e = stat (output, out file_info);
+				Posix.Stat file_info;
+				var e = Posix.stat (output, out file_info);
 				if (e == 0) {
 					if (Posix.S_ISREG (file_info.st_mode) && timespec_cmp (file_info.st_mtim, max_output_time) > 0) {
 						max_output_time = file_info.st_mtim;

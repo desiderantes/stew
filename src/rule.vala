@@ -131,8 +131,8 @@ namespace Bake {
 
 			/* Delete the files that exist */
 			foreach (var input in clean_files) {
-				Stat file_info;        
-				var e = stat (input, out file_info);
+				Posix.Stat file_info;        
+				var e = Posix.stat (input, out file_info);
 				if (e != 0) {
 					continue;
 				}
