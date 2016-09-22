@@ -46,9 +46,22 @@ class DpkgModule : BuildModule {
 
 		/* Generate debian/changelog */
 		var changelog_file = "%s/debian/changelog".printf (build_dir);
-		var distribution = "oneiric";
-		var name = Environment.get_real_name ();
-		var email = Environment.get_variable ("DEBEMAIL");
+		string distribution = "";
+		try {
+			Process.spawn_command_line_sync ("lsb_release -sc", out distribution, null, out exit_status);
+			distribution = distribution.strip ();
+		} catch (SpawnError err) {
+			warning ("Failed to get distribution release, assuming latest Ubuntu LTS");
+			distribution = "xenial";		
+		}
+		if (exit_status != 0) {
+			distribution = "xenial";
+		}
+		string name = Environment.get_variable ("DEBFULLNAME");
+		if (name == null) {
+			name = Environment.get_real_name ();
+		}
+		string email = Environment.get_variable ("DEBEMAIL");
 		if (email == null) {
 			email = Environment.get_variable ("EMAIL");
 		}

@@ -1,3 +1,15 @@
+Overview of changes in bake 0.1.50 [UNRELEASED]
+
+    * Requires at least Vala 0.32 and GLib 2.45
+    * Preliminar Rust support
+    * Fixed GLib.Source usage in some tests
+    * Added launchpad-project variabe to launchpad module,defaults to 
+      project name 
+    * Respect DEBFULNAME env var in dpkg module 
+    * Changed codestyle 
+    * Fix wrong Test() block creation [Eugenio Paolantonio (g7) <me@medesimo.eu>]
+    * Fix .gir lookup [Eugenio Paolantonio (g7) <me@medesimo.eu>]
+
 Overview of changes in bake 0.1.49
 
     * Support valac < 0.20 which doesn't have --api-version

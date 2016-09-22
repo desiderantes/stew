@@ -11,7 +11,18 @@ Bake knows how some of these services work and makes <link xref="rules">rules</l
 Supported services are Launchpad (<em>release-launchpad</em> and <em>release-ppa</em> rules) and GNOME (<em>release-gnome</em> rule).
 </p>
 <p>
-FIXME: Define special variables
+<table frame="all" shade="rows">
+<thead>
+<tr>
+  <td><p>Name</p></td>
+  <td><p>Description</p></td>
+</tr>
+</thead>
+<tr>
+  <td><p>launchpad-project</p></td>
+  <td><p>Specifies a Launchpad project name (Optional, defaults to project name)</p></td>
+</tr>
+</table>
 </p>
 <example>
 <p>

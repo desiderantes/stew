@@ -6,9 +6,9 @@
 
   <name xml:lang="en">Bake</name>
   <shortdesc xml:lang="en">Build System</shortdesc>
-  <homepage rdf:resource="https://launchpad.net/bake" />
-  <download-page rdf:resource="https://launchpad.net/bake/+download" />
-  <bug-database rdf:resource="https://bugs.launchpad.net/bake" />
+  <homepage rdf:resource="https://github.com/desiderantes/bake" />
+  <download-page rdf:resource="https://github.com/desiderantes/bake/releases" />
+  <bug-database rdf:resource="https://github.com/desiderantes/bake/issues" />
   <category rdf:resource="http://api.gnome.org/doap-extensions#desktop" />
 
   <maintainer>
@@ -16,6 +16,13 @@
       <foaf:name>Robert Ancell</foaf:name>
       <foaf:mbox rdf:resource="mailto:robert.ancell@gmail.com" />
       <gnome:userid>rancell</gnome:userid>
+    </foaf:Person>
+  </maintainer>
+  <maintainer>
+    <foaf:Person>
+      <foaf:name>Mario Daniel Ruiz Saavedra</foaf:name>
+      <foaf:mbox rdf:resource="mailto:desiderantes@rocketmail.com" />
+      <gnome:userid>desiderantes</gnome:userid>
     </foaf:Person>
   </maintainer>
 </Project>

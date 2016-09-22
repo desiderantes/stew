@@ -1,7 +1,7 @@
 project {
   name = bake
-  version = 0.1.49+bzr
-  ppa = lp:~bake-team/releases
+  version = 0.1.50+git
+  ppa = lp:~desiderantes/bake
   minimum-bake-version = 0.1.49
 }
 
@@ -18,4 +18,4 @@ data.man {
 
 %release-test: %test %release-xzip
 
-%release: %test %tag-bzr %release-launchpad
+%release: %test %tag-git %release-launchpad
