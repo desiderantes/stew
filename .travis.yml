@@ -5,16 +5,16 @@ services:
 language: c
 
 before_install:
-  - docker run ubuntu:latest apt update
-  - docker run ubuntu:latest apt-get install -qq software-properties-common > /dev/null
-  - docker run ubuntu:latest add-apt-repository -y ppa:vala-team/ppa
-  - docker run ubuntu:latest apt-get update -qq > /dev/null
-  - docker run ubuntu:latest apt-get install -qq valac libglib2.0-dev itstool debhelper pkg-config bake > /dev/null
-  - docker run ubuntu:latest git clone https://github.com/desiderantes/bake
+  - docker run -i -t ubuntu:latest apt-get update -qq > /dev/null
+  - docker run -i -t ubuntu:latest apt-get -qq install software-properties-common
+  - docker run -i -t ubuntu:latest add-apt-repository -y ppa:vala-team/ppa
+  - docker run -i -t ubuntu:latest apt-get update -qq > /dev/null
+  - docker run -i -t ubuntu:latest apt-get install -qq valac libglib2.0-dev itstool debhelper pkg-config bake > /dev/null
+  - docker run -i -t ubuntu:latest git clone https://github.com/desiderantes/bake
 
 script:
 
-  - docker run ubuntu:latest /bin/sh -c "cd bake && make LIBRARY_DIRECTORY=/usr/lib/x86_64-linux-gnu/"
+  - docker run -i -t ubuntu:latest /bin/sh -c "cd bake && make LIBRARY_DIRECTORY=/usr/lib/x86_64-linux-gnu/"
 
   
 after_success:
