@@ -1,19 +1,19 @@
+sudo: required
+services:
+  - docker
+
 language: c
-compiler:
-  - gcc
 
 before_install:
-  - sudo add-apt-repository -y ppa:vala-team/ppa
-  - sudo add-apt-repository -y ppa:bake-team/releases
-  - sudo apt-get update -qq > /dev/null
-  - sudo apt-get install -qq valac libglib2.0-dev itstool debhelper pkg-config bake > /dev/null
-
-sudo: required
-dist: trusty
+  - docker run ubuntu:latest add-apt-repository -y ppa:vala-team/ppa
+  - docker run ubuntu:latest apt-get update -qq > /dev/null
+  - docker run ubuntu:latest apt-get install -qq valac libglib2.0-dev itstool debhelper pkg-config bake > /dev/null
+  - docker run ubuntu:latest git clone https://github.com/desiderantes/bake
 
 script:
-  - make LIBRARY_DIRECTORY=/usr/lib/x86_64-linux-gnu/
-  - bake
+
+  - docker run ubuntu:latest /bin/sh -c "cd bake && make LIBRARY_DIRECTORY=/usr/lib/x86_64-linux-gnu/"
+
   
 after_success:
  - echo "Nice"

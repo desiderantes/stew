@@ -163,7 +163,7 @@ public class TestRunner {
 
 	private static void usage () {
 		stderr.printf ("Usage: %s [--keep-directory] test-directory\n", Environment.get_prgname ());
-		Posix.exit (Posix.EXIT_FAILURE);
+		GLib.Process.exit (Posix.EXIT_FAILURE);
 	}
 
 	public static int main (string[] args) {

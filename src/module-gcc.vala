@@ -387,6 +387,8 @@ class GCCModule : BuildModule {
 			var command = "@%s".printf (compiler);
 			if (compilable is Library) {
 				command += " -fPIC";
+			} else if (compilable is Program && compilable.get_boolean_variable("position-independent")) {
+				command += " -fPIE";
 			}
 			if (compile_flags != "") {
 				command += " " + compile_flags;

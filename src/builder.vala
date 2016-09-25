@@ -135,21 +135,22 @@ namespace Bake {
 
 		private bool needs_build (Rule rule) {
 			/* Find the most recently changed input */
-			Posix.timespec max_input_time = { 0, 0 };
+			GLib.Timeval max_input_time = { 0, 0 };
 			string? youngest_input = null;
 			foreach (var input in rule.inputs) {
-				Posix.Stat file_info;
-				var e = Posix.stat (input, out file_info);
-				if (e == 0) {
-					if (Posix.S_ISREG (file_info.st_mode) && timespec_cmp (file_info.st_mtim, max_input_time) > 0) {
-						max_input_time = file_info.st_mtim;
+				GLib.File file = GLib.File.new_from_path (input);
+				try {
+					var file_info = file.query_info ("*", GLib.FileQueryInfoFlags.NONE, null );
+					GLib.Timeval mtime = file_info.get_modification_time ();
+					if (file_info.get_file_type () == GLib.FileType.REGULAR && timeval_cmp (mtime, max_input_time) > 0) {
+						max_input_time = mtime;
 						youngest_input = input;
 					}
-				} else {
-					if (errno == Posix.ENOENT) {
+				} catch (Error e) {
+					if (e is IOError && e == IOError.NOT_FOUND) {
 						report_debug ("Input %s is missing".printf (get_relative_path (base_directory, Path.build_filename (rule.recipe.dirname, input))));
 					} else {
-						warning ("Unable to access input file %s: %s", input, strerror (errno));
+						warning ("Unable to access input file %s: %s", input, strerror (e.message));
 					}
 					/* Something has gone wrong, run the rule anyway and it should fail */
 					return true;
@@ -157,31 +158,32 @@ namespace Bake {
 			}
 
 			/* Rebuild if any of the outputs are missing */
-			Posix.timespec max_output_time = { 0, 0 };
+			GLib.Timeval max_output_time = { 0, 0 };
 			string? youngest_output = null;
 			foreach (var output in rule.outputs)  {
 				/* Always rebuild if doesn't produce output */
 				if (output.has_prefix ("%")) {
 					return true;
 				}
-
-				Posix.Stat file_info;
-				var e = Posix.stat (output, out file_info);
-				if (e == 0) {
-					if (Posix.S_ISREG (file_info.st_mode) && timespec_cmp (file_info.st_mtim, max_output_time) > 0) {
-						max_output_time = file_info.st_mtim;
+				
+				GLib.File file = GLib.File.new_from_path (output);
+				try {
+					var file_info = file.query_info ("*", GLib.FileQueryInfoFlags.NONE, null );
+					GLib.Timeval mtime = file_info.get_modification_time ();
+					if (file_info.get_file_type () == GLib.FileType.REGULAR && timeval_cmp (mtime, max_output_time) > 0) {
+						max_output_time = mtime;
 						youngest_output = output;
 					}
-				} else {
-					if (errno == Posix.ENOENT) {
+				} catch (Error e) {
+					if (e is IOError && e == IOError.NOT_FOUND) {
 						report_debug ("Output %s is missing".printf (get_relative_path (base_directory, Path.build_filename (rule.recipe.dirname, output))));
 					}
-
 					return true;
 				}
+				
 			}
 
-			if (timespec_cmp (max_input_time, max_output_time) > 0) {
+			if (timeval_cmp (max_input_time, max_output_time) > 0) {
 				report_debug ("Rebuilding %s as %s is newer".printf (get_relative_path (base_directory, Path.build_filename (rule.recipe.dirname, youngest_output)), get_relative_path (base_directory, Path.build_filename (rule.recipe.dirname, youngest_input))));
 				return true;
 			}
@@ -189,9 +191,9 @@ namespace Bake {
 			return false;
 		}
 
-		private static int timespec_cmp (Posix.timespec a, Posix.timespec b){
+		private static int timeval_cmp (GLib.Timeval a, GLib.Timeval b){
 			if (a.tv_sec == b.tv_sec) {
-				return (int) (a.tv_nsec - b.tv_nsec);
+				return (int) (a.tv_usec - b.tv_usec);
 			} else {
 				return (int) (a.tv_sec - b.tv_sec);
 			}
