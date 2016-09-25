@@ -52,7 +52,7 @@ libraries {
     vala-packages = posix gio-2.0
     compile-flags = -DGETTEXT_PACKAGE=\"bake\"
     so-version = 0
-    vala-compile-flags = --target-glib=2.48
+    vala-compile-flags = --target-glib=2.40
     symbol-filter = bake_.*
   }
 }
