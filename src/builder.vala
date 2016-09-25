@@ -7,6 +7,7 @@
  * version. See http://www.gnu.org/copyleft/gpl.html the full text of the
  * license.
  */
+using GLib;
 
 namespace Bake {
  
@@ -135,22 +136,22 @@ namespace Bake {
 
 		private bool needs_build (Rule rule) {
 			/* Find the most recently changed input */
-			GLib.Timeval max_input_time = { 0, 0 };
+			GLib.TimeVal max_input_time = { 0, 0 };
 			string? youngest_input = null;
 			foreach (var input in rule.inputs) {
-				GLib.File file = GLib.File.new_from_path (input);
+				File file = File.new_for_path (input);
 				try {
 					var file_info = file.query_info ("*", GLib.FileQueryInfoFlags.NONE, null );
-					GLib.Timeval mtime = file_info.get_modification_time ();
+					GLib.TimeVal mtime = file_info.get_modification_time ();
 					if (file_info.get_file_type () == GLib.FileType.REGULAR && timeval_cmp (mtime, max_input_time) > 0) {
 						max_input_time = mtime;
 						youngest_input = input;
 					}
 				} catch (Error e) {
-					if (e is IOError && e == IOError.NOT_FOUND) {
+					if (e is IOError.NOT_FOUND) {
 						report_debug ("Input %s is missing".printf (get_relative_path (base_directory, Path.build_filename (rule.recipe.dirname, input))));
 					} else {
-						warning ("Unable to access input file %s: %s", input, strerror (e.message));
+						warning ("Unable to access input file %s: %s", input, strerror (e.code));
 					}
 					/* Something has gone wrong, run the rule anyway and it should fail */
 					return true;
@@ -158,7 +159,7 @@ namespace Bake {
 			}
 
 			/* Rebuild if any of the outputs are missing */
-			GLib.Timeval max_output_time = { 0, 0 };
+			GLib.TimeVal max_output_time = { 0, 0 };
 			string? youngest_output = null;
 			foreach (var output in rule.outputs)  {
 				/* Always rebuild if doesn't produce output */
@@ -166,16 +167,16 @@ namespace Bake {
 					return true;
 				}
 				
-				GLib.File file = GLib.File.new_from_path (output);
+				File file = File.new_for_path (output);
 				try {
 					var file_info = file.query_info ("*", GLib.FileQueryInfoFlags.NONE, null );
-					GLib.Timeval mtime = file_info.get_modification_time ();
+					GLib.TimeVal mtime = file_info.get_modification_time ();
 					if (file_info.get_file_type () == GLib.FileType.REGULAR && timeval_cmp (mtime, max_output_time) > 0) {
 						max_output_time = mtime;
 						youngest_output = output;
 					}
 				} catch (Error e) {
-					if (e is IOError && e == IOError.NOT_FOUND) {
+					if (e is IOError.NOT_FOUND) {
 						report_debug ("Output %s is missing".printf (get_relative_path (base_directory, Path.build_filename (rule.recipe.dirname, output))));
 					}
 					return true;
@@ -191,7 +192,7 @@ namespace Bake {
 			return false;
 		}
 
-		private static int timeval_cmp (GLib.Timeval a, GLib.Timeval b){
+		private static int timeval_cmp (GLib.TimeVal a, GLib.TimeVal b){
 			if (a.tv_sec == b.tv_sec) {
 				return (int) (a.tv_usec - b.tv_usec);
 			} else {

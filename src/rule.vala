@@ -131,7 +131,7 @@ namespace Bake {
 
 			/* Delete the files that exist */
 			foreach (var input in clean_files) {
-				GLib.File file = GLib.File.new_from_path (input);
+				GLib.File file = GLib.File.new_for_path (input);
 				try {
 					var file_type = file.query_file_type (GLib.FileQueryInfoFlags.NONE );
 					if ( file_type == GLib.FileType.REGULAR) {

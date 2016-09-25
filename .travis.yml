@@ -5,6 +5,7 @@ services:
 language: c
 
 before_install:
+  - docker run ubuntu:latest apt-get install -qq software-properties-common > /dev/null
   - docker run ubuntu:latest add-apt-repository -y ppa:vala-team/ppa
   - docker run ubuntu:latest apt-get update -qq > /dev/null
   - docker run ubuntu:latest apt-get install -qq valac libglib2.0-dev itstool debhelper pkg-config bake > /dev/null
