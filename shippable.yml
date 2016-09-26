@@ -1,0 +1,24 @@
+language: c
+build:
+  pre_ci_boot:
+    image_name: ubuntu
+    image_tag: 16.04
+  ci:
+  - add-apt-repository -y ppa:vala-team/ppa
+  - add-apt-repository -y ppa:bake-team/releases
+  - apt-get update -qq > /dev/null
+  - apt-get install -y 
+    valac
+    git 
+    libglib2.0-dev 
+    itstool 
+    debhelper 
+    pkg-config 
+    bake
+  - git clone https://github.com/desiderantes/bake.git
+  - cd bake
+  - make LIBRARY_DIRECTORY=/usr/lib/x86_64-linux-gnu/
+  - bake
+  
+on_success:
+ - echo "Nice"
