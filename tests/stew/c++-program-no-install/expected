@@ -1,0 +1,13 @@
+!stew
+mkdir -p .built
+g++ -MMD -MF .built/test-test.d -c test.cpp -o .built/test-test.o
+g++ -o test .built/test-test.o
+(exit SUCCESS)
+!stew install
+(exit SUCCESS)
+!stew uninstall
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+rm -f test
+(exit SUCCESS)

@@ -1,0 +1,11 @@
+!stew
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/share/applications
+cp test.desktop /usr/share/applications/test.desktop
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/share/applications/test.desktop
+(exit SUCCESS)
+!stew clean
+(exit SUCCESS)

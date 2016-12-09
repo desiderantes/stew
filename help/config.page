@@ -14,7 +14,7 @@ After a project is configured the file <file>Recipe.conf</file> is generated con
 For example, running the following for a project:
 </p>
 <code>
-bake --configure <em>name1</em>=<em>value1</em> <em>name2</em>=<em>value2</em>
+stew --configure <em>name1</em>=<em>value1</em> <em>name2</em>=<em>value2</em>
 </code>
 <p>
 Will configure the project with options <em>name1</em> and <em>name2</em> set.
@@ -22,12 +22,12 @@ Will configure the project with options <em>name1</em> and <em>name2</em> set.
 </example>
 <note>
 <p>
-You can see the options for a project by running <code>bake --list-options</code>.
+You can see the options for a project by running <code>stew --list-options</code>.
 </p>
 </note>
 <note>
 <p>
-Configuring is an optional step, if run on an unconfigured project Bake will configure using default values.
+Configuring is an optional step, if run on an unconfigured project Stew will configure using default values.
 </p>
 </note>
 </page>

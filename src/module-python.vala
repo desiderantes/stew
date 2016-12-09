@@ -8,7 +8,7 @@
  * license.
  */
 
-using Bake;
+using Stew;
 
 class PythonModule : BuildModule {
 	public override bool can_generate_program_rules (Program program) throws Error {

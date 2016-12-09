@@ -1,0 +1,19 @@
+!stew
+python -m py_compile test.py
+mkdir -p .built
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/share/test-project
+cp test.pyc /usr/share/test-project/test.pyc
+mkdir -p /usr/bin
+cp .built/test /usr/bin/test
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/share/test-project/test.pyc
+rm -f /usr/bin/test
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+rm -f test.pyc
+rm -f test
+(exit SUCCESS)

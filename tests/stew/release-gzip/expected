@@ -1,0 +1,22 @@
+!stew release-gzip
+dpkg-architecture -qDEB_BUILD_ARCH
+rpmbuild --showrc
+mkdir -p .built
+mkdir -p .built/test-project-1.0
+cp Recipe .built/test-project-1.0/Recipe
+tar --create --gzip --file test-project-1.0.tar.gz --directory .built test-project-1.0
+(exit SUCCESS)
+!stew install
+dpkg-architecture -qDEB_BUILD_ARCH
+rpmbuild --showrc
+(exit SUCCESS)
+!stew uninstall
+dpkg-architecture -qDEB_BUILD_ARCH
+rpmbuild --showrc
+(exit SUCCESS)
+!stew clean
+dpkg-architecture -qDEB_BUILD_ARCH
+rpmbuild --showrc
+rm -f test-project-1.0.tar.gz
+rm -rf .built/
+(exit SUCCESS)

@@ -1,0 +1,13 @@
+!stew
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/share/test-project/test
+cp test1 /usr/share/test-project/test/test1
+cp test2 /usr/share/test-project/test/test2
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/share/test-project/test/test1
+rm -f /usr/share/test-project/test/test2
+(exit SUCCESS)
+!stew clean
+(exit SUCCESS)

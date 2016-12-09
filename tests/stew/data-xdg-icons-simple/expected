@@ -1,0 +1,11 @@
+!stew
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/share/icons/hicolor/scalable/apps
+cp test.png /usr/share/icons/hicolor/scalable/apps/test.png
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/share/icons/hicolor/scalable/apps/test.png
+(exit SUCCESS)
+!stew clean
+(exit SUCCESS)

@@ -1,4 +1,4 @@
-data.bake {
+data.stew {
   mallard-pages = building.page \
                   cleaning.page \
                   conditionals.page \
@@ -44,5 +44,5 @@ data.bake {
                   xdg-appdata.page \
                   xdg-desktop.page \
                   xdg-icons.page
-  gettext-domain = bake-help
+  gettext-domain = stew-help
 }

@@ -14,5 +14,5 @@ install:
   - make LIBRARY_DIRECTORY=/usr/lib/x86_64-linux-gnu/ && sudo make install
 
 script: 
-  - bake 
-  - bake test
+  - stew 
+  - stew test

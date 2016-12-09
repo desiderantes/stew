@@ -6,7 +6,7 @@
 <title>Objective C Language Support</title>
 
 <p>
-Bake supports <link xref="programs">programs</link> and <link xref="libraries">libraries</link> written in the Objective C language.
+Stew supports <link xref="programs">programs</link> and <link xref="libraries">libraries</link> written in the Objective C language.
 </p>
 <example>
 <p>

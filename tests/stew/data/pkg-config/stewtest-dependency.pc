@@ -1,0 +1,6 @@
+Name: Stew Test Library (dependency)
+Description: Test library for stew tests that has a depedency
+Version: 1.2.3
+Libs: -lstewtest-dependency
+Cflags: -Istewtest-dependency
+Requires: stewtest-library

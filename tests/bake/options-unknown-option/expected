@@ -1,2 +1,0 @@
-!bake --configure sound=boom
-(exit FAILURE)

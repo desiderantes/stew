@@ -7,7 +7,7 @@
 
 <p>
 Some projects require source files to be only used under certain conditions.
-Bake supports this by allowing a source file to be followed by a conditional tag.
+Stew supports this by allowing a source file to be followed by a conditional tag.
 </p>
 <p>
 The syntax for a conitional is:
@@ -48,7 +48,7 @@ programs.example-program {
 }
 </code>
 <p>
-When building Bake will compile in foo.c if <code>use-foo</code> was set to <code>true</code> at <link xref="config">configure</link> time.
+When building Stew will compile in foo.c if <code>use-foo</code> was set to <code>true</code> at <link xref="config">configure</link> time.
 </p>
 </example>
 </page>

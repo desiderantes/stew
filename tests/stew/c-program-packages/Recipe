@@ -1,0 +1,9 @@
+project {
+  name = test-project
+}
+
+programs.test {
+  sources = test.c
+  packages = stewtest-library \
+             stewtest-library2
+}

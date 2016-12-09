@@ -8,7 +8,7 @@
  * license.
  */
 
-namespace Bake {
+namespace Stew {
 
 	public class Rule : Object {
 		public Recipe recipe;

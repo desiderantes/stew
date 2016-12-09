@@ -1,0 +1,4 @@
+!stew b
+touch a
+cp a b
+(exit SUCCESS)

@@ -1,0 +1,23 @@
+!stew
+mkdir -p .built
+valac --ccode test.vala
+mv test.c .built/test-test.c
+touch .built/test-test.c-stamp
+gcc -w -fPIC -Igobject -Iglib -c .built/test-test.c -o .built/test-test.o
+gcc -o libtest.so -shared -Wl,-soname,libtest.so .built/test-test.o -lgobject -lglib
+ar -cq libtest.a .built/test-test.o
+valac --fast-vapi=.built/test-test.vapi test.vala
+touch .built/test-test.vapi-stamp
+valac --ccode --header=test.h --vapi=test.vapi --library=test --use-fast-vapi=.built/test-test.vapi
+(exit SUCCESS)
+!stew install
+(exit SUCCESS)
+!stew uninstall
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+rm -f libtest.so
+rm -f libtest.a
+rm -f test.h
+rm -f test.vapi
+(exit SUCCESS)

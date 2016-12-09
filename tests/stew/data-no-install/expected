@@ -1,0 +1,8 @@
+!stew
+(exit SUCCESS)
+!stew install
+(exit SUCCESS)
+!stew uninstall
+(exit SUCCESS)
+!stew clean
+(exit SUCCESS)

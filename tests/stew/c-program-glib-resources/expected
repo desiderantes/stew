@@ -1,0 +1,18 @@
+!stew
+mkdir -p .built
+glib-compile-resources --generate --target=.built/test.glib-resources.c resources.xml
+gcc -Iglib -MMD -MF .built/test-test.glib-resources.d -c .built/test.glib-resources.c -o .built/test-test.glib-resources.o
+gcc -Iglib -MMD -MF .built/test-test.d -c test.c -o .built/test-test.o
+gcc -o test .built/test-test.glib-resources.o .built/test-test.o -lglib
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/bin
+cp test /usr/bin/test
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/bin/test
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+rm -f test
+(exit SUCCESS)

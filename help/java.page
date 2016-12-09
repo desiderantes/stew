@@ -6,7 +6,7 @@
 <title>Java Language Support</title>
 
 <p>
-Bake supports <link xref="programs">programs</link> and <link xref="libraries">libraries</link> written in the Java language.
+Stew supports <link xref="programs">programs</link> and <link xref="libraries">libraries</link> written in the Java language.
 </p>
 <p>
 C programs and libraries can set the following program <link xref="variables">variables</link> to control compiling:

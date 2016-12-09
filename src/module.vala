@@ -8,7 +8,7 @@
  * license.
  */
 
-namespace Bake {
+namespace Stew {
 
 	public class BuildModule : Object {
 		public virtual void generate_toplevel_rules (Recipe toplevel) {

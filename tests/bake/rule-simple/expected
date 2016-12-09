@@ -1,4 +1,0 @@
-# Check the rule is run and produces the output
-!bake a
-touch a
-(exit SUCCESS)

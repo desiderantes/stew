@@ -1,4 +1,0 @@
-project {
-  name = test-project
-  minimum-bake-version = 0.1
-}

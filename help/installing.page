@@ -15,13 +15,13 @@ The install rule will automatically <link xref="building">build</link> any files
 If you project contains a single program called <em>foo</em>, then running the following:
 </p>
 <code>
-bake install
+stew install
 </code>
 <p>
 will take this program and install it to /usr/bin/foo (on Unix systems)
 </p>
 <code>
-bake uninstall
+stew uninstall
 </code>
 <p>
 will remove the installed files

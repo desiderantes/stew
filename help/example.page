@@ -17,7 +17,7 @@ Here is an example of a <link xref="recipe-files">recipe</link> for a simple pro
 project {
   name = foo
   version = 0.0.1
-  minimum-bake-version = 1.0
+  minimum-stew-version = 1.0
 }
 
 # There is a README file that needs to be distributed with the project
@@ -39,13 +39,13 @@ data.images {
 }
 </code>
 <p>
-The first line is a comment, and is ignored by Bake.
+The first line is a comment, and is ignored by Stew.
 </p>
 <p>
 The <em>project.name</em> <link xref="variables">variable</link> defines this recipe as being for the <em>foo</em> project.
-This variable tells Bake that this is the top level recipe for this project.
+This variable tells Stew that this is the top level recipe for this project.
 The <em>project.version</em> variable specified this is version <em>0.0.1</em> of the foo project.
-The <em>project.minimum-bake-version</em> means that this project requires Bake version 1.0 to build.
+The <em>project.minimum-stew-version</em> means that this project requires Stew version 1.0 to build.
 </p>
 <p>
 The <em>data.meta</em> variables states that there is a file called README that is part of the project.
@@ -53,7 +53,7 @@ This file should be <link xref="releasing">distributed</link> with the project b
 </p>
 <p>
 The <em>programs.example-program.sources</em> variable describes a C <link xref="programs">program</link> that this project produces.
-This variable means that when <link xref="building">building</link> Bake will compile a C program called <em>example-program</em> using the source file <em>example-program.c</em>.
+This variable means that when <link xref="building">building</link> Stew will compile a C program called <em>example-program</em> using the source file <em>example-program.c</em>.
 The produced executable will be <link xref="installing">installed</link> into an appropriate location and the source file will be distributed with the project.
 Note that this variable is spread over more than one line to make it more readable.
 </p>

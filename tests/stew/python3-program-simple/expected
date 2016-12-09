@@ -1,0 +1,24 @@
+!stew
+mkdir -p __pycache__
+python3.2 -m py_compile test.py
+mkdir -p .built
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/share/test-project
+cp test.py /usr/share/test-project/test.py
+mkdir -p /usr/share/test-project/__pycache__
+cp __pycache__/test.cpython-32.pyc /usr/share/test-project/__pycache__/test.cpython-32.pyc
+mkdir -p /usr/bin
+cp .built/test /usr/bin/test
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/share/test-project/test.py
+rm -f /usr/share/test-project/__pycache__/test.cpython-32.pyc
+rm -f /usr/bin/test
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+rm -f __pycache__/test.cpython-32.pyc
+rm -rf __pycache__/
+rm -f test
+(exit SUCCESS)

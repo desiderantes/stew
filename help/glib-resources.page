@@ -34,7 +34,7 @@ resources.xml:
 </gresources>
 ]]></code>
 <p>
-When running the build rule Bake will embed test.png into the program <em>test</em>.
+When running the build rule Stew will embed test.png into the program <em>test</em>.
 </p>
 </example>
 </page>

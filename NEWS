@@ -1,5 +1,6 @@
-Overview of changes in bake 0.1.50 [UNRELEASED]
+Overview of changes in stew 0.1.50
 
+    * Rename to Stew
     * Requires at least Vala 0.32 and GLib 2.45
     * Preliminar Rust support
     * Fixed GLib.Source usage in some tests

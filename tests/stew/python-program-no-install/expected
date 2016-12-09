@@ -1,0 +1,13 @@
+!stew
+python -m py_compile test.py
+mkdir -p .built
+(exit SUCCESS)
+!stew install
+(exit SUCCESS)
+!stew uninstall
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+rm -f test.pyc
+rm -f test
+(exit SUCCESS)

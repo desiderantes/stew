@@ -1,0 +1,13 @@
+!stew
+valac --api-version
+(exit FAILURE)
+!stew install
+valac --api-version
+(exit FAILURE)
+!stew uninstall
+valac --api-version
+rm -f /usr/bin/test
+(exit SUCCESS)
+!stew clean
+valac --api-version
+(exit SUCCESS)

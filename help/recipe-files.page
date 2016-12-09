@@ -8,7 +8,7 @@
 <title>Recipe Files</title>
 
 <p>
-To describe your project to Bake you need to have a <em>recipe</em> file in the toplevel directory of your project.
+To describe your project to Stew you need to have a <em>recipe</em> file in the toplevel directory of your project.
 This text file is called <em>Recipe</em> (case sensitive) and defines the components of your project using <link xref="variables">variables</link> and <link xref="rules">rules</link>.
 </p>
 
@@ -27,21 +27,21 @@ project {
 </code>
 </example>
 <p>
-Optionally you can specify the version of the project with <em>project.version</em> and the minimum version of Bake required by specifying <em>project.minimum-bake-version</em>.
+Optionally you can specify the version of the project with <em>project.version</em> and the minimum version of Stew required by specifying <em>project.minimum-stew-version</em>.
 </p>
 <example>
 <code>
 project {
   name = foo
   version = 0.0.1
-  minimum-bake-version = 1.0
+  minimum-stew-version = 1.0
 }
 </code>
 </example>
 <p>
 To make your project more managable you can have recipe files in the subdirectories under the toplevel recipe file.
 Each recipe inherits all the variables from the parent so you can define common values in one recipe and use them in any recipes below this one.
-You can run Bake from any directory containing a recipe; it will find the toplevel one itself and load all its decendendants.
+You can run Stew from any directory containing a recipe; it will find the toplevel one itself and load all its decendendants.
 </p>
 <example>
 <p>

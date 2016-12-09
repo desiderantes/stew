@@ -9,7 +9,7 @@
  */
 using GLib;
 
-namespace Bake {
+namespace Stew {
  
 	public errordomain BuildError {
 		ERROR
@@ -96,7 +96,7 @@ namespace Bake {
 				}
 
 				/* If doesn't exist then we can't continue */
-				errors.append ("File '%s' does not exist and no rule to build it.\nRun bake --list-targets to see which targets can be built.".printf (get_relative_path (base_directory, target)));
+				errors.append ("File '%s' does not exist and no rule to build it.\nRun stew --list-targets to see which targets can be built.".printf (get_relative_path (base_directory, target)));
 				return false;
 			}
 
@@ -268,14 +268,14 @@ namespace Bake {
 					while (c[i] != '\0' && !c[i].isspace ()) {
 						i++;
 					}
-					var bake_command = c.substring (1, i - 1);
+					var stew_command = c.substring (1, i - 1);
 					var arg = c[i] == '\0' ? "" : c.substring (i + 1);
 
-					if (in_error && bake_command != "error") {
+					if (in_error && stew_command != "error") {
 						return false;
 					}
 
-					switch (bake_command) {
+					switch (stew_command) {
 						case "status":
 							builder.report_status (arg);
 							break;
@@ -288,7 +288,7 @@ namespace Bake {
 							}
 							break;
 						default:
-							error = "Unknown command %s".printf (bake_command);
+							error = "Unknown command %s".printf (stew_command);
 							return false;
 					}
 					continue;

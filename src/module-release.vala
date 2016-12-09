@@ -8,7 +8,7 @@
  * license.
  */
 
-using Bake;
+using Stew;
 
 private class ReleaseRule : Rule {
 	public HashTable<string, bool> file_table;

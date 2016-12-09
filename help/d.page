@@ -6,7 +6,7 @@
 <title>D Language Support</title>
 
 <p>
-Bake supports <link xref="programs">programs</link> and <link xref="libraries">libraries</link> written in the D language.
+Stew supports <link xref="programs">programs</link> and <link xref="libraries">libraries</link> written in the D language.
 </p>
 <example>
 <p>

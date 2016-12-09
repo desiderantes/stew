@@ -14,7 +14,7 @@ The <link xref="rules"><em>test</em> rule</link> does this for the recipe and it
 Running the following on your project:
 </p>
 <code>
-bake test
+stew test
 </code>
 <p>
 will return success if the tests pass or failure otherwise.

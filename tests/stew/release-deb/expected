@@ -1,0 +1,39 @@
+!stew release-deb
+dpkg-architecture -qDEB_BUILD_ARCH
+rpmbuild --showrc
+mkdir -p .built
+mkdir -p .built/test-project-1.0
+cp Recipe .built/test-project-1.0/Recipe
+tar --create --gzip --file test-project-1.0.tar.gz --directory .built test-project-1.0
+cp test-project-1.0.tar.gz test-project_1.0.orig.tar.gz
+rm -rf .built/dpkg-builddir
+mkdir -p .built/dpkg-builddir/debian
+mkdir -p .built/dpkg-builddir/debian/source
+tar --create --gzip --file test-project_1.0-0.debian.tar.gz --directory .built/dpkg-builddir debian
+rm -rf .built/dpkg-builddir
+rm -rf .built/dpkg-builddir
+mkdir -p .built/dpkg-builddir
+cp test-project_1.0.orig.tar.gz test-project_1.0-0.debian.tar.gz .built/dpkg-builddir
+tar --extract --gzip --file test-project_1.0.orig.tar.gz --directory .built/dpkg-builddir
+tar --extract --gzip --file test-project_1.0-0.debian.tar.gz --directory .built/dpkg-builddir/test-project-1.0
+dpkg-buildpackage -b
+mv .built/dpkg-builddir/test-project_1.0-0_amd64.deb .
+rm -rf .built/dpkg-builddir
+(exit SUCCESS)
+!stew install
+dpkg-architecture -qDEB_BUILD_ARCH
+rpmbuild --showrc
+(exit SUCCESS)
+!stew uninstall
+dpkg-architecture -qDEB_BUILD_ARCH
+rpmbuild --showrc
+(exit SUCCESS)
+!stew clean
+dpkg-architecture -qDEB_BUILD_ARCH
+rpmbuild --showrc
+rm -f test-project_1.0.orig.tar.gz
+rm -f test-project_1.0-0.debian.tar.gz
+rm -f test-project_1.0-0_amd64.deb
+rm -f test-project-1.0.tar.gz
+rm -rf .built/
+(exit SUCCESS)

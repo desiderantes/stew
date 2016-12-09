@@ -8,7 +8,7 @@
  * license.
  */
 
-using Bake;
+using Stew;
 
 class GSettingsModule : BuildModule {
 	public override void generate_data_rules (Data data) throws Error {

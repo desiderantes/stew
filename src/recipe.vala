@@ -8,7 +8,7 @@
  * license.
  */
 
-namespace Bake {
+namespace Stew {
 
 	public errordomain RecipeError {
 		INVALID

@@ -1,0 +1,17 @@
+!stew
+mkdir -p .built
+itstool --output .built/test.appdata.xml.pot test.appdata.xml
+itstool --output .built/test-disabled.appdata.xml.pot test-disabled.appdata.xml
+msgcat --force-po --output-file=test.pot .built/test.appdata.xml.pot .built/test-disabled.appdata.xml.pot
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/share/appdata
+cp test.appdata.xml /usr/share/appdata/test.appdata.xml
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/share/appdata/test.appdata.xml
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+rm -f test.pot
+(exit SUCCESS)

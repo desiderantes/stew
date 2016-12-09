@@ -1,0 +1,13 @@
+!stew
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/share/help/C/test
+cp index.page /usr/share/help/C/test/index.page
+cp test.page /usr/share/help/C/test/test.page
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/share/help/C/test/index.page
+rm -f /usr/share/help/C/test/test.page
+(exit SUCCESS)
+!stew clean
+(exit SUCCESS)

@@ -1,0 +1,8 @@
+project {
+  name = test-project
+}
+
+programs.test {
+  sources = test.c
+  libraries = (static) stewstaticlib
+}

@@ -8,7 +8,7 @@
  * license.
  */
 
-using Bake;
+using Stew;
 
 class GNOMEModule : BuildModule {
 	public override void generate_toplevel_rules (Recipe recipe) {

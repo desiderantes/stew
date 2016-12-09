@@ -1,6 +1,0 @@
-Name: Bake Test Library (dependency)
-Description: Test library for bake tests that has a depedency
-Version: 1.2.3
-Libs: -lbaketest-dependency
-Cflags: -Ibaketest-dependency
-Requires: baketest-library

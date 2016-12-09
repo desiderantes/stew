@@ -26,7 +26,7 @@ data.images {
 }
 </code>
 <p>
-When running the install rule Bake will copy these files to <code>/usr/share/foo/images</code>.
+When running the install rule Stew will copy these files to <code>/usr/share/foo/images</code>.
 </p>
 </example>
 </page>

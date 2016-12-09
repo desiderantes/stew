@@ -1,0 +1,22 @@
+!stew
+moc -o test.moc test.cpp
+mkdir -p .built
+g++ -fPIC -MMD -MF .built/test-test.d -c test.cpp -o .built/test-test.o
+g++ -o libtest.so -shared -Wl,-soname,libtest.so .built/test-test.o
+ar -cq libtest.a .built/test-test.o
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/lib
+cp libtest.so /usr/lib/libtest.so
+cp libtest.a /usr/lib/libtest.a
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/lib/libtest.so
+rm -f /usr/lib/libtest.a
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+rm -f libtest.so
+rm -f libtest.a
+rm -f test.moc
+(exit SUCCESS)

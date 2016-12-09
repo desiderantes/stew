@@ -6,11 +6,11 @@
     </credit>
 </info>
 
-<title>Bake Help</title>
+<title>Stew Help</title>
 
 <p>
-Bake is a <em>build system</em> that takes a project that is made up of programs, libraries and data and provides methods of compiling, testing, installing and distributing that project.
-To use Bake you need to generate <em>recipes</em> that describe how the components of your project fit together.
+Stew is a <em>build system</em> that takes a project that is made up of programs, libraries and data and provides methods of compiling, testing, installing and distributing that project.
+To use Stew you need to generate <em>recipes</em> that describe how the components of your project fit together.
 </p>
 
 <section id="recipes" style="2column">
@@ -18,7 +18,7 @@ To use Bake you need to generate <em>recipes</em> that describe how the componen
 </section>
 
 <section id="using" style="2column">
-    <title>Using Bake</title>
+    <title>Using Stew</title>
 </section>
 
 <section id="programs-and-libraries" style="2column">

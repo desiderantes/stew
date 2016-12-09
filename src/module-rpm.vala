@@ -8,7 +8,7 @@
  * license.
  */
 
-using Bake;
+using Stew;
 
 class RPMModule : BuildModule {
 	public override void generate_toplevel_rules (Recipe recipe) {
@@ -70,11 +70,11 @@ class RPMModule : BuildModule {
 		rule.add_command ("@echo \"%%setup -q\" >> %s".printf (spec_file));
 		rule.add_command ("@echo >> %s".printf (spec_file));
 		rule.add_command ("@echo \"%%build\" >> %s".printf (spec_file));
-		rule.add_command ("@echo \"bake --configure resource-directory=/usr install-directory=\\$RPM_BUILD_ROOT\" >> %s".printf (spec_file));
-		rule.add_command ("@echo \"bake\" >> %s".printf (spec_file));
+		rule.add_command ("@echo \"stew --configure resource-directory=/usr install-directory=\\$RPM_BUILD_ROOT\" >> %s".printf (spec_file));
+		rule.add_command ("@echo \"stew\" >> %s".printf (spec_file));
 		rule.add_command ("@echo >> %s".printf (spec_file));
 		rule.add_command ("@echo \"%%install\" >> %s".printf (spec_file));
-		rule.add_command ("@echo \"bake install\" >> %s".printf (spec_file));
+		rule.add_command ("@echo \"stew install\" >> %s".printf (spec_file));
 		rule.add_command ("@echo \"find \\$RPM_BUILD_ROOT -type f -print | sed \\\"s#^\\$RPM_BUILD_ROOT/*#/#\\\" > FILE-LIST\" >> %s".printf (spec_file));
 		rule.add_command ("@echo \"sed -i 's/\\/man\\/man.*/&*/' FILE-LIST\" >> %s".printf (spec_file));
 		rule.add_command ("@echo >> %s".printf (spec_file));

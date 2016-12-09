@@ -1,0 +1,13 @@
+!stew
+gmcs -target:library -out:Test.dll Test.cs
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/lib/cli/test-project
+cp Test.dll /usr/lib/cli/test-project/Test.dll
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/lib/cli/test-project/Test.dll
+(exit SUCCESS)
+!stew clean
+rm -f Test.dll
+(exit SUCCESS)

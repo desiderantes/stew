@@ -2,15 +2,15 @@ ifndef $(LIBRARY_DIRECTORY)
 	LIBRARY_DIRECTORY = /usr/lib
 endif    
 
-all: Recipe.conf bake-bootstrap
-	PATH=`pwd`:$$PATH ./bake-bootstrap
+all: Recipe.conf stew-bootstrap
+	PATH=`pwd`:$$PATH ./stew-bootstrap
 
-Recipe.conf: bake-bootstrap
-	PATH=`pwd`:$$PATH ./bake-bootstrap --configure library-directory=$(LIBRARY_DIRECTORY)
+Recipe.conf: stew-bootstrap
+	PATH=`pwd`:$$PATH ./stew-bootstrap --configure library-directory=$(LIBRARY_DIRECTORY)
 
 PACKAGES = --pkg=gio-2.0 \
            --pkg=posix
-SOURCES = src/bake.vala \
+SOURCES = src/stew.vala \
           src/builder.vala \
           src/config-bootstrap.vala \
           src/cookbook.vala \
@@ -48,36 +48,36 @@ SOURCES = src/bake.vala \
           src/tools.vala
 TARGET_GLIB=2.48
 
-bake-template: src/bake-template.vala
-	valac -o bake-template --pkg=posix src/bake-template.vala
+stew-template: src/stew-template.vala
+	valac -o stew-template --pkg=posix src/stew-template.vala
 
-bake-get-symbols: src/bake-get-symbols.vala
-	valac -o bake-get-symbols --pkg=posix src/bake-get-symbols.vala
+stew-get-symbols: src/stew-get-symbols.vala
+	valac -o stew-get-symbols --pkg=posix src/stew-get-symbols.vala
 
-bake-test: src/bake-test.vala
-	valac -o bake-test --pkg=posix src/bake-test.vala
+stew-test: src/stew-test.vala
+	valac -o stew-test --pkg=posix src/stew-test.vala
 
 src/config-bootstrap.vala: Recipe
 	v=`sed -n 's/^\W*version\W*=\W*\(.*\)/\1/p' Recipe` ; sed "s/@VERSION@/$$v/g" src/config-bootstrap.vala.in > src/config-bootstrap.vala
 
-bake-bootstrap: $(SOURCES) bake-template bake-get-symbols bake-test
-	valac -o bake-bootstrap --target-glib=$(TARGET_GLIB) $(PACKAGES) --Xcc='-DGETTEXT_PACKAGE="C"' --Xcc='-DLIBRARY_DIRECTORY="$(LIBRARY_DIRECTORY)"' $(SOURCES)
+stew-bootstrap: $(SOURCES) stew-template stew-get-symbols stew-test
+	valac -o stew-bootstrap --target-glib=$(TARGET_GLIB) $(PACKAGES) --Xcc='-DGETTEXT_PACKAGE="C"' --Xcc='-DLIBRARY_DIRECTORY="$(LIBRARY_DIRECTORY)"' $(SOURCES)
 
-install: bake-bootstrap
-	PATH=`pwd`:$$PATH ./bake-bootstrap install
+install: stew-bootstrap
+	PATH=`pwd`:$$PATH ./stew-bootstrap install
 
-uninstall: bake-bootstrap
-	PATH=`pwd`:$$PATH ./bake-bootstrap uninstall
+uninstall: stew-bootstrap
+	PATH=`pwd`:$$PATH ./stew-bootstrap uninstall
 
-test: bake-bootstrap
-	PATH=`pwd`:$$PATH ./bake-bootstrap test
+test: stew-bootstrap
+	PATH=`pwd`:$$PATH ./stew-bootstrap test
 
-release-test: bake-bootstrap
-	PATH=`pwd`:$$PATH ./bake-bootstrap release-test
+release-test: stew-bootstrap
+	PATH=`pwd`:$$PATH ./stew-bootstrap release-test
 
-release: bake-bootstrap
-	PATH=`pwd`:$$PATH ./bake-bootstrap release
+release: stew-bootstrap
+	PATH=`pwd`:$$PATH ./stew-bootstrap release
 
 clean:
-	if [ -e bake-bootstrap ] ; then PATH=`pwd`:$$PATH ./bake-bootstrap clean ; rm -f bake-bootstrap bake-template bake-get-symbols bake-test src/config-bootstrap.vala ; fi
+	if [ -e stew-bootstrap ] ; then PATH=`pwd`:$$PATH ./stew-bootstrap clean ; rm -f stew-bootstrap stew-template stew-get-symbols stew-test src/config-bootstrap.vala ; fi
 

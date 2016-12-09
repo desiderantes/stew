@@ -6,7 +6,7 @@
 <title>Templates</title>
 
 <p>
-A <em>template</em> is a file that Bake uses to generate another file by substituting text.
+A <em>template</em> is a file that Stew uses to generate another file by substituting text.
 Templates are useful when you need to make use of build variables in your source code.
 </p>
 <p>
@@ -59,7 +59,7 @@ templates.example {
 }
 </code>
 <p>
-Bake will generate a <file>config.h</file> like:
+Stew will generate a <file>config.h</file> like:
 </p>
 <code>
 #define DATA_DIRECTORY="/usr/share/example"
@@ -67,7 +67,7 @@ Bake will generate a <file>config.h</file> like:
 </example>
 <note>
 <p>
-Bake templates are quite simple and don't allow complicated substitutions.
+Stew templates are quite simple and don't allow complicated substitutions.
 If this is required consider making a <link xref="rules">custom rule</link> that uses another tool like <code>sed</code> or <code>awk</code>.
 </p>
 </note>

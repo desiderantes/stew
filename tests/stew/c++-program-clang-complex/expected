@@ -1,0 +1,24 @@
+!stew
+mkdir -p .built
+clang++ -g -c test1.cpp -o .built/test-test1.o
+clang++ -g -c test2.cpp -o .built/test-test2.o
+clang++ -g -c test3.cpp -o .built/test-test3.o
+clang++ -o test .built/test-test1.o .built/test-test2.o .built/test-test3.o
+stew-gettext --domain test --mime-type text/x-c++src --output .built/test1.cpp.pot test1.cpp
+stew-gettext --domain test --mime-type text/x-c++src --output .built/test2.cpp.pot test2.cpp
+stew-gettext --domain test --mime-type text/x-c++src --output .built/test3.cpp.pot test3.cpp
+stew-gettext --domain test --mime-type text/x-c++src --output .built/test-disabled.cpp.pot test-disabled.cpp
+msgcat --force-po --output-file=test.pot .built/test1.cpp.pot .built/test2.cpp.pot .built/test3.cpp.pot .built/test-disabled.cpp.pot
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/bin
+cp test /usr/bin/test
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/bin/test
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+rm -f test
+rm -f test.pot
+(exit SUCCESS)

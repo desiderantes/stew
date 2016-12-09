@@ -7,7 +7,7 @@
 
 <p>
 Many projects are developed using a remote hosting service.
-Bake knows how some of these services work and makes <link xref="rules">rules</link> in the toplevel recipe to make it releasing easy.
+Stew knows how some of these services work and makes <link xref="rules">rules</link> in the toplevel recipe to make it releasing easy.
 Supported services are Launchpad (<em>release-launchpad</em> and <em>release-ppa</em> rules) and GNOME (<em>release-gnome</em> rule).
 </p>
 <p>
@@ -29,7 +29,7 @@ Supported services are Launchpad (<em>release-launchpad</em> and <em>release-ppa
 For example, if your <em>foo</em> uses Launchpad for code hosting, go to the top level directory and type:
 </p>
 <code>
-bake release-launchpad
+stew release-launchpad
 </code>
 <p>
 This will build a file archive of the current project and upload it to the Launchpad project foo.

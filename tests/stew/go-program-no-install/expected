@@ -1,0 +1,13 @@
+!stew
+mkdir -p .built
+gccgo -c test.go -o .built/test-test.o
+gccgo -o test .built/test-test.o
+(exit SUCCESS)
+!stew install
+(exit SUCCESS)
+!stew uninstall
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+rm -f test
+(exit SUCCESS)

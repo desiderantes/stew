@@ -1,0 +1,21 @@
+<Project xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:foaf="http://xmlns.com/foaf/0.1/"
+         xmlns:gnome="http://api.gnome.org/doap-extensions#"
+         xmlns="http://usefulinc.com/ns/doap#">
+
+  <name xml:lang="en">Stew</name>
+  <shortdesc xml:lang="en">Stew Build System</shortdesc>
+  <homepage rdf:resource="https://github.com/desiderantes/stew" />
+  <download-page rdf:resource="https://github.com/desiderantes/stew/releases" />
+  <bug-database rdf:resource="https://github.com/desiderantes/stew/issues" />
+  <category rdf:resource="http://api.gnome.org/doap-extensions#desktop" />
+  <programming-language>Vala</programming-language>
+  <maintainer>
+    <foaf:Person>
+      <foaf:name>Mario Daniel Ruiz Saavedra</foaf:name>
+      <foaf:mbox rdf:resource="mailto:desiderantes93@gmail.com" />
+      <gnome:userid>desiderantes</gnome:userid>
+    </foaf:Person>
+  </maintainer>
+</Project>

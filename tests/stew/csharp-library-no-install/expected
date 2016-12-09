@@ -1,0 +1,10 @@
+!stew
+gmcs -target:library -out:Test.dll Test.cs
+(exit SUCCESS)
+!stew install
+(exit SUCCESS)
+!stew uninstall
+(exit SUCCESS)
+!stew clean
+rm -f Test.dll
+(exit SUCCESS)

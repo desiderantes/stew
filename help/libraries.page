@@ -55,7 +55,7 @@ If you require period characters set the <em>name</em> variable.
 </p>
 </note>
 <p>
-Bake will attempt to <link xref="building">build</link> your library by checking the filenames in the <code>sources</code> variable and generating the required <link xref="rules">rules</link>.
+Stew will attempt to <link xref="building">build</link> your library by checking the filenames in the <code>sources</code> variable and generating the required <link xref="rules">rules</link>.
 Depending on what <link xref="index#programs-and-libraries">language</link> your library uses additional variables may be allowed.
 </p>
 <example>
@@ -68,8 +68,8 @@ libraries.lib1 {
 }
 </code>
 <p>
-When building Bake will compile lib1.c and produce the library <em>lib1</em>.
-When <link xref="installing">installing</link> Bake will install <em>lib1</em> into the appropriate directory.
+When building Stew will compile lib1.c and produce the library <em>lib1</em>.
+When <link xref="installing">installing</link> Stew will install <em>lib1</em> into the appropriate directory.
 </p>
 </example>
 </page>

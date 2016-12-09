@@ -1,0 +1,13 @@
+!stew
+rustc -o test test.rs
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/bin/test
+cp test /usr/bin/test/test
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/bin/test/test
+(exit SUCCESS)
+!stew clean
+rm -f test
+(exit SUCCESS)

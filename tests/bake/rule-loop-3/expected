@@ -1,3 +1,0 @@
-# Check fails if a build loop detected
-!bake a
-(exit FAILURE)

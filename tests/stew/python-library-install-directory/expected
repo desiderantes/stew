@@ -1,0 +1,13 @@
+!stew
+python -m py_compile test.py
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/lib/custom-directory
+cp test.pyc /usr/lib/custom-directory/test.pyc
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/lib/custom-directory/test.pyc
+(exit SUCCESS)
+!stew clean
+rm -f test.pyc
+(exit SUCCESS)

@@ -1,0 +1,19 @@
+!stew
+(exit SUCCESS)
+!stew test
+mkdir -p .built
+stew-test run .built/test.test1-pass.test-results ./test
+stew-test run .built/test.test2-fail.test-results ./test
+stew-test run .built/test.test3-pass.test-results ./test
+stew-test check .built/test.test1-pass.test-results .built/test.test2-fail.test-results .built/test.test3-pass.test-results
+(exit FAILURE)
+!stew install
+mkdir -p /usr/bin
+cp test /usr/bin/test
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/bin/test
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+(exit SUCCESS)

@@ -1,0 +1,9 @@
+!stew
+(exit FAILURE)
+!stew install
+(exit FAILURE)
+!stew uninstall
+rm -f /usr/lib/test
+(exit SUCCESS)
+!stew clean
+(exit SUCCESS)

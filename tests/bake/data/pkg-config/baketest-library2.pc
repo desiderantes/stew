@@ -1,5 +1,0 @@
-Name: Bake Test Library 2
-Description: Second test library for bake tests
-Version: 0.1.2
-Libs: -lbaketest-library2
-Cflags: -Ibaketest-library2

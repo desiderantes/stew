@@ -6,8 +6,8 @@
 <title>Tests</title>
 
 <p>
-Bake provides a way to run the <link xref="programs">programs</link> in a project to test they are correctly working.
-If the program returns an error code, then Bake considers the test to have failed.
+Stew provides a way to run the <link xref="programs">programs</link> in a project to test they are correctly working.
+If the program returns an error code, then Stew considers the test to have failed.
 Tests provide a good method of catching regressions in your project if run after changes are made.
 The <em>test</em> <link xref="rules">rule</link> runs the tests from the current recipe and any child recipes.
 </p>
@@ -47,7 +47,7 @@ programs.example-program {
 When you run the following command:
 </p>
 <code>
-bake test
+stew test
 </code>
 <p>
 <code>example-program --test</code> will be run and the tests will considered to have failed if the program returns an error code.

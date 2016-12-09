@@ -1,0 +1,5 @@
+!stew --configure name=apple color=red taste=sweet sound=crunch
+(exit SUCCESS)
+!stew
+touch apple red sweet crunch
+(exit SUCCESS)

@@ -1,0 +1,11 @@
+!stew
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/share/man/man1
+cp test.1 /usr/share/man/man1/test.1
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/share/man/man1/test.1
+(exit SUCCESS)
+!stew clean
+(exit SUCCESS)

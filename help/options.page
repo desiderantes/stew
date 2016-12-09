@@ -25,7 +25,7 @@ The following variables are allowed:
 </tr>
 <tr>
   <td><p>default</p></td>
-  <td><p>Default value for the option. If no default is specified then Bake will not build until this value is set</p></td>
+  <td><p>Default value for the option. If no default is specified then Stew will not build until this value is set</p></td>
 </tr>
 </table>
 <example>
@@ -42,7 +42,7 @@ options.widget-directory {
 This project can then use the variable <code>options.widget-directory</code> which can be specified by running:
 </p>
 <code>
-bake --configure widget-directory=/path/to/widgets
+stew --configure widget-directory=/path/to/widgets
 </code>
 <p>
 If the user does not configure this variable then it will default to <code>/usr/share/widgets</code>.

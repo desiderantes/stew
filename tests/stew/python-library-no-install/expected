@@ -1,0 +1,14 @@
+!stew
+python --version
+python -m py_compile test.py
+(exit SUCCESS)
+!stew install
+python --version
+(exit SUCCESS)
+!stew uninstall
+python --version
+(exit SUCCESS)
+!stew clean
+python --version
+rm -f test.pyc
+(exit SUCCESS)

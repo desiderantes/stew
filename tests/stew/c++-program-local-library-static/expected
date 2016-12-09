@@ -1,0 +1,21 @@
+!stew
+mkdir -p .built
+g++ -fPIC -MMD -MF .built/testlib-test.d -c test.cpp -o .built/testlib-test.o
+g++ -o libtestlib.so -shared -Wl,-soname,libtestlib.so .built/testlib-test.o
+ar -cq libtestlib.a .built/testlib-test.o
+g++ -MMD -MF .built/test-main.d -c main.cpp -o .built/test-main.o
+g++ -o test .built/test-main.o libtestlib.a
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/bin
+cp test /usr/bin/test
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/bin/test
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+rm -f libtestlib.so
+rm -f libtestlib.a
+rm -f test
+(exit SUCCESS)

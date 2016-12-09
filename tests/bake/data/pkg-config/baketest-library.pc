@@ -1,5 +1,0 @@
-Name: Bake Test Library
-Description: Test library for bake tests
-Version: 1.2.3
-Libs: -lbaketest-library
-Cflags: -Ibaketest-library

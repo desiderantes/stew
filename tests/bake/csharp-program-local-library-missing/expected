@@ -1,9 +1,0 @@
-!bake
-(exit FAILURE)
-!bake install
-(exit FAILURE)
-!bake uninstall
-rm -f /usr/bin/Test.exe
-(exit SUCCESS)
-!bake clean
-(exit SUCCESS)

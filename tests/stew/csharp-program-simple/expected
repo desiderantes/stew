@@ -1,0 +1,13 @@
+!stew
+gmcs -out:Test.exe Test.cs
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/bin
+cp Test.exe /usr/bin/Test.exe
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/bin/Test.exe
+(exit SUCCESS)
+!stew clean
+rm -f Test.exe
+(exit SUCCESS)

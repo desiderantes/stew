@@ -1,8 +1,8 @@
-# Bake [![Build Status](https://travis-ci.org/desiderantes/bake.png?branch=master)](https://travis-ci.org/desiderantes/bake)
+# Stew [![Build Status](https://travis-ci.org/desiderantes/stew.png?branch=master)](https://travis-ci.org/desiderantes/stew)
 An easy to use build system. Designed to be make/autotools for the 21st century.
 
 ## Installation
-If you got bake already, just run `bake` on the project folder. Else, you can run:
+If you got stew already, just run `stew` on the project folder. Else, you can run:
 
       make LIBRARY_DIRECTORY=/usr/lib/x86_64-linux-gnu/
       make install
@@ -18,7 +18,7 @@ TODO: Write usage instructions
 5. Submit a pull request :D
  
 ## History
-Bake is a creation of Robert Ancell
+Stew is a fork of Bake, a creation of Robert Ancell.
 
 ## License
-Bake is licensed under [GPLv3+](COPYING).
+Stew is licensed under [GPLv3+](COPYING).

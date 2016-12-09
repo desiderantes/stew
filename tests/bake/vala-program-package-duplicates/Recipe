@@ -1,9 +1,0 @@
-project {
-  name = test-project
-}
-
-programs.test {
-  sources = test.vala
-  vala-packages = baketest-library
-  packages = baketest-library
-}

@@ -8,14 +8,14 @@
 <p>
 Building is the process of producing all the files required to run your project.
 This may include compiling source code into programs and libraries, generating system configuration and producing documentation.
-Building is done using the <em>build</em> <link xref="rules">rule</link> which is the rule that is run by Bake when none is requested.
+Building is done using the <em>build</em> <link xref="rules">rule</link> which is the rule that is run by Stew when none is requested.
 </p>
 <example>
 <p>
 For example, running the following for a C project:
 </p>
 <code>
-bake
+stew
 </code>
 <p>
 will take the C source code for this project and compile it to an executable file.
@@ -28,7 +28,7 @@ You can remove any built files using the <link xref="cleaning">clean</link> rule
 </note>
 <note>
 <p>
-You can build in parallel mode using the <code>--parallel</code> option to Bake.
+You can build in parallel mode using the <code>--parallel</code> option to Stew.
 </p>
 </note>
 </page>

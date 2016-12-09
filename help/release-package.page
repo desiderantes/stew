@@ -7,7 +7,7 @@
 
 <p>
 Most operating systems use a packaging format for distributing compiled projects.
-Bake knows about the common formats .deb (used in Debian based distributions like Ubuntu) and .rpm (used in distributions like Fedora) and makes the <link xref="rules">rules</link> <em>release-deb</em> and <em>release-rpm</em> in the toplevel recipe.
+Stew knows about the common formats .deb (used in Debian based distributions like Ubuntu) and .rpm (used in distributions like Fedora) and makes the <link xref="rules">rules</link> <em>release-deb</em> and <em>release-rpm</em> in the toplevel recipe.
 These rules compile your project and produce an archive file that can be installed on those systems.
 </p>
 <p>
@@ -18,7 +18,7 @@ FIXME: Define special variables
 For example, if you want to provide a package for Ubuntu users to run your project <em>foo</em> version 0.0.1, go to the top level directory and type:
 </p>
 <code>
-bake release-deb
+stew release-deb
 </code>
 <p>
 This will compile your project and generate the file <em>foo_0.0.1-0_amd64.deb</em>.

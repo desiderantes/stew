@@ -1,0 +1,5 @@
+!stew --configure color=green
+(exit SUCCESS)
+!stew
+touch green
+(exit SUCCESS)

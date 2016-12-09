@@ -1,0 +1,21 @@
+!stew
+mkdir -p .built
+gcc -Istewtest-dependency -Istewtest-library -MMD -MF .built/test1-test.d -c test.c -o .built/test1-test.o
+gcc -o test1 .built/test1-test.o -lstewtest-dependency -lstewtest-library
+gcc -Istewtest-dependency -Istewtest-library -MMD -MF .built/test2-test.d -c test.c -o .built/test2-test.o
+gcc -o test2 .built/test2-test.o -lstewtest-dependency -lstewtest-library
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/bin
+cp test1 /usr/bin/test1
+cp test2 /usr/bin/test2
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/bin/test1
+rm -f /usr/bin/test2
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+rm -f test1
+rm -f test2
+(exit SUCCESS)

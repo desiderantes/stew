@@ -8,10 +8,10 @@
  * license.
  */
 
-using Bake;
+using Stew;
 
-private class PotRule : Bake.Rule {
-	public PotRule (Bake.Recipe recipe, string pot_filename, bool pretty_print) {
+private class PotRule : Stew.Rule {
+	public PotRule (Stew.Recipe recipe, string pot_filename, bool pretty_print) {
 		base (recipe, pretty_print);
 		add_output (pot_filename);
 	}
@@ -46,7 +46,7 @@ class GettextModule : BuildModule {
 			rule.add_command (extract_command);
 		} else {
 			rule.add_status_command ("GETTEXT %s".printf (filename));
-			var extract_command = "@bake-gettext --domain %s --mime-type %s --output %s %s".printf (gettext_domain, mime_type, translation_file, filename);
+			var extract_command = "@stew-gettext --domain %s --mime-type %s --output %s %s".printf (gettext_domain, mime_type, translation_file, filename);
 			rule.add_command (extract_command);
 		}
 

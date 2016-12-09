@@ -1,0 +1,17 @@
+!stew
+python --version
+python -m py_compile test.py
+(exit SUCCESS)
+!stew install
+python --version
+mkdir -p /usr/lib/python2.7/site-packages/test
+cp test.pyc /usr/lib/python2.7/site-packages/test/test.pyc
+(exit SUCCESS)
+!stew uninstall
+python --version
+rm -f /usr/lib/python2.7/site-packages/test/test.pyc
+(exit SUCCESS)
+!stew clean
+python --version
+rm -f test.pyc
+(exit SUCCESS)

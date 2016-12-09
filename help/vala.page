@@ -6,7 +6,7 @@
 <title>Vala Language Support</title>
 
 <p>
-Bake supports <link xref="programs">programs</link> and <link xref="libraries">libraries</link> written in the Vala language.
+Stew supports <link xref="programs">programs</link> and <link xref="libraries">libraries</link> written in the Vala language.
 </p>
 <p>
 Vala programs and libraries can set the following program <link xref="variables">variables</link> to control compiling:
@@ -99,7 +99,7 @@ programs.example-program {
 </example>
 <p>
 You can specify a GLib version to be targeted against with the <code>target-glib</code> variable.
-Bake does a check on compile time to ensure that the required version is available, if this is not what you want, and prefer to generate code withouth the additional check, add instead your version vía the <code> --target-glib</code> flag inside the <code>vala-compile-flags</code> variable
+Stew does a check on compile time to ensure that the required version is available, if this is not what you want, and prefer to generate code withouth the additional check, add instead your version vía the <code> --target-glib</code> flag inside the <code>vala-compile-flags</code> variable
 </p>
 <example>
 <p>

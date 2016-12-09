@@ -1,0 +1,5 @@
+Name: Stew Test Library
+Description: Test library for stew tests
+Version: 1.2.3
+Libs: -lstewtest-library
+Cflags: -Istewtest-library

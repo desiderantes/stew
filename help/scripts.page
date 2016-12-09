@@ -6,7 +6,7 @@
 <title>Script Support</title>
 
 <p>
-Bake supports scripts (i.e. single file non-compiled) programs.
+Stew supports scripts (i.e. single file non-compiled) programs.
 Scripts can contain <link xref="programs">general program variables</link> except they have no sources defined.
 </p>
 <example>

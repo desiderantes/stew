@@ -1,0 +1,27 @@
+!stew
+mkdir -p .built/com/example
+javac -d .built com/example/Test1.java com/example/Test2.java com/example/Test3.java
+jar cfme test.jar Manifest.txt TestEntrypoint -C .built com/example/Test1.class -C .built com/example/Test2.class -C .built com/example/Test3.class Icon.png
+stew-gettext --domain test --mime-type text/x-java --output .built/com/example/Test1.java.pot com/example/Test1.java
+stew-gettext --domain test --mime-type text/x-java --output .built/com/example/Test2.java.pot com/example/Test2.java
+stew-gettext --domain test --mime-type text/x-java --output .built/com/example/Test3.java.pot com/example/Test3.java
+stew-gettext --domain test --mime-type text/x-java --output .built/com/example/TestDisabled.java.pot com/example/TestDisabled.java
+msgcat --force-po --output-file=test.pot .built/com/example/Test1.java.pot .built/com/example/Test2.java.pot .built/com/example/Test3.java.pot .built/com/example/TestDisabled.java.pot
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/share/test-project
+cp test.jar /usr/share/test-project/test.jar
+mkdir -p /usr/bin
+cp .built/test /usr/bin/test
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/share/test-project/test.jar
+rm -f /usr/bin/test
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+rm -f test.jar
+rm -rf .built/com/example/
+rm -f test.pot
+rm -f test
+(exit SUCCESS)

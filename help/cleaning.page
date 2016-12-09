@@ -15,7 +15,7 @@ The <em>clean</em> <link xref="rules">rule</link> deletes these file from the cu
 For example, if you run the command for a project that uses C source code:
 </p>
 <code>
-bake clean
+stew clean
 </code>
 <p>
 All the .o files and the project binaries that were compiled will be deleted.
@@ -24,7 +24,7 @@ All the .o files and the project binaries that were compiled will be deleted.
 <note>
 <p>
 Cleaning does not remove the project configuration (the toplevel <em>Recipe.conf</em>).
-To do this you need to run <em>bake --unconfigure</em> or delete this file yourself.
+To do this you need to run <em>stew --unconfigure</em> or delete this file yourself.
 </p>
 </note>
 </page>

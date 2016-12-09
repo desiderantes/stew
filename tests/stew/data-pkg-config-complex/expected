@@ -1,0 +1,11 @@
+!stew
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/share/pkgconfig
+cp test.pc /usr/share/pkgconfig/test.pc
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/share/pkgconfig/test.pc
+(exit SUCCESS)
+!stew clean
+(exit SUCCESS)

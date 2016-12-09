@@ -1,0 +1,2 @@
+!stew --configure sound=boom
+(exit FAILURE)

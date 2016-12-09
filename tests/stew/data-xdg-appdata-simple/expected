@@ -1,0 +1,11 @@
+!stew
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/share/appdata
+cp test.appdata.xml /usr/share/appdata/test.appdata.xml
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/share/appdata/test.appdata.xml
+(exit SUCCESS)
+!stew clean
+(exit SUCCESS)

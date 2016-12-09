@@ -1,0 +1,12 @@
+!stew
+stew-template test1.template test1 TEST=test FOO=foo
+stew-template test2.template test2 TEST=test FOO=foo
+(exit SUCCESS)
+!stew install
+(exit SUCCESS)
+!stew uninstall
+(exit SUCCESS)
+!stew clean
+rm -f test1
+rm -f test2
+(exit SUCCESS)

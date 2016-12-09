@@ -1,0 +1,13 @@
+!stew
+mkdir -p .built
+javac -d .built Test.java
+(exit FAILURE)
+!stew install
+(exit FAILURE)
+!stew uninstall
+rm -f /usr/share/test-project/test.jar
+rm -f /usr/bin/test
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+(exit SUCCESS)

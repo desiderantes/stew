@@ -4,16 +4,16 @@ templates.config {
 }
 
 templates.pkg-config {
-  files = libbake.pc
+  files = libstew.pc
   variables = %VERSION%=$(project.version) %LIBRARY_DIRECTORY%=$(options.library-directory) %RESOURCE_DIRECTORY%=$(options.resource-directory)
 }
 
 data.pkg-config {
-  pkg-config-files = libbake.pc
+  pkg-config-files = libstew.pc
 }
 
 libraries {
-  bake {
+  stew {
     sources = builder.vala \
               config.vala \
               cookbook.vala \
@@ -50,40 +50,40 @@ libraries {
               rule.vala \
               tools.vala
     vala-packages = posix gio-2.0
-    compile-flags = -DGETTEXT_PACKAGE=\"bake\"
+    compile-flags = -DGETTEXT_PACKAGE=\"stew\"
     so-version = 0
     target-glib = 2.48
-    symbol-filter = bake_.*
+    symbol-filter = stew_.*
   }
 }
 
 programs {
-  bake-template {
-    sources = bake-template.vala
+  stew-template {
+    sources = stew-template.vala
     vala-packages = posix
   }
 
-  bake-gettext {
-    sources = bake-gettext.vala
+  stew-gettext {
+    sources = stew-gettext.vala
     vala-packages = posix
   }
 
-  bake-test {
-    sources = bake-test.vala
+  stew-test {
+    sources = stew-test.vala
     vala-packages = posix
   }
 
-  bake-get-symbols {
-    sources = bake-get-symbols.vala
+  stew-get-symbols {
+    sources = stew-get-symbols.vala
     vala-packages = posix
   }
 
-  bake {
-    sources = bake.vala
+  stew {
+    sources = stew.vala
     vala-packages = posix gio-2.0
     target-glib = 2.48
-    libraries = bake (local)
-    compile-flags = -DGETTEXT_PACKAGE=\"bake\"
+    libraries = stew (local)
+    compile-flags = -DGETTEXT_PACKAGE=\"stew\"
   }
 }
 

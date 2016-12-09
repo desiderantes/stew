@@ -8,7 +8,7 @@
  * license.
  */
 
-using Bake; 
+using Stew; 
 
 class BZIPModule : BuildModule {
 	public override void generate_toplevel_rules (Recipe recipe) {

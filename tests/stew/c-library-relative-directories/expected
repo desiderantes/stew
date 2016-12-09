@@ -1,0 +1,24 @@
+!stew
+# Note we can't really tell which directory this is occurring in, but in this case it should all be in src/
+mkdir -p .built
+gcc -fPIC -MMD -MF .built/test-test.d -c test.c -o .built/test-test.o
+gcc -fPIC -MMD -MF .built/test-child.d -c child/child.c -o .built/test-child.o
+gcc -fPIC -MMD -MF .built/test-parent.d -c ../parent.c -o .built/test-parent.o
+gcc -fPIC -MMD -MF .built/test-uncle.d -c ../uncle/uncle.c -o .built/test-uncle.o
+gcc -o libtest.so -shared -Wl,-soname,libtest.so .built/test-test.o .built/test-child.o .built/test-parent.o .built/test-uncle.o
+ar -cq libtest.a .built/test-test.o .built/test-child.o .built/test-parent.o .built/test-uncle.o
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/lib
+cp libtest.so /usr/lib/libtest.so
+cp libtest.a /usr/lib/libtest.a
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/lib/libtest.so
+rm -f /usr/lib/libtest.a
+(exit SUCCESS)
+!stew clean
+rm -f libtest.so
+rm -f libtest.a
+rm -rf .built/
+(exit SUCCESS)

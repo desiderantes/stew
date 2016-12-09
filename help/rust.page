@@ -6,7 +6,7 @@
 <title>Rust Language Support</title>
 
 <p>
-Bake supports <link xref="programs">programs</link> written in the Rust language.
+Stew supports <link xref="programs">programs</link> written in the Rust language.
 </p>
 <example>
 <p>

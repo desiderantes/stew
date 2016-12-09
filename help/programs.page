@@ -51,7 +51,7 @@ If you require period characters set the <em>name</em> variable.
 </p>
 </note>
 <p>
-Bake will attempt to <link xref="building">build</link> your program by checking the filenames in the <code>sources</code> variable and generating the required <link xref="rules">rules</link>.
+Stew will attempt to <link xref="building">build</link> your program by checking the filenames in the <code>sources</code> variable and generating the required <link xref="rules">rules</link>.
 Depending on what <link xref="index#programs-and-libraries">language</link> your program uses additional variables may be allowed.
 </p>
 <example>
@@ -64,8 +64,8 @@ programs.example-program {
 }
 </code>
 <p>
-When building Bake will compile example-program.c and produce the program <em>example-program</em>.
-When <link xref="installing">installing</link> Bake will install <em>example-program</em> into the appropriate directory.
+When building Stew will compile example-program.c and produce the program <em>example-program</em>.
+When <link xref="installing">installing</link> Stew will install <em>example-program</em> into the appropriate directory.
 </p>
 </example>
 <note>

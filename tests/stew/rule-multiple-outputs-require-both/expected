@@ -1,0 +1,5 @@
+# Build the target
+!stew c
+touch a
+touch b
+cat a b

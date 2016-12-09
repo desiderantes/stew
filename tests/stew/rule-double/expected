@@ -1,0 +1,5 @@
+# Check both rules are run
+!stew a b
+touch a
+touch b
+(exit SUCCESS)

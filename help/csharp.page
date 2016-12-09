@@ -6,7 +6,7 @@
 <title>C# Language Support</title>
 
 <p>
-Bake supports <link xref="programs">programs</link> and <link xref="libraries">libraries</link> written in the C# language.
+Stew supports <link xref="programs">programs</link> and <link xref="libraries">libraries</link> written in the C# language.
 Only the Mono compiler is supported.
 </p>
 <p>

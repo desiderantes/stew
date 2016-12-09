@@ -6,7 +6,7 @@
 <title>Qt Support</title>
 
 <p>
-Bake supports Qt programs by automatically generating the required Meta Object Compiler (MOC) code.
+Stew supports Qt programs by automatically generating the required Meta Object Compiler (MOC) code.
 </p>
 <p>
 Qt programs and libraries can set the following program <link xref="variables">variables</link> in addition to the standard <link xref="c++">variables</link> to control compiling:

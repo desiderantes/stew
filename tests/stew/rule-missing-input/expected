@@ -1,0 +1,14 @@
+# Build b which depends on a
+!stew b
+touch a
+cp a b
+(exit SUCCESS)
+
+# Remove the input and check both input and output is rebuilt
+!rm a
+rm a
+(exit SUCCESS)
+!stew b
+touch a
+cp a b
+(exit SUCCESS)

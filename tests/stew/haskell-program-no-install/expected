@@ -1,0 +1,13 @@
+!stew
+mkdir -p .built
+ghc -c test.hs -ohi .built/test.hi -o .built/test.o
+ghc -o test .built/test.o
+(exit SUCCESS)
+!stew install
+(exit SUCCESS)
+!stew uninstall
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+rm -f test
+(exit SUCCESS)

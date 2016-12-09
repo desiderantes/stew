@@ -1,0 +1,20 @@
+!stew
+mkdir -p .built
+gcc -fPIC -MMD -MF .built/test-test.d -c test.c -o .built/test-test.o
+gcc -o libtest.so -shared -Wl,-soname,libtest.so .built/test-test.o
+ar -cq libtest.a .built/test-test.o
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/lib/custom-directory
+cp libtest.so /usr/lib/custom-directory/libtest.so
+cp libtest.a /usr/lib/custom-directory/libtest.a
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/lib/custom-directory/libtest.so
+rm -f /usr/lib/custom-directory/libtest.a
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+rm -f libtest.so
+rm -f libtest.a
+(exit SUCCESS)

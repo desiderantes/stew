@@ -1,0 +1,11 @@
+!stew
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/share/test-project
+cp test.ui /usr/share/test-project/test.ui
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/share/test-project/test.ui
+(exit SUCCESS)
+!stew clean
+(exit SUCCESS)

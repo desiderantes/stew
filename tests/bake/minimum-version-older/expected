@@ -1,8 +1,0 @@
-!bake
-(exit SUCCESS)
-!bake install
-(exit SUCCESS)
-!bake uninstall
-(exit SUCCESS)
-!bake clean
-(exit SUCCESS)

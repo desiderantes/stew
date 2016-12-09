@@ -1,0 +1,8 @@
+dependency_name=library
+
+Name: Stew Test Library (variable dependency)
+Description: Test library for stew tests that has a dependency containing a variable
+Version: 1.2.3
+Libs: -lstewtest-variable-dependency
+Cflags: -Istewtest-variable-dependency
+Requires: stewtest-${dependency_name}

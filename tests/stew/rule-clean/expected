@@ -1,0 +1,7 @@
+# Build the target
+!stew a
+touch a
+(exit SUCCESS)
+!stew clean
+rm -f a
+(exit SUCCESS)

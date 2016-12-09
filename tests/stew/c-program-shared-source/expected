@@ -1,0 +1,23 @@
+!stew
+mkdir -p .built
+gcc -MMD -MF .built/test1-test1.d -c test1.c -o .built/test1-test1.o
+gcc -MMD -MF .built/test1-shared.d -c shared.c -o .built/test1-shared.o
+gcc -o test1 .built/test1-test1.o .built/test1-shared.o
+gcc -MMD -MF .built/test2-test2.d -c test2.c -o .built/test2-test2.o
+gcc -MMD -MF .built/test2-shared.d -c shared.c -o .built/test2-shared.o
+gcc -o test2 .built/test2-test2.o .built/test2-shared.o
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/bin
+cp test1 /usr/bin/test1
+cp test2 /usr/bin/test2
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/bin/test1
+rm -f /usr/bin/test2
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+rm -f test1
+rm -f test2
+(exit SUCCESS)

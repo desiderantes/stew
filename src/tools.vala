@@ -8,7 +8,7 @@
  * license.
  */
 
-namespace Bake {
+namespace Stew {
 
 	public string get_relative_path (string source_path, string target_path) {
 		/* Already relative */

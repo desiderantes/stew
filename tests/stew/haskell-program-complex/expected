@@ -1,0 +1,18 @@
+!stew
+mkdir -p .built
+ghc -c test1.hs -ohi .built/test1.hi -o .built/test1.o
+ghc -c test2.hs -ohi .built/test2.hi -o .built/test2.o
+ghc -c test3.hs -ohi .built/test3.hi -o .built/test3.o
+ghc -o test .built/test1.o .built/test2.o .built/test3.o
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/bin
+cp test /usr/bin/test
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/bin/test
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+rm -f test
+(exit SUCCESS)

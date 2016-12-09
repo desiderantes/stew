@@ -1,0 +1,17 @@
+!stew
+mkdir -p .built
+stew-gettext --domain test --mime-type application/x-desktop --output .built/test.desktop.pot test.desktop
+stew-gettext --domain test --mime-type application/x-desktop --output .built/test-disabled.desktop.pot test-disabled.desktop
+msgcat --force-po --output-file=test.pot .built/test.desktop.pot .built/test-disabled.desktop.pot
+(exit SUCCESS)
+!stew install
+mkdir -p /usr/share/applications
+cp test.desktop /usr/share/applications/test.desktop
+(exit SUCCESS)
+!stew uninstall
+rm -f /usr/share/applications/test.desktop
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+rm -f test.pot
+(exit SUCCESS)

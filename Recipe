@@ -1,19 +1,19 @@
 project {
-  name = bake
-  version = 0.1.50+git
-  ppa = lp:~desiderantes/bake
-  minimum-bake-version = 0.1.49
+  name = stew
+  version = 0.1.50
+  ppa = lp:~desiderantes/stew
+  minimum-stew-version = 0.1.50
 }
 
 data.meta {
   files = Makefile \
-          bake.doap \
+          stew.doap \
           NEWS
   install = false
 }
 
 data.man {
-  man-pages = bake.1
+  man-pages = stew.1
 }
 
 %release-test: %test %release-xzip

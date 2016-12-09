@@ -1,0 +1,14 @@
+!stew
+mkdir -p .built
+javac -d .built Test.java
+jar cf test.jar -C .built Test.class
+(exit SUCCESS)
+!stew install
+(exit SUCCESS)
+!stew uninstall
+(exit SUCCESS)
+!stew clean
+rm -rf .built/
+rm -f test.jar
+rm -f test
+(exit SUCCESS)

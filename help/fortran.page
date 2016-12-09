@@ -6,7 +6,7 @@
 <title>Fortran Language Support</title>
 
 <p>
-Bake supports <link xref="programs">programs</link> and <link xref="libraries">libraries</link> written in the Fortran language.
+Stew supports <link xref="programs">programs</link> and <link xref="libraries">libraries</link> written in the Fortran language.
 </p>
 <example>
 <p>

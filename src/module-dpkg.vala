@@ -8,7 +8,7 @@
  * license.
  */
 
-using Bake;
+using Stew;
 
 class DpkgModule : BuildModule {
 	public override void generate_toplevel_rules (Recipe recipe) {
@@ -86,22 +86,22 @@ class DpkgModule : BuildModule {
 		rule.add_command ("@echo '\tdh $@' >> %s".printf (rules_file));
 		rule.add_command ("@echo >> %s".printf (rules_file));
 		rule.add_command ("@echo \"override_dh_auto_configure:\" >> %s".printf (rules_file));
-		rule.add_command ("@echo \"\tbake --configure resource-directory=/usr install-directory=debian/%s\" >> %s".printf (recipe.project_name, rules_file));
+		rule.add_command ("@echo \"\tstew --configure resource-directory=/usr install-directory=debian/%s\" >> %s".printf (recipe.project_name, rules_file));
 		rule.add_command ("@echo >> %s".printf (rules_file));
 		rule.add_command ("@echo \"override_dh_auto_build:\" >> %s".printf (rules_file));
-		rule.add_command ("@echo \"\tbake\" >> %s".printf (rules_file));
+		rule.add_command ("@echo \"\tstew\" >> %s".printf (rules_file));
 		rule.add_command ("@echo >> %s".printf (rules_file));
 		rule.add_command ("@echo \"override_dh_auto_install:\" >> %s".printf (rules_file));
-		rule.add_command ("@echo '\tbake install' >> %s".printf (rules_file));
+		rule.add_command ("@echo '\tstew install' >> %s".printf (rules_file));
 		rule.add_command ("@echo >> %s".printf (rules_file));
 		rule.add_command ("@echo \"override_dh_auto_clean:\" >> %s".printf (rules_file));
-		rule.add_command ("@echo \"\tbake clean\" >> %s".printf (rules_file));
-		rule.add_command ("@echo \"\tbake --unconfigure\" >> %s".printf (rules_file));
+		rule.add_command ("@echo \"\tstew clean\" >> %s".printf (rules_file));
+		rule.add_command ("@echo \"\tstew --unconfigure\" >> %s".printf (rules_file));
 		rule.add_command ("@echo chmod +x %s".printf (rules_file));
 
 		/* Generate debian/control */
 		var control_file = "%s/debian/control".printf (build_dir);
-		var build_depends = "debhelper"; // "bake"
+		var build_depends = "debhelper"; // "stew"
 		var short_description = "Short description of %s".printf (recipe.project_name);
 		var long_description = "Long description of %s".printf (recipe.project_name);
 		rule.add_status_command ("Writing debian/control");
