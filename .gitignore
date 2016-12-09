@@ -4,6 +4,7 @@
 ./bake-test
 bake-help.pot
 ./Recipe.conf
+Recipe.conf
 src/bake
 src/bake.h
 src/bake.vapi
@@ -75,3 +76,6 @@ bake_0.1.50+git-0_amd64.deb
 bake-0.1.50+git.tar.gz
 bake-0.1.50+git-1.x86_64.rpm
 bake-0.1.50+git.tar.xz
+bake-0.1.50.tar.bz2
+bake-0.1.50.tar.gz
+bake-0.1.50.tar.xz

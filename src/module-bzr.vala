@@ -10,7 +10,7 @@
 
 using Bake;
 
-class BZRModule : BuildModule {
+class BzrModule : BuildModule {
 	public override void generate_toplevel_rules (Recipe recipe) {
 		if (recipe.project_version != null) {
 			var rule = recipe.add_rule ();

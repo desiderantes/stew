@@ -1,24 +1,22 @@
+env:
+  global:
+    - DEBIAN_FRONTEND=noninteractive
+    - LC_ALL=C
+
 language: c
-build:
-  pre_ci_boot:
-    image_name: ubuntu
-    image_tag: 16.04
-  ci:
+
+before_install:
   - add-apt-repository -y ppa:vala-team/ppa
-  - add-apt-repository -y ppa:bake-team/releases
-  - apt-get update -qq > /dev/null
-  - apt-get install -y 
-    valac
-    git 
-    libglib2.0-dev 
-    itstool 
-    debhelper 
-    pkg-config 
-    bake
-  - git clone https://github.com/desiderantes/bake.git
-  - cd bake
-  - make LIBRARY_DIRECTORY=/usr/lib/x86_64-linux-gnu/
+  - apt-get -qq update
+  - apt-get install -y libboost-all-dev
+  - apt-get install -y valac libvala-0.34-dev
+  - apt-get install itstool
+  - apt-get build-dep glib2.0
+  - wget http://ftp.gnome.org/pub/gnome/sources/glib/2.48/glib-2.48.2.tar.xz && tar xf glib-2.48.2.tar.xz && cd glib-2.48.2 && ./configure && make && make install && cd ..
+
+install:
+  - make LIBRARY_DIRECTORY=/usr/lib/x86_64-linux-gnu/ && make install
+
+script:
   - bake
-  
-on_success:
- - echo "Nice"
+  - bake test

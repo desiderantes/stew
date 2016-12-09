@@ -132,25 +132,21 @@ namespace Bake {
 			/* Delete the files that exist */
 			foreach (var input in clean_files) {
 				File file = File.new_for_path (input);
-				try {
-					var file_type = file.query_file_type (GLib.FileQueryInfoFlags.NONE );
-					if ( file_type == GLib.FileType.REGULAR) {
-						if (pretty_print) {
-							dynamic_commands.append (make_status_command ("RM %s".printf (input)));
-						}
-						dynamic_commands.append ("@rm -f %s".printf (input));
-					} else if (file_type == GLib.FileType.DIRECTORY) {
-						if (!input.has_suffix ("/")) {
-							input += "/";
-						}
-						if (pretty_print) {
-							dynamic_commands.append (make_status_command ("RM %s".printf (input)));
-						}
-						dynamic_commands.append ("@rm -rf %s".printf (input));
-					} else {
-						continue;
+				var file_type = file.query_file_type (GLib.FileQueryInfoFlags.NONE );
+				if ( file_type == GLib.FileType.REGULAR) {
+					if (pretty_print) {
+						dynamic_commands.append (make_status_command ("RM %s".printf (input)));
 					}
-				} catch (Error e) {
+					dynamic_commands.append ("@rm -f %s".printf (input));
+				} else if (file_type == GLib.FileType.DIRECTORY) {
+					if (!input.has_suffix ("/")) {
+						input += "/";
+					}
+					if (pretty_print) {
+						dynamic_commands.append (make_status_command ("RM %s".printf (input)));
+					}
+					dynamic_commands.append ("@rm -rf %s".printf (input));
+				} else {
 					continue;
 				}
 			}

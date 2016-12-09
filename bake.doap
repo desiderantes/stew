@@ -10,7 +10,7 @@
   <download-page rdf:resource="https://github.com/desiderantes/bake/releases" />
   <bug-database rdf:resource="https://github.com/desiderantes/bake/issues" />
   <category rdf:resource="http://api.gnome.org/doap-extensions#desktop" />
-
+  <programming-language>Vala</programming-language>
   <maintainer>
     <foaf:Person>
       <foaf:name>Robert Ancell</foaf:name>

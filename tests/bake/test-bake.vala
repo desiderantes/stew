@@ -214,9 +214,10 @@ public class TestRunner {
 		}
 
 		/* Copy project to a temporary directory */
-		temp_dir = Path.build_filename (Environment.get_tmp_dir (), "bake-test-XXXXXX");
-		if (DirUtils.mkdtemp (temp_dir) == null) {
-			stderr.printf ("Error creating temporary directory: %s\n", strerror (errno));
+		try {
+			temp_dir = DirUtils.make_tmp("bake-test-XXXXXX");
+		} catch (Error e) {
+			stderr.printf ("Error creating temporary directory: %s\n", e.message);
 			return Posix.EXIT_FAILURE;
 		}
 		if (keep_directory) {

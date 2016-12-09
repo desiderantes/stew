@@ -1,0 +1,18 @@
+sudo: required
+dist: trusty
+
+before_install:
+  - sudo add-apt-repository -y ppa:vala-team/ppa
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libboost-all-dev
+  - sudo apt-get install -y valac libvala-0.34-dev
+  - sudo apt-get install itstool
+  - sudo apt-get build-dep glib2.0
+  - wget http://ftp.gnome.org/pub/gnome/sources/glib/2.48/glib-2.48.2.tar.xz && tar xf glib-2.48.2.tar.xz && cd glib-2.48.2 && ./configure && make && sudo make install && cd ..
+
+install:
+  - make LIBRARY_DIRECTORY=/usr/lib/x86_64-linux-gnu/ && sudo make install
+
+script: 
+  - bake 
+  - bake test

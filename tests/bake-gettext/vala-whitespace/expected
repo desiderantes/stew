@@ -2,22 +2,22 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
-#: source.vala:3
+#: source.vala:2
 msgid "whitespace1"
 msgstr ""
 
-#: source.vala:4
+#: source.vala:3
 msgid "whitespace2"
 msgstr ""
 
-#: source.vala:5
+#: source.vala:4
 msgid "whitespace3"
 msgstr ""
 
-#: source.vala:6
+#: source.vala:5
 msgid "whitespace4"
 msgstr ""
 
-#: source.vala:9
+#: source.vala:8
 msgid "whitespace5"
 msgstr ""

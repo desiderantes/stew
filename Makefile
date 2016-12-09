@@ -8,8 +8,7 @@ all: Recipe.conf bake-bootstrap
 Recipe.conf: bake-bootstrap
 	PATH=`pwd`:$$PATH ./bake-bootstrap --configure library-directory=$(LIBRARY_DIRECTORY)
 
-PACKAGES = --pkg=glib-2.0 \
-           --pkg=gio-2.0 \
+PACKAGES = --pkg=gio-2.0 \
            --pkg=posix
 SOURCES = src/bake.vala \
           src/builder.vala \
@@ -47,6 +46,7 @@ SOURCES = src/bake.vala \
           src/recipe.vala \
           src/rule.vala \
           src/tools.vala
+TARGET_GLIB=2.48
 
 bake-template: src/bake-template.vala
 	valac -o bake-template --pkg=posix src/bake-template.vala
@@ -61,7 +61,7 @@ src/config-bootstrap.vala: Recipe
 	v=`sed -n 's/^\W*version\W*=\W*\(.*\)/\1/p' Recipe` ; sed "s/@VERSION@/$$v/g" src/config-bootstrap.vala.in > src/config-bootstrap.vala
 
 bake-bootstrap: $(SOURCES) bake-template bake-get-symbols bake-test
-	valac -o bake-bootstrap $(PACKAGES) --Xcc='-DGETTEXT_PACKAGE="C"' --Xcc='-DLIBRARY_DIRECTORY="$(LIBRARY_DIRECTORY)"' $(SOURCES)
+	valac -o bake-bootstrap --target-glib=$(TARGET_GLIB) $(PACKAGES) --Xcc='-DGETTEXT_PACKAGE="C"' --Xcc='-DLIBRARY_DIRECTORY="$(LIBRARY_DIRECTORY)"' $(SOURCES)
 
 install: bake-bootstrap
 	PATH=`pwd`:$$PATH ./bake-bootstrap install

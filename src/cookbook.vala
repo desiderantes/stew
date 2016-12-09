@@ -44,14 +44,14 @@ namespace Bake {
 
 			modules = new List<BuildModule> ();
 			modules.append (new BZIPModule ());
-			modules.append (new BZRModule ());
+			modules.append (new BzrModule ());
 			modules.append (new DataModule ());
 			modules.append (new DpkgModule ());
 			modules.append (new GCCModule ());
 			modules.append (new ClangModule ());
 			modules.append (new GettextModule ());
 			modules.append (new GHCModule ());
-			modules.append (new GITModule ());
+			modules.append (new GitModule ());
 			modules.append (new GNOMEModule ());
 			modules.append (new GSettingsModule ());
 			modules.append (new GTKModule ());
@@ -221,13 +221,13 @@ namespace Bake {
 			foreach (var library in libraries) {
 				generate_library_rules (library);
 			}
-			foreach (var program in programs) {
-				generate_program_rules (program);
-			}
 			foreach (var data in datas) {
 				foreach (var module in modules) {
 					module.generate_data_rules (data);
 				}
+			}
+			foreach (var program in programs) {
+				generate_program_rules (program);
 			}
 
 			/* Generate clean rule */

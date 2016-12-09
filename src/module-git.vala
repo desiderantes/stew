@@ -10,7 +10,7 @@
 
 using Bake;
 
-class GITModule : BuildModule {
+class GitModule : BuildModule {
 	public override void generate_toplevel_rules (Recipe recipe) {
 		if (recipe.project_version != null) {
 			var rule = recipe.add_rule ();

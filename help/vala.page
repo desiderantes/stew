@@ -23,6 +23,10 @@ Vala programs and libraries can set the following program <link xref="variables"
   <td><p>Minimum API version required (optional)</p></td>
 </tr>
 <tr>
+  <td><p>target-glib</p></td>
+  <td><p>Minimum GLib version required (optional)</p></td>
+</tr>
+<tr>
   <td><p>so-version</p></td>
   <td><p>Shared object version for library (libraries only, optional)</p></td>
 </tr>
@@ -90,6 +94,23 @@ programs.example-program {
   vala-packages = gtk+-3.0
   packages = gtk+-3.0
   debug = true
+}
+</code>
+</example>
+<p>
+You can specify a GLib version to be targeted against with the <code>target-glib</code> variable.
+Bake does a check on compile time to ensure that the required version is available, if this is not what you want, and prefer to generate code withouth the additional check, add instead your version vía the <code> --target-glib</code> flag inside the <code>vala-compile-flags</code> variable
+</p>
+<example>
+<p>
+The following shows a recipe for a single file Vala program that requires at least GLib 2.32:
+</p>
+<code>
+programs.example-program {
+  target-glib = 2.32
+  sources = main.vala
+  vala-packages = gtk+-3.0
+  packages = gtk+-3.0
 }
 </code>
 </example>

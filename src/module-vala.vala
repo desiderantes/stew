@@ -153,6 +153,18 @@ class ValaModule : BuildModule {
 			compile_flags += " -g";
 			valac_flags += " -g";
 		}
+		var link_errors = new List<string> ();
+
+		var glib_version = compilable.get_variable("target-glib");
+		if (glib_version != null) {
+			var version_array = glib_version.split(".", 2);
+			unowned string? check_result = Version.check(int.parse(version_array[0]), int.parse(version_array[1]));
+			if (check_result != null) {
+				link_errors.append("GLib version mismatch: %s".printf(check_result));
+			} else {
+				valac_flags += " --target-glib=" + glib_version;
+			}
+		}
 
 		if (valac_flags != "") {
 			valac_command += " " + valac_flags;
@@ -200,8 +212,6 @@ class ValaModule : BuildModule {
 			recipe.build_rule.add_input (archive_name);
 			archive_command = "@ar -cq %s".printf (archive_name);
 		}
-
-		var link_errors = new List<string> ();
 
 		/* Check we have a new enough version of Vala */
 		var required_api_version = compilable.get_variable ("vala-api-version");
